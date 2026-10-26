@@ -219,3 +219,7 @@ Layered component styles declare the same layer order before their first block,
 including when a component import is emitted before the global entry. Browser
 smoke checks assert home/page heading size and code padding to detect reset
 precedence regressions; DOM structure and overflow checks alone miss them.
+
+React training/playground labels and text links also adopt the shared editorial
+primitives. Astro and React read the same recipes; browser checks compare their
+font size, weight, case and color, including the semantic link color.

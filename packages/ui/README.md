@@ -152,3 +152,8 @@ Eyebrow and TextLink are the corresponding paragraph/link primitives. All accept
 native attributes and a `class` override merged through `cn`. HomeSurface and
 ReadingSurface still own the remaining generated-code and product typography
 CSS, now explicitly in the components layer below consumer utilities.
+
+React islands use `Eyebrow` and `TextLink` from `@typeshade/site-ui/react`.
+They consume the same recipes as the Astro primitives. Use `as="span"` for an
+inline React eyebrow; the default is a paragraph. Do not retain bare
+`className="eyebrow"` or `className="text-link"` when migrating a reading surface.

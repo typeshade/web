@@ -112,3 +112,9 @@ export const dialogStyles = [
   "border border-solid border-ui-border rounded-ui-panel bg-ui-surface text-ui-text font-ui-sans shadow-[0_12px_48px_rgb(0_0_0/0.24)]",
   "backdrop:bg-black/60 [&_.ui-field]:my-ui-4",
 ].join(" ");
+
+export const eyebrowStyles =
+  "eyebrow m-0 mb-[13px] text-[var(--ui-link)] text-[11px] font-[650] tracking-[0.075em] leading-[1.4] uppercase";
+
+export const textLinkStyles =
+  "inline-flex items-center gap-ui-2 text-[var(--ui-link)] text-[13px] font-[550] hover:underline underline-offset-4";

@@ -105,6 +105,44 @@ export async function checkPlayground(page, base, site) {
       assert.ok(await page.locator(`[id="${tipId}"]`).isHidden());
       if (!locale) await checkEditorCoordinates(page);
     }
+    if (site === "typenn") {
+      const typography = await page.evaluate(() => {
+        const astro = getComputedStyle(
+          document.querySelector(".page-heading .eyebrow"),
+        );
+        const react = getComputedStyle(
+          document.querySelector(".control-heading .eyebrow"),
+        );
+        const link = getComputedStyle(
+          document.querySelector(".playground-code .text-link"),
+        );
+        return {
+          astro: [
+            astro.fontSize,
+            astro.fontWeight,
+            astro.color,
+            astro.textTransform,
+          ],
+          react: [
+            react.fontSize,
+            react.fontWeight,
+            react.color,
+            react.textTransform,
+          ],
+          link: link.color,
+        };
+      });
+      assert.deepEqual(
+        typography.react,
+        typography.astro,
+        "Astro and React editorial primitives share typography",
+      );
+      assert.equal(
+        typography.link,
+        typography.astro[2],
+        "React text links keep the semantic link color",
+      );
+    }
     const scope =
       site === "typecv"
         ? "#pair-form"

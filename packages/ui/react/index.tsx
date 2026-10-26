@@ -12,3 +12,5 @@ export {
 } from "./controls";
 
 export { Toolbar, Panel, EmptyState, Alert, Tabs } from "./compositions";
+
+export { Eyebrow, TextLink } from "./editorial";

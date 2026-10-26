@@ -1,16 +1,10 @@
 ---
 import type { HTMLAttributes } from "astro/types";
-import { cn } from "../recipes/cn";
+import { cn, eyebrowStyles } from "../recipes";
 type Props = HTMLAttributes<"p">;
 const { class: className, ...attributes } = Astro.props;
 ---
 
-<p
-  {...attributes}
-  class={cn(
-    "eyebrow m-0 mb-[13px] text-[var(--ui-link)] text-[11px] font-[650] tracking-[0.075em] leading-[1.4] uppercase",
-    className,
-  )}
->
+<p {...attributes} class={cn(eyebrowStyles, className)}>
   <slot />
 </p>

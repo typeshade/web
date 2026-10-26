@@ -18,7 +18,9 @@ try {
     const context = await browser.newContext({ colorScheme: "light" });
     const page = await context.newPage();
     const errors = [];
-    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("pageerror", (error) =>
+      errors.push(`${page.url()}\n${error.stack ?? error.message}`),
+    );
     try {
       for (const route of [
         "/",
