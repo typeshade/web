@@ -18,7 +18,8 @@
   "peerDependencies": {
     "astro": ">=6 <8",
     "react": ">=19 <20",
-    "antd": ">=5 <6"
+    "antd": ">=5 <6",
+    "react-dom": ">=19 <20"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -26,6 +27,14 @@
     },
     "antd": {
       "optional": true
+    },
+    "react-dom": {
+      "optional": true
     }
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "5.9.3"
   }
 }

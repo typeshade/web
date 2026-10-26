@@ -66,6 +66,8 @@ jobs:
         run: pnpm prepare:source ${{ matrix.site }}
       - run: pnpm check:${{ matrix.site }}
       - run: pnpm build:${{ matrix.site }}
+      - if: matrix.site == 'typecv'
+        run: pnpm --filter typecv-site test:links
       - if: matrix.site == 'typenn'
         run: pnpm --filter typenn-site test:datasets && pnpm --filter typenn-site test:graph
       - if: matrix.site == 'typeshade'
