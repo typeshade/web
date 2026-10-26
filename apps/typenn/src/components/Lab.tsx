@@ -1,3 +1,4 @@
+import "../styles/training.css";
 import {
   ThemeProvider,
   Button,

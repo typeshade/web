@@ -1,0 +1,31 @@
+.figure .expressive-code {
+  margin-block-start: 0;
+}
+.expressive-code pre {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-2) transparent;
+}
+.expressive-code pre[tabindex]:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  box-shadow: var(--ring);
+}
+/* Without hover the copy button stays on screen, so a code frame opens with an empty band
+   and the first line starts below the button instead of under it. The button sits at the
+   same height inside the code area in every non-terminal frame, titled or not, because the
+   tab bar's own height already pushes the whole code block down in normal flow before the
+   button's own offset is measured from there; a titled frame's `--button-spacing` already
+   encodes that tab bar height for positioning the button, so reusing it in the code's
+   padding here would add the tab bar's height a second time and open an empty band on the
+   tab bar instead, which is why the two cases get separate rules with the same clearance. */
+@media (hover: none) {
+  .expressive-code .frame:not(.is-terminal):not(.has-title) {
+    --button-spacing: 0.5rem;
+  }
+  .expressive-code .frame:not(.is-terminal):not(.has-title) pre > code {
+    padding-block-start: calc(var(--button-spacing) + 2.9rem);
+  }
+  .expressive-code .frame.has-title:not(.is-terminal) pre > code {
+    padding-block-start: calc(0.5rem + 2.9rem);
+  }
+}

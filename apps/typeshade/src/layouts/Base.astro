@@ -1,4 +1,5 @@
 ---
+import SearchDialog from '../components/SearchDialog.astro';
 import SkipLink from '@typeshade/site-ui/astro/SkipLink';
 // The frame every page shares: head metadata, hreflang alternates, header and footer.
 // The spacing Temml's MathML is written against (src/lib/math.mjs). It comes first, so the
@@ -165,76 +166,6 @@ const jsonLd = {
     </main>
     <SiteFooter locale={locale} path={path} switchTarget={switchTarget} />
     <IssueDialog locale={locale} />
-    <dialog class="search-dialog" aria-label={t.nav.search} data-pagefind-ignore>
-      <div class="search-dialog-bar">
-        <button class="search-dialog-close" type="button" aria-label={t.nav.close} data-search-close>
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>
-        </button>
-      </div>
-      <div id="search"></div>
-      <p class="search-note" hidden>{t.nav.searchUnavailable}</p>
-    </dialog>
-    <script is:inline define:vars={{ translations: t.nav.searchUi }}>
-      const dialog = document.querySelector('.search-dialog')
-      const note = dialog.querySelector('.search-note')
-      let started = false
-      const asset = (tag, attrs) => new Promise((resolve, reject) => {
-        const el = Object.assign(document.createElement(tag), attrs)
-        el.addEventListener('load', resolve)
-        el.addEventListener('error', reject)
-        document.head.append(el)
-      })
-      async function mount() {
-        if (started) return
-        started = true
-        try {
-          await asset('link', { rel: 'stylesheet', href: '/pagefind/pagefind-ui.css' })
-          await asset('script', { src: '/pagefind/pagefind-ui.js' })
-          new PagefindUI({ element: '#search', showSubResults: true, showImages: false, translations })
-        } catch {
-          note.hidden = false
-        }
-      }
-      async function openSearch() {
-        for (const d of document.querySelectorAll('details[open]')) d.open = false
-        if (!dialog.open) dialog.showModal()
-        await mount()
-        dialog.querySelector('input')?.focus()
-      }
-      for (const b of document.querySelectorAll('[data-search-open]')) b.addEventListener('click', openSearch)
-      dialog.querySelector('[data-search-close]')?.addEventListener('click', () => dialog.close())
-      dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close() })
-      addEventListener('keydown', (e) => {
-        if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openSearch() }
-      })
-    </script>
-    <script is:inline>
-      function themeIsDark() {
-        return document.documentElement.dataset.theme
-          ? document.documentElement.dataset.theme === 'dark'
-          : matchMedia('(prefers-color-scheme: dark)').matches;
-      }
-      function syncThemeButtons() {
-        const dark = themeIsDark();
-        for (const b of document.querySelectorAll('[data-theme-toggle]')) {
-          b.setAttribute('aria-pressed', dark ? 'true' : 'false');
-        }
-      }
-      syncThemeButtons();
-      for (const b of document.querySelectorAll('[data-theme-toggle]')) b.addEventListener('click', () => {
-        const next = themeIsDark() ? 'light' : 'dark';
-        document.documentElement.dataset.theme = next;
-        try { localStorage.setItem('theme', next); } catch {}
-        syncThemeButtons();
-      });
-      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        if (!document.documentElement.dataset.theme) syncThemeButtons();
-      });
-    </script>
-    <script>
-      import { bindDisclosureMenus } from '@typeshade/site-ui/dom/menus';
-      const menus = [...document.querySelectorAll<HTMLDetailsElement>('.site-menu-drop, .site-menu')];
-      bindDisclosureMenus(menus, document.querySelector<HTMLDetailsElement>('.site-menu') ?? undefined);
-    </script>
+    <SearchDialog locale={locale} />
   </body>
 </html>

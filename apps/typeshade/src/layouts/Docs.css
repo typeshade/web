@@ -321,3 +321,7 @@
     padding-block: 40px 48px;
   }
 }
+
+:lang(ko) .docs-group a {
+  line-height: 1.5;
+}

@@ -1,3 +1,4 @@
+import "../styles/controls.css";
 import {
   createContext,
   useContext,

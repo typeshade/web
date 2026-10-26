@@ -1,5 +1,6 @@
 ---
-import NavLink from './NavLink.astro';
+import "../styles/product-header.css";
+import NavLink from "./NavLink.astro";
 interface Props {
   name: string;
   mark: string;
@@ -9,14 +10,24 @@ interface Props {
 }
 const { name, mark, home, label, links } = Astro.props;
 ---
+
 <header class="site-header">
   <div class="header-inner">
     <a class="brand" href={home} aria-label={`${name} home`}>
-      <span class="brand-mark" aria-hidden="true">{mark}</span><span>{name}</span>
+      <span class="brand-mark" aria-hidden="true">
+        {mark}
+      </span>
+      <span>{name}</span>
     </a>
     <nav class="top-nav" aria-label={label}>
-      {links.map((link) => <NavLink class="top-link" href={link.href} active={link.active}>{link.label}</NavLink>)}
+      {links.map((link) => (
+        <NavLink class="top-link" href={link.href} active={link.active}>
+          {link.label}
+        </NavLink>
+      ))}
     </nav>
-    <div class="header-tools"><slot name="tools" /></div>
+    <div class="header-tools">
+      <slot name="tools" />
+    </div>
   </div>
 </header>

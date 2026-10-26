@@ -1,4 +1,5 @@
 ---
+import './SiteHeader.css';
 import NavLink from '@typeshade/site-ui/astro/NavLink';
 // The bar at the top of every page: the mark and the name; Guide and Examples; then search,
 // the language menu, the dark-mode switch and GitHub as icons. Under 64rem the nav, the version
@@ -126,3 +127,32 @@ const ordered = [...languages.filter((l) => l.current), ...others];
     </div>
   </div>
 </header>
+
+    <script is:inline>
+      function themeIsDark() {
+        return document.documentElement.dataset.theme
+          ? document.documentElement.dataset.theme === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+      function syncThemeButtons() {
+        const dark = themeIsDark();
+        for (const b of document.querySelectorAll('[data-theme-toggle]')) {
+          b.setAttribute('aria-pressed', dark ? 'true' : 'false');
+        }
+      }
+      syncThemeButtons();
+      for (const b of document.querySelectorAll('[data-theme-toggle]')) b.addEventListener('click', () => {
+        const next = themeIsDark() ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem('theme', next); } catch {}
+        syncThemeButtons();
+      });
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (!document.documentElement.dataset.theme) syncThemeButtons();
+      });
+    </script>
+    <script>
+      import { bindDisclosureMenus } from '@typeshade/site-ui/dom/menus';
+      const menus = [...document.querySelectorAll<HTMLDetailsElement>('.site-menu-drop, .site-menu')];
+      bindDisclosureMenus(menus, document.querySelector<HTMLDetailsElement>('.site-menu') ?? undefined);
+    </script>

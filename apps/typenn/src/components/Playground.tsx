@@ -1,3 +1,4 @@
+import "../styles/playground.css";
 import {
   ThemeProvider,
   Button,

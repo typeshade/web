@@ -1,0 +1,15 @@
+.skip-link {
+  position: fixed;
+  z-index: 20;
+  top: 8px;
+  left: 8px;
+  transform: translateY(-150%);
+  padding: 8px 12px;
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  box-shadow: 0 4px 14px #0002;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}

@@ -1,6 +1,28 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
-type Props = HTMLAttributes<'button'> & { variant?: 'primary' | 'secondary' | 'quiet'; tone?: 'neutral' | 'danger'; size?: 'small' | 'default' | 'large' };
-const { variant = 'secondary', tone = 'neutral', size = 'default', type = 'button', class: className, ...attributes } = Astro.props;
+import "../styles/controls.css";
+import type { HTMLAttributes } from "astro/types";
+type Props = HTMLAttributes<"button"> & {
+  variant?: "primary" | "secondary" | "quiet";
+  tone?: "neutral" | "danger";
+  size?: "small" | "default" | "large";
+};
+const {
+  variant = "secondary",
+  tone = "neutral",
+  size = "default",
+  type = "button",
+  class: className,
+  ...attributes
+} = Astro.props;
 ---
-<button {...attributes} type={type} class:list={['ui-button', className]} data-variant={variant} data-tone={tone} data-size={size}><slot /></button>
+
+<button
+  {...attributes}
+  type={type}
+  class:list={["ui-button", className]}
+  data-variant={variant}
+  data-tone={tone}
+  data-size={size}
+>
+  <slot />
+</button>

@@ -1,29 +1,39 @@
 ---
-import SiteHeader from '@typeshade/site-ui/astro/SiteHeader';
-import SkipLink from '@typeshade/site-ui/astro/SkipLink';
-import ThemeControl from '../components/ThemeControl';
-import '../styles/global.css';
+import SiteHeader from "@typeshade/site-ui/astro/SiteHeader";
+import SkipLink from "@typeshade/site-ui/astro/SkipLink";
+import ThemeControl from "../components/ThemeControl";
+import "../styles/global.css";
+import "../styles/shell.css";
+import SiteFooter from "@typeshade/site-ui/astro/SiteFooter";
 type Props = {
-  locale: 'en' | 'ko';
-  active?: 'home' | 'docs' | 'playground' | 'lab';
+  locale: "en" | "ko";
+  active?: "home" | "docs" | "playground" | "lab";
   title: string;
   description: string;
 };
-const { locale, active = 'home', title, description } = Astro.props;
-const ko = locale === 'ko';
-const prefix = ko ? '/ko' : '';
-const alt = Astro.url.pathname.includes('404')
+const { locale, active = "home", title, description } = Astro.props;
+const ko = locale === "ko";
+const prefix = ko ? "/ko" : "";
+const alt = Astro.url.pathname.includes("404")
   ? ko
-    ? '/'
-    : '/ko/'
+    ? "/"
+    : "/ko/"
   : ko
-    ? Astro.url.pathname.replace(/^\/ko/, '') || '/'
-    : `/ko${Astro.url.pathname === '/' ? '/' : Astro.url.pathname}`;
+    ? Astro.url.pathname.replace(/^\/ko/, "") || "/"
+    : `/ko${Astro.url.pathname === "/" ? "/" : Astro.url.pathname}`;
 const nav = [
-  { href: `${prefix}/`, label: ko ? '소개' : 'Overview', key: 'home' },
-  { href: `${prefix}/docs/`, label: ko ? '문서' : 'Documentation', key: 'docs' },
-  { href: `${prefix}/playground/`, label: ko ? '플레이그라운드' : 'Playground', key: 'playground' },
-  { href: `${prefix}/lab/`, label: ko ? 'SfM 실험실' : 'SfM lab', key: 'lab' },
+  { href: `${prefix}/`, label: ko ? "소개" : "Overview", key: "home" },
+  {
+    href: `${prefix}/docs/`,
+    label: ko ? "문서" : "Documentation",
+    key: "docs",
+  },
+  {
+    href: `${prefix}/playground/`,
+    label: ko ? "플레이그라운드" : "Playground",
+    key: "playground",
+  },
+  { href: `${prefix}/lab/`, label: ko ? "SfM 실험실" : "SfM lab", key: "lab" },
 ];
 ---
 
@@ -32,17 +42,21 @@ const nav = [
   <head>
     <script is:inline>
       try {
-        const saved = localStorage.getItem('typecv-theme');
-        if (saved === 'dark' || saved === 'light') document.documentElement.dataset.theme = saved;
+        const saved = localStorage.getItem("typecv-theme");
+        if (saved === "dark" || saved === "light")
+          document.documentElement.dataset.theme = saved;
         else
-          document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)')
-            .matches
-            ? 'dark'
-            : 'light';
+          document.documentElement.dataset.theme = matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches
+            ? "dark"
+            : "light";
       } catch {
-        document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'dark'
-          : 'light';
+        document.documentElement.dataset.theme = matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches
+          ? "dark"
+          : "light";
       }
     </script>
     <meta charset="utf-8" />
@@ -50,7 +64,10 @@ const nav = [
     <meta name="description" content={description} />
     <meta name="theme-color" content="#f5f5f5" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="canonical" href={`https://cv.typeshade.dev${Astro.url.pathname}`} />
+    <link
+      rel="canonical"
+      href={`https://cv.typeshade.dev${Astro.url.pathname}`}
+    />
     <link
       rel="alternate"
       hreflang="en"
@@ -65,13 +82,13 @@ const nav = [
   </head>
   <body>
     <SkipLink class="skip-link" href="#main">
-      {ko ? '본문으로 건너뛰기' : 'Skip to content'}
+      {ko ? "본문으로 건너뛰기" : "Skip to content"}
     </SkipLink>
     <SiteHeader
       name="TypeCV"
       mark="⌗"
-      home={ko ? '/ko/' : '/'}
-      label={ko ? '주 메뉴' : 'Primary navigation'}
+      home={ko ? "/ko/" : "/"}
+      label={ko ? "주 메뉴" : "Primary navigation"}
       links={nav.map((item) => ({
         href: item.href,
         label: item.label,
@@ -80,31 +97,29 @@ const nav = [
     >
       <Fragment slot="tools">
         <a class="language-link" href={alt}>
-          {ko ? 'English' : '한국어'}
+          {ko ? "English" : "한국어"}
         </a>
         <ThemeControl
           client:load
-          darkLabel={ko ? '어두운 테마' : 'Dark theme'}
-          lightLabel={ko ? '밝은 테마' : 'Light theme'}
+          darkLabel={ko ? "어두운 테마" : "Dark theme"}
+          lightLabel={ko ? "밝은 테마" : "Light theme"}
         />
       </Fragment>
     </SiteHeader>
-    <main id="main" class:list={['site-main', active === 'home' && 'home-main']}>
+    <main id="main" class="site-main">
       <slot />
     </main>
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <span>
-          {ko
-            ? 'TypeScript와 TypeShade GPU로 구현하는 컴퓨터 비전.'
-            : 'Computer vision in TypeScript, accelerated by TypeShade.'}
-        </span>
-        <div>
-          <a href="https://github.com/typeshade/typecv">GitHub ↗</a>
-          <a href="https://typeshade.dev">TypeShade</a>
-          <a href="https://nn.typeshade.dev">TypeNN</a>
-        </div>
+    <SiteFooter>
+      <span>
+        {ko
+          ? "TypeScript와 TypeShade GPU로 구현하는 컴퓨터 비전."
+          : "Computer vision in TypeScript, accelerated by TypeShade."}
+      </span>
+      <div>
+        <a href="https://github.com/typeshade/typecv">GitHub ↗</a>
+        <a href="https://typeshade.dev">TypeShade</a>
+        <a href="https://nn.typeshade.dev">TypeNN</a>
       </div>
-    </footer>
+    </SiteFooter>
   </body>
 </html>

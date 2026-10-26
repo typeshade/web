@@ -1,3 +1,4 @@
+import "../styles/lab.css";
 import {
   ThemeProvider,
   Button,

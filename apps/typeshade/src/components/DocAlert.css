@@ -1,12 +1,3 @@
-.button-icon {
-  inline-size: 12px;
-  block-size: 12px;
-  fill: currentColor;
-  transition: transform var(--motion);
-}
-.ui-button:hover .button-icon {
-  transform: translateX(2px);
-}
 /* The icon is centred on the first line, not on the box: half the line box less the icon.
    `.doc p` would otherwise add its 16px to the paragraph inside a guide's alert and drop
    the first line below the icon, so the alert's own reset outranks it. */
@@ -36,29 +27,6 @@
 .doc h2 + .ui-alert {
   margin-block-start: 0;
 }
-/* The tab head needs the script, so it stays out of the page
-   until the script has run; with no script every panel is in the flow and they stack, which
-   is also what the search index reads. */
-.tabs-panel {
-  flex: 1 1 auto;
-  min-block-size: 0;
-}
-.tabs-panel > .expressive-code {
-  block-size: 100%;
-}
-.tabs-head.ui-tablist {
-  display: none;
-  gap: var(--ui-space-4);
-  border-block-end: 1px solid var(--color-line-1);
-}
-[data-front-tabs][data-ready] .tabs-head.ui-tablist {
-  display: flex;
-}
-.wide {
-  inline-size: var(--wide);
-  margin-inline: auto;
-}
-
 .ui-alert {
   display: flex;
   align-items: start;

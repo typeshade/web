@@ -1,0 +1,13 @@
+/* Diagnostic */
+.diagnostic {
+  margin-block-start: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  line-height: var(--text-code--line-height);
+  color: var(--color-text-2);
+  overflow-wrap: anywhere;
+}
+.diagnostic b {
+  color: var(--color-diag);
+  font-weight: 500;
+}

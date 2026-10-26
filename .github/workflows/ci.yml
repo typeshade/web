@@ -21,6 +21,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm test:styles
       - run: pnpm check:ui
       - run: pnpm build:ui
       - run: pnpm exec playwright install --with-deps chromium
@@ -92,7 +93,10 @@ jobs:
       - if: matrix.site != 'typeshade'
         run: pnpm prepare:source ${{ matrix.site }}
       - run: pnpm check:${{ matrix.site }}
+      - if: matrix.site == 'typeshade'
+        run: pnpm --filter typeshade-site test:playground-boundaries
       - run: pnpm build:${{ matrix.site }}
+      - run: pnpm test:styles apps/${{ matrix.site }}/dist
       - if: matrix.site == 'typecv'
         run: pnpm --filter typecv-site test:links
       - if: matrix.site == 'typenn'

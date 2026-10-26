@@ -1,15 +1,23 @@
 ---
-import LinkButton from '@typeshade/site-ui/astro/LinkButton';
-import SiteLayout from '../layouts/SiteLayout.astro';
+import "../styles/lab-page.css";
+import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import LinkButton from "@typeshade/site-ui/astro/LinkButton";
+import SiteLayout from "../layouts/SiteLayout.astro";
 ---
 
-<SiteLayout locale="en" title="Page not found" description="This TypeCV page does not exist.">
-  <div class="lab-main">
-    <p class="eyebrow">404</p>
-    <h1>Outside the frame.</h1>
-    <p>The page you requested does not exist.</p>
-    <LinkButton variant="primary" size="default" href="/">
-      Back to TypeCV →
-    </LinkButton>
-  </div>
+<SiteLayout
+  locale="en"
+  title="Page not found"
+  description="This TypeCV page does not exist."
+>
+  <ReadingSurface>
+    <div class="lab-main">
+      <p class="eyebrow">404</p>
+      <h1>Outside the frame.</h1>
+      <p>The page you requested does not exist.</p>
+      <LinkButton variant="primary" size="default" href="/">
+        Back to TypeCV →
+      </LinkButton>
+    </div>
+  </ReadingSurface>
 </SiteLayout>
