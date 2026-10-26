@@ -1,4 +1,6 @@
 ---
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
 import "../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../layouts/SiteLayout.astro";
@@ -12,26 +14,18 @@ import SiteLayout from "../layouts/SiteLayout.astro";
 >
   <ReadingSurface class="nn-docs">
     <article class="docs-article">
-      <header class="page-heading">
-        <p class="eyebrow">404</p>
-        <h1>Page not found</h1>
-        <p class="lead">
+      <PageHeading>
+        <Fragment slot="eyebrow">404</Fragment>
+        <Fragment slot="title">Page not found</Fragment>
+        <Fragment slot="description">
           No page exists at this address. Go back to the home page or the guide.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <section class="doc-section">
         <p>
-          <a class="text-link" href="/">
-            TypeNN home
-          </a>{" "}
-          ·{" "}
-          <a class="text-link" href="/guide/">
-            Get started
-          </a>{" "}
-          ·{" "}
-          <a class="text-link" href="/ko/">
-            한국어
-          </a>
+          <TextLink href="/">TypeNN home</TextLink> ·{" "}
+          <TextLink href="/guide/">Get started</TextLink> ·{" "}
+          <TextLink href="/ko/">한국어</TextLink>
         </p>
       </section>
     </article>

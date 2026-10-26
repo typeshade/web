@@ -1,4 +1,9 @@
 ---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import LinkItem from "@typeshade/site-ui/astro/LinkItem";
+import LinkList from "@typeshade/site-ui/astro/LinkList";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
 import "../../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
@@ -24,19 +29,19 @@ await device.dispose();`;
 >
   <ReadingSurface class="nn-docs">
     <article class="docs-article">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <Breadcrumbs aria-label="Breadcrumb">
         <a href="/ko/">TypeNN</a>
         <span>/</span>
         <span>시작하기</span>
-      </nav>
-      <header class="page-heading">
-        <p class="eyebrow">먼저 시작하기</p>
-        <h1>TypeNN 시작하기</h1>
-        <p class="lead">
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">먼저 시작하기</Fragment>
+        <Fragment slot="title">TypeNN 시작하기</Fragment>
+        <Fragment slot="description">
           Device를 열고 Tensor 연산으로 계산을 정의한 뒤 필요한 결과를
           구체화합니다.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <section class="doc-section" id="install">
         <h2>프로젝트 상태</h2>
         <p>
@@ -45,9 +50,9 @@ await device.dispose();`;
           소스와 예제를 기준으로 확인하세요.
         </p>
         <p>
-          <a class="text-link" href="https://github.com/typeshade/typenn">
+          <TextLink href="https://github.com/typeshade/typenn">
             TypeNN 저장소 열기 ↗
-          </a>
+          </TextLink>
         </p>
       </section>
       <section class="doc-section" id="first-operation">
@@ -81,8 +86,8 @@ await device.dispose();`;
       </section>
       <section class="doc-section">
         <h2>다음 가이드</h2>
-        <div class="next-links">
-          <a href="/ko/guide/execution/">
+        <LinkList class="next-links">
+          <LinkItem href="/ko/guide/execution/">
             <span>
               <strong>실행 모델</strong>
               <small>
@@ -90,22 +95,22 @@ await device.dispose();`;
               </small>
             </span>
             <b>→</b>
-          </a>
-          <a href="/ko/guide/training/">
+          </LinkItem>
+          <LinkItem href="/ko/guide/training/">
             <span>
               <strong>모델 학습</strong>
               <small>Module과 옵티마이저 실행 경로를 확인합니다.</small>
             </span>
             <b>→</b>
-          </a>
-          <a href="/ko/playground/">
+          </LinkItem>
+          <LinkItem href="/ko/playground/">
             <span>
               <strong>Playground 실행</strong>
               <small>프로젝트 설정 없이 연산을 실행합니다.</small>
             </span>
             <b>→</b>
-          </a>
-        </div>
+          </LinkItem>
+        </LinkList>
       </section>
     </article>
   </ReadingSurface>

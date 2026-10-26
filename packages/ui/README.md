@@ -115,3 +115,40 @@ head until `data-ui-tabs-ready` is present, and leave panels readable before tha
 `bindDisclosureMenus(menus, mobileMenu?)` enhances native navigation disclosures,
 not an ARIA application menu. DOM controllers return cleanup/destroy functions
 for consumers with a mount/unmount lifecycle.
+
+### Editorial and page compositions
+
+Use the shared page components for repeated product-page structures. They use
+the same Tailwind source registration and semantic palette as the controls.
+
+```astro
+---
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import HomeSection from "@typeshade/site-ui/astro/HomeSection";
+import LinkList from "@typeshade/site-ui/astro/LinkList";
+import LinkItem from "@typeshade/site-ui/astro/LinkItem";
+---
+<PageHeading>
+  <Fragment slot="eyebrow">Guide</Fragment>
+  <Fragment slot="title">Get started</Fragment>
+  <Fragment slot="description">Run your first example.</Fragment>
+</PageHeading>
+<HomeSection layout="split" aria-labelledby="learn-title">
+  <div><h2 id="learn-title">Learn the API</h2></div>
+  <LinkList>
+    <LinkItem href="/playground/">
+      <span><strong>Playground</strong><small>Run an example.</small></span>
+      <b aria-hidden="true">↗</b>
+    </LinkItem>
+  </LinkList>
+</HomeSection>
+```
+
+PageHeading renders one h1; its title slot contains inline content, not another
+heading. Breadcrumbs requires a localized `aria-label` and accepts links and
+separators in its slot. HomeHero and StepGrid own responsive layout without
+imposing page copy. HomeSection accepts `default`, `split` or `action` layouts.
+Eyebrow and TextLink are the corresponding paragraph/link primitives. All accept
+native attributes and a `class` override merged through `cn`. HomeSurface and
+ReadingSurface still own the remaining generated-code and product typography
+CSS, now explicitly in the components layer below consumer utilities.

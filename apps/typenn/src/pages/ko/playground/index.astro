@@ -1,4 +1,6 @@
 ---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 import Playground from "../../../components/Playground";
@@ -12,19 +14,19 @@ import Playground from "../../../components/Playground";
 >
   <ReadingSurface>
     <article class="playground-page">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <Breadcrumbs aria-label="Breadcrumb">
         <a href="/ko/">TypeNN</a>
         <span>/</span>
         <span>Playground</span>
-      </nav>
-      <header class="page-heading">
-        <p class="eyebrow">브라우저에서 TypeNN 실행</p>
-        <h1>Tensor Playground</h1>
-        <p class="lead">
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">브라우저에서 TypeNN 실행</Fragment>
+        <Fragment slot="title">Tensor Playground</Fragment>
+        <Fragment slot="description">
           행렬 값과 연산, 백엔드를 선택하고 사이트에 포함된 TypeNN 런타임으로
           실행해 보세요.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <Playground locale="ko" client:load />
       <div class="playground-disclosure">
         <p>

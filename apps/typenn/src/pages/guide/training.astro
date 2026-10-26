@@ -1,4 +1,7 @@
 ---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
 import "../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../layouts/SiteLayout.astro";
@@ -58,22 +61,22 @@ const modelCode = `export class SimpleMLP extends nn.Module {
 >
   <ReadingSurface class="nn-docs">
     <article class="docs-article">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <Breadcrumbs aria-label="Breadcrumb">
         <a href="/">TypeNN</a>
         <span>/</span>
         <a href="/guide/">Guides</a>
         <span>/</span>
         <span>Training</span>
-      </nav>
-      <header class="page-heading">
-        <p class="eyebrow">Guides</p>
-        <h1>Train a model</h1>
-        <p class="lead">
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">Guides</Fragment>
+        <Fragment slot="title">Train a model</Fragment>
+        <Fragment slot="description">
           The Module API keeps the training loop explicit: clear gradients, run
           forward, backpropagate, update parameters, and release the batch
           graph.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <section class="doc-section">
         <h2>Model definition</h2>
         <p>
@@ -132,12 +135,9 @@ const modelCode = `export class SimpleMLP extends nn.Module {
           pending work finish.
         </p>
         <p>
-          <a
-            class="text-link"
-            href="https://github.com/typeshade/typenn/tree/main/examples/mnist"
-          >
+          <TextLink href="https://github.com/typeshade/typenn/tree/main/examples/mnist">
             Open the full MNIST example ↗
-          </a>
+          </TextLink>
         </p>
       </section>
       <section class="doc-section">

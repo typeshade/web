@@ -1,4 +1,7 @@
 ---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
 import "../../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
@@ -58,21 +61,21 @@ const modelCode = `export class SimpleMLP extends nn.Module {
 >
   <ReadingSurface class="nn-docs">
     <article class="docs-article">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <Breadcrumbs aria-label="Breadcrumb">
         <a href="/ko/">TypeNN</a>
         <span>/</span>
         <a href="/ko/guide/">가이드</a>
         <span>/</span>
         <span>모델 학습</span>
-      </nav>
-      <header class="page-heading">
-        <p class="eyebrow">가이드</p>
-        <h1>모델 학습</h1>
-        <p class="lead">
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">가이드</Fragment>
+        <Fragment slot="title">모델 학습</Fragment>
+        <Fragment slot="description">
           Module API에서 학습 루프는 명시적입니다. 기울기를 초기화하고 forward,
           역전파, 파라미터 갱신을 실행한 뒤 배치 그래프를 해제합니다.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <section class="doc-section">
         <h2>모델 정의</h2>
         <p>
@@ -128,12 +131,9 @@ const modelCode = `export class SimpleMLP extends nn.Module {
           마친 다음 Device를 해제하세요.
         </p>
         <p>
-          <a
-            class="text-link"
-            href="https://github.com/typeshade/typenn/tree/main/examples/mnist"
-          >
+          <TextLink href="https://github.com/typeshade/typenn/tree/main/examples/mnist">
             MNIST 전체 예제 보기 ↗
-          </a>
+          </TextLink>
         </p>
       </section>
       <section class="doc-section">

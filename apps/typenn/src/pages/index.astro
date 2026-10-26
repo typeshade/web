@@ -1,4 +1,11 @@
 ---
+import HomeHero from "@typeshade/site-ui/astro/HomeHero";
+import HomeSection from "@typeshade/site-ui/astro/HomeSection";
+import StepGrid from "@typeshade/site-ui/astro/StepGrid";
+import Eyebrow from "@typeshade/site-ui/astro/Eyebrow";
+import LinkItem from "@typeshade/site-ui/astro/LinkItem";
+import LinkList from "@typeshade/site-ui/astro/LinkList";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
 import HomeSurface from "@typeshade/site-ui/astro/HomeSurface";
 import LinkButton from "@typeshade/site-ui/astro/LinkButton";
 import SiteLayout from "../layouts/SiteLayout.astro";
@@ -25,9 +32,9 @@ await device.dispose();`;
 >
   <HomeSurface>
     <div class="home-content">
-      <section class="home-intro">
+      <HomeHero>
         <div class="home-copy">
-          <p class="eyebrow">A TypeScript neural network framework</p>
+          <Eyebrow>A TypeScript neural network framework</Eyebrow>
           <h1>
             Write the graph.
             <br />
@@ -59,19 +66,19 @@ await device.dispose();`;
             <span class="result-label">Example output</span>
           </div>
         </div>
-      </section>
+      </HomeHero>
 
-      <section class="home-path" aria-labelledby="path-title">
+      <HomeSection aria-labelledby="path-title">
         <div class="section-heading-row">
           <div>
-            <p class="eyebrow">From TypeScript to execution</p>
+            <Eyebrow>From TypeScript to execution</Eyebrow>
             <h2 id="path-title">Three layers, one visible path.</h2>
           </div>
-          <a class="text-link" href="/guide/execution/">
+          <TextLink href="/guide/execution/">
             How execution works <span aria-hidden="true">↗</span>
-          </a>
+          </TextLink>
         </div>
-        <div class="path-strip">
+        <StepGrid>
           <article>
             <span class="path-index">01</span>
             <h3>Define</h3>
@@ -99,16 +106,16 @@ await device.dispose();`;
             </p>
             <code>CPU · WebGPU · WebGL2*</code>
           </article>
-        </div>
+        </StepGrid>
         <p class="fine-print">
           * WebGL2 and the CPU tier run the same kernel functions apart. Only
           WebGPU fuses an elementwise chain into one dispatch.
         </p>
-      </section>
+      </HomeSection>
 
-      <section class="home-learning" aria-labelledby="learn-title">
+      <HomeSection layout="split" aria-labelledby="learn-title">
         <div class="learning-copy">
-          <p class="eyebrow">Explore TypeNN</p>
+          <Eyebrow>Explore TypeNN</Eyebrow>
           <h2 id="learn-title">
             Start with a runnable operation. Continue into the system.
           </h2>
@@ -117,41 +124,41 @@ await device.dispose();`;
             graph execution, automatic differentiation, and model training.
           </p>
         </div>
-        <div class="learning-links">
-          <a href="/playground/">
+        <LinkList class="learning-links">
+          <LinkItem href="/playground/">
             <span>
               <strong>Playground</strong>
               <small>Run real TypeNN operations in this browser.</small>
             </span>
             <b aria-hidden="true">↗</b>
-          </a>
-          <a href="/guide/training/">
+          </LinkItem>
+          <LinkItem href="/guide/training/">
             <span>
               <strong>Train a model</strong>
               <small>Build the documented MNIST MLP path.</small>
             </span>
             <b aria-hidden="true">↗</b>
-          </a>
-          <a href="/api/">
+          </LinkItem>
+          <LinkItem href="/api/">
             <span>
               <strong>API reference</strong>
               <small>Browse the current Tensor and Module surface.</small>
             </span>
             <b aria-hidden="true">↗</b>
-          </a>
-          <a href="/examples/">
+          </LinkItem>
+          <LinkItem href="/examples/">
             <span>
               <strong>Examples</strong>
               <small>Open complete source examples and current limits.</small>
             </span>
             <b aria-hidden="true">↗</b>
-          </a>
-        </div>
-      </section>
+          </LinkItem>
+        </LinkList>
+      </HomeSection>
 
-      <section class="home-status" aria-labelledby="status-title">
+      <HomeSection layout="action" aria-labelledby="status-title">
         <div>
-          <p class="eyebrow">Current implementation</p>
+          <Eyebrow>Current implementation</Eyebrow>
           <h2 id="status-title">
             Every op is a kernel function. Training is not tuned yet.
           </h2>
@@ -168,7 +175,7 @@ await device.dispose();`;
         >
           Read implementation status <span aria-hidden="true">↗</span>
         </LinkButton>
-      </section>
+      </HomeSection>
     </div>
   </HomeSurface>
 </SiteLayout>

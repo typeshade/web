@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "../recipes/cn";
+type Props = HTMLAttributes<"a">;
+const { class: className, ...attributes } = Astro.props;
+---
+
+<a
+  {...attributes}
+  class={cn(
+    "text-link inline-flex items-center gap-ui-2 text-[var(--ui-link)] text-[13px] font-[550] hover:underline underline-offset-4",
+    className,
+  )}
+>
+  <slot />
+</a>
