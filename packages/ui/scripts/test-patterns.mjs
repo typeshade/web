@@ -206,6 +206,12 @@ try {
       await page.waitForFunction(
         () => document.documentElement.dataset.theme === "dark",
       );
+      // Contrast snapshots must sample the settled theme, not the button color transition.
+      await page.waitForFunction(
+        () =>
+          getComputedStyle(document.querySelector("[data-open-dialog]"))
+            .backgroundColor === "rgb(20, 20, 20)",
+      );
     }
     for (const width of [1440, 390, 320]) {
       await page.setViewportSize({ width, height: 1000 });
