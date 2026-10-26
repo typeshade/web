@@ -1,0 +1,8 @@
+{
+  "slug": "glsles300backend",
+  "source": "4810e96bb4fdf84bc05950a11901f3f0a4914f2acd09e2024bc2e621065b7058",
+  "texts": {
+    "summary": "GLSL ES 3.00(WebGL2) 백엔드입니다.",
+    "description": "GLSL ES 3.00(WebGL2) [`Backend`](/api/backend/)입니다. 이 백엔드는 공유 생성기에 타입, 리터럴, 내장 함수, 선언의 GLSL 표기를 제공합니다. 생성기는 모든 타깃에 대해 모듈의 제어 흐름을 같은 방식으로 순회합니다. [`emitGlslModule`](/api/emitglslmodule/), [`emitGlslStages`](/api/emitglslstages/), [`emitGlslFragment`](/api/emitglslfragment/)가 이 백엔드를 구동합니다. 단일 구문의 GLSL 표기가 필요하면 이 백엔드를 `Backend`를 받는 함수에 넘깁니다.\n\nGLSL ES 3.00으로 표현할 수 없는 것은 모두 소스를 만들기 전에 [`UnsupportedFeatureError`](/api/unsupportedfeatureerror/)(`SD0030`)를 던집니다. 예를 들어 `portable`로 선언하지 않은 `@compute` 진입점, 다중 샘플(`2d-ms`) 텍스처 로드, `f16`, 서브그룹, 독립 `sampler` 바인딩(GLSL에는 결합된 `sampler2D`만 있다)이 있습니다. 구조체가 아닌 출력을 그대로 돌려주는 버텍스 진입점도 여기에 포함됩니다. GLSL은 스테이지 사이의 varying을 필드 이름으로 연결하므로, 출력은 프래그먼트 입력이 공유하는 필드를 가진 구조체여야 합니다.\n\n`storage` 바인딩 자체는 오류가 아닙니다. [`emitGlslModule`](/api/emitglslmodule/)가 먼저 이를 데이터 텍스처 읽기로 바꿉니다. 이 변환이 지원하지 않는 형태에서만 오류를 던집니다. 예를 들어 `read_write` 스토리지 바인딩이나 지원하지 않는 요소 타입이 해당합니다."
+  }
+}

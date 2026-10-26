@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.cache/
+.dataset-cache/
+.dev.vars*
+*.log
+.DS_Store
+artifacts/
+apps/typecv/public/runtime/
+apps/typecv/public/docs/
+apps/typecv/public/version.json
+apps/typecv/public/robots.txt
+apps/typecv/public/sitemap.xml
+apps/typenn/public/data/
+apps/typenn/src/vendor/typenn/*.js

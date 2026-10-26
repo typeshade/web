@@ -1,0 +1,12 @@
+{
+  "slug": "emitfragment-interface",
+  "source": "5cc44366ebc79e02025541566c748ffcf1493900dd66e286209f20732a20444a",
+  "texts": {
+    "summary": "스테이지 래퍼 없이 생성된 모듈과, 결과를 컴파일하려면 호스트가 제공하거나 보장해야 하는 모든 것입니다.",
+    "description": "이 값은 [`emitFragment`](/api/emitfragment/)(WGSL)와 [`emitGlslFragment`](/api/emitglslfragment/)(GLSL)이 만들어 냅니다.",
+    "members.source": "머리말이 없는 소스입니다. 선언, 헬퍼 함수, 그리고(제외하지 않았다면) 진입점을 담습니다.",
+    "members.preamble": "호스트가 `source` 앞에 순서대로 두어야 하는 지시문과 정밀도 선언 줄입니다. 이 줄들은 데이터로 돌려주므로, 조합기가 여러 조각에 걸쳐 이를 합치고 중복을 제거할 수 있습니다.",
+    "members.declares": "`source`가 선언하는 항목의 목록입니다.",
+    "members.requires": "조각이 참조하지만 정의하지 않는 심볼입니다. [`externFn`](/api/externfn/)으로 선언한 함수와 [`externVar`](/api/externvar/)로 선언한 변수가 여기에 들어가며, 대상 언어에 맞는 표기로 적힙니다. 조합기는 이 목록을 호스트가 실제로 제공하는 것과 대조할 수 있습니다. 함수 이름은 모듈 함수로도 알려진 내장 함수로도 해석되지 않는 호출 지점에서 나옵니다. 목록은 정렬되고 중복이 제거된 상태입니다."
+  }
+}

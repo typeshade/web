@@ -1,0 +1,9 @@
+{
+  "slug": "builtregistry",
+  "source": "5a810d2f78f3615b5abcc39fe60828b18afcec2040435241face9845faaf6e0d",
+  "texts": {
+    "summary": "buildRegistry가 만든 결과입니다.",
+    "members.source": "렌더링된 TypeScript 모듈입니다.",
+    "members.ids": "id들입니다. 렌더링된 파일에 나타나는 순서대로 담깁니다."
+  }
+}

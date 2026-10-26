@@ -1,0 +1,12 @@
+{
+  "slug": "semanticdiff-interface",
+  "source": "e3920b124e4b54b79f3a50b4366bbbbd30a236fa78b58a54f5f0de04bf20f72a",
+  "texts": {
+    "summary": "비교 결과의 차이를 네 가지로 분류한 것입니다.",
+    "description": "각 항목은 사실 한 줄이며, `a`에는 있고 `b`에는 없으면 `-`, 그 반대이면 `+`로 시작합니다. 네 분류가 모두 비어 있으면 두 모듈은 이 비교가 검사하는 모든 것에서 같습니다. [`isSemanticallyEqual`](/api/issemanticallyequal/)이 그 검사를 수행합니다.",
+    "members.interface": "진입점의 시그니처와 버텍스 속성 레이아웃입니다.",
+    "members.resources": "바인드 그룹, std140/std430 구조체 레이아웃, 필요한 기능입니다.",
+    "members.constants": "모듈 const, 파이프라인 오버라이드, 함수 본문의 숫자 리터럴 다중 집합입니다. 리터럴의 값은 여기에만 보고됩니다. 제어 흐름 골격에는 값이 빠지기 때문입니다. 그래서 상수를 바꾸는 변경과 그 주변 코드의 형태를 바꾸는 변경은 서로 다른 분류에 들어갑니다.",
+    "members.controlFlow": "문마다 한 줄씩 적은 제어 흐름 골격이며, 각 줄은 경로로 주소를 지정합니다."
+  }
+}

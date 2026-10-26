@@ -1,0 +1,13 @@
+{
+  "slug": "texturenumlayers",
+  "source": "b914dcf7a680644678c5462ab8f262d04259d9b74b66b0da85d6b593d5a4c5d4",
+  "texts": {
+    "summary": "2D 배열 텍스처가 가진 레이어 수를 u32로 반환합니다.",
+    "description": "[`textureDimensions`](/api/texturedimensions/)는 배열 텍스처에서도 일반 텍스처와 같이 너비와 높이만 `vec2<u32>`로 반환합니다. 그래서 레이어 수는 이 별도 쿼리로 구합니다. 부동소수점 산술에 쓰려면 결과를 [`toF32`](/api/tof32/)로 감쌉니다.\n\n이 함수는 배열 키만 받습니다. 일반 2D 텍스처나 다중 샘플 텍스처에는 레이어 수가 없으므로, 이런 키를 넘기면 tsc 오류가 납니다. 정수 배열 텍스처는 받아들여집니다. 레이어 수는 텍셀 원소의 성질이 아니라 뷰의 성질이기 때문입니다.\n\n두 타깃의 표기가 다르므로 이 함수는 `textureDimensions`에 오버로드하지 않고 자신의 id를 가집니다. WGSL에는 전용 `textureNumLayers(t)`가 있습니다. GLSL ES 3.00에는 이런 함수가 없어서, `textureSize(t, 0)`의 세 번째 성분을 읽습니다. 이 성분은 `textureDimensions`의 바탕이 되는 `uvec2()` 생성자가 버리는 바로 그 성분입니다. GLSL 쪽에서는 lod 인자가 필수입니다. 레이어 수는 lod에 따라 바뀌지 않으므로 항상 `0`이 맞습니다.\n\nCPU 평가(`compileModule`)에는 텍스처를 조회할 방법이 없습니다. `gpuStubs` 옵션이 켜져 있으면 플레이스홀더를 반환합니다.",
+    "parameters.tex": "측정할 배열 텍스처 바인딩입니다.",
+    "returns": "레이어 수입니다.",
+    "targets.wgsl": "`textureNumLayers(tex)`.",
+    "targets.glsl": "`uint(textureSize(tex, 0).z)`.",
+    "targets.cpu": "오라클에는 텍스처 메모리와 이웃 프래그먼트가 없습니다. `{ gpuStubs: true }`로 모듈을 컴파일하지 않으면 이 호출은 예외를 던집니다. 그 옵션으로 컴파일하면 플레이스홀더를 반환합니다."
+  }
+}

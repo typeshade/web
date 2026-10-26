@@ -1,0 +1,7 @@
+{
+  "slug": "vec2it",
+  "source": "7c4a8d85f28d7d87084751e399364f8b53e492969862ae3a0caee13f0acf03fb",
+  "texts": {
+    "summary": "기본 vec2<i32>입니다. vec2i 생성자로 값을 만듭니다. 예를 들어 textureLoad에 넘기는 텍셀 좌표에 쓰입니다."
+  }
+}

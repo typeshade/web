@@ -1,0 +1,11 @@
+{
+  "slug": "inversesqrt",
+  "source": "ea9a36703eaa8dab48e5b116691bde5b6bf6d180f9771e42f2b5f1ff3dd313df",
+  "texts": {
+    "summary": "inverseSqrt(x): 1/√x이며, 성분별로 계산합니다.",
+    "description": "WGSL에서는 `inverseSqrt`로, GLSL에서는 `inversesqrt`로 생성됩니다.",
+    "targets.wgsl": "`inverseSqrt(x)`로 생성합니다.",
+    "targets.glsl": "`inversesqrt(x)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

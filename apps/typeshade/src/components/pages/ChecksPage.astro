@@ -1,0 +1,50 @@
+---
+// The same gradient source is mounted twice below: once through the WebGPU path and once
+// forced onto WebGL2. Each caption is written from the backend that actually drew the frame.
+import Docs from '../../layouts/Docs.astro';
+import DiagnosticBlock from '../DiagnosticBlock.astro';
+import LayoutTable from '../LayoutTable.astro';
+import Rich from '../Rich.astro';
+import ShaderCanvas from '../ShaderCanvas.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { slugify } from '../../lib/slug.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = copyFor(locale).checks;
+const headings = [c.ciH, c.pairH, c.authorTime.h].map((h) => ({ depth: 2, slug: slugify(h), text: h }));
+---
+
+<Docs locale={locale} path={links.checks.href} title={c.title} description={c.description} headings={headings} editHref={editCopy(locale, 'checks')}>
+    <h1>{c.h1}</h1>
+    <h2 id={slugify(c.ciH)}>{c.ciH}</h2>
+    <p><Rich text={c.intro} locale={locale} /></p>
+    <ol>{c.items.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ol>
+    <h2 id={slugify(c.pairH)}>{c.pairH}</h2>
+    <p>{c.pairIntro}</p>
+    <div class="figure-pair">
+      <ShaderCanvas locale={locale} example="gradient-twin" stillId="gradient" aspect="3/2" still caption={c.gpuFrame} />
+      <ShaderCanvas
+        locale={locale}
+        example="gradient-twin"
+        stillId="gradient-webgl2"
+        aspect="3/2"
+        still
+        forceWebGl2
+        caption={c.glFrame}
+      />
+    </div>
+
+    <section>
+      <h2 id={slugify(c.authorTime.h)}>{c.authorTime.h}</h2>
+      <p>{c.authorTime.p}</p>
+      <figure class="figure">
+        <DiagnosticBlock locale={locale} />
+        <LayoutTable locale={locale} />
+        <figcaption class="figure-caption"><Rich text={c.authorTime.caption} locale={locale} /></figcaption>
+      </figure>
+    </section>
+</Docs>

@@ -1,0 +1,42 @@
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .doc table {
+    background-image: none;
+  }
+  .figure-split {
+    display: none;
+  }
+  a {
+    color: LinkText;
+  }
+  .site-menu-bar {
+    background: CanvasText;
+  }
+  .docs-group a[aria-current='page'] {
+    color: LinkText;
+  }
+  .button-primary {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Line breaks in prose. `pretty` lets the browser weigh the whole paragraph, not one line at a
+   time, so a paragraph does not end on a single short word and its lines keep a more even
+   length; `balance` gives a heading that wraps lines of about one length. A browser that does
+   not support them breaks lines as before. Only the docs' prose takes them: the home page and
+   the code blocks keep their own breaks. */
+.doc :is(p, li, dd, td, th, figcaption, blockquote) {
+  text-wrap: pretty;
+}
+.doc :is(h1, h2, h3, h4) {
+  text-wrap: balance;
+}

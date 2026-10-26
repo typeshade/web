@@ -1,0 +1,9 @@
+{
+  "slug": "capabilityrow",
+  "source": "2504db7cacda26f92a94b976187119325138770bbfc96b1f5cd37777443d4fe9",
+  "texts": {
+    "summary": "기능 행렬의 행 하나입니다. 기능 하나와, 각 백엔드가 그 기능을 지원하는 방식을 담습니다.",
+    "members.support": "`Backend.id`를 키로 씁니다. 넘긴 백엔드마다 항목이 하나씩 있습니다.",
+    "members.declarable": "모듈이 이 기능의 이름을 `enables`에 적을 수 있는지 나타냅니다. 모듈의 형태에서 파생되는 9개 기능(`storageBuffer`부터 `textureGather`까지, `bgra8unormStorage`와 `packed4x8Dot`)에 대해서는 거짓입니다. 이 기능들은 [`DeclarableCapability`](/api/declarablecapability/)가 `enables`에서 제외합니다."
+  }
+}

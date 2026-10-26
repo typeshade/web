@@ -1,0 +1,8 @@
+{
+  "slug": "vec4it",
+  "source": "42577d3eae9373e3e92fb7f62ee89e87ccb47f04c2a6a5af3166712b3450814d",
+  "texts": {
+    "summary": "기본 vec4<i32> 타입입니다. vec2iT와 함께 부호 있는 정수 벡터 계열을 완성합니다.",
+    "description": "`vec4<i32>`로 선언한 `fn` 매개변수, `resource` 또는 구조체 필드의 타입을 지정할 때 씁니다. `construct(vec4iT, [...])`로 값을 만들거나 `.at()`으로 이 타입의 값을 읽습니다."
+  }
+}

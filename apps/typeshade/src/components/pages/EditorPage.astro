@@ -1,0 +1,68 @@
+---
+// The editor page at /guide/editor/: how to install the VS Code extension and what it does.
+// Copy lives in `editor` (src/i18n/en.ts, src/i18n/ko.ts); the shell commands are not copy, so
+// they stay here. The label over each code frame is copy.
+import { Code } from 'astro-expressive-code/components';
+import Docs from '../../layouts/Docs.astro';
+import CodeFrame from '../CodeFrame.astro';
+import Rich from '../Rich.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { slugify } from '../../lib/slug.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = copyFor(locale).editor;
+const headings = [c.installH, c.desktopH, c.webH, c.roundH, c.agentsH].map((h) => ({ depth: 2, slug: slugify(h), text: h }));
+const installCommand = 'code --install-extension typeshade.vscode-typeshade';
+const pluginCommands = `/plugin marketplace add typeshade/vscode-typeshade
+/plugin install typeshade@typeshade`;
+---
+
+<Docs locale={locale} path={links.editor.href} title={c.title} description={c.description} headings={headings} editHref={editCopy(locale, 'editor')}>
+  <h1>{c.h1}</h1>
+  <p><Rich text={c.intro} locale={locale} /></p>
+
+  <section>
+    <h2 id={slugify(c.installH)}>{c.installH}</h2>
+    <p><Rich text={c.installP} locale={locale} /></p>
+    <CodeFrame label={c.installLabel}>
+      <Code code={installCommand} lang="bash" locale={locale} wrap />
+    </CodeFrame>
+    <p><Rich text={c.installP2} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.desktopH)}>{c.desktopH}</h2>
+    <p><Rich text={c.desktopP} locale={locale} /></p>
+    <ul>
+      {c.desktopItems.map((item) => <li><Rich text={item} locale={locale} /></li>)}
+    </ul>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.webH)}>{c.webH}</h2>
+    <p><Rich text={c.webP} locale={locale} /></p>
+    <p>{c.webConditionsP}</p>
+    <ul>
+      {c.webConditions.map((item) => <li><Rich text={item} locale={locale} /></li>)}
+    </ul>
+    <p><Rich text={c.webTestedP} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.roundH)}>{c.roundH}</h2>
+    <p><Rich text={c.roundP1} locale={locale} /></p>
+    <p><Rich text={c.roundP2} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.agentsH)}>{c.agentsH}</h2>
+    <p><Rich text={c.agentsP} locale={locale} /></p>
+    <CodeFrame label={c.agentsLabel}>
+      <Code code={pluginCommands} lang="text" locale={locale} wrap />
+    </CodeFrame>
+    <p><Rich text={c.agentsP2} locale={locale} /></p>
+    <p><Rich text={c.sourceP} locale={locale} /></p>
+  </section>
+</Docs>

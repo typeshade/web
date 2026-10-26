@@ -1,0 +1,8 @@
+{
+  "slug": "issemanticallyequal",
+  "source": "719417e19ff4cf3cfaa00ea97e512d94977a41fd021358f3c3b96a5746d48bce",
+  "texts": {
+    "summary": "d의 모든 버킷이 비어 있으면 true를 돌려줍니다.",
+    "description": "`explained` 항목은 세지 않습니다. 그래서 [`ClassifiedSemanticDiff`](/api/classifiedsemanticdiff/)에 대해 이 함수가 true를 돌려주면 \"선언된 변환을 제외하면 같다\"는 뜻입니다."
+  }
+}

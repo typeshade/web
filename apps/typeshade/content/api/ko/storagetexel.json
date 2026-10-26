@@ -1,0 +1,8 @@
+{
+  "slug": "storagetexel",
+  "source": "b6358a5e8b3912171ae1af09ddbd995e5bd5776c69e4f31fa2529eff649bf0a0",
+  "texts": {
+    "summary": "스토리지 텍스처의 텍셀 하나가 갖는 타입입니다. 이 타입은 형식의 채널 종류에 따라 정해집니다. …uint 형식은 vec4<u32>를 읽고 씁니다. …sint 형식은 vec4<i32>를 읽고 씁니다. 그 밖의 모든 형식은 vec4<f32>를 읽고 씁니다.",
+    "description": "Tint가 이 규칙을 강제한다(`no matching call to\n'textureStore(texture_storage_2d<rgba8uint, write>, vec2<i32>, vec4<f32>)'`). 그래서 이를 먼저 검사하는 프런트엔드는 같은 내용을 자기 말로 설명하고 수정 방법을 알려 줄 수 있습니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "float64key",
+  "source": "399cd6284eab780bcec1ec842257c07699d43d73ff947525382d8f3d670be4d6",
+  "texts": {
+    "summary": "에뮬레이션 배정밀도 키입니다. 스칼라 'f64'와 f64 벡터를 가리킵니다.",
+    "description": "f64 에뮬레이션을 갖춘 내장 함수만 이 키를 받습니다. 그런 함수는 `abs`, `floor`, `fract`, `sin`, `cos`, `min`, `max`, `mix`, 벡터 `normalize`, 스칼라 `sqrt`입니다. 그 밖의 내장 함수는 키를 [`FloatKey`](/api/floatkey/)로 한정합니다. 따라서 그런 함수에 f64 인수를 넘기면 작성 위치에서 `tsc` 오류가 납니다."
+  }
+}

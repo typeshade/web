@@ -1,0 +1,8 @@
+{
+  "slug": "isconsolemethod",
+  "source": "346c949c9a4c91a78231041038701c0b2dc16039d3b6c91f59647e39f52f3340",
+  "texts": {
+    "summary": "name이 소스 컴파일러가 하향 변환하는 콘솔 메서드 가운데 하나인지 확인하고, 그렇다면 ConsoleMethod로 좁힙니다.",
+    "description": "프런트엔드는 `console.<name>(...)`을 만날 때마다 이 함수로 지원 여부를 확인합니다. 나머지는 이름을 밝혀 거부하며, TypeShade만의 콘솔을 따로 만들어 내지 않습니다."
+  }
+}

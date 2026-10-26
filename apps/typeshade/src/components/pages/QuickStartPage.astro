@@ -1,0 +1,196 @@
+---
+import { Code } from 'astro-expressive-code/components';
+import Docs from '../../layouts/Docs.astro';
+import CodeFrame from '../CodeFrame.astro';
+import LiveShader from '../LiveShader.astro';
+import InstallCommand from '../InstallCommand.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { hero, quickStartFile } from '../../lib/examples.ts';
+import { useTypeshadeSample } from '../../lib/use-typeshade-sample.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { slugify } from '../../lib/slug.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copyFor(locale);
+const q = t.quickStart as typeof t.quickStart & { p0?: string };
+const host = t.quickStart.host;
+const heading = (depth: number) => (h: string) => ({ depth, slug: slugify(h), text: h });
+const headings = [
+  ...[q.installH, q.live.h, host.boundaryH, host.hostH].map(heading(2)),
+  ...[host.compileH, host.importH].map(heading(3)),
+  ...[q.status.h, host.nextLearnH].map(heading(2)),
+];
+const p0 = q.p0 ?? host.p0;
+const useLabel = t.codeLabels.useTypeshade ?? 'hello.shade.ts';
+
+// The live example's sample: a whole file, the way a Book of Shaders page shows a whole
+// .frag. <LiveShader> supplies the vertex half and nothing else, so every name here is
+// declared here (DESIGN.md, Live examples). Code is not copy, so it stays on this page.
+const stripes = `"use typeshade"
+
+const TAU: f32 = 6.2831853
+
+class Uniforms {
+  time: f32
+  bands: f32
+  low: vec3
+  high: vec3
+}
+
+declare const u: uniform<Uniforms>
+
+@fragment
+export function main(@location(0) uv: vec2): vec4 {
+  const phase = (uv.x * u.bands + u.time) * TAU
+  const wave = sin(phase) * 0.5 + 0.5
+  return vec4(mix(u.low, u.high, wave), 1.)
+}
+`;
+
+// The import setup and a host file that draws the sample above. Code, so it stays here too.
+const viteConfig = `import { defineConfig } from 'vite';
+import { typeshade } from 'typeshade/vite';
+
+export default defineConfig({ plugins: [typeshade()] });`;
+const tsconfig = `{
+  "compilerOptions": {
+    // ...
+    "moduleSuffixes": [".typeshade", ""]
+  },
+  "exclude": ["src/**/*.shade.ts"]
+}`;
+const packageJson = `{
+  "scripts": {
+    "dev": "tsx node_modules/vite/bin/vite.js",
+    "build": "tsx node_modules/vite/bin/vite.js build",
+    "prepare": "tsx node_modules/typeshade/src/cli/bin.ts sync"
+  }
+}`;
+const appTs = `import { fs } from './hello.shade.ts';
+
+const canvas = document.querySelector('canvas')!;
+fs(canvas, {});`;
+---
+
+<Docs locale={locale} path={links.quickStart.href} title={q.title} description={q.description} headings={headings} editHref={editCopy(locale, 'quickStart')}>
+  <h1>{q.h1}</h1>
+  <h2 id={slugify(q.installH)}>{q.installH}</h2>
+  <InstallCommand locale={locale} />
+  <p><Rich text={p0} locale={locale} /></p>
+  <CodeFrame label={useLabel}>
+    <Code code={useTypeshadeSample} lang="ts" title="hello.shade.ts" locale={locale} />
+  </CodeFrame>
+  <section>
+    <h2 id={slugify(q.live.h)}>{q.live.h}</h2>
+    <p><Rich text={q.live.p} locale={locale} /></p>
+    <LiveShader
+      locale={locale}
+      id="quick-start-stripes"
+      title={q.live.title}
+      code={stripes}
+      caption={q.live.caption}
+      anchor={q.live.anchor}
+      exercises={q.live.exercises}
+      file="stripes.shade.ts"
+      aspect="3/1"
+      controls={{
+        bands: { label: q.live.bands, min: 1, max: 24, step: 1, value: 6 },
+        low: { label: q.live.low, color: true, value: [0.149, 0.141, 0.912] },
+        high: { label: q.live.high, color: true, value: [1, 0.833, 0.224] },
+      }}
+    />
+  </section>
+  <p><Rich text={q.p1} locale={locale} /></p>
+  <CodeFrame label={t.codeLabels.quickStartShader}>
+    <Code code={quickStartFile.shader.code} lang="ts" title={quickStartFile.shader.name} locale={locale} />
+  </CodeFrame>
+  <CodeFrame label={t.codeLabels.quickStartHost}>
+    <Code code={quickStartFile.host.code} lang="ts" title={quickStartFile.host.name} locale={locale} />
+  </CodeFrame>
+  <CodeFrame label={q.runLabel}>
+    <Code code={`npx tsx ${quickStartFile.host.name}`} lang="bash" locale={locale} />
+  </CodeFrame>
+  <p>{q.p2}</p>
+  <CodeFrame label={t.codeLabels.wgsl}>
+    <Code code={hero.wgsl} lang="wgsl" locale={locale} />
+  </CodeFrame>
+  <p><Rich text={q.p3} locale={locale} /></p>
+  <section>
+    <h2 id={slugify(host.boundaryH)}>{host.boundaryH}</h2>
+    <p><Rich text={host.boundaryP} locale={locale} /></p>
+    <ul>
+      {host.boundaryBullets.map((bullet) => <li><Rich text={bullet} locale={locale} /></li>)}
+    </ul>
+  </section>
+  <section>
+    <h2 id={slugify(host.hostH)}>{host.hostH}</h2>
+    <p><Rich text={host.hostP0} locale={locale} /></p>
+    <h3 id={slugify(host.compileH)}>{host.compileH}</h3>
+    <p><Rich text={host.hostP1} locale={locale} /></p>
+    <CodeFrame label={host.hostWgslLabel}>
+      <Code code={`const shaderCode = /* WGSL emitted from the TypeShade module */
+const shaderModule = device.createShaderModule({ code: shaderCode })
+
+const pipeline = device.createComputePipeline({
+  layout: 'auto',
+  compute: {
+    module: shaderModule,
+    entryPoint: 'paint',
+  },
+})`} lang="ts" title="webgpu.ts" locale={locale} />
+    </CodeFrame>
+    <p><Rich text={host.hostP2} locale={locale} /></p>
+    <h3 id={slugify(host.importH)}>{host.importH}</h3>
+    <p><Rich text={host.importP} locale={locale} /></p>
+    <p><Rich text={host.setupP} locale={locale} /></p>
+    <CodeFrame label={host.toolingLabel}>
+      <Code code="npm install --save-dev vite" lang="bash" locale={locale} />
+    </CodeFrame>
+    <CodeFrame label={host.viteLabel}>
+      <Code code={viteConfig} lang="ts" title="vite.config.ts" locale={locale} />
+    </CodeFrame>
+    <CodeFrame label={host.tsconfigLabel}>
+      <Code code={tsconfig} lang="jsonc" title="tsconfig.json" locale={locale} />
+    </CodeFrame>
+    <CodeFrame label={host.packageLabel}>
+      <Code code={packageJson} lang="json" title="package.json" locale={locale} />
+    </CodeFrame>
+    <p><Rich text={host.drawP} locale={locale} /></p>
+    <CodeFrame label={host.drawLabel}>
+      <Code code={appTs} lang="ts" title="app.ts" locale={locale} />
+    </CodeFrame>
+    <CodeFrame label={host.devLabel}>
+      <Code code="npm run dev" lang="bash" locale={locale} />
+    </CodeFrame>
+    <p><Rich text={host.untilP} locale={locale} /></p>
+  </section>
+  <section>
+    <h2 id={slugify(q.status.h)}>{q.status.h}</h2>
+    <div class="alert alert-info">
+      <svg class="alert-icon" viewBox="0 0 1024 1024" aria-hidden="true" focusable="false">
+        <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z" />
+        <path d="M464 336a48 48 0 1096 0 48 48 0 10-96 0zm72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z" />
+      </svg>
+      <p><Rich text={q.status.p} locale={locale} /></p>
+    </div>
+  </section>
+  <section>
+    <h2 id={slugify(host.nextLearnH)}>
+      {host.nextLearnH}
+    </h2>
+    <p>
+      {host.nextLearnP}
+    </p>
+    <ul>
+      {host.nextLinks.map(({ linkKey, label }) => (
+        <li><a href={localePath(locale, links[linkKey].href)}>{label}</a></li>
+      ))}
+    </ul>
+    <p><a href={localePath(locale, links.guide.href)}>{host.nextLearnAllLink}</a></p>
+    <p><Rich text={host.nextEditorP} locale={locale} /></p>
+  </section>
+</Docs>

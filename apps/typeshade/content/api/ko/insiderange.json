@@ -1,0 +1,7 @@
+{
+  "slug": "insiderange",
+  "source": "5ac459354fb45e6fbf0081cf4bbc748ddc6965ccdcc8f827ea29e9474a7a6204",
+  "texts": {
+    "summary": "범위 안에 있는지 판정하는 술어이다: x >= lo && x <= hi."
+  }
+}

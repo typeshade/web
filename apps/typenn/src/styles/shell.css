@@ -1,0 +1,46 @@
+@import "@typeshade/site-ui/product-shell.css";
+/* Shared documentation and product navigation */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  font-weight: 650;
+  font-size: 17px;
+  letter-spacing: -0.025em;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  color: white;
+  background: var(--ui-blue-6);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 16px;
+  font-weight: 600;
+}
+.top-link,
+.language-link {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: var(--ui-radius-control);
+  white-space: nowrap;
+}
+.top-link:hover,
+.language-link:hover {
+  color: var(--ink);
+  background: var(--soft);
+}
+.sidebar-heading {
+  padding: 0 10px;
+  margin: 0 0 5px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

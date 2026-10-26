@@ -1,0 +1,8 @@
+{
+  "slug": "variant",
+  "source": "f23addfafd15f40517636359aeba8507e0e2bf47684384072c916a444ddb9db0",
+  "texts": {
+    "summary": "빌드된 변형 하나입니다.",
+    "members.reflection": "이 변형의 고유 [`reflect`](/api/reflect/) 결과입니다. 그래서 호스트가 고를 수 있는 프로그램마다 따로 설명됩니다."
+  }
+}

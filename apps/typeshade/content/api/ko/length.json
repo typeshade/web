@@ -1,0 +1,11 @@
+{
+  "slug": "length",
+  "source": "97b0df147ee51893165f9f5d4d361222c4cd82b74dbdd49ef489f8850687a434",
+  "texts": {
+    "summary": "length(v): 유클리드 벡터 크기이며, |v|입니다.",
+    "description": "반환 값의 정밀도는 피연산자를 따릅니다. f32 벡터(vec2, vec3 또는 vec4)는 f32를 돌려주고, 에뮬레이션된 배정밀도 `vec${N}<f64>`는 f64를 돌려줍니다. 그래서 f64 피연산자는 캐스트 없이도 정밀도를 유지합니다.",
+    "targets.wgsl": "`length(v)`로 생성합니다. `f64` 피연산자에는 fp64 패스가 이를 `df64` 헬퍼로 다시 씁니다.",
+    "targets.glsl": "`length(v)`로 생성합니다. `f64` 피연산자에는 fp64 패스가 이를 `df64` 헬퍼로 다시 씁니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,90 @@
+/* Footer: the site map in three groups on the container's white, held off the page field by
+   its var(--ui-gray-3) top rule, then the licence, the copyright and the commit. The three groups sit
+   at their own widths across the shell, and Documentation's 20 links run down two columns
+   32px apart. What spreads is the space between one group and the next; a group stays as
+   narrow as its own longest link, so the heading nearest a link is the one it belongs to.
+   Tracks of one width spread the links instead: Documentation flowed into five columns
+   1328px wide at 1920, and the four columns with no heading over them read as four more
+   groups. */
+.site-footer {
+  margin-block-start: 96px;
+  border-block-start: 1px solid var(--color-line-1);
+  background: var(--color-ground);
+}
+.site-map {
+  padding: 32px var(--gutter-x) 24px;
+  max-inline-size: var(--container);
+  margin-inline: auto;
+  display: grid;
+  gap: 24px 32px;
+}
+.site-map h2 {
+  font-size: var(--text-ui);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text-1);
+}
+.site-map ul {
+  margin-block-start: 2px;
+}
+/* The spacing between two links is the link's own padding, not a margin: a margin at the top
+   of a flowed column is dropped, which would leave the first item of every column but the
+   first sitting higher than its neighbours. */
+.site-map li {
+  break-inside: avoid;
+}
+.site-map a {
+  display: block;
+  padding-block: 3px;
+  font-size: var(--text-ui);
+  color: var(--color-text-2);
+  text-decoration: none;
+  transition: color var(--motion);
+}
+.site-map a:hover {
+  color: var(--color-accent);
+}
+.site-legal {
+  max-inline-size: var(--container);
+  margin-inline: auto;
+  padding: 16px var(--gutter-x) 24px;
+  border-block-start: 1px solid var(--color-line-1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  font-size: 0.75rem;
+  line-height: 1.6667;
+  color: var(--color-text-2);
+}
+.site-legal p {
+  margin: 0;
+}
+.site-legal a {
+  color: var(--color-text-2);
+  text-decoration: none;
+  transition: color var(--motion);
+}
+.site-legal a:hover {
+  color: var(--color-accent);
+}
+/* One group per row on a phone, where 20 links down one column is what a phone footer does.
+   From 40rem Documentation splits into two columns, and from 48rem the three groups go side
+   by side, each as wide as its own longest link, spread across the shell so the last one
+   ends on its right edge. The space goes between the groups and never inside one:
+   Documentation's two columns stay 32px apart at every width, while the groups stand 120px
+   apart at a 768 viewport and 396px from 1440 up in English, 148px and 424px in Korean, so
+   the heading a link sits under is the near one. The 64px column gap is the floor under that
+   spread, for a width where the groups' own widths leave little to give away. */
+@media (min-width: 40rem) {
+  .site-map-docs ul {
+    columns: 2;
+    column-gap: var(--ui-space-8);
+  }
+}
+@media (min-width: 48rem) {
+  .site-map {
+    grid-template-columns: repeat(3, minmax(0, max-content));
+    column-gap: 64px;
+    justify-content: space-between;
+  }
+}

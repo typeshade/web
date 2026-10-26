@@ -1,0 +1,72 @@
+---
+// The language service at /guide/language-service/: the editor-neutral layer the Playground
+// reads from and a language server will. Copy lives in `languageService` (src/i18n/en.ts,
+// src/i18n/ko.ts); the TypeScript sample is not copy, so it stays here. It imports the
+// package by its release name, the way the reference's import lines do.
+import { Code } from 'astro-expressive-code/components';
+import Docs from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { PACKAGE_NAME } from '../../lib/api.ts';
+import { slugify } from '../../lib/slug.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = copyFor(locale).languageService;
+const headings = [c.layersH, c.requestsH, c.documentsH, c.packagingH, c.exampleH, c.furtherH].map((h) => ({ depth: 2, slug: slugify(h), text: h }));
+const sample = `import { createTypeshadeLanguageService } from '${PACKAGE_NAME}/language-service'
+
+// readDocument reads a file a document imports that the editor has not opened.
+const service = createTypeshadeLanguageService({ readDocument: (uri) => files.get(uri) })
+const uri = 'file:///hello.shade.ts'
+
+service.openDocument(uri, source)
+const diagnostics = service.getDiagnostics(uri)
+const hover = service.getHover(uri, cursor)
+const output = service.getCompiledOutput(uri, 'wgsl')
+
+service.updateDocument(uri, nextSource)
+service.closeDocument(uri)`;
+---
+
+<Docs locale={locale} path={links.languageService.href} title={c.title} description={c.description} headings={headings} editHref={editCopy(locale, 'languageService')}>
+  <h1>{c.h1}</h1>
+  <p><Rich text={c.intro} locale={locale} /></p>
+
+  <section>
+    <h2 id={slugify(c.layersH)}>{c.layersH}</h2>
+    <p><Rich text={c.layersP} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.requestsH)}>{c.requestsH}</h2>
+    <p>{c.requestsP}</p>
+    <ul>
+      {c.requests.map(([name, answer]) => <li><strong>{name}</strong> <Rich text={answer} locale={locale} /></li>)}
+    </ul>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.documentsH)}>{c.documentsH}</h2>
+    <p><Rich text={c.documentsP1} locale={locale} /></p>
+    <p>{c.documentsP2}</p>
+    <p><Rich text={c.documentsP3} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.packagingH)}>{c.packagingH}</h2>
+    <p><Rich text={c.packagingP} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.exampleH)}>{c.exampleH}</h2>
+    <p>{c.exampleP}</p>
+    <Code code={sample} lang="ts" title="editor.ts" locale={locale} />
+  </section>
+
+  <section>
+    <h2 id={slugify(c.furtherH)}>{c.furtherH}</h2>
+    <p><Rich text={c.furtherP} locale={locale} /></p>
+  </section>
+</Docs>

@@ -1,0 +1,8 @@
+{
+  "slug": "voidt",
+  "source": "3ec0b509a90abfbc8ae929086a22add5ba6aaaccb8384c1a16ba8df40f7a3ea5",
+  "texts": {
+    "summary": "값이 없음을 나타내는 타입입니다. 본문이 값을 전혀 돌려주지 않는 fn의 반환 타입입니다.",
+    "description": "본문에서 `Return`을 찾지 못하면 반환 타입 추론이 이 타입으로 되돌아갑니다. 그래서 이 타입을 직접 적을 일은 드뭅니다."
+  }
+}

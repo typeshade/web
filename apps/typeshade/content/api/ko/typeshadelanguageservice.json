@@ -1,0 +1,13 @@
+{
+  "slug": "typeshadelanguageservice",
+  "source": "365c2a31ee15331b26bae9e52bad882772c13a534f51628e0a79e61a2f8ba88b",
+  "texts": {
+    "summary": "편집기 통합에 쓰는 Typeshade 진단, 자동 완성, 호버, 위치 변환을 제공합니다.",
+    "members.fileName": "소스 텍스트를 파싱할 때 쓰는 파일 이름입니다. 파일 시스템에서 갖는 의미는 없습니다.",
+    "members.getDiagnostics": "편집기 마커에 쓰기 알맞도록 0부터 세는 범위와 UTF-16 구간을 붙인 컴파일러 진단을 반환합니다.",
+    "members.getCompletions": "0부터 세는 편집기 위치에서 문맥에 맞는 Typeshade 자동 완성 항목을 반환합니다.",
+    "members.getHover": "0부터 세는 편집기 위치에 있는 알려진 Typeshade 타입과 어트리뷰트의 호버 문서를 반환합니다.",
+    "members.getPosition": "UTF-16 소스 오프셋을 어댑터가 쓰는 0부터 세는 위치로 바꿉니다. 소스 끝을 넘는 오프셋은 끝으로 맞춥니다.",
+    "members.getOffset": "0부터 세는 편집기 위치를 UTF-16 소스 오프셋으로 바꿉니다. 소스 끝을 넘는 위치는 끝으로 맞춥니다."
+  }
+}

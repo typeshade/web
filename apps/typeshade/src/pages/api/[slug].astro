@@ -1,0 +1,20 @@
+---
+// Two kinds of page share the segment under /api/: an export's reference page and a
+// category's index page. Their slugs cannot collide (src/lib/api.ts asserts it), so one
+// route builds both.
+import { getCollection } from 'astro:content';
+import ApiCategoryPage from '../../components/pages/ApiCategoryPage.astro';
+import ApiReferencePage from '../../components/pages/ApiReferencePage.astro';
+import { apiCategories } from '../../lib/api-nav.ts';
+
+export async function getStaticPaths() {
+  const entries = (await getCollection('api')).map((entry) => ({ params: { slug: entry.id }, props: { entry: entry.data } }));
+  const categories = apiCategories().map(({ category }) => ({ params: { slug: category.slug }, props: { category: category.slug } }));
+  return [...entries, ...categories];
+}
+const { entry, category } = Astro.props;
+---
+
+{category
+  ? <ApiCategoryPage locale="en" slug={category} />
+  : <ApiReferencePage locale="en" entry={entry} path={`/api/${entry.slug}/`} />}

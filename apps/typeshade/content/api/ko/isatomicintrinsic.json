@@ -1,0 +1,7 @@
+{
+  "slug": "isatomicintrinsic",
+  "source": "c349e568af9253f33fcba5dfd214c26244401d875c086cb623c870990df6b156",
+  "texts": {
+    "summary": "name이 ATOMIC_INTRINSICS 중 하나인지 여부입니다."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "slug": "typeshadeposition",
+  "source": "29965f38699b06963e9893d2d8f48ed70a4e5129c946a5bf04947926b6ecd4cd",
+  "texts": {
+    "summary": "0부터 세는 편집기 위치입니다. Language Server Protocol의 관례에 따라 줄과 문자 모두 0에서 시작합니다.",
+    "description": "Monaco 자체 API는 1부터 세므로, Monaco 어댑터는 위치를 표시하거나 받기 전에 각 값에 1을 더합니다.",
+    "members.line": "0부터 세는 줄 번호입니다.",
+    "members.character": "줄 안에서 0부터 세는 UTF-16 문자 오프셋입니다."
+  }
+}

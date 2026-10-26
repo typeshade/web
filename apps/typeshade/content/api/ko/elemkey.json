@@ -1,0 +1,7 @@
+{
+  "slug": "elemkey",
+  "source": "6c6d8965088bf92a58fce3105f8ccb8ec58ac9f295ede43c7dde006f5cc3c6bb",
+  "texts": {
+    "summary": "벡터 키의 원소 키입니다. 스칼라 키에서는 키 자신이 그대로 나옵니다."
+  }
+}

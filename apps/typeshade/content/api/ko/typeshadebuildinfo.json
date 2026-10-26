@@ -1,0 +1,10 @@
+{
+  "slug": "typeshadebuildinfo",
+  "source": "0a5caeffe2ee0abb841d56105a44f04d844efcb1a782a6b263c650c6758c03c2",
+  "texts": {
+    "summary": "패키지의 빌드 정보입니다. 프로그램을 만든 컴파일러나 벤치마크의 리비전과는 별도로 기록합니다.",
+    "description": "`typeshade`와 `typeshade/runtime`에서 내보낸다(변경 0083).",
+    "members.version": "TypeShade 패키지 버전입니다.",
+    "members.revision": "패키징 중 확인한, 수정되지 않은 소스의 정확한 리비전입니다. 기록되지 않았거나 수정된 소스는 `null`이입니다. 브라우저 실행 중에는 Git이나 패키지 메타데이터를 읽지 않습니다."
+  }
+}

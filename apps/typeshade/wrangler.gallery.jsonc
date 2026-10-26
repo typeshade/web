@@ -1,0 +1,35 @@
+// gallery.typeshade.dev on Cloudflare Workers (docs/cloudflare.md, The gallery). A second
+// Worker beside typeshade-site (wrangler.jsonc): the same dist/, the same bucket and database,
+// and worker/gallery.ts in front of every request, since every path on this host is either a
+// gallery page the Worker fills in or a file of the build's. Deployed with
+// `wrangler deploy -c wrangler.gallery.jsonc`, after the site's Worker has applied the
+// migrations.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "typeshade-gallery",
+  "main": "worker/gallery.ts",
+  "account_id": "7c029c2ac777ff3c45a4bcbe67918a1e",
+  "compatibility_date": "2026-09-01",
+  // The gallery answers at its own address only; a pull request's preview version keeps a
+  // workers.dev URL of its own (deploy.yml's cloudflare-preview).
+  "workers_dev": false,
+  "preview_urls": true,
+  "routes": [{ "pattern": "gallery.typeshade.dev", "custom_domain": true }],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    "run_worker_first": true,
+  },
+  "r2_buckets": [{ "binding": "DATA", "bucket_name": "typeshade-data" }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "typeshade",
+      "database_id": "bd328565-57f1-47b9-b970-98fb2b3b792a",
+      "migrations_dir": "worker/migrations",
+    },
+  ],
+  "observability": { "enabled": true },
+}

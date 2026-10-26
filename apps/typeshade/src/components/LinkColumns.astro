@@ -1,0 +1,24 @@
+---
+// A short list of links to other pages, the reference's See also and a language reference
+// entry's examples: one column on a phone, two from 40rem, run down the columns in order.
+// The caller writes the <li> items; this draws the list around them.
+---
+
+<ul class="link-columns"><slot /></ul>
+
+<style>
+  /* No markers, the way the footer's two columns of links have none: a marker hangs in the
+     gutter to the left of its item, so the second column's markers sat in the gap beside the
+     first column's text. The space between two items sits under each item, not over it: the
+     top of a flowed column drops the space over an item, which left the first column's
+     first item 8px below the second column's. In one column it is a margin, so the last
+     one folds into the gap before the next section. In two it is padding, which a column
+     break keeps whole, so the list is as tall as its longer column at any count.
+     These outrank `.doc ul` and `.doc li`. */
+  .link-columns { padding-inline-start: 0; list-style: none }
+  .link-columns :global(li) { margin-block: 0 8px; padding-inline-start: 0; break-inside: avoid }
+  @media (min-width: 40rem) {
+    .link-columns { columns: 2; column-gap: 32px }
+    .link-columns :global(li) { margin-block-end: 0; padding-block-end: 8px }
+  }
+</style>

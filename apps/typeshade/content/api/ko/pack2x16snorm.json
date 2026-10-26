@@ -1,0 +1,11 @@
+{
+  "slug": "pack2x16snorm",
+  "source": "96d4e2db229d680d3788c5b5f26aad36cc054730939cb921ded8cd838f2e1362",
+  "texts": {
+    "summary": "vec2<f32>를 u32 하나로 패킹합니다. 두 성분은 16비트 snorm 값이며, 성분마다 ⌊0.5 + 32767·clamp(x, -1, 1)⌋을 2의 보수로 나타냅니다. 성분 0은 하위 16비트에 들어갑니다.",
+    "description": "부호 있는 법선과 방향 필드에 알맞습니다. GLSL ES 3.00에서는 이름이 `packSnorm2x16`이입니다.",
+    "targets.wgsl": "`pack2x16snorm(v)`로 생성합니다.",
+    "targets.glsl": "`packSnorm2x16(v)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "slug": "vec4f64t",
+  "source": "25a77b83180a3efe2fc2506b966f1013d977de3d5cf8d25d34c8fd4b9fd70f36",
+  "texts": {
+    "summary": "4성분 에뮬레이션 배정밀도 벡터입니다. 생성 방식과, vec4fT 대신 에뮬레이션 배정밀도 계열을 골라야 하는 경우는 vec2f64T를 참고합니다."
+  }
+}

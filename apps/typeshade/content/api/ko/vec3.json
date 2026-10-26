@@ -1,0 +1,8 @@
+{
+  "slug": "vec3",
+  "source": "990723eaf93a31ac21d75ac94223381efdc8abaab825f8627d9f5e9513db3d81",
+  "texts": {
+    "summary": "vec3<f32> 생성자이며, WGSL 방식으로 vec3(x, y, z)라고 씁니다.",
+    "description": "일반 숫자 성분은 f32로 승격됩니다."
+  }
+}

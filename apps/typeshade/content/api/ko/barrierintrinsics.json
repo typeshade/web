@@ -1,0 +1,8 @@
+{
+  "slug": "barrierintrinsics",
+  "source": "978772d4a5b04e54419c0f1a56f4d8d55efe7e5ea0b28a79c982d7617b2b8a03",
+  "texts": {
+    "summary": "workgroupBarrier()와 storageBarrier()는 배리어입니다. 두 문은 값을 내지 않습니다. 워크그룹의 모든 호출이 이 문에 도달한 뒤에만 각 호출이 다음 코드를 실행합니다.",
+    "description": "WGSL은 이들을 감싸는 형식 없이 문으로 씁니다. GLSL ES 3.00에는 컴퓨트 스테이지도 배리어도 없습니다. CPU 오라클은 `dispatch`로 이들을 실행합니다. dispatch는 워크그룹의 각 호출을 모든 호출이 도착할 때까지 배리어에서 대기시킵니다."
+  }
+}

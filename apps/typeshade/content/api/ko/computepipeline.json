@@ -1,0 +1,10 @@
+{
+  "slug": "computepipeline",
+  "source": "fc2c3812a2c1715b5757180a96e8fdd9f9f5a54e8a9c1b3d561391c7f42d8e82",
+  "texts": {
+    "summary": "컴퓨트 파이프라인입니다. 진입점은 하나이며, 디스패치할 때 바인딩을 이름으로 지정합니다.",
+    "description": "`B`는 진입점이 닿는 바인딩이다(변경 0030). `workgroupShape`는 이 파이프라인을 만들 때 쓴 상수(워크그룹 크기 오버라이드 포함)에 따라 확정된 `[x, y, z]` 형태입니다.",
+    "members.workgroupShape": "이 파이프라인을 만들 때 적용한 확정된 `[x, y, z]` 워크그룹 크기입니다.",
+    "members.dispatch": "호스트의 인코더나 컴퓨트 패스, 또는 프레임의 인코더에 디스패치를 기록합니다.\n탈출구(Rule 11.17)입니다. 호스트의 `GPUCommandEncoder` 또는 `GPUComputePassEncoder`에 디스패치가 기록됩니다. WebGL2는 프레임만 받습니다."
+  }
+}

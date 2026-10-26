@@ -1,0 +1,10 @@
+{
+  "slug": "typeshadehover",
+  "source": "bdf1ed72f67d43076f40e8bdc17b5183f6944845ff62a49c3230bf8c871df25e",
+  "texts": {
+    "summary": "언어 계층이 돌려주는 호버 문서와 소스 구간입니다.",
+    "members.contents": "렌더링된 호버 내용으로, 절마다 항목이 하나씩 있습니다.",
+    "members.span": "호버가 설명하는 UTF-16 오프셋 구간입니다.",
+    "members.range": "호버가 설명하는, 0부터 세는 시작 위치를 포함하고 끝 위치를 제외하는 범위로 `span`과 같은 범위입니다."
+  }
+}

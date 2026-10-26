@@ -1,0 +1,10 @@
+{
+  "slug": "fieldlayout",
+  "source": "ea5958339dbec258241f6bf2d6a5fc480586311984958db81991413dda7e7599",
+  "texts": {
+    "summary": "구조체 필드 하나의 바이트 레이아웃입니다. 이름, DSL 타입 키(typeKey가 돌려주는 문자열), 그리고 감싸는 StructLayout을 계산할 때 적용한 LayoutKind 규칙으로 구한 offset, align, size(바이트 단위)를 담습니다.",
+    "description": "`Float32Array` 슬롯에 쓰는 패커는 `offset`을 4로 나눕니다. 이 엔진이 배치하는 모든 타입은 최소 4바이트로 정렬되므로 나눗셈은 정확합니다.",
+    "members.name": "필드를 작성한 이름입니다. 호스트는 이 이름으로 필드를 읽습니다.",
+    "members.emitted": "생성된 텍스트에 쓰인 필드 이름이다(규칙 11.10). 대상 언어가 작성한 그대로 쓸 수 있으면 `name`과 같습니다."
+  }
+}

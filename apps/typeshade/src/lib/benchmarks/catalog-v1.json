@@ -1,0 +1,439 @@
+{
+  "revision": "2026-10-22.1",
+  "compiler": "94203d3cab6433065bbe111c3b93f66a4058828e",
+  "digest": "016e717e5f9e53f0275dfc6b6b0238133b67e19ea9341720365c5c52bc64fa88",
+  "cases": [
+    {
+      "id": "layout-aos-8-read-1",
+      "suite": "layout",
+      "kind": "layout",
+      "variant": "aos",
+      "fields": 8,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\nclass Item { f0: f32; f1: f32; f2: f32; f3: f32; f4: f32; f5: f32; f6: f32; f7: f32; }\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<Item>>;\ndeclare const out: storage<array<f32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[i].f0;\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\nstruct Item {\n  f0: f32,\n  f1: f32,\n  f2: f32,\n  f3: f32,\n  f4: f32,\n  f5: f32,\n  f6: f32,\n  f7: f32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<Item>;\n@group(0) @binding(2) var<storage, read_write> out: array<f32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i].f0;\n}\n",
+      "shader": "e5f97f6b93109a6d813da987bcf09f91920f230534fd7246761f0870e068cf93",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "layout-soa-8-read-1",
+      "suite": "layout",
+      "kind": "layout",
+      "variant": "soa",
+      "fields": 8,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<f32>>;\ndeclare const out: storage<array<f32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[0 * args.n + i];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<f32>;\n@group(0) @binding(2) var<storage, read_write> out: array<f32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[0u * args.n + i];\n}\n",
+      "shader": "65c8f42bcb52367874d8cb060d23d0306e320e2d00eec58712586e3077b02c26",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "layout-aos-1-read-1",
+      "suite": "layout",
+      "kind": "layout",
+      "variant": "aos",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\nclass Item { f0: f32; }\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<Item>>;\ndeclare const out: storage<array<f32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[i].f0;\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\nstruct Item {\n  f0: f32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<Item>;\n@group(0) @binding(2) var<storage, read_write> out: array<f32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i].f0;\n}\n",
+      "shader": "ffed51f86a8f8ff8e72d1305ee5e0a3d16072d3ddd92329a9b9cc1e1451b603f",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "layout-soa-1-read-1",
+      "suite": "layout",
+      "kind": "layout",
+      "variant": "soa",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<f32>>;\ndeclare const out: storage<array<f32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[0 * args.n + i];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<f32>;\n@group(0) @binding(2) var<storage, read_write> out: array<f32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[0u * args.n + i];\n}\n",
+      "shader": "65c8f42bcb52367874d8cb060d23d0306e320e2d00eec58712586e3077b02c26",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "layout-aos-8-read-8",
+      "suite": "layout",
+      "kind": "layout",
+      "variant": "aos",
+      "fields": 8,
+      "reads": 8,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\nclass Item { f0: f32; f1: f32; f2: f32; f3: f32; f4: f32; f5: f32; f6: f32; f7: f32; }\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<Item>>;\ndeclare const out: storage<array<f32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[i].f0 + src[i].f1 + src[i].f2 + src[i].f3 + src[i].f4 + src[i].f5 + src[i].f6 + src[i].f7;\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\nstruct Item {\n  f0: f32,\n  f1: f32,\n  f2: f32,\n  f3: f32,\n  f4: f32,\n  f5: f32,\n  f6: f32,\n  f7: f32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<Item>;\n@group(0) @binding(2) var<storage, read_write> out: array<f32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  let _lc0 = src[i];\n  out[i] = _lc0.f0 + _lc0.f1 + _lc0.f2 + _lc0.f3 + _lc0.f4 + _lc0.f5 + _lc0.f6 + _lc0.f7;\n}\n",
+      "shader": "7ff10aef509970d21f9159edc0d03b224ee5b91021bbca4898d3f66f0f2ef347",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "layout-soa-8-read-8",
+      "suite": "layout",
+      "kind": "layout",
+      "variant": "soa",
+      "fields": 8,
+      "reads": 8,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<f32>>;\ndeclare const out: storage<array<f32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[0 * args.n + i] + src[1 * args.n + i] + src[2 * args.n + i] + src[3 * args.n + i] + src[4 * args.n + i] + src[5 * args.n + i] + src[6 * args.n + i] + src[7 * args.n + i];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<f32>;\n@group(0) @binding(2) var<storage, read_write> out: array<f32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[0u * args.n + i] + src[1u * args.n + i] + src[2u * args.n + i] + src[3u * args.n + i] + src[4u * args.n + i] + src[5u * args.n + i] + src[6u * args.n + i] + src[7u * args.n + i];\n}\n",
+      "shader": "c1c8c1942fe1ba7c4421770f4efcf7aa09dc8573b7c15867d2a196b2e5778b01",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "transfer-upload",
+      "suite": "transfer",
+      "kind": "upload",
+      "variant": "transfer-upload",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "",
+      "wgsl": "",
+      "shader": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bindings": []
+    },
+    {
+      "id": "transfer-readback",
+      "suite": "transfer",
+      "kind": "readback",
+      "variant": "transfer-readback",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "",
+      "wgsl": "",
+      "shader": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bindings": []
+    },
+    {
+      "id": "memory-step-1",
+      "suite": "memory",
+      "kind": "copy",
+      "variant": "memory-step-1",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[(i * 1) % args.n];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i * 1u % args.n];\n}\n",
+      "shader": "79fc089030379db35d5c6e70fcf07fc17821d4f90793f0d6bb95dbf848ca4b91",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "memory-step-17",
+      "suite": "memory",
+      "kind": "copy",
+      "variant": "memory-step-17",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 17,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[(i * 17) % args.n];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i * 17u % args.n];\n}\n",
+      "shader": "46c5f240ccddc428d8f71edb62b92d5b185a725e5b0a2819d00660f76b78edd0",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "memory-step-4097",
+      "suite": "memory",
+      "kind": "copy",
+      "variant": "memory-step-4097",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 4097,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[(i * 4097) % args.n];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i * 4097u % args.n];\n}\n",
+      "shader": "b1b6c3dad209f2dbb9f2a917876608c3f6186cd747ec52b73522f45829500927",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "arithmetic-rounds-4",
+      "suite": "arithmetic",
+      "kind": "arithmetic",
+      "variant": "arithmetic-rounds-4",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 4,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n let x: u32 = src[i]; for (let k: u32 = 0; k < 4; k++) { x = x * 1664525 + 1013904223; } out[i] = x;\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  var x: u32 = src[i];\n  for (var k: u32 = 0u; (k < 4u); k = k + 1u) {\n    x = x * 1664525u + 1013904223u;\n  }\n  out[i] = x;\n}\n",
+      "shader": "5983be97d9cab52d7fa2743b169a629ac70552b3bf71fc6d0120b1439d257ac8",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "arithmetic-rounds-64",
+      "suite": "arithmetic",
+      "kind": "arithmetic",
+      "variant": "arithmetic-rounds-64",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 64,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n let x: u32 = src[i]; for (let k: u32 = 0; k < 64; k++) { x = x * 1664525 + 1013904223; } out[i] = x;\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  var x: u32 = src[i];\n  for (var k: u32 = 0u; (k < 64u); k = k + 1u) {\n    x = x * 1664525u + 1013904223u;\n  }\n  out[i] = x;\n}\n",
+      "shader": "a13de1aa5ca31050804003820a5c767e28525cfd265c748a613208539aee5b85",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "reduction-serial",
+      "suite": "reduction",
+      "kind": "reduce",
+      "variant": "serial",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n / 64) { return; }\n let sum: u32 = 0; for (let k: u32 = 0; k < 64; k++) { sum += src[i * 64 + k]; } out[i] = sum;\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n / 64u)) {\n    return;\n  }\n  var sum: u32 = 0u;\n  for (var k: u32 = 0u; (k < 64u); k = k + 1u) {\n    sum += src[i * 64u + k];\n  }\n  out[i] = sum;\n}\n",
+      "shader": "7eb48108b57481c3b0137657ffc0a7ddbac2fb796ce98430a71df6b4b0df424b",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "reduction-workgroup",
+      "suite": "reduction",
+      "kind": "reduce",
+      "variant": "shared",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u, @builtin(\"local_invocation_id\") lid: vec3u, @builtin(\"workgroup_id\") wid: vec3u): void {\n tile[lid.x] = src[gid.x]; workgroupBarrier();\n for (let stride: u32 = 32; stride > 0; stride /= 2) {\n   if (lid.x < stride) { tile[lid.x] += tile[lid.x + stride]; }\n   workgroupBarrier();\n }\n if (lid.x === 0) { out[wid.x] = tile[0]; }\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>, @builtin(workgroup_id) wid: vec3<u32>) {\n  tile[lid.x] = src[gid.x];\n  workgroupBarrier();\n  for (var stride: u32 = 32u; (stride > 0u); stride /= 2u) {\n    if ((lid.x < stride)) {\n      tile[lid.x] += tile[lid.x + stride];\n    }\n    workgroupBarrier();\n  }\n  if ((lid.x == 0u)) {\n    out[wid.x] = tile[0];\n  }\n}\n",
+      "shader": "65897324821e24a25ac08a408bb43eec55e4f3bac5ac1e388ebf15e1136a2240",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "atomics-bins-1",
+      "suite": "atomics",
+      "kind": "atomic",
+      "variant": "atomics-bins-1",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n atomicAdd(out[i % 1], src[i]);\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<atomic<u32>>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  _ = atomicAdd(&out[i % 1u], src[i]);\n}\n",
+      "shader": "bf4842435242b070d8618b1987386c0501502542a04fc253a14a4113886394bd",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "atomics-bins-256",
+      "suite": "atomics",
+      "kind": "atomic",
+      "variant": "atomics-bins-256",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 256,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n atomicAdd(out[i % 256], src[i]);\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<atomic<u32>>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  _ = atomicAdd(&out[i % 256u], src[i]);\n}\n",
+      "shader": "d58e3623f76f7f63c2a760e8a70184394d5efe138d140481b88d3ad494821760",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "workgroup-64",
+      "suite": "workgroup",
+      "kind": "copy",
+      "variant": "workgroup-64",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[(i * 1) % args.n];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i * 1u % args.n];\n}\n",
+      "shader": "79fc089030379db35d5c6e70fcf07fc17821d4f90793f0d6bb95dbf848ca4b91",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "workgroup-128",
+      "suite": "workgroup",
+      "kind": "copy",
+      "variant": "workgroup-128",
+      "fields": 1,
+      "reads": 1,
+      "wg": 128,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([128])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[(i * 1) % args.n];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(128)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i * 1u % args.n];\n}\n",
+      "shader": "f1c804bf8b4b7f2f7c00b73e83e03ad7324dc9d6eacf7a030d0e53bfc43c5396",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "workgroup-256",
+      "suite": "workgroup",
+      "kind": "copy",
+      "variant": "workgroup-256",
+      "fields": 1,
+      "reads": 1,
+      "wg": 256,
+      "factor": 1,
+      "dispatches": 1,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([256])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[(i * 1) % args.n];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(256)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i * 1u % args.n];\n}\n",
+      "shader": "9d27f5e804b6967cbb4d61f14599f8d5c92989cbd12d481d0383c3c70f4fd2fb",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "submission-batched",
+      "suite": "submission",
+      "kind": "copy",
+      "variant": "submission-batched",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 16,
+      "separate": false,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[(i * 1) % args.n];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i * 1u % args.n];\n}\n",
+      "shader": "79fc089030379db35d5c6e70fcf07fc17821d4f90793f0d6bb95dbf848ca4b91",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    },
+    {
+      "id": "submission-separate",
+      "suite": "submission",
+      "kind": "copy",
+      "variant": "submission-separate",
+      "fields": 1,
+      "reads": 1,
+      "wg": 64,
+      "factor": 1,
+      "dispatches": 16,
+      "separate": true,
+      "source": "\"use typeshade\";\nclass Args { n: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[(i * 1) % args.n];\n}",
+      "wgsl": "struct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i * 1u % args.n];\n}\n",
+      "shader": "79fc089030379db35d5c6e70fcf07fc17821d4f90793f0d6bb95dbf848ca4b91",
+      "bindings": [
+        { "name": "args", "binding": 0, "group": 0 },
+        { "name": "src", "binding": 1, "group": 0 },
+        { "name": "out", "binding": 2, "group": 0 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "findusetypeshadedirective",
+  "source": "2cdd8a9afa15f96ece4f4e244e87a591feb819fcbae2b8d70525fffeee901ce3",
+  "texts": {
+    "summary": "SourceFile의 최상위 문장을 훑어, 처음 나오는 \"use typeshade\"; 지시문을 반환합니다. 지시문이 없으면 undefined를 반환합니다.",
+    "description": "SourceFile의 직접 자식만 검사합니다. 중첩된 스코프는 검사하지 않습니다."
+  }
+}

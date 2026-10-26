@@ -1,0 +1,12 @@
+{
+  "slug": "dpdx",
+  "source": "651026ae83b99dc6179aeac108ba445e72b4f37811225c2ea261aa65a7917cb7",
+  "texts": {
+    "summary": "dpdx(x): x의 화면 공간 편미분을 X축 방향으로 구합니다. 성분별로 적용합니다.",
+    "description": "[`fwidth`](/api/fwidth/)와 같이 GPU에서만 존재하며(CPU 계산은 0을 돌려준다) 프래그먼트 셰이더에서만 쓸 수 있습니다. 다른 곳에서 쓰면 `fragment-only-builtin` 린트 규칙이 `SD0109`를 냅니다. WGSL에서는 `dpdx`, GLSL ES 3.00에서는 `dFdx`로 씁니다. [`dpdy`](/api/dpdy/)는 Y축 방향의 짝입니다.",
+    "exceptions.SD0109": "fwidth와 같이 GPU에서만, 그리고 프래그먼트 셰이더에서만 존재합니다. fragment-only-builtin 린트 규칙이 다른 곳에서는 SD0109를 냅니다.",
+    "targets.wgsl": "`dpdx(x)`.",
+    "targets.glsl": "`dFdx(x)`.",
+    "targets.cpu": "오라클에는 텍스처 메모리가 없고 이웃 프래그먼트도 없습니다. `{ gpuStubs: true }` 옵션으로 모듈을 컴파일하지 않았다면 이 호출은 예외를 던집니다. 이 옵션을 켜면 플레이스홀더 값을 돌려줍니다."
+  }
+}

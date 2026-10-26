@@ -1,0 +1,11 @@
+{
+  "slug": "smoothstep",
+  "source": "ed89f78c57c18e7f1dadd891febb1073ab99ab8be1eb8b146757edfc2bdb6ce6",
+  "texts": {
+    "summary": "smoothstep(e0, e1, x): x = e0일 때 0, x = e1일 때 1이 되는 에르미트 보간을 성분별로 계산합니다.",
+    "description": "WGSL은 세 인자가 모두 같은 타입(스칼라 또는 벡터)이어야 한다고 요구합니다. 벡터 오버로드는 `x`의 키를 유지합니다. 스칼라 오버로드는 f32 노드나 JS 숫자를 받습니다.",
+    "targets.wgsl": "`smoothstep(e0, e1, x)`.",
+    "targets.glsl": "`smoothstep(e0, e1, x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

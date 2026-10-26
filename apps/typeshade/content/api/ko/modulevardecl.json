@@ -1,0 +1,9 @@
+{
+  "slug": "modulevardecl",
+  "source": "5f8c3e249041a996948a3daf7f98f64bd0d13fbd650568d568ceaa627f148a08",
+  "texts": {
+    "summary": "ModuleDecl.vars의 항목 하나입니다. 리소스가 아닌 모듈 범위 변수를 나타냅니다.",
+    "description": "`workgroup`은 WGSL의 `var<workgroup>`에 해당하며, 한 워크그룹의 호출들이 공유하는 메모리입니다. 각 워크그룹이 시작될 때 0이며, 초기화할 수 없습니다.\n`private`은 WGSL의 `var<private>`에 해당하며, 각 인보케이션이 실행되는 동안 소유하는 값입니다. 시작할 때 `init` 값이거나 0입니다.\n두 종류 모두 그룹, 바인딩, 바이트 레이아웃을 갖지 않습니다. 그래서 [`reflect`](/api/reflect/)는 이 변수들에 대해 아무것도 보고하지 않으며, 호스트는 이를 바인딩하지 않습니다.",
+    "members.init": "초기 값입니다. 리터럴과 모듈 범위 const로 이루어진 상수 식입니다. `private` 변수만 초기 값을 가집니다. WGSL은 `workgroup` 메모리의 초기화 식을 금지합니다."
+  }
+}

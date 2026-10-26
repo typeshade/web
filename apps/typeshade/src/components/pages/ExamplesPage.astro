@@ -1,0 +1,219 @@
+---
+import { Code } from 'astro-expressive-code/components';
+import Docs from '../../layouts/Docs.astro';
+import CodeFrame from '../CodeFrame.astro';
+import Rich from '../Rich.astro';
+import ShaderCanvas from '../ShaderCanvas.astro';
+import type { CanvasText } from '../ShaderCanvas.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { hero } from '../../lib/examples.ts';
+import { checkedShade, shadeExampleList, SHADE_GROUPS } from '../../lib/shade-examples.ts';
+import { examplePath } from '../../lib/example-pages.ts';
+import { checkedHost, hostExampleIds } from '../../lib/host-example-pages.ts';
+import { SHADE_STILL_EXAMPLES } from '../../../scripts/artifacts.mjs';
+import { slugify } from '../../lib/slug.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copyFor(locale);
+const e = t.examples;
+
+const deepZoom: CanvasText = {
+  neutral: e.f64.caption,
+  webgpu: e.f64.caption,
+  webgl2: e.f64.caption,
+  none: `${e.f64.caption} ${e.f64.captionNone}`,
+};
+const headings = [
+  { depth: 2, slug: 'mnist', text: t.mnist.title },
+  { depth: 2, slug: slugify(e.shade.h), text: e.shade.h },
+  ...SHADE_GROUPS.map((g) => ({ depth: 3, slug: slugify(g.key), text: e.shade.groups[g.key] })),
+  { depth: 2, slug: slugify(e.host.h), text: e.host.h },
+  ...[e.glsl.h, e.f64.h].map((h) => ({ depth: 2, slug: slugify(h), text: h })),
+];
+
+const learningPath = e.path.steps.map((step) => ({ ...step, href: localePath(locale, links[step.linkKey].href) }));
+
+// The `.shade.ts` corpus, by group. The picture is there for the ones the page can draw and the
+// plain mark stands in for the rest. Every tile opens the example's own page
+// (src/components/pages/ExamplePage.astro), which runs it and shows what it emits.
+const shadeTitleFor = checkedShade('title', e.shade.titles);
+const shadeTextFor = checkedShade('description', e.shade.descriptions);
+const shadeStills = new Set<string>(SHADE_STILL_EXAMPLES);
+const shadeById = new Map(shadeExampleList.map((x) => [x.id, x]));
+const shadeGroups = SHADE_GROUPS.map((g) => ({
+  key: g.key,
+  heading: e.shade.groups[g.key],
+  rows: g.ids.map((id) => {
+    const x = shadeById.get(id)!;
+    return {
+      id,
+      still: shadeStills.has(id),
+      title: shadeTitleFor[id]!,
+      href: localePath(locale, examplePath(id)),
+      wgslOnly: !x.renderable,
+      blurb: shadeTextFor[id]!,
+    };
+  }),
+}));
+// The host examples (compiler change 0061), after the `.shade.ts` groups, in the compiler's
+// order. They draw nothing on the page, so every tile carries the plain mark, with a line that
+// says what the page holds instead of a picture.
+const hostTitleFor = checkedHost('title', e.host.titles);
+const hostTextFor = checkedHost('description', e.host.descriptions);
+const hostRows = hostExampleIds.map((id) => ({
+  id,
+  title: hostTitleFor[id]!,
+  href: localePath(locale, examplePath(id)),
+  blurb: hostTextFor[id]!,
+}));
+// A gallery tile: an Ant Card, a picture where the runtime can draw one as the cover, the name
+// and the sentence in the body, the whole tile one link to the example's page.
+const tile = 'example-tile group flex block-full flex-col overflow-hidden rounded-md border border-line-1 bg-(--color-elevated)';
+const tileTitle = 'px-4 pbs-4 text-h5 font-semibold text-text-1 transition-[color] group-hover:text-accent';
+const tileBlurb = 'example-tile-blurb px-4 pbs-1 pbe-4 text-ui text-text-2';
+// An Ant tag beside the name of an example that emits a single target.
+const tag = 'ms-2 inline-block rounded-sm border border-line-2 bg-surface-1 px-[7px] text-label whitespace-nowrap text-text-2';
+---
+
+<Docs locale={locale} path={links.examples.href} title={e.title} description={e.description} headings={headings} editHref={editCopy(locale, 'examples')}>
+    <h1>{e.h1}</h1>
+    <p><Rich text={e.intro} locale={locale} /></p>
+
+    <section class="learning-path">
+      <h2>{e.path.h}</h2>
+      <p>{e.path.p}</p>
+      <ol>
+        {learningPath.map((step) => (
+          <li>
+            <strong>{step.title}</strong>
+            <p>{step.text}</p>
+            <a class="mbs-1 inline-block" href={step.href}>{step.label} →</a>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="mbs-8 rounded-md border border-line-1 bg-(--color-elevated) p-5">
+      <h2 id="mnist" class="mbs-0">{t.mnist.title}</h2>
+      <p class="mbs-3 text-text-2">{t.mnist.short}</p>
+      <a href={localePath(locale, links.mnist.href)}>{t.mnist.open} →</a>
+    </section>
+
+    <section>
+      <h2 id={slugify(e.shade.h)}>{e.shade.h}</h2>
+      <p><Rich text={e.shade.p} locale={locale} /></p>
+      {shadeGroups.map((group) => (
+        <Fragment>
+          <h3 id={slugify(group.key)}>{group.heading}</h3>
+          <ul class="example-grid grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-x-4 gap-y-6">
+            {group.rows.map((row) => (
+              <li>
+                <a class={tile} href={row.href}>
+                  <span class="tile-cover">
+                    {row.still ? <img src={`/stills/${row.id}.webp`} alt="" loading="lazy" decoding="async" /> : (
+                      <span class="no-still">
+                        <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+                          <rect x="3.75" y="8.75" width="32.5" height="22.5" rx="3" />
+                          <path d="M3.75 24.5l7.5-6.5 6 5 5.5-4.5 13.5 11" />
+                          <circle cx="14.5" cy="15.5" r="2.25" />
+                        </svg>
+                        <span class="no-still-note">{e.noStill}</span>
+                      </span>
+                    )}
+                  </span>
+                  <span class={tileTitle}>{row.title}{row.wgslOnly && <span class={tag}>{e.wgslOnly}</span>}</span>
+                  <span class={tileBlurb}><Rich text={row.blurb} locale={locale} inert /></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Fragment>
+      ))}
+    </section>
+
+    <section>
+      <h2 id={slugify(e.host.h)}>{e.host.h}</h2>
+      <p><Rich text={e.host.p} locale={locale} /></p>
+      <ul class="example-grid grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-x-4 gap-y-6">
+        {hostRows.map((row) => (
+          <li>
+            <a class={tile} href={row.href}>
+              <span class="tile-cover">
+                <span class="no-still">
+                  <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+                    <rect x="3.75" y="8.75" width="32.5" height="22.5" rx="3" />
+                    <path d="M3.75 24.5l7.5-6.5 6 5 5.5-4.5 13.5 11" />
+                    <circle cx="14.5" cy="15.5" r="2.25" />
+                  </svg>
+                  <span class="no-still-note">{e.host.cover}</span>
+                </span>
+              </span>
+              <span class={tileTitle}>{row.title}</span>
+              <span class={tileBlurb}><Rich text={row.blurb} locale={locale} inert /></span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    {/* Examples the compiler has and this build does not: the section stays hidden until
+        src/scripts/examples-runtime.ts finds some in the example data the Worker serves, and
+        fills a tile for each from the template below. */}
+    <section data-examples-runtime hidden>
+      <h2 id={slugify(e.runtime.h)}>{e.runtime.h}</h2>
+      <p>{e.runtime.p}</p>
+      <ul class="example-grid grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-x-4 gap-y-6" data-runtime-grid>
+        <template data-runtime-tile>
+          <li>
+            <a class={tile} href="">
+              <span class="tile-cover">
+                <img src="" alt="" loading="lazy" decoding="async" data-tile-still />
+                <span class="no-still" data-tile-empty>
+                  <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+                    <rect x="3.75" y="8.75" width="32.5" height="22.5" rx="3" />
+                    <path d="M3.75 24.5l7.5-6.5 6 5 5.5-4.5 13.5 11" />
+                    <circle cx="14.5" cy="15.5" r="2.25" />
+                  </svg>
+                  <span class="no-still-note">{e.noStill}</span>
+                </span>
+              </span>
+              <span class={tileTitle}><span data-tile-title></span><span class={tag} data-tile-wgsl>{e.wgslOnly}</span></span>
+              <span class={tileBlurb} data-tile-blurb></span>
+            </a>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <section><h2 id={slugify(e.glsl.h)}>{e.glsl.h}</h2><p><Rich text={e.glsl.p1} locale={locale} /></p><CodeFrame label={t.codeLabels.glsl}><Code code={hero.glsl} lang="glsl" locale={locale} /></CodeFrame><p><Rich text={e.glsl.p2} locale={locale} /></p></section>
+    <section><h2 id={slugify(e.f64.h)}>{e.f64.h}</h2><p><Rich text={e.f64.p1} locale={locale} /></p><p><Rich text={e.f64.p2} locale={locale} /></p><p><Rich text={e.f64.p3} locale={locale} /></p><ShaderCanvas locale={locale} example="fp64-deep-zoom-twin" stillId="fp64-deep-zoom" aspect="3/1" still split caption={deepZoom} /></section>
+</Docs>
+
+<style>
+  /* The rules below outrank the document column's own list, paragraph and link rules
+     (.doc ul, .doc li, .doc p, .doc > section > ul), which utilities cannot. */
+  /* The examples page opens with a numbered path through the guide. Each step's own heading
+     carries its number, so the list marker would print it a second time. */
+  .learning-path ol { padding-inline-start: 0; list-style: none }
+  .learning-path li { margin-block-start: 24px }
+  .learning-path li p { margin-block-start: 4px }
+  /* A tile is a 3:2 cover with a name and a sentence under it, and 260px is the width the two
+     columns in the old 596px document column gave one, so a wider column carries more tiles
+     instead of taller ones. */
+  /* A grid of cards takes the whole column (DESIGN.md, the Container Rule), and a tile is not a
+     list item with a marker. The measure comes from `.doc > section > :is(…, .alert)`, which
+     weighs two classes and an element, so this names the column too. */
+  :global(.doc) .example-grid { max-inline-size: none; padding-inline-start: 0; list-style: none }
+  .example-grid li { margin: 0; padding: 0 }
+  .example-tile:hover { border-color: transparent; box-shadow: var(--shadow-elevated) }
+  @media (hover: hover) and (pointer: fine) { .example-tile:hover .tile-cover img { transform: scale(1.03) } }
+  .example-tile-blurb :global(code) { font-family: var(--font-mono); font-size: 0.9em }
+</style>
+
+<script>
+  import '../../scripts/examples-runtime.ts';
+</script>

@@ -1,0 +1,8 @@
+{
+  "slug": "determinismaccuracy",
+  "source": "2f4f452e880894ac9fb81d2313530d94499c2004aa2935c55774ac7dd216ed7c",
+  "texts": {
+    "summary": "accuracyOf가 연산 하나에 대해 알려 주는 내용입니다. WGSL이 답을 하나로 주고 두 타깃이 그 답에 동의하면 exact입니다. 그렇지 않으면 남은 여지의 종류와 그 경계를 말로 적습니다. GLSL ES 3.00 표기가 중요한 경우에는 메모를 붙입니다.",
+    "description": "`exact` 답에는, 그 답이 일부 입력에서만 성립할 때 `note`가 붙습니다. 예를 들어 NaN이나 비정규화(subnormal) `f32` 값을 `bitcast`하는 경우가 그렇다(change 0045)."
+  }
+}

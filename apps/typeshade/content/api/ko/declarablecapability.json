@@ -1,0 +1,8 @@
+{
+  "slug": "declarablecapability",
+  "source": "19dd4c49ddb678a6de1f7e441dffffeeb47baaf2dbeda45211a922e11005c6de",
+  "texts": {
+    "summary": "모듈이 ModuleDecl.enables에 적을 수 있는 기능입니다. 모듈의 형태에서 파생되는 아홉 가지 기능을 Capability에서 뺀 집합입니다.",
+    "description": "`requiredCaps`는 모듈이 이미 드러낸 내용에서 각 기능을 추론합니다. 스토리지 바인딩이면 `storageBuffer`, `@compute` 진입점이면 `compute`, 다중 샘플 텍스처면 `msaaTextureLoad`로 추론하고, 텍스처 id, `bgra8unorm` 스토리지 포맷, 패킹된 4x8 호출도 같은 방식으로 다룹니다. 그러므로 이 기능을 선언하면 모듈의 형태를 중복해서 명시하거나, 모듈이 쓰지 않는 기능을 요청하게 됩니다. 이 타입은 그 선언을 컴파일 오류로 만듭니다. 제외 목록은 비공개 `DERIVED_CAPABILITIES`(`derived-capabilities.ts`)이며, `capabilityMatrix`가 `declarable` 열에 읽는 목록과 같습니다.\n\n`clipDistances`, `primitiveIndex`, `subgroups`는 양쪽 모두에 속하며, 이는 의도된 동작입니다. 각각은 모듈이 적은 `@builtin(...)` id(§50)에서 파생되지만, 모듈이 다른 경로로 그 기능에 도달하면서 그 기능의 지시문을 가질 수도 있으므로 각각은 여전히 선언할 수 있습니다. 파생과 선언이 한 집합에서 만나므로, 이름을 하나 적어도 달라지는 것은 없습니다.\n\n작성 인터페이스만 좁아집니다. `requiredCaps`, [`Capabilities`](/api/capabilities/), [`CapProfile`](/api/capprofile/)은 여전히 전체 `Capability`를 읽습니다. 파생된 id가 바로 이 셋이 나타내야 하는 값이기 때문입니다."
+  }
+}

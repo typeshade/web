@@ -1,0 +1,149 @@
+name: pin-compiler
+
+# The site is built from the compiler at the commit vendor/shader-dsl pins. While that pin
+# only moved by hand, it fell behind the compiler's main: the site kept documenting a surface
+# the compiler had already changed (a removed spelling, a refused type) beside pages written
+# against the new one. This workflow moves the pin for us. Once a day, or on demand, it points
+# vendor/shader-dsl at the compiler's main and opens (or refreshes) one pull request that does
+# only that, listing the compiler commits it takes in and the guide translations it leaves
+# stale. The build on that pull request is what says which copy the new compiler needs.
+#
+# A pull request opened with GITHUB_TOKEN starts no pull_request workflow, so the job
+# dispatches deploy.yml on the branch itself; deploy.yml publishes only from main.
+# The repository needs Settings > Actions > General > "Allow GitHub Actions to create and
+# approve pull requests" turned on for the pull request step.
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  # The compiler, or anyone with a token, can ask for a bump straight after a merge.
+  repository_dispatch:
+    types: [compiler-updated]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: pin-compiler
+  cancel-in-progress: false
+
+jobs:
+  pin:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: pin/compiler
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Point vendor/shader-dsl at the compiler's main
+        id: bump
+        run: |
+          # An open pin pull request may already carry the copy fixes someone pushed to it, so a
+          # run builds on that branch and never rewrites it. With none open, it starts from main.
+          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')" ]; then
+            git fetch --quiet origin "$BRANCH"
+            git switch --quiet -C "$BRANCH" FETCH_HEAD
+            git submodule update --quiet vendor/shader-dsl
+            echo "open=true" >> "$GITHUB_OUTPUT"
+          else
+            git switch --quiet -C "$BRANCH"
+            echo "open=false" >> "$GITHUB_OUTPUT"
+          fi
+          base=$(git rev-parse origin/main:vendor/shader-dsl)
+          old=$(git -C vendor/shader-dsl rev-parse HEAD)
+          git -C vendor/shader-dsl fetch --quiet origin main
+          new=$(git -C vendor/shader-dsl rev-parse FETCH_HEAD)
+          if [ "$old" = "$new" ]; then
+            echo "The pin is the compiler's main ($old); nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git -C vendor/shader-dsl checkout --quiet "$new"
+          {
+            echo "changed=true"
+            echo "base=$base"
+            echo "new=$new"
+            echo "short=${new:0:7}"
+          } >> "$GITHUB_OUTPUT"
+      - uses: oven-sh/setup-bun@v2
+        if: steps.bump.outputs.changed == 'true'
+        with:
+          bun-version: 1.4.3
+      - name: Write the pull request body
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          OLD: ${{ steps.bump.outputs.base }}
+          NEW: ${{ steps.bump.outputs.new }}
+        run: |
+          bun install --frozen-lockfile
+          bun scripts/regression-catalog.ts --new
+          {
+            echo "Moves the compiler pin (\`vendor/shader-dsl\`) from \`${OLD:0:7}\`, where \`main\` has it, to \`${NEW:0:7}\`, the compiler's \`main\`."
+            echo
+            echo "## Compiler commits this takes in"
+            echo
+            git -C vendor/shader-dsl log --format='- %h %s' "$OLD..$NEW"
+            echo
+            echo "## Guide translations this leaves stale"
+            echo
+            echo "Each one is shown in English on its locale until it is translated again from the pinned \`AUTHORING.md\`."
+            echo
+            stale=$(bun scripts/check-guide-translations.ts 2>&1 | sed -n 's/^  stale: \([^ ]*\) .*/- `\1`/p' || true)
+            echo "${stale:-None.}"
+            echo
+            echo "## API reference translations this leaves stale"
+            echo
+            echo "The build on this pull request fails until each one is translated again from the pinned JSDoc (\`bun scripts/check-api-translations.ts --source <slug>\`)."
+            echo
+            api_stale=$(bun scripts/check-api-translations.ts 2>&1 | sed -n 's/^  \(content\/api\/[^ ]*\) was translated from older English.*/- `\1`/p' || true)
+            echo "${api_stale:-None.}"
+            echo
+            echo "## Reference notes this pin leaves stale"
+            echo
+            echo "The build on this pull request fails until each English section below is read again against the new values and the reading recorded (\`bun run check:notes --read <note>\`, in a commit with a \`Read-Against: <note>\` line). A translated section is shown in English until it is translated or read again."
+            echo
+            # The script prints None. when nothing is stale, so an empty answer is a run that
+            # stopped before it could compare; the build on the pull request says why.
+            notes=$(bun scripts/check-reference-notes.ts --stale --markdown 2>/dev/null || true)
+            echo "${notes:-The check stopped before it could compare the notes at this pin; the build on this pull request names the reason.}"
+            echo
+            if [ -f vendor/shader-dsl/scripts/downstream-impact.ts ]; then
+              echo
+              impact=$(bun vendor/shader-dsl/scripts/downstream-impact.ts --repo typeshade.github.io \
+                --submodule vendor/shader-dsl --old "$OLD" --new "$NEW" --base HEAD --markdown || true)
+              echo "$impact"
+              if ! grep -q '^Nothing in this repository' <<< "$impact"; then
+                echo
+                echo "Each line above still names what the new compiler removes. The build on this pull request fails until every one is fixed on this branch."
+              fi
+              echo
+            fi
+            echo "The build on this pull request stops on every other page whose copy the new compiler changes; fix those on this branch before merging."
+          } > "$RUNNER_TEMP/body.md"
+          cat "$RUNNER_TEMP/body.md"
+      - name: Push the branch and open or refresh the pull request
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          SHORT: ${{ steps.bump.outputs.short }}
+          OPEN: ${{ steps.bump.outputs.open }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add vendor/shader-dsl src/lib/benchmarks/regression-catalog*.json public/benchmarks/artifacts
+          git commit --quiet -m "site: pin the compiler at $SHORT"
+          title="site: pin the compiler at $SHORT"
+          if [ "$OPEN" = "true" ]; then
+            git push origin "$BRANCH"
+            gh pr edit "$BRANCH" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          else
+            # No open pull request: whatever the branch held was merged or dropped.
+            git push --force origin "$BRANCH"
+            gh pr create --head "$BRANCH" --base main --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          fi
+          gh workflow run deploy.yml --ref "$BRANCH"

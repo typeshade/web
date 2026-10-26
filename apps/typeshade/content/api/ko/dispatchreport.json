@@ -1,0 +1,7 @@
+{
+  "slug": "dispatchreport",
+  "source": "20b42621f85b5bacbfd2bcda503f268f8606832b27cb07ae6fdf41549d4b4a1c",
+  "texts": {
+    "summary": "CpuModule.dispatch가 실행한 결과입니다. 워크그룹 수, 모든 워크그룹에 걸친 호출 수, 그리고 각 워크그룹의 호출들이 거친 배리어 단계의 총수를 담습니다."
+  }
+}

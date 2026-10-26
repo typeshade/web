@@ -1,0 +1,75 @@
+---
+// Concepts: the shader pipeline, at /guide/concepts/the-pipeline/. The steps of a draw, what
+// each stage is handed and what it produces, and how an entry point signature maps onto that.
+// Copy lives in `concepts.pipeline` (src/i18n/en.ts, src/i18n/ko.ts). The code samples are
+// not copy: src/lib/pipeline-samples.ts holds them and compiles them while the page is built.
+import Docs from '../../layouts/Docs.astro';
+import { fitDescription } from '../../lib/meta-description.ts';
+import ConceptLesson from '../ConceptLesson.astro';
+import ConceptDoc from '../ConceptDoc.astro';
+import Rich from '../Rich.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import { copyFor, localeSettings, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { slugify } from '../../lib/slug.ts';
+import { computeSample, entrySample, interpolationSample } from '../../lib/pipeline-samples.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = copyFor(locale).concepts.pipeline;
+const lesson = copyFor(locale).concepts.lessons.pipeline;
+const learningLabels = copyFor(locale).concepts.lessonLabels;
+const learningHeadings = [
+  { depth: 2, slug: 'learning-use', text: learningLabels.use },
+  { depth: 2, slug: 'learning-example', text: learningLabels.example },
+  { depth: 2, slug: 'learning-caveat', text: learningLabels.caveat },
+];
+// The title is measured here, as the reference's entry pages measure theirs.
+if (c.title.length < 45 || c.title.length > 60) throw new Error(`[concepts] the pipeline page has a ${c.title.length}-character title, outside the 45 to 60 the SEO checks want: ${c.title}`);
+const headings = [...learningHeadings, ...[c.drawH, c.stagesH, c.entryH, c.interpolationH, c.computeH, c.furtherH].map((h) => ({ depth: 2, slug: slugify(h), text: h }))];
+---
+
+<Docs locale={locale} path={links.conceptsPipeline.href} title={c.title} description={fitDescription(`${lesson.meaning} ${lesson.use}`, localeSettings[locale].metaDescriptionMax)} headings={headings} editHref={editCopy(locale, 'concepts')} breadcrumbs={[{ name: copyFor(locale).docs.labels.sidebarGroups.concepts, href: links.concepts.href }, { name: c.h1, href: links.conceptsPipeline.href }]}>
+  <h1>{c.h1}</h1>
+  <p><Rich text={lesson.meaning} locale={locale} /></p>
+  <ConceptLesson locale={locale} lesson={lesson} topic="pipeline" />
+  <p>{c.lead}</p>
+
+  <section>
+    <h2 id={slugify(c.drawH)}>{c.drawH}</h2>
+    <p><Rich text={c.drawP} locale={locale} /></p>
+    <ConceptDoc locale={locale} rows={c.drawRows} columns={c.drawColumns} strongTerm />
+  </section>
+
+  <section>
+    <h2 id={slugify(c.stagesH)}>{c.stagesH}</h2>
+    <p>{c.stagesP}</p>
+    <ConceptDoc locale={locale} rows={c.stagesRows} columns={c.stagesColumns} strongTerm />
+  </section>
+
+  <section>
+    <h2 id={slugify(c.entryH)}>{c.entryH}</h2>
+    <p><Rich text={c.entryP} locale={locale} /></p>
+    <TypeShadeCode code={entrySample} />
+    <p>{c.entryNote}</p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.interpolationH)}>{c.interpolationH}</h2>
+    <p>{c.interpolationP}</p>
+    <TypeShadeCode code={interpolationSample} />
+    <p><Rich text={c.interpolationNote} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.computeH)}>{c.computeH}</h2>
+    <p><Rich text={c.computeP} locale={locale} /></p>
+    <TypeShadeCode code={computeSample} />
+  </section>
+
+  <section>
+    <h2 id={slugify(c.furtherH)}>{c.furtherH}</h2>
+    <ul>{c.furtherItems.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ul>
+    <p><Rich text={c.nextP} locale={locale} /></p>
+  </section>
+</Docs>

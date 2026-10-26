@@ -1,0 +1,88 @@
+name: gallery-setup
+
+# Maintenance of gallery.typeshade.dev that needs the Cloudflare account (docs/cloudflare.md, The
+# gallery), run by hand on main (Actions > gallery-setup > Run workflow):
+#
+# - stills: a still for every approved entry that has none (scripts/gallery-stills.ts), captured
+#   in Chromium from the site built on the runner and put in R2.
+# - access: Cloudflare Access in front of the review page, letting in the reviewer's address
+#   alone, and its two values on the gallery's Worker (scripts/setup-gallery-access.ts). The
+#   address is read from the event and masked before any step prints it; it is not stored in the
+#   repository.
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'What to run'
+        type: choice
+        options: [stills, access, both]
+        default: stills
+      reviewer_email:
+        description: 'The address Access lets into /review/ (access only)'
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gallery-setup
+  cancel-in-progress: false
+
+jobs:
+  stills:
+    if: github.ref == 'refs/heads/main' && inputs.task != 'access'
+    runs-on: ubuntu-latest
+    environment: cloudflare
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # vendor/shader-dsl is the compiler the build reads, and the build reads the pin's
+          # history too (src/lib/rule-history.ts), as deploy.yml's site job does.
+          submodules: true
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      # The shares are opened on this build, served on the runner: typeshade.dev answers a
+      # headless browser here with Cloudflare's challenge page.
+      - run: bun run build
+      - run: bun scripts/gallery-stills.ts
+      # What was put up, for a look before or after.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gallery-stills
+          path: gallery-stills
+          if-no-files-found: ignore
+          retention-days: 7
+
+  access:
+    if: github.ref == 'refs/heads/main' && inputs.task != 'stills'
+    runs-on: ubuntu-latest
+    environment: cloudflare
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Read the reviewer's address
+        run: |
+          email=$(jq -r '.inputs.reviewer_email // ""' "$GITHUB_EVENT_PATH")
+          if [ -z "$email" ]; then
+            echo "::error::reviewer_email is required for the access task."
+            exit 1
+          fi
+          echo "::add-mask::$email"
+          echo "GALLERY_REVIEWER_EMAIL=$email" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun scripts/setup-gallery-access.ts

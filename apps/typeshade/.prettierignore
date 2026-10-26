@@ -1,0 +1,27 @@
+dist
+node_modules
+.astro
+bun.lock
+*.sha256
+
+# The compiler, pinned as a submodule; it is formatted in its own repository.
+vendor
+
+# Built or third-party: font subsets and captured images, and the skills and agents installed
+# from their own repositories (skills-lock.json), which are kept as they arrive.
+public
+.claude
+.impeccable
+skills-lock.json
+
+# The snippet region is shown on the page as laid out and capped at 8 lines (typed-error.ts);
+# Prettier would break it over 19. Its `;` are written by hand.
+src/lib/typed-error-shader.ts
+
+# Astro keeps the whitespace written between tags, so reformatting a component's markup changes
+# the page (`<a>{t.skip}</a>` broken over three lines renders as `<a> Skip to content </a>`).
+# The TypeScript inside a component (its frontmatter and <script>) gets its `;` from
+# scripts/astro-semicolons.ts instead.
+*.astro
+.wrangler
+.cache

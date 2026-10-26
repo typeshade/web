@@ -1,0 +1,9 @@
+{
+  "slug": "emitexpr",
+  "source": "0489183569ea53f2c8c20d6c2a95310c1910d027c14843e6e7854cf9148d4912",
+  "texts": {
+    "summary": "기본값인 'full' 괄호 표기를 쓰는 wgslBackend로, Expr 하나를 WGSL 소스 텍스트로 생성합니다.",
+    "description": "식은 주어진 그대로 쓰입니다. [`emitModule`](/api/emitmodule/)이 실행하는 하향 변환과 최적화 패스는 여기서 실행되지 않습니다.",
+    "targets.wgsl": "WebGPU용 WGSL을 씁니다."
+  }
+}

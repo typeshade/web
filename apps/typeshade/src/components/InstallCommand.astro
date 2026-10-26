@@ -1,0 +1,19 @@
+---
+// Install from the public Git repository; the source package uses a TypeScript runner.
+// Each command wraps on narrow screens.
+import { Code } from 'astro-expressive-code/components';
+import { facts } from '../lib/examples.ts';
+import CodeFrame from './CodeFrame.astro';
+import { copyFor, type Locale } from '../i18n/index.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const command = `npm install ${facts.mirrorUrl.replace(/\.git$/, '')}.git\nnpm install --save-dev tsx`;
+---
+
+<CodeFrame label={copyFor(locale).install.label}>
+  <Code code={command} lang="bash" locale={locale} wrap />
+</CodeFrame>
+<p>{copyFor(locale).install.source}</p>

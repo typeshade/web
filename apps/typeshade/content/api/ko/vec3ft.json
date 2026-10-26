@@ -1,0 +1,7 @@
+{
+  "slug": "vec3ft",
+  "source": "1d23a7b2d8d9a9d8c687bdf5d7a37c37f12b6c845688e9f5570aad17bc7b1ad2",
+  "texts": {
+    "summary": "기본 vec3<f32>입니다. 월드 공간 위치나 방향을 담을 때 흔히 쓰는 타입입니다. 예를 들어 부호 있는 거리 장면 함수의 p: vec3fT 매개변수에 쓰입니다."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "i32",
+  "source": "4b9bdd019554b84ea26204ed4e19e8b9eb5eab38985f9f804b437b64c78ff598",
+  "texts": {
+    "summary": "i32 리터럴 노드입니다.",
+    "description": "값이 부호 있는 정수로 타입 검사를 통과해야 하는 자리라면 기본값인 f32 대신 이 함수를 사용합니다. 배열과 반복의 인덱스, `matchExpr`와 `matchEnum`의 판별값, 텍스처 레이어 인자가 그런 자리입니다.\n\nNode를 인자로 넘기면 캐스트가 됩니다. `i32(x)`는 변환이며, `x.i32()`의 독립 함수 버전입니다. [`toI32`](/api/toi32/)와 같은 노드를 만들고, 피연산자는 스칼라로 제한됩니다.",
+    "exceptions.TypeError": "`v`가 JS 숫자도 스칼라 노드도 아닐 때 발생합니다.",
+    "exceptions.SD0116": "노드 피연산자가 스칼라가 아니면 `SD0116`이 발생합니다.",
+    "targets.wgsl": "`i32(a)`로 생성합니다.",
+    "targets.glsl": "`int(a)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

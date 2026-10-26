@@ -1,0 +1,102 @@
+/* API reference page: the crumbs, the kind line, definition lists for parameters and members,
+   the targets table */
+.api-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-2);
+  font-size: var(--text-ui);
+  color: var(--color-text-3);
+}
+.api-crumbs a {
+  color: var(--color-text-2);
+  text-decoration: none;
+}
+.api-crumbs a:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.doc .api-crumbs + h1 {
+  margin-block-start: 12px;
+}
+.doc h1 code {
+  font-size: 0.9em;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.api-kind {
+  margin-block-start: 4px;
+  font-size: var(--text-ui);
+  color: var(--color-text-3);
+}
+.api-summary {
+  font-size: var(--text-prose);
+  color: var(--color-text-1);
+}
+.api-list {
+  margin-block-start: 16px;
+}
+.api-list dt {
+  margin-block-start: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+.api-list dt:first-child {
+  margin-block-start: 0;
+}
+.api-list dd {
+  margin-block-start: 4px;
+  padding-inline-start: 20px;
+  color: var(--color-text-2);
+}
+.api-list dd p {
+  margin-block-start: 8px;
+}
+.api-list dd p:first-child {
+  margin-block-start: 0;
+}
+.api-type {
+  color: var(--color-text-3);
+}
+.api-type a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--color-line-2);
+  text-underline-offset: 3px;
+}
+.api-type a:hover {
+  color: var(--color-accent);
+  text-decoration-color: currentColor;
+}
+.api-optional {
+  font-size: 0.75rem;
+  line-height: 1.6667;
+  padding: 0 7px;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-1);
+  color: var(--color-text-2);
+}
+.doc h1 .api-optional {
+  margin-inline-start: 10px;
+  vertical-align: middle;
+}
+/* The reference's index pages: a category or an export per row, its name a link in the
+   site's primary, its sentence under it. The same definition list the parameters use. */
+.api-index dt {
+  margin-block-start: 20px;
+}
+.api-index dt a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.api-index dt a:hover {
+  color: var(--color-primary-text-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.api-index dd {
+  padding-inline-start: 0;
+}

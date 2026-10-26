@@ -1,0 +1,7 @@
+{
+  "slug": "externvarhandle",
+  "source": "596208d3a7d9aa1af714e6f0c4299d8e2e517c26ae76df8dfa0cc93f98452904",
+  "texts": {
+    "summary": "externVar가 반환하는 쌍입니다. 값을 읽는 노드와 module()에 넘길 선언입니다."
+  }
+}

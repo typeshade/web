@@ -1,0 +1,419 @@
+---
+// One documented name of the language surface, on a page of its own at
+// /reference/<kind>/<name>/. The shape is the one /api/ already uses and MDN set: the name,
+// a summary and a compiler reference ordered as Syntax, Parameters, Return value,
+// Description, Targets, Examples and See also. Mathematical lessons and authored notes
+// lead the page. Sections the compiler has nothing for are omitted. The declarations,
+// parameters, return types,
+// sentence, the stage rules and the two target spellings are a LanguageEntry
+// (src/lib/language-reference.ts), the examples come from the corpus
+// (src/lib/language-examples.ts), and the words around them are docs.reference in every
+// dictionary. Mathematical explanations live in the lesson dictionaries. Authored reference
+// notes are translated like guide sections and held to the values they read (DESIGN.md,
+// Reference notes; src/lib/reference-notes.ts, ReferenceNotes.astro).
+import { getEntry } from 'astro:content';
+import { Code } from 'astro-expressive-code/components';
+import Docs, { type Heading } from '../../layouts/Docs.astro';
+import LanguageType from '../LanguageType.astro';
+import LinkColumns from '../LinkColumns.astro';
+import ReferenceNotes from '../ReferenceNotes.astro';
+import FunctionDemo from '../FunctionDemo.astro';
+import OperationLesson from '../OperationLesson.astro';
+import { operationModel } from '../../lib/operation-models.ts';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import MappingTable from '../MappingTable.astro';
+import { textureForms } from '../../lib/texture-load-forms.ts';
+import { typeSpellings } from '../../lib/type-spellings.ts';
+import { irBuilderSlugByName } from '../../lib/api-nav.ts';
+import { facts } from '../../lib/examples.ts';
+import { languageExamples } from '../../lib/language-examples.ts';
+import {
+  languageEntry,
+  languageEntryPath,
+  languageSection,
+  languageSections,
+  languageSiblings,
+  scalarBrand,
+  type LanguageKind,
+} from '../../lib/language-reference.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { META_MIN, fitDescription, fitLeadAndTail } from '../../lib/meta-description.ts';
+import { assertNoteReading, noteEntryId, noteOf, type NoteView } from '../../lib/reference-notes.ts';
+import { functionDemo } from '../../lib/function-demos.ts';
+import { functionSpellings } from '../../lib/function-spellings.ts';
+import type { FunctionLesson } from '../../i18n/function-lessons-en.ts';
+
+interface Props {
+  locale: Locale;
+  kind: LanguageKind;
+  name: string;
+}
+const { locale, kind, name } = Astro.props;
+const r = copyFor(locale).docs.reference;
+const e = r.entry;
+const entry = languageEntry(kind, name);
+const mathLesson = kind === 'function' ? (r.demo.lessons as Record<string, FunctionLesson>)[name] : undefined;
+const workedLesson = kind === 'function' ? (r.worked.lessons as Record<string, FunctionLesson>)[name] ?? r.worked.constructor(name) : undefined;
+const lesson = mathLesson ?? workedLesson;
+const model = workedLesson ? operationModel(name) : undefined;
+if (kind === 'function' && !lesson) throw new Error(`[function-lesson] missing lesson for ${name}`);
+if (workedLesson && !model) throw new Error(`[function-lesson] missing worked model for ${name}`);
+const demo = kind === 'function' ? functionDemo(name) : undefined;
+const section = languageSection(kind);
+const named = r.kinds[kind];
+const kindWord = e.kindWords[kind];
+
+// The title and the description. Both are measured here, not left to qa:seo: with 470 entry
+// pages a title out of bounds is one line in a page dump, and the name behind it is what a
+// fix starts from.
+// A builtin with a form on both targets names them in the title and the description.
+const targets =
+  entry.spelling?.wgsl && entry.spelling.glsl
+    ? { wgsl: entry.spelling.wgsl, glsl: entry.spelling.glsl }
+    : undefined;
+// A scalar, vector or matrix type names what each target writes for it the same way.
+const typeTargets = kind === 'type' ? typeSpellings(entry.name) : undefined;
+// A Math member is named as an author writes it, `Math.pow`, the way its h1 names it.
+const shownName = kind === 'math' ? entry.title : entry.name;
+const discovery = kind === 'function' ? functionSpellings(entry.name) : [];
+const relatedSearchNames = [...new Set([...discovery].sort((a, b) => Number(b.language === 'GLSL') - Number(a.language === 'GLSL')).map(item => item.name))];
+const title = (lesson ? r.discovery.title(shownName, relatedSearchNames, targets !== undefined) : undefined) ?? e.title(shownName, kindWord, targets !== undefined || typeTargets !== undefined);
+if (title.length < 45 || title.length > 60) {
+  throw new Error(`[reference-entry] '${kind}/${name}' has a ${title.length}-character title, outside the 45 to 60 the SEO checks want: ${title}`);
+}
+// The compiler's sentence is Markdown with inline code; a meta description carries neither,
+// so the backticks come off and the rest is the compiler's own words.
+const plain = (text: string): string => text.replace(/[`$]/g, '');
+const line = plain(entry.line);
+// With both targets' forms the lead names them and stays whole; the compiler's sentence after
+// it is what gets cut, so the description still says what the name does.
+const lead = targets ? e.targetsLead(shownName, targets) : typeTargets ? e.typeLead(shownName, typeTargets) : undefined;
+const composed = lead ? `${lead} ${line}` : e.description(shownName, kindWord, line);
+// A one-clause sentence leaves the description under the 70 characters the SEO checks want,
+// so the kind's own line fills it out, the way a category's does in the API reference.
+const short = composed.length < META_MIN;
+const max = localeSettings[locale].metaDescriptionMax;
+const description = lesson
+  ? fitDescription(plain(`${lesson.meaning} ${lesson.use} ${lesson.caution}`), max)
+  : lead
+  ? fitLeadAndTail(lead, short ? `${line} ${plain(named.summary)}` : line, max)
+  : fitDescription(short ? `${composed} ${plain(named.summary)}` : composed, max);
+
+// The examples that call this name, found by parsing the corpus.
+const examples = languageExamples(kind, name);
+// The compiler's IR builder of the same name, where it has one: `mix` is a builtin an author
+// calls and a function the `fn()` builder exports, and the two pages answer two questions.
+// Only a builder counts; the export named `reflect` is the module reflection, not this call.
+const apiSlug = irBuilderSlugByName().get(entry.name);
+
+// See also: the index this name is listed on, the family of the builtin table that shows the
+// same call four columns wide, the same call under its other name, and the compiler's own
+// page for it.
+// A label marked `rich` is copy with inline code, rendered through <Rich>.
+const seeAlso: { href: string; label: string; code: boolean; rich?: true }[] = [
+  { href: localePath(locale, `/reference/${section.slug}/`), label: named.name, code: false },
+];
+if (entry.spelling) seeAlso.push({ href: `${localePath(locale, links.languageBuiltins.href)}#${entry.spelling.family}`, label: r.inTable, code: false });
+if (entry.alias) seeAlso.push({ href: localePath(locale, languageEntryPath(entry.alias.kind, entry.alias.name)), label: entry.alias.title, code: true });
+if (apiSlug) seeAlso.push({ href: localePath(locale, `/api/${apiSlug}/`), label: r.irBuilderLink(entry.name), code: false, rich: true });
+
+// The two target cells, the way the builtin table's own rows read them: the copy for an id a
+// pre-emit pass consumes, the registry's own message where it named a reason, and the plain
+// "no form" line otherwise. The compiler's message is English on every locale, the way the
+// sentence above it is.
+type Cell = { readonly code: string } | { readonly copy: string } | { readonly message: string };
+const cellFor = (text: string | null, message: string): Cell => {
+  if (text !== null) return { code: text };
+  if (entry.spelling?.preEmit) return { copy: r.preEmit };
+  return message.length > 0 ? { message } : { copy: r.noForm };
+};
+// A builtin whose form depends on the texture it reads lists every form under Targets, one row
+// per texture, measured through the compiler (src/lib/texture-load-forms.ts).
+const forms = kind === 'function' ? textureForms(name) : undefined;
+const formRows = forms?.map((f) => [f.texture, f.call, f.wgsl, f.glsl ?? { note: r.noForm }] as const);
+const wgslCell = entry.spelling ? cellFor(entry.spelling.wgsl, '') : null;
+const glslCell = entry.spelling ? cellFor(entry.spelling.glsl, entry.spelling.glslMessage) : null;
+// The two spellings the facts box shows, when both targets have a form.
+const spelled = wgslCell && glslCell && 'code' in wgslCell && 'code' in glslCell ? { wgsl: wgslCell.code, glsl: glslCell.code } : undefined;
+
+// The entry's reference note, if it has one. A note read against values the pin no longer
+// gives stops the build here, as it does in scripts/check-reference-notes.ts, since a build of
+// the pages alone (capture:stills) runs no script before Astro.
+assertNoteReading(kind, name);
+const noteId = noteOf(kind, name);
+const notes = noteId ? ((await getEntry('referenceNotes', noteEntryId(locale, noteId)))?.data as NoteView | undefined) : undefined;
+if (noteId && !notes) throw new Error(`[reference-notes] the referenceNotes collection has no ${noteEntryId(locale, noteId)}`);
+
+const stageText = entry.stages.map((s) =>
+  r.stageRule(r.stages[s.stage as keyof typeof r.stages] ?? s.stage, r.directions[s.direction as keyof typeof r.directions] ?? s.direction),
+);
+
+// The brand is quoted under a signature that writes a bare `number`, except on the `f32`
+// type's own page, which prints that same declaration as its syntax.
+const quoteBrand = entry.showsNumber && !(kind === 'type' && name === 'f32');
+
+const sections = [
+  ...(demo ? [
+    { id: 'interactive-example', label: r.demo.heading, show: true },
+    { id: 'practical-use', label: r.demo.useHeading, show: true },
+    { id: 'input-limits', label: r.demo.cautionHeading, show: true },
+    { id: 'related-functions', label: r.demo.related, show: true },
+  ] : []),
+  ...(model ? [
+    { id: 'worked-examples', label: r.worked.heading, show: true },
+    { id: 'practical-use', label: r.demo.useHeading, show: true },
+    { id: 'input-limits', label: r.demo.cautionHeading, show: true },
+    { id: 'related-functions', label: r.demo.related, show: true },
+  ] : []),
+  ...(notes?.sections ?? []).map((n) => ({ id: n.id, label: n.heading.replace(/`/g, ''), show: true })),
+  { id: 'syntax', label: e.syntax, show: true },
+  // A decorator written on its own has no row to show and still has something to say, so
+  // its Parameters heading stands with the line that it takes no arguments.
+  { id: 'parameters', label: e.parameters, show: entry.parameters.length > 0 || entry.bareForm },
+  { id: 'return-value', label: e.returnValue, show: entry.returns.length > 0 },
+  // The lead under the name is the compiler's first sentence, so Description carries what
+  // the sentence goes on to say, the stage the front end holds a builtin id to, and what the
+  // CPU oracle does with the name. An entry with none of the three has no Description.
+  { id: 'description', label: e.descriptionHeading, show: entry.rest.length > 0 || entry.oracle !== null },
+  { id: 'targets', label: e.targets, show: entry.spelling !== null },
+  { id: 'examples', label: e.examples, show: examples.length > 0 },
+  { id: 'see-also', label: e.seeAlso, show: true },
+].filter((s) => s.show);
+const headings: Heading[] = sections.map((s) => ({ depth: 2, slug: s.id, text: s.label }));
+const shows = (id: string): boolean => sections.some((s) => s.id === id);
+
+// Previous and next walk this kind in the order its table lists it, then step out to the
+// index at either end, the way the API reference walks a category.
+const index = { label: named.name, href: localePath(locale, `/reference/${section.slug}/`) };
+const siblings = languageSiblings(kind, name);
+const all = languageSections();
+const at = all.findIndex((s) => s.kind === kind);
+const nextSection = all[at + 1];
+const previous = siblings.previous
+  ? { label: siblings.previous.title, href: localePath(locale, languageEntryPath(kind, siblings.previous.name)) }
+  : index;
+const next = siblings.next
+  ? { label: siblings.next.title, href: localePath(locale, languageEntryPath(kind, siblings.next.name)) }
+  : nextSection
+    ? { label: r.kinds[nextSection.kind].name, href: localePath(locale, `/reference/${nextSection.slug}/`) }
+    : { label: copyFor(locale).docs.errors.h1, href: localePath(locale, links.errors.href) };
+// What a search result calls the page: the name with its kind, so a hit reads mix (function).
+const searchNames = [entry.name, ...new Set(discovery.map(item => item.name))].join(' / ');
+const meta = `title:${searchNames} (${kindWord})`;
+---
+
+<Docs
+  locale={locale}
+  path={languageEntryPath(kind, name)}
+  title={title}
+  description={description}
+  headings={headings}
+  editHref={editCopy(locale, 'docs')}
+  previous={previous}
+  next={next}
+  label={entry.title}
+  meta={meta}
+  breadcrumbs={[
+    { name: r.reference, href: links.reference.href },
+    { name: named.name, href: `/reference/${section.slug}/` },
+    { name: entry.title, href: languageEntryPath(kind, name) },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  <nav class="api-crumbs" aria-label={r.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, links.reference.href)}>{r.h1}</a>
+    <span aria-hidden="true">›</span>
+    <a href={index.href}>{named.name}</a>
+  </nav>
+  <h1><code>{entry.title}</code></h1>
+  <p class:list={['api-kind', lesson ? 'sr-only' : undefined]} lang={locale} data-pagefind-meta={`${e.kindMeta}:${e.kindNames[kind]}`}>{e.kindNames[kind]}</p>
+  <p class="api-summary" lang={lesson ? locale : 'en'}><Rich text={lesson?.meaning ?? entry.line} locale={locale} /></p>
+  {kind === 'math' && entry.alias?.kind === 'function' && <p data-canonical-lesson><a href={localePath(locale, languageEntryPath(entry.alias.kind, entry.alias.name))}>{r.discovery.canonical}: <code>{entry.alias.title}</code></a></p>}
+  {discovery.length > 0 && <details class="mbs-4 text-(length:--text-ui) text-text-2" data-function-spellings data-pagefind-weight="3">
+    <summary class="cursor-pointer">{r.discovery.label}</summary>
+    <p>{r.discovery.note}</p>
+    <ul>{discovery.map(item => <li>{item.language}: <code>{item.name}</code></li>)}</ul>
+    <p><a href={shows('targets') ? '#targets' : '#syntax'}>{shows('targets') ? r.entry.targets : r.entry.syntax}</a></p>
+  </details>}
+  {demo && lesson && <FunctionDemo locale={locale} name={name} lesson={lesson} />}
+  {model && workedLesson && <OperationLesson locale={locale} name={name} lesson={workedLesson} model={model} />}
+  <ReferenceNotes locale={locale} view={notes} />
+  {(spelled || entry.kind === 'builtin') && (
+    <dl class="ref-facts" lang={locale}>
+      {spelled && (
+        <>
+          <dt>{r.wgsl}</dt>
+          <dd><code>{spelled.wgsl}</code></dd>
+          <dt>{r.glsl}</dt>
+          <dd><code>{spelled.glsl}</code></dd>
+        </>
+      )}
+      {entry.kind === 'builtin' && (
+        <>
+          <dt>{r.validIn}</dt>
+          <dd>{stageText.length > 0 ? stageText.join(', ') : r.anyStage}</dd>
+        </>
+      )}
+    </dl>
+  )}
+  <p class="guide-note" lang={locale}><Rich text={r.note} locale={locale} /></p>
+  {lesson && <p lang="en"><Rich text={entry.line} locale={locale} /></p>}
+
+  <section>
+    <h2 id="syntax" lang={locale}>{e.syntax}</h2>
+    {entry.kind === 'builtin'
+      ? <p class="ref-entry-code wrap-anywhere"><code>{entry.signature}</code></p>
+      : <Code code={entry.signature} lang="ts" locale={locale} wrap />}
+    {(entry.elided > 0 || entry.showsNumber || entry.helpers.length > 0) && (
+      <div class="ref-reading mbs-5 text-(length:--text-ui) text-text-2" lang={locale}>
+        {entry.elided > 0 && <p><Rich text={r.swizzlesP(entry.elided)} locale={locale} /></p>}
+        {entry.showsNumber && (
+          <>
+            <p><Rich text={r.numberP} locale={locale} /></p>
+            {quoteBrand && <p class="ref-entry-code wrap-anywhere"><code>{scalarBrand()}</code></p>}
+            <p><Rich text={r.widthP} locale={locale} /></p>
+          </>
+        )}
+        {entry.helpers.length > 0 && (
+          <>
+            <p><Rich text={r.helpersP} locale={locale} /></p>
+            <dl class="ref-helpers mbs-2.5 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-1">
+              {entry.helpers.map((h) => (
+                <>
+                  <dt class="font-semibold text-text-2"><code>{h.name}</code></dt>
+                  <dd class="min-w-0 wrap-anywhere"><code>{h.declaration}</code></dd>
+                </>
+              ))}
+            </dl>
+          </>
+        )}
+      </div>
+    )}
+  </section>
+
+  {shows('parameters') && (
+    <section>
+      <h2 id="parameters" lang={locale}>{e.parameters}</h2>
+      {entry.positional && <p class="guide-note" lang={locale}><Rich text={r.positionsP} locale={locale} /></p>}
+      {entry.parameters.length > 0 && (
+        <ul class="ref-params">
+          {entry.parameters.map((p) => (
+            <li class="flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">
+              <code class="font-semibold text-text-1">{p.rest ? `...${p.name}` : p.name}</code>
+              {p.optional && <span class="api-optional" lang={locale}>{e.optional}</span>}
+              {p.types.map((t) => <LanguageType locale={locale} text={t} self={entry.name} />)}
+            </li>
+          ))}
+        </ul>
+      )}
+      {entry.bareForm && (
+        <p lang={locale}><Rich text={entry.parameters.length > 0 ? e.decoratorBareToo : e.decoratorNone} locale={locale} /></p>
+      )}
+      {entry.protocol && <p class="guide-note" lang={locale}><Rich text={e.decoratorProtocol} locale={locale} /></p>}
+    </section>
+  )}
+
+  {shows('return-value') && (
+    <section>
+      <h2 id="return-value" lang={locale}>{e.returnValue}</h2>
+      <p class="ref-types flex min-w-0 flex-wrap items-baseline gap-x-2.5 gap-y-1">{entry.returns.map((t) => <LanguageType locale={locale} text={t} self={entry.name} />)}</p>
+    </section>
+  )}
+
+  {shows('description') && (
+  <section>
+    <h2 id="description" lang={locale}>{e.descriptionHeading}</h2>
+    {entry.rest.length > 0 && <p lang="en"><Rich text={entry.rest} locale={locale} /></p>}
+    {entry.oracle && (
+      <p class="ref-entry-meta text-(length:--text-ui) text-text-3" lang={locale}>
+        <Rich text={entry.oracle === 'evaluates' ? e.oracleEvaluates : e.oracleStub} locale={locale} />
+      </p>
+    )}
+  </section>
+  )}
+
+  {shows('targets') && wgslCell && glslCell && (
+    <section>
+      <h2 id="targets" lang={locale}>{e.targets}</h2>
+      <dl class="ref-emits mbs-3 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-4 gap-y-1 text-(length:--text-ui)">
+        <dt class="font-semibold text-text-2" lang={locale}>{r.wgsl}</dt>
+        <dd class="min-w-0 text-text-2 wrap-anywhere">
+          {'code' in wgslCell && <code>{wgslCell.code}</code>}
+          {'copy' in wgslCell && <span lang={locale}><Rich text={wgslCell.copy} locale={locale} /></span>}
+          {'message' in wgslCell && <span lang="en">{wgslCell.message}</span>}
+        </dd>
+        <dt class="font-semibold text-text-2" lang={locale}>{r.glsl}</dt>
+        <dd class="min-w-0 text-text-2 wrap-anywhere">
+          {'code' in glslCell && <code>{glslCell.code}</code>}
+          {'copy' in glslCell && <span lang={locale}><Rich text={glslCell.copy} locale={locale} /></span>}
+          {'message' in glslCell && <span lang="en">{glslCell.message}</span>}
+        </dd>
+      </dl>
+      {formRows && (
+        <>
+          <p lang={locale}><Rich text={r.formsP} locale={locale} /></p>
+          <MappingTable locale={locale} caption={e.targets} columns={r.formsColumns} lang={['wgsl', 'ts', 'wgsl', 'glsl']} rows={formRows} />
+        </>
+      )}
+    </section>
+  )}
+
+  {shows('examples') && (
+    <section>
+      <h2 id="examples" lang={locale}>{e.examples}</h2>
+      <LinkColumns>
+        {examples.map((x) => <li><a href={localePath(locale, x.href)}><code>{x.file}</code></a></li>)}
+      </LinkColumns>
+    </section>
+  )}
+
+  <section>
+    <h2 id="see-also" lang={locale}>{e.seeAlso}</h2>
+    <LinkColumns>
+      {seeAlso.map((s) => <li><a href={s.href} lang={s.code ? 'en' : locale}>{s.rich ? <Rich text={s.label} locale={locale} inert /> : s.code ? <code>{s.label}</code> : s.label}</a></li>)}
+    </LinkColumns>
+  </section>
+</Docs>
+
+<style>
+  /* The parts a language reference page has and an API page does not: a declaration the
+     highlighter does not set, the lines under the Description heading, the types beside a
+     parameter, the helper declarations and the two target spellings. They sit in the document
+     column, so the margins and code sizes here outrank `.doc p`, `.doc ul` and `.doc code`. */
+  .ref-entry-code { margin-block-start: 12px }
+  .ref-entry-code code { font-size: var(--text-code) }
+  .ref-entry-meta { margin-block-start: 10px }
+  /* The facts of a builtin under its summary: what each target writes and where the compiler
+     allows the id, as a label column and a value column in a frame of their own. */
+  .ref-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 16px; margin-block-start: 16px; padding: 12px 16px; border: 1px solid var(--color-line-2); border-radius: 8px; font-size: var(--text-ui); color: var(--color-text-2) }
+  .ref-facts dt { font-weight: 600 }
+  .ref-facts dd { min-width: 0; overflow-wrap: anywhere }
+  .ref-facts code { font-size: var(--text-code) }
+  @media (max-width: 30rem) { .ref-facts { grid-template-columns: minmax(0, 1fr); gap: 2px } .ref-facts dt { margin-block-start: 6px } .ref-facts dt:first-child { margin-block-start: 0 } }
+  .ref-entry-meta :global(a) { color: var(--color-text-2); text-decoration: underline; text-decoration-color: var(--color-line-2); text-underline-offset: 3px }
+  .ref-entry-meta :global(a:hover) { color: var(--color-accent); text-decoration-color: currentColor }
+  /* One parameter per row: the name, whether a call may leave it out, and every type the
+     overloads write for that slot. A slot the overloads spell several ways carries one type
+     per spelling, and the row wraps inside the column. The return types are the same row
+     without a name. */
+  .ref-params { margin-block-start: 16px; padding-inline-start: 0; list-style: none }
+  .ref-params li, .ref-types { margin-block-start: 10px }
+  .ref-params :global(code), .ref-types :global(code) { overflow-wrap: anywhere }
+  /* How to read a declaration, under the Syntax frame: what a bare `number` stands for and
+     the declaration of each helper type this signature reaches for, as a label column and a
+     declaration column. The declaration is one wrapped line, so a sixteen-format union costs a
+     paragraph. */
+  .ref-reading p { margin-block-start: 10px }
+  /* The reading is a run of sentences inside a box of its own, so the document's measure does
+     not reach it: each sentence takes the text measure here. The brand line and the helpers'
+     declarations are code, and they take the column the way a code frame does. */
+  .ref-reading > p:not(.ref-entry-code) { max-inline-size: var(--content) }
+  .ref-helpers code, .ref-emits dd :global(code) { font-size: var(--text-code) }
+  /* Below 30rem the pairs stack, since a GLSL cell can hold a whole inlined expression and
+     needs the row's width to itself. */
+  @media (max-width: 30rem) {
+    .ref-helpers, .ref-emits { grid-template-columns: minmax(0, 1fr); gap: 2px }
+    .ref-helpers dt, .ref-emits dt { margin-block-start: 6px }
+  }
+</style>

@@ -1,0 +1,11 @@
+{
+  "slug": "builtin",
+  "source": "13b948af27dbf9dac2a1a45712db0547200b9fef98e112a5fb3af54eace86765",
+  "texts": {
+    "summary": "필드 또는 엔트리 포인트 매개변수에 @builtin(<name>)을 붙입니다. 이 속성은 파이프라인이 셰이더에 공급하는 값을 지정합니다.",
+    "description": "같은 헬퍼가 [`ioStruct`](/api/iostruct/) 필드 맵과 [`fn`](/api/fn/) 매개변수 레코드 모두에 쓰입니다.\n\n이름은 WGSL의 표기를 그대로 사용하며, `name`은 닫힌 유니온 [`WgslBuiltinName`](/api/wgslbuiltinname/)으로 타입이 정해집니다. 허용되는 값은 `'position'`, `'vertex_index'`, `'instance_index'`, `'front_facing'`, `'frag_depth'`, `'sample_index'`, `'sample_mask'`, 컴퓨트 계열(`'global_invocation_id'`, `'local_invocation_id'`, `'local_invocation_index'`, `'workgroup_id'`, `'num_workgroups'`), 서브그룹 쌍, 그리고 `'clip_distances'`이입니다. 따라서 오타나 GLSL 철자는 작성 줄에서 tsc 오류가 됩니다. WGSL을 직접 작성하면 이름이 이 검사 없이 전달되므로, 오류는 GPU 컴파일러에서 발생하며 작성한 원본 소스에 연결되지 않습니다.\n\nGLSL 백엔드는 각 id를 그 대상의 용어로 표기합니다. 그래서 아래 표는 각 id가 대신하는 `gl_*` 전역 변수를 보여 줍니다.\n\n| id | GLSL ES 3.00 |\n| --- | --- |\n| 버텍스 출력의 `position` | `gl_Position` |\n| 프래그먼트 입력의 `position` | `gl_FragCoord` |\n| `vertex_index` | `uint(gl_VertexID)` |\n| `instance_index` | `uint(gl_InstanceID)` |\n| `front_facing` | `gl_FrontFacing` |\n| `frag_depth` | `gl_FragDepth` |\n\n두 `position` 행은 WGSL에 position이 하나뿐이므로 id 하나에 대응합니다. 버텍스 단계는 클립 공간에 쓰고, 프래그먼트 단계는 창 공간을 읽습니다. 프래그먼트가 이 값을 읽을 때는 y 원점에 주의해야 합니다. GL 창 공간은 아래에서 위로 향하고, WGSL 프레임버퍼 공간은 위에서 아래로 향합니다.\n\n`vertex_index`와 `instance_index`는 여기서 `u32`이고 GLSL에서는 `int`이입니다. 그래서 GLSL 읽기는 `uint(...)`로 감쌉니다.\n\n타입 토큰은 선택 사항입니다. WGSL은 `clip_distances`를 빼고 모든 id의 타입을 고정합니다. 그래서 `builtin('vertex_index')`는 타입을 [`WGSL_BUILTIN_TYPES`](/api/wgslbuiltintypes/)에서 읽습니다. 인자가 하나인 호출은 사양의 타입을 사용합니다. 타입 토큰을 직접 지정하면 사양과 어긋날 수 있습니다. 예를 들어 `builtin('vertex_index', f32T)`는 타입 검사를 통과하고 드라이버에서 실패합니다. id의 타입이 하나로 고정되지 않을 때는 토큰을 지정합니다. 이에 해당하는 id는 `clip_distances`이며, 작성자가 고른 `array<f32, N>`이입니다.",
+    "parameters.name": "WGSL 빌트인 id입니다.",
+    "parameters.type": "필드의 타입이며, 빌트인이 공급하는 것과 맞아야 합니다. [`WGSL_BUILTIN_TYPES`](/api/wgslbuiltintypes/)에 있는 id이면 생략합니다. `clip_distances`를 뺀 모든 id가 이 표에 있습니다.",
+    "returns": "`ioStruct` 필드 맵 또는 `fn` 매개변수 레코드를 위한 [`FieldSpec`](/api/fieldspec/)입니다."
+  }
+}

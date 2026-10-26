@@ -1,0 +1,7 @@
+{
+  "slug": "packjson",
+  "source": "e5cf1bb25528795b6183edb8347781123367e1763cf8ec778db5ba6828fe344b",
+  "texts": {
+    "summary": "packModule의 결과를 들여쓰기 두 칸의 JSON 문자열로 변환한 형태입니다. 빌드 단계에서 디스크에 저장하거나 생성된 모듈에 포함합니다."
+  }
+}

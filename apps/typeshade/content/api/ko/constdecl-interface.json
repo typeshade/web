@@ -1,0 +1,11 @@
+{
+  "slug": "constdecl-interface",
+  "source": "4d157962c0c8b935e1b2c4783105fd23d773fa5128f41924ca35289e5d780896",
+  "texts": {
+    "summary": "ModuleDecl.consts의 항목으로, 모듈 범위 상수입니다.",
+    "description": "스칼라 상수는 정밀도마다 값 하나씩을 담은 일반 객체 리터럴로 적습니다. 예를 들면 `{ name: 'PI', type: f32T, wgslValue: 3.14159265, cpuValue: Math.PI }`와 같습니다. WGSL과 GLSL 백엔드는 `wgslValue`를 생성하고, 모듈을 배정밀도로 실행하는 CPU 백엔드는 `cpuValue`를 씁니다. 벡터, 배열 또는 구조체 상수에는 [`constExpr`](/api/constexpr/)를 씁니다. 그러면 `valueExpr`이 대신 채워집니다. 두 형태가 모두 있으면 `valueExpr`이 우선합니다.",
+    "members.wgslValue": "WGSL/GLSL 백엔드가 생성하는 스칼라 값이다(잘린 셰이더 상수). `valueExpr`이 없을 때 사용됩니다. 있으면 무시됩니다.",
+    "members.cpuValue": "CPU 백엔드가 쓰는 스칼라 값으로, 전체 배정밀도로 보관합니다. `valueExpr`이 없을 때 사용됩니다. 있으면 무시됩니다.",
+    "members.valueExpr": "선택 사항인 상수 값으로, IR 리터럴 식으로 적습니다. 예를 들면 `vec4<f32>(…)` 색상, `array<vec4<f32>, N>(…)` 팔레트, 구조체 리터럴이 있습니다. 값이 있으면 모든 백엔드에서 `wgslValue`와 `cpuValue`를 대체합니다. WGSL과 GLSL은 이를 생성하고, CPU 백엔드는 이를 계산합니다. 이 값은 상수 폴딩할 수 있는 리터럴 식이어야 합니다. 즉 `lit`, `construct`, `unop`, `binop` 중 하나이며 피연산자가 이들인 식이거나, 앞서 선언한 상수를 가리키는 `constref`이입니다. 바인딩, 매개변수, 런타임 입력을 읽어서는 안 됩니다. 일반 `f32` 스칼라는 여전히 `wgslValue`/`cpuValue` 쌍을 씁니다."
+  }
+}

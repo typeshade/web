@@ -1,0 +1,65 @@
+---
+// Language guide: the index of the WGSL construct set. It says how to read a row, names its
+// four sections, one page each, and closes with the pointer to the builtin table; the tables
+// themselves are on the section pages (LanguageFromWgslSectionPage.astro). The words live in
+// language.mapping.fromWgsl (src/i18n/en.ts, src/i18n/ko.ts); the rows do not, and
+// src/lib/target-mapping.ts measures every one of them at build time.
+import Docs from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links, mappingSet } from '../../lib/links.ts';
+import { wgslMapping } from '../../lib/target-mapping.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = copyFor(locale).language.mapping.fromWgsl;
+// The generator runs here too, so the index is one more page a row the compiler stopped
+// writing has to get past.
+wgslMapping();
+
+const heads: Record<string, string> = {
+  types: c.typesH,
+  resources: c.resourcesH,
+  entries: c.stagesH,
+  statements: c.statementsH,
+};
+const pages = mappingSet('languageFromWgsl').sections.map(({ key, link }) => ({
+  h: heads[key]!,
+  href: localePath(locale, links[link].href),
+  summary: c.pages[key].description,
+}));
+
+const headings = [
+  { depth: 2, slug: 'reading', text: c.readingH },
+  { depth: 2, slug: 'sections', text: c.pagesH },
+  { depth: 2, slug: 'functions', text: c.functionsH },
+];
+---
+
+<Docs
+  locale={locale}
+  path={links.languageFromWgsl.href}
+  title={c.title}
+  description={c.description}
+  headings={headings}
+  editHref={editCopy(locale, 'language')}
+>
+  <h1>{c.h1}</h1>
+  <p><Rich text={c.intro} locale={locale} /></p>
+
+  <h2 id="reading">{c.readingH}</h2>
+  <p><Rich text={c.readingP} locale={locale} /></p>
+
+  <h2 id="sections">{c.pagesH}</h2>
+  <dl class="api-list api-index">
+    {pages.map((p) => (
+      <>
+        <dt><a href={p.href}>{p.h}</a></dt>
+        <dd>{p.summary}</dd>
+      </>
+    ))}
+  </dl>
+
+  <h2 id="functions">{c.functionsH}</h2>
+  <p><Rich text={c.functionsP} locale={locale} /></p>
+</Docs>

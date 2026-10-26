@@ -1,0 +1,10 @@
+{
+  "slug": "sign",
+  "source": "33399901b227d38db1239ac4869eefeecbda0e336e64d51c4c4eefe684152c59",
+  "texts": {
+    "summary": "sign(x): x의 부호에 따라 성분마다 -1, 0 또는 1을 구합니다.",
+    "targets.wgsl": "`sign(x)`로 생성합니다.",
+    "targets.glsl": "`sign(x)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

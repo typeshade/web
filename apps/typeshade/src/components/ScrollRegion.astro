@@ -1,0 +1,12 @@
+---
+interface Props {
+  /** Names the content, for example "Reflected std140 layout". */
+  label: string;
+  class?: string;
+}
+const { label, class: className } = Astro.props;
+---
+
+<div class:list={['overflow-x-auto overscroll-x-contain [scrollbar-width:thin]', className]} role="region" tabindex="0" aria-label={label}>
+  <slot />
+</div>

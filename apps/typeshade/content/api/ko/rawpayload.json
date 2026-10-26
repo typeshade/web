@@ -1,0 +1,8 @@
+{
+  "slug": "rawpayload",
+  "source": "d6976822d729e9b60b9a7f0efc71dc7ba2a3034f7070b9b908a42ef608952c18",
+  "texts": {
+    "summary": "rawStmt의 인자로, raw 문에 삽입할 wgsl 및 glsl 소스 텍스트를 담습니다.",
+    "description": "최소 한쪽은 있어야 하므로 `rawStmt({})`는 컴파일되지 않습니다."
+  }
+}

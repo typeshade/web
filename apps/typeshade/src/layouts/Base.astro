@@ -1,0 +1,284 @@
+---
+import SkipLink from '@typeshade/site-ui/astro/SkipLink';
+// The frame every page shares: head metadata, hreflang alternates, header and footer.
+// The spacing Temml's MathML is written against (src/lib/math.mjs). It comes first, so the
+// math face global.css names wins over the system faces this file lists.
+import 'temml/dist/Temml-Local.css';
+import '../styles/global.css';
+import SiteNotice from '../components/SiteNotice.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import IssueDialog from '../components/IssueDialog.astro';
+import { facts } from '../lib/examples.ts';
+import { copyFor, defaultLocale, localeSettings, locales, localeUrl, type Locale } from '../i18n/index.ts';
+
+interface Props {
+  locale: Locale;
+  /** The locale-neutral route, for example '/checks/'; the 404 passes its file name. */
+  path: string;
+  title?: string;
+  description?: string;
+  noAlternates?: boolean;
+  noindex?: boolean;
+  searchable?: boolean;
+  searchTitle?: string;
+  breadcrumbs?: readonly { name: string; href: string }[];
+  dateModified?: string;
+  /** Overrides the language switcher's target per locale, already a real href, for a page
+   *  (the 404) whose own path isn't a page that exists in every language. */
+  switchTarget?: Partial<Record<Locale, string>>;
+}
+
+const { locale, path, noAlternates = false, noindex = false, searchable = false, searchTitle, breadcrumbs, dateModified, switchTarget } = Astro.props;
+const t = copyFor(locale);
+const siteDescription = copyFor(defaultLocale).meta.description;
+const title = Astro.props.title ?? t.meta.title;
+const description = Astro.props.description ?? t.meta.description;
+
+const settings = localeSettings[locale];
+const site = Astro.site ?? new URL('https://typeshade.dev/');
+const canonical = localeUrl(site, locale, path);
+const ogImage = new URL('/og.png', site).toString();
+const alternates = noAlternates ? [] : locales.map((l) => ({ lang: l, href: localeUrl(site, l, path) }));
+
+const organizationId = `${site.origin}/#organization`;
+const breadcrumbId = `${canonical}#breadcrumb`;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': organizationId,
+      name: facts.author,
+      url: `${site.origin}/`,
+      logo: { '@type': 'ImageObject', url: new URL('/favicon.svg', site).toString(), width: 1024, height: 1024 },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${site.origin}/#website`,
+      url: `${site.origin}/`,
+      name: 'TypeShade',
+      description: siteDescription,
+      inLanguage: [...locales],
+      publisher: { '@id': organizationId },
+    },
+    {
+      '@type': 'SoftwareSourceCode',
+      '@id': `${site.origin}/#software`,
+      name: 'TypeShade',
+      description: siteDescription,
+      programmingLanguage: ['TypeScript', 'WGSL', 'GLSL'],
+      codeRepository: facts.mirrorUrl,
+      license: facts.licenseUrl,
+      url: `${site.origin}/`,
+      author: { '@id': organizationId },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': canonical,
+      url: canonical,
+      name: title,
+      description,
+      inLanguage: locale,
+      isPartOf: { '@id': `${site.origin}/#website` },
+      about: { '@id': `${site.origin}/#software` },
+      ...(dateModified ? { dateModified } : {}),
+      ...(breadcrumbs ? { breadcrumb: { '@id': breadcrumbId } } : {}),
+    },
+    ...(breadcrumbs
+      ? [
+          {
+            '@type': 'BreadcrumbList',
+            '@id': breadcrumbId,
+            itemListElement: breadcrumbs.map((b, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: b.name,
+              item: localeUrl(site, locale, b.href),
+            })),
+          },
+        ]
+      : []),
+  ],
+};
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-PM5GB63EJ7"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-PM5GB63EJ7');
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <script is:inline>
+      try { const t = localStorage.getItem('theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch {}
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212" />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
+    {alternates.length > 0 && <link rel="alternate" hreflang="x-default" href={localeUrl(site, defaultLocale, path)} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-sans-latin-wght-normal.woff2" crossorigin />
+    {settings.fontPreloads.map((href) => <link rel="preload" as="font" type="font/woff2" href={href} crossorigin />)}
+    <meta property="og:site_name" content="TypeShade" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={settings.ogLocale} />
+    {!noAlternates && locales.filter((l) => l !== locale).map((l) => <meta property="og:locale:alternate" content={localeSettings[l].ogLocale} />)}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={t.meta.ogAlt} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={t.meta.ogAlt} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <SkipLink class="skip" href="#main">{t.skip}</SkipLink>
+    <SiteHeader locale={locale} path={path} switchTarget={switchTarget} />
+    <SiteNotice locale={locale} />
+    <main
+      id="main"
+      tabindex="-1"
+      data-pagefind-body={searchable ? '' : undefined}
+      data-pagefind-meta={searchable && searchTitle ? `title:${searchTitle}` : undefined}
+    >
+      <slot />
+    </main>
+    <SiteFooter locale={locale} path={path} switchTarget={switchTarget} />
+    <IssueDialog locale={locale} />
+    <dialog class="search-dialog" aria-label={t.nav.search} data-pagefind-ignore>
+      <div class="search-dialog-bar">
+        <button class="search-dialog-close" type="button" aria-label={t.nav.close} data-search-close>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <div id="search"></div>
+      <p class="search-note" hidden>{t.nav.searchUnavailable}</p>
+    </dialog>
+    <script is:inline define:vars={{ translations: t.nav.searchUi }}>
+      const dialog = document.querySelector('.search-dialog')
+      const note = dialog.querySelector('.search-note')
+      let started = false
+      const asset = (tag, attrs) => new Promise((resolve, reject) => {
+        const el = Object.assign(document.createElement(tag), attrs)
+        el.addEventListener('load', resolve)
+        el.addEventListener('error', reject)
+        document.head.append(el)
+      })
+      async function mount() {
+        if (started) return
+        started = true
+        try {
+          await asset('link', { rel: 'stylesheet', href: '/pagefind/pagefind-ui.css' })
+          await asset('script', { src: '/pagefind/pagefind-ui.js' })
+          new PagefindUI({ element: '#search', showSubResults: true, showImages: false, translations })
+        } catch {
+          note.hidden = false
+        }
+      }
+      async function openSearch() {
+        for (const d of document.querySelectorAll('details[open]')) d.open = false
+        if (!dialog.open) dialog.showModal()
+        await mount()
+        dialog.querySelector('input')?.focus()
+      }
+      for (const b of document.querySelectorAll('[data-search-open]')) b.addEventListener('click', openSearch)
+      dialog.querySelector('[data-search-close]')?.addEventListener('click', () => dialog.close())
+      dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close() })
+      addEventListener('keydown', (e) => {
+        if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openSearch() }
+      })
+    </script>
+    <script is:inline>
+      function themeIsDark() {
+        return document.documentElement.dataset.theme
+          ? document.documentElement.dataset.theme === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+      function syncThemeButtons() {
+        const dark = themeIsDark();
+        for (const b of document.querySelectorAll('[data-theme-toggle]')) {
+          b.setAttribute('aria-pressed', dark ? 'true' : 'false');
+        }
+      }
+      syncThemeButtons();
+      for (const b of document.querySelectorAll('[data-theme-toggle]')) b.addEventListener('click', () => {
+        const next = themeIsDark() ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem('theme', next); } catch {}
+        syncThemeButtons();
+      });
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (!document.documentElement.dataset.theme) syncThemeButtons();
+      });
+    </script>
+    <script is:inline>
+      const drops = [...document.querySelectorAll('.site-menu-drop')];
+      const panel = document.querySelector('.site-menu');
+      const all = panel ? [...drops, panel] : drops;
+
+      function closeAllBut(except) {
+        for (const d of all) if (d !== except && d.open) d.open = false;
+      }
+      for (const d of drops) d.addEventListener('toggle', () => { if (d.open) closeAllBut(d); });
+
+      document.addEventListener('click', (e) => {
+        for (const d of all) if (d.open && !d.contains(e.target)) d.open = false;
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        const open = all.find((d) => d.open);
+        if (open) { open.open = false; open.querySelector('summary')?.focus(); }
+      });
+
+      if (panel) {
+        const summary = panel.querySelector(':scope > summary');
+        let restoreOverflow = '';
+        panel.addEventListener('toggle', () => {
+          if (panel.open) {
+            closeAllBut(panel);
+            restoreOverflow = document.documentElement.style.overflow;
+            document.documentElement.style.overflow = 'hidden';
+          } else {
+            document.documentElement.style.overflow = restoreOverflow;
+          }
+        });
+        panel.addEventListener('keydown', (e) => {
+          if (!panel.open) return;
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            panel.open = false;
+            summary?.focus();
+            return;
+          }
+          if (e.key !== 'Tab') return;
+          const focusable = [...panel.querySelectorAll('summary, a[href], button:not([disabled])')].filter((el) => el.offsetParent !== null);
+          if (focusable.length === 0) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
+      }
+    </script>
+  </body>
+</html>

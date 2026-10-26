@@ -1,0 +1,7 @@
+{
+  "slug": "consolemethods",
+  "source": "f286984a401f725fd4bb525d3fc7e2bd777c7554a761ca5df20e90ac036ef120",
+  "texts": {
+    "summary": "TypeShade가 셰이더 소스에서 인식하는 JavaScript Console API 메서드 목록입니다."
+  }
+}

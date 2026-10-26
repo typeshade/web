@@ -1,0 +1,7 @@
+{
+  "slug": "outsiderange",
+  "source": "0810b3dd0904bf25a332f515dfd556b523d2487ee061398a6f456fbe5b763ff5",
+  "texts": {
+    "summary": "범위 밖인지 판정하는 조건식이다: x < lo || x > hi."
+  }
+}

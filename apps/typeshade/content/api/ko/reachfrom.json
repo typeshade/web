@@ -1,0 +1,8 @@
+{
+  "slug": "reachfrom",
+  "source": "bd0b8c5f2d176da744abe1b03fe5a88068593bb81e912dbf73e86df2b822000c",
+  "texts": {
+    "summary": "진입점에서 출발해 호출 그래프를 따라가며, 진입점들이 도달하는 항목을 모읍니다.",
+    "description": "순수 함수입니다."
+  }
+}

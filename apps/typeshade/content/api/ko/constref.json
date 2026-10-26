@@ -1,0 +1,8 @@
+{
+  "slug": "constref",
+  "source": "c9ca9e737071ad8e787f92084ef750559d40a30e5a19687fbeb271fedb43463a",
+  "texts": {
+    "summary": "모듈 수준 상수를 이름으로 가리키는 참조입니다. constExpr로 선언한 상수가 그런 예입니다.",
+    "description": "타입을 주지 않으면 f32입니다."
+  }
+}

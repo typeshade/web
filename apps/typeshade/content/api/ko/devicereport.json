@@ -1,0 +1,7 @@
+{
+  "slug": "devicereport",
+  "source": "68dfa20a3b31e705f8caed05400548418d87ee645f8f652b74151d92f9e0affa",
+  "texts": {
+    "summary": "callDevice()가 호출이 실행되는 디바이스에 대해 보고하는 값입니다. WebGPU의 이름을 키로 쓰는 숫자 한도와, 정렬된 순서의 활성화된 기능을 담습니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "texture2darrayft",
+  "source": "bbf49acdd28df7eefe3a1b05426543da0edfa3c8dfc2ff575360aea493159218",
+  "texts": {
+    "summary": "샘플링하는 2D 배열 텍스처입니다. 독립적으로 주소를 지정할 수 있는 레이어 N개를 담은 텍스처 객체 하나입니다.",
+    "description": "레이어는 샘플 호출마다 넘기는 인자입니다. 레이어가 N개여도 바인딩 슬롯 하나와 바인드 그룹 전환 하나만 듭니다. 두 타깃 모두 코어에 있으므로 [`Capability`](/api/capability/)는 필요하지 않습니다."
+  }
+}

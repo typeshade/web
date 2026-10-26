@@ -1,0 +1,8 @@
+{
+  "slug": "gllinker",
+  "source": "493c4a654e7e4202897e78c4811f1ce6711c8946f6ffd56313505e0ab3b82da8",
+  "texts": {
+    "summary": "프로그램을 컴파일하고 링크하는 데 필요한 WebGL2 부분집합입니다.",
+    "description": "실제 `WebGL2RenderingContext`는 수정 없이 이 타입을 만족하므로 그대로 넘기면 됩니다. 핸들 타입은 제네릭입니다. 그래서 실제 컨텍스트를 넘기는 호출자는 `WebGLShader`와 `WebGLProgram`을 돌려받고, 테스트는 자체 핸들 타입을 가진 레코더로 대신할 수 있습니다."
+  }
+}

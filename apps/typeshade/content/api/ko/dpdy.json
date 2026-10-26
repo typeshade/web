@@ -1,0 +1,11 @@
+{
+  "slug": "dpdy",
+  "source": "85d7a874bb1e43a69ebf2508e8f38c921728860c7c01baf73e9f949a36953b3c",
+  "texts": {
+    "summary": "dpdy(x): x의 화면 공간 편미분을 Y축 방향으로 구합니다. 성분별로 적용하며, dpdx의 짝입니다. GPU 전용과 프래그먼트 전용이라는 제약도 같습니다.",
+    "description": "WGSL에서는 `dpdy`, GLSL ES 3.00에서는 `dFdy`로 씁니다.",
+    "targets.wgsl": "`dpdy(x)`.",
+    "targets.glsl": "`dFdy(x)`.",
+    "targets.cpu": "오라클에는 텍스처 메모리가 없고 이웃 프래그먼트도 없습니다. `{ gpuStubs: true }` 옵션으로 모듈을 컴파일하지 않았다면 이 호출은 예외를 던집니다. 이 옵션을 켜면 플레이스홀더 값을 돌려줍니다."
+  }
+}

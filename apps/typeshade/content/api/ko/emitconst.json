@@ -1,0 +1,9 @@
+{
+  "slug": "emitconst",
+  "source": "ec441cefae4a65fa3e122ee350d42a85d4162812f140976b145b243b9b52be1b",
+  "texts": {
+    "summary": "ConstDecl 하나를 모듈 없이 WGSL const 줄로 생성합니다.",
+    "description": "이 함수는 따로 작성한 조각으로 셰이더를 조합할 때 씁니다. 상수는 한 번만 생성하고, 그 문자열을 보관해 소스의 나머지와 이어 붙입니다. 이 줄은 같은 선언에 대해 [`emitModule`](/api/emitmodule/)이 쓰는 줄과 똑같습니다. 그래서 여기서 생성한 조각과 다른 곳에서 생성한 모듈이 서로 맞고, 이것이 이어 붙이기를 안전하게 만드는 이유입니다.\n\n선언은 주어진 그대로 쓰입니다. [`emitModule`](/api/emitmodule/)이 모듈을 쓰기 전에 실행하는 패스는 여기서 실행되지 않습니다. 그러므로 그 패스가 필요 없는 선언을 넘겨야 합니다. [`emitFuncs`](/api/emitfuncs/)의 주의 사항도 똑같이 적용됩니다.",
+    "targets.wgsl": "WebGPU용 WGSL을 씁니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "intkey",
+  "source": "1a406cd710e3f11acdd4431125802d5e9e4d621bb92b9f9c8b513c717a1f7ef0",
+  "texts": {
+    "summary": "정수 키입니다. i32와 u32 스칼라 및 벡터를 가리킵니다. WGSL과 GLSL의 정의역에 정수가 포함된 내장 함수인 abs, min, max, clamp에 쓰입니다.",
+    "description": "`sign`은 부동소수점과 부호 있는 정수에 대해서만 정의됩니다. 그래서 이 함수는 i32를 받고 u32는 거부합니다."
+  }
+}

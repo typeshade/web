@@ -1,0 +1,8 @@
+{
+  "slug": "transformmat4",
+  "source": "7f6441d441c29b9e2e7d50df072efc59d2ee9059b4684bf5bc7aebb0bb75c251",
+  "texts": {
+    "summary": "mat4x4<f32> × vec4<f32> → vec4<f32>: 모델-뷰-투영 변환에서 쓰는 것과 같은 행렬-벡터 곱입니다.",
+    "description": "일반 `.mul`은 행렬 피연산자를 거부합니다. 행렬은 스칼라도 아니고 맞는 벡터도 아니기 때문입니다. 이 함수가 그 명시적인 형태입니다."
+  }
+}

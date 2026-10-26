@@ -1,0 +1,11 @@
+{
+  "slug": "round",
+  "source": "2f6d8da898006939a6307fe3c14603a172fb4d77c614c5e25f2a3cf08e8a76c5",
+  "texts": {
+    "summary": "round(x): 성분별로 가장 가까운 정수를 구하며, 동점은 짝수 쪽으로 맞춥니다. 두 타깃 모두 같습니다.",
+    "description": "`round(x)`는 성분별로 가장 가까운 정수를 구하며, 동점은 짝수 쪽으로 맞춥니다. 두 타깃 모두 같습니다. 이는 JS의 `Math.round`와 다릅니다. 그 함수는 절반 값을 +∞ 쪽으로 반올림합니다. WGSL의 `round`는 동점을 짝수 쪽으로 맞추고, GLSL ES 3.00의 `round`는 정확한 절반 값의 처리를 구현에 맡깁니다. 그래서 GLSL 출력에는 `roundEven`을 씁니다.",
+    "targets.wgsl": "`round(x)`로 생성합니다. `f64` 피연산자에서는 fp64 패스가 이를 자신의 `df64` 헬퍼로 바꿉니다.",
+    "targets.glsl": "`roundEven(x)`로 생성합니다. `f64` 피연산자에서는 fp64 패스가 이를 자신의 `df64` 헬퍼로 바꿉니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

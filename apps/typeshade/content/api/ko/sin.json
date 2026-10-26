@@ -1,0 +1,11 @@
+{
+  "slug": "sin",
+  "source": "7baa4d8c05d87b6075fa8d3a8b4717c48d723c2294c08dd8eeeff4155274850c",
+  "texts": {
+    "summary": "sin(x): 라디안 단위 x의 사인을 성분별로 계산합니다.",
+    "description": "WGSL과 GLSL ES 3.00에서 같은 이름을 사용합니다.",
+    "targets.wgsl": "`sin(x)`. `f64` 피연산자이면 fp64 패스가 이를 `df64` 헬퍼로 다시 씁니다.",
+    "targets.glsl": "`sin(x)`. `f64` 피연산자이면 fp64 패스가 이를 `df64` 헬퍼로 다시 씁니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

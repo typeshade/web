@@ -1,0 +1,11 @@
+{
+  "slug": "matt",
+  "source": "6c4df144f0adf5128d46129f515f7c3b103aa8720a08363b7f5de946a7bff626",
+  "texts": {
+    "summary": "임의의 matCxR<f32> 또는 matCxR<f64>입니다. 열 수는 cols이고, 열마다 rows개의 성분이 있습니다. 두 타깃과 같이 열 우선(column-major) 순서입니다.",
+    "description": "위의 이름 있는 상수는 고유한 표기를 가진 모양입니다. 나머지 여섯 가지 모양은 프런트엔드와 호스트가 이 함수로 만듭니다.",
+    "parameters.cols": "열의 개수입니다. `matCxR`의 `C`에 해당합니다.",
+    "parameters.rows": "행의 개수입니다. `matCxR`의 `R`이며, 열 하나의 성분 개수이기도 합니다.",
+    "parameters.elem": "기본 행렬이면 `'f32'`, 에뮬레이션 배정밀도 행렬이면 `'f64'`이다(정사각형에만 해당합니다)."
+  }
+}

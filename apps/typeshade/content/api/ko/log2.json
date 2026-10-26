@@ -1,0 +1,11 @@
+{
+  "slug": "log2",
+  "source": "bc8d7544d8a51f35c8d70611131405a7de6260b9a25d564c7cf42bf7056629af",
+  "texts": {
+    "summary": "log2(x): 밑이 2인 로그를 성분별로 계산합니다. exp2의 역함수입니다.",
+    "description": "[`log`](/api/log/)는 자연로그 형태입니다.",
+    "targets.wgsl": "`log2(x)`로 생성합니다.",
+    "targets.glsl": "`log2(x)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

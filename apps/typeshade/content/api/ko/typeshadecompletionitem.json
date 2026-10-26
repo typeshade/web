@@ -1,0 +1,11 @@
+{
+  "slug": "typeshadecompletionitem",
+  "source": "91bf7427c26f270ad0afcc8110af8ee44a2abb7944ccc045dec2cb9c3949b6d8",
+  "texts": {
+    "summary": "Typeshade 언어 계층이 내놓는 자동 완성 항목입니다.",
+    "members.label": "자동 완성 항목에 표시되는 텍스트입니다.",
+    "members.kind": "편집기 아이콘과 그룹을 고르는 데 쓰는 분류입니다.",
+    "members.detail": "라벨 옆에 표시되는, 사람이 읽을 짧은 설명입니다.",
+    "members.insertText": "`label`과 다를 때 삽입할 스니펫 텍스트입니다."
+  }
+}

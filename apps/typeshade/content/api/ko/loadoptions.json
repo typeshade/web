@@ -1,0 +1,8 @@
+{
+  "slug": "loadoptions",
+  "source": "82f40cc138dca09f3f8fce766b6bb4ab45cfe5bea678115c9d50ac1d99195a1a",
+  "texts": {
+    "summary": "rt.load()가 프로그램을 적재하는 방법입니다.",
+    "members.console": "진입점들의 `console.*` 호출을 기록합니다. 기본값은 매니페스트에 기록된 변형이 담겨 있을 때입니다. 기록하는 빌드(`vite dev`)가 그 변형을 매니페스트에 넣습니다. 기록된 변형이 없는 매니페스트에 IR이 담겨 있으면, 런타임의 `emit`이 그 변형을 넣어 다시 생성합니다."
+  }
+}

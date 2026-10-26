@@ -1,0 +1,8 @@
+{
+  "slug": "param",
+  "source": "f0c95d2d2d6ea4f9774022c487b3948a3f6c758a9d9cd81dca7cbc5b45d9a17e",
+  "texts": {
+    "summary": "함수 매개변수 참조로, 키는 ShaderType에서 추론합니다.",
+    "description": "매개변수는 읽기 전용이라서, 매개변수에 `.assign()`을 쓰면 `tsc` 오류가 납니다."
+  }
+}

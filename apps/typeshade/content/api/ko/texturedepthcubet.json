@@ -1,0 +1,7 @@
+{
+  "slug": "texturedepthcubet",
+  "source": "0828569f51ab81a431234c9983a0ecc71b9b7d0171bc7ee1e05e3d83626a6469",
+  "texts": {
+    "summary": "큐브 깊이 텍스처입니다. 점광원의 그림자 맵이며, 광원에서 출발하는 방향으로 비교합니다."
+  }
+}

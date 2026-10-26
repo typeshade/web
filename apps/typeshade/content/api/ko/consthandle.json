@@ -1,0 +1,9 @@
+{
+  "slug": "consthandle",
+  "source": "2fd0c4eaea0c131d27c39521fa7b08803f283b3f79b91b32e76271757e8f7c4b",
+  "texts": {
+    "summary": "constDecl이 반환하는 핸들입니다. 모듈 수준 상수와 그 타입이 지정된 참조를 담으며, 두 가지를 한 번에 선언하므로 이름은 한 번만 적습니다.",
+    "members.decl": "상수의 선언입니다. `module({ consts })` 또는 `module({ uses })`에 넣습니다.",
+    "members.node": "호출 지점에서 상수를 읽을 때 쓰는 타입이 지정된 참조입니다."
+  }
+}

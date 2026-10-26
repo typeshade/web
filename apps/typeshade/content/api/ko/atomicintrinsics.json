@@ -1,0 +1,8 @@
+{
+  "slug": "atomicintrinsics",
+  "source": "5426a4a1d9aea666f5ff8174547161db264be638ff6765f56dd5436532b53961",
+  "texts": {
+    "summary": "atomic 내장 함수 목록입니다. 각 함수의 인자 개수와 결과를 함께 적습니다. atomicLoad는 위치만 받고 그 위치의 값을 돌려줍니다. atomicStore는 값을 받고 아무것도 돌려주지 않습니다. read-modify-write 형태의 여덟 함수는 값을 받고, 갱신하기 전 위치의 값을 돌려줍니다.",
+    "description": "각 함수는 첫 번째 인자를 위치로 받습니다. 위치는 `xs[i]`, 스토리지 구조체의 필드, 단일 atomic 바인딩이 될 수 있습니다. WGSL은 이 위치를 포인터로 적으며, 예를 들어 `&xs[i]`로 씁니다. CPU 백엔드는 위치를 한 번만 해석하고, 그 위치를 통해 값을 다시 씁니다. GLSL ES 3.00에는 atomic이 없습니다."
+  }
+}

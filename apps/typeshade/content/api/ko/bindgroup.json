@@ -1,0 +1,8 @@
+{
+  "slug": "bindgroup",
+  "source": "d5922ddf23923bd622c8361517b7e379b399cb9fb774e76e0edf59b90371f1cc",
+  "texts": {
+    "summary": "하나의 WGSL @group(N)에 속한 바인드 항목입니다. binding 순으로 정렬됩니다.",
+    "description": "`Reflection.bindGroups`는 모듈이 선언한 그룹마다 이 항목을 하나씩 담으며, `group` 순으로 정렬합니다. `@group(0)`만 선언한 모듈은 원소가 하나인 목록을 만듭니다. GLSL ES 3.00에는 그룹이라는 개념이 없습니다. GLSL 호스트가 `group`을 자신이 할당하는 바인딩 지점에 어떻게 합치는지는 [`BindEntry`](/api/bindentry/)에서 설명합니다."
+  }
+}

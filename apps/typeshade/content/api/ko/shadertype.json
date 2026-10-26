@@ -1,0 +1,8 @@
+{
+  "slug": "shadertype",
+  "source": "7951d2d0a3f20df66a967bf5ebaadd610f97a00662a5c97a47321ee79e94b406",
+  "texts": {
+    "summary": "DSL이 나타낼 수 있는 모든 값의 런타임 타입 기술자입니다. 단순한 데이터로 표현한 비교 가능한 판별 유니온(discriminated union)입니다. 그래서 이것을 switch (t.kind)로 나누면, 형태를 어떻게 처리할지 정해야 하는 모든 위치(typeKey, wgslLayout, 두 백엔드의 생성 순회 함수)에서 tsc가 빠짐없이 검사합니다.",
+    "description": "객체 리터럴로 직접 만들지 않습니다. 이름이 붙은 상수(`f32T`, `vec3fT`, …)나 [`structT`](/api/structt/)와 [`arrayT`](/api/arrayt/) 생성자를 사용합니다. 이들은 [`KeyOf`](/api/keyof/)가 기대는 `as const satisfies ShaderType` 좁히기를 유지하며, 그 덕분에 `string`이 아닌 정확한 문자열 키를 얻습니다. [`typeKey`](/api/typekey/)는 어떤 `ShaderType`이든 런타임에 같은 키로 바꿉니다. `KeyOf<T>`는 이것의 타입 수준 짝입니다. 이 덕분에 [`Node`](/api/node/)는 키를 컴파일 시점의 팬텀 값으로 지니므로, 타입이 맞지 않으면 작성 코드를 실행할 때 `SD0002`가 던져지는 대신 `tsc` 오류가 됩니다."
+  }
+}

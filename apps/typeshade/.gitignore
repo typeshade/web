@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.astro/
+*.log
+.DS_Store
+shots/
+
+# impeccable platform binary: the launcher downloads it per machine
+.claude/skills/impeccable/scripts/bin/
+
+# impeccable review screenshots, regenerated per session
+.impeccable/review/
+
+# Wrangler's local state (wrangler dev) and the example data scripts/publish-examples.ts writes.
+.wrangler/
+.cache/
+
+# Wrangler's local secrets for `wrangler dev` (docs/cloudflare.md, Locally).
+.dev.vars*

@@ -1,0 +1,12 @@
+{
+  "slug": "linkvariants",
+  "source": "d0a394a6c6f72015a0ddc70cacb1cec63b33a7d375692af488aca8c6c30c38c9",
+  "texts": {
+    "summary": "실제 WebGL2 컨텍스트에서 패밀리의 모든 변형을 생성하고, 컴파일하고, 링크합니다.",
+    "description": "모듈 전체는 타입 검사를 통과하더라도, 호스트가 실제로 고르는 축 값의 조합은 드라이버의 실제 컴파일과 링크로 확인해야 합니다. 이 함수는 패밀리를 순회하며, 변형마다 GLSL ES 3.00을 생성하고, 버텍스 셰이더와 프래그먼트 셰이더를 컴파일한 뒤 하나의 프로그램으로 링크합니다. 그리고 결과를 키마다 보고합니다.\n\n```ts\nconst gl = canvas.getContext('webgl2')!\nconst failed = linkVariants(gl, family).filter((r) => !r.ok)\nexpect(failed, failed.map((r) => `${r.key}: ${r.failedAt} ${r.log}`).join('\\n')).toEqual([])\n```\n\n한 변형이 실패한 뒤에도 모든 변형을 시도합니다. 그래서 결과에는 실패한 조합이 한 번의 실행으로 모두 나열됩니다.\n\nGL 객체는 진행하면서 바로 삭제합니다. 패밀리는 데카르트 곱이므로, 축이 몇 개만 있는 행렬도 프로그램을 수백 개 만듭니다. 이를 삭제하지 않으면 프로그램 객체가 누적되며, 이 컨텍스트는 보통 실시간 페이지와 공유됩니다.",
+    "parameters.gl": "WebGL2 컨텍스트, 또는 [`GlLinker`](/api/gllinker/)를 만족하는 값이면 무엇이든 됩니다.",
+    "parameters.family": "열거할 패밀리입니다. `family.keys`의 모든 키를 시도합니다.",
+    "parameters.opts": "생성 옵션이며, 모든 변형에 똑같이 적용됩니다. 배포용 출력을 확인하려면 배포용 생성에 쓰는 것과 같은 플러그인을 넘긴다(예: `{ plugins: obfuscate() }`).",
+    "returns": "키마다 결과가 하나씩 있으며, `family.keys`의 순서를 따릅니다."
+  }
+}

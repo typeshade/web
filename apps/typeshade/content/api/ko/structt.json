@@ -1,0 +1,10 @@
+{
+  "slug": "structt",
+  "source": "c1450f70b3c219f92e64a69eee7806518123910e3afa2981f8066e2e9f9fa16c",
+  "texts": {
+    "summary": "이름이 붙은 구조체의 ShaderType을 만듭니다. 구조체 타입 값을 작성하는 곳이면 어디에든 넘기는 타입입니다. b.var(name, structT('VsOut'))로 만드는 지역 변수, fn 매개변수, arrayT를 거친 배열 원소가 그런 곳입니다.",
+    "description": "같은 `name`을 가진 두 호출은 객체 동일성과 관계없이 [`typeKey`](/api/typekey/)와 [`typeEq`](/api/typeeq/)에서 같다고 비교됩니다. 키가 이름 문자열만으로 정해지기 때문입니다. 여기서는 필드 목록을 비교하지 않습니다. 새 코드에서는 더 높은 수준의 [`ioStruct`](/api/iostruct/)와 [`uniformStruct`](/api/uniformstruct/) 선언자를 쓰는 편이 좋습니다. 두 선언자는 이 함수 위에 만들어진 타입이 지정된 접근자를 반환합니다. 이미 [`StructDecl`](/api/structdecl-interface/)이 있고 그 `ShaderType`만 필요하면 `structT`를 직접 호출합니다.",
+    "parameters.name": "구조체의 선언된 이름입니다. 이 이름이 타입의 키 `struct:<name>`이 됩니다.",
+    "returns": "`{ kind: 'struct', name }` 타입 기술자입니다. `name`은 리터럴 타입을 그대로 유지합니다."
+  }
+}

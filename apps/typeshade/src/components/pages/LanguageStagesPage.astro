@@ -1,0 +1,30 @@
+---
+// Language guide: Shader stages. Content lives in language.topics.stages (src/i18n/en.ts,
+// src/i18n/ko.ts); the code samples are not copy, so they stay here.
+import Docs from '../../layouts/Docs.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).language.topics.stages;
+const headings = [
+  ['mapping', content.mapping], ['compute', content.compute], ['graphics', content.graphics], ['helper', content.helper],
+].map(([slug, text]) => ({ depth: 2, slug, text }));
+---
+
+<Docs locale={locale} path={links.languageStages.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
+  <h1>{content.h1}</h1><p>{content.intro}</p>
+  <h2 id="mapping">{content.mapping}</h2><p><Rich text={content.mappingP} locale={locale} /></p>
+  <TypeShadeCode code={`const WG_SIZE: override<u32> = 64;\n\nfunction addBias(value: f32): f32 {\n  return value + 0.1;\n}\n\n@compute([WG_SIZE])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  pixels[gid.x] = addBias(camera.pos.x);\n}`} />
+  <h2 id="compute">{content.compute}</h2><p><Rich text={content.computeP} locale={locale} /></p>
+  <p><Rich text={content.computeHostP} locale={locale} /></p>
+  <TypeShadeCode code={`const selected = input.length >= 256 ? 256 : 64;\nconst pipeline = await program.compute('paint', { constants: { WG_SIZE: selected } });\nconst [workgroupSize] = pipeline.workgroupShape;\npipeline.dispatch(encoder, bindings, [Math.ceil(input.length / workgroupSize), 1, 1]);`} />
+  <h2 id="graphics">{content.graphics}</h2><p><Rich text={content.graphicsP} locale={locale} /></p>
+  <TypeShadeCode code={`@vertex\nexport function vs(\n  @builtin("vertex_index") vid: u32,\n  vin: VsIn\n): vec4 {\n  return camera.view * vec4(vin.position, 1)\n}\n\n@fragment\nexport function fs(): vec4 {\n  return vec4(1, 0, 0, 1)\n}`} />
+  <h2 id="helper">{content.helper}</h2><p><Rich text={content.helperP} locale={locale} /></p>
+  <TypeShadeCode code={`function saturate(x: f32): f32 {\n  return clamp(x, 0.0, 1.0)\n}`} />
+  <p><a href={localePath(locale, links.languageAlgorithms.href)}>{content.next}</a></p>
+</Docs>

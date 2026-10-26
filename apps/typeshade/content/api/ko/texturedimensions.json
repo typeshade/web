@@ -1,0 +1,11 @@
+{
+  "slug": "texturedimensions",
+  "source": "8e4aa6525d5fb5452ee85ee8aa491152180761988cbca06ab4b3ff77ca570110",
+  "texts": {
+    "summary": "텍셀 단위의 텍스처 크기를 vec2<u32>로 반환합니다.",
+    "description": "2D 배열 텍스처도 같은 방식으로 너비와 높이를 반환합니다. 레이어 수는 별도의 [`textureNumLayers`](/api/texturenumlayers/) 쿼리로 구합니다. 크기는 텍셀 원소 타입에 따라 달라지지 않으므로 정수 텍스처도 받아들입니다. GLSL ES 3.00에서는 배열에 대해 `textureSize`가 돌려주는 `ivec3`에서 두 크기 성분만 남깁니다. 한 호출 안에서 두 번 이상 읽을 때는 결과를 `Let`으로 묶어 씁니다.",
+    "targets.wgsl": "`textureDimensions(tex)`.",
+    "targets.glsl": "`uvec2(textureSize(tex, 0))`.",
+    "targets.cpu": "오라클에는 텍스처 메모리와 이웃 프래그먼트가 없습니다. 모듈을 `{ gpuStubs: true }` 옵션으로 컴파일하지 않았다면 이 호출은 예외를 던집니다. 이 옵션을 켜면 플레이스홀더를 반환합니다."
+  }
+}

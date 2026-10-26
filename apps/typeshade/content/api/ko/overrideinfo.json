@@ -1,0 +1,11 @@
+{
+  "slug": "overrideinfo",
+  "source": "e1baa068ec1183efb44b752f771015ecd1e36321a29c9ba6eb1ebb44d07f0814",
+  "texts": {
+    "summary": "호스트가 파이프라인을 만들 때 넘기는 파이프라인 특수화 상수입니다.",
+    "description": "호스트가 파이프라인을 만들 때 넘기는 파이프라인 특수화 상수(WGSL `override`)입니다. 두 백엔드의 호스트 쪽 형태는 모두 이 정의에서 파생됩니다. WGSL의 `constants` 사전은 `{ [name]: value }` 형태이고, GLSL의 `#define` 헤더는 항목마다 `#define <name> <value>` 한 줄입니다. 둘 다 `name`을 키로 쓰며, 호스트가 값을 넘기지 않으면 `default`로 돌아갑니다.",
+    "members.name": "오버라이드를 작성한 이름입니다. 호스트는 이 이름으로 값을 준다(규칙 11.10).",
+    "members.emittedGlsl": "오버라이드의 GLSL 표기입니다. `emitted`와 다를 때만 있다(D3).",
+    "members.emitted": "생성된 텍스트에 쓰인 오버라이드 이름이다(규칙 11.10)."
+  }
+}

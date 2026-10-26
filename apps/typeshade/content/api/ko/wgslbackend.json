@@ -1,0 +1,8 @@
+{
+  "slug": "wgslbackend",
+  "source": "9cb3e7a2de6560ca1f3af11429c79fc8f5a4e32bca6297b7269ed5c4f5dfaf33",
+  "texts": {
+    "summary": "WGSL 타깃용 Backend입니다. 타입, 리터럴, 내장 함수와 모듈 선언을 device.createShaderModule에 맞게 표기합니다.",
+    "description": "백엔드를 받는 모든 API에 넘깁니다. 예를 들어 [`hostFeaturesFor`](/api/hostfeaturesfor/)나 [`capabilityMatrix`](/api/capabilitymatrix/)가 그런 API입니다. 이 모듈의 WGSL 생성 함수([`emitModule`](/api/emitmodule/), [`emitFragment`](/api/emitfragment/), [`emitFuncs`](/api/emitfuncs/), …)는 이미 이 백엔드에 묶여 있습니다."
+  }
+}

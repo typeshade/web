@@ -1,0 +1,11 @@
+{
+  "slug": "asinh",
+  "source": "c61fb02d85c803cc6c58e7243d08a4a1bc4610f60184894762a8130996ac6ff0",
+  "texts": {
+    "summary": "asinh(x): 역쌍곡사인을 성분별로 구합니다. 모든 실수에서 정의됩니다.",
+    "description": "역 구데르만 함수로 보면 `asinh(tan(φ))`는 `log(tan(π/4 + φ/2))`와 같습니다. 이 형태는 초월 함수 하나가 적고, 잘라 내야 할 π/4 상수도 없습니다.",
+    "targets.wgsl": "`asinh(x)`.",
+    "targets.glsl": "`asinh(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

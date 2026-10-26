@@ -1,0 +1,11 @@
+---
+import ReferenceKindPage from '../../../components/pages/ReferenceKindPage.astro';
+import { languageSections } from '../../../lib/language-reference.ts';
+
+export function getStaticPaths() {
+  return languageSections().map((section) => ({ params: { kind: section.slug }, props: { kind: section.kind } }));
+}
+const { kind } = Astro.props;
+---
+
+<ReferenceKindPage locale="ko" kind={kind} />

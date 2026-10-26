@@ -1,0 +1,70 @@
+---
+import Rich from './Rich.astro';
+import LinkColumns from './LinkColumns.astro';
+import { copyFor, localePath, type Locale } from '../i18n/index.ts';
+import type { FunctionLesson } from '../i18n/function-lessons-en.ts';
+import { modelBits, type OperationModel } from '../lib/operation-models.ts';
+interface Props { locale: Locale; name: string; lesson: FunctionLesson; model: OperationModel }
+const { locale, name, lesson, model } = Astro.props;
+const r = copyFor(locale).docs.reference;
+const t = r.worked;
+const caption = name.startsWith('texture') ? t.textureDiagram : name.startsWith('mat') || name === 'transpose' || name === 'determinant' ? t.matrixDiagram : /^(dpd|fwidth)/.test(name) ? t.derivativeDiagram : t.diagram;
+const value = (v: number | boolean) => typeof v === 'number' ? Number(v.toPrecision(7)).toString() : String(v);
+---
+<section data-operation-lesson={name} lang={locale}>
+  <h2 id="worked-examples">{t.heading}</h2>
+  <p><Rich text={lesson.try} locale={locale} /></p>
+  {model.setup && <p class="model-setup text-(length:--text-ui) text-text-2"><strong>{t.setup}</strong><code>{model.setup}</code></p>}
+  <div class="model-examples mbs-5 grid gap-3">
+    {model.cases.map((sample, i) => (
+      <details class="model-case rounded-md border border-line-2" name={`model-${name}`} open={i === 0} data-model-case={i}>
+        <summary class="cursor-pointer px-4 py-3 text-(length:--text-ui) font-semibold text-text-1">{t.example(i + 1)}<code class="model-preview font-normal text-text-2">{sample.input}</code></summary>
+        <div class="model-result px-4 pbe-4">
+          {sample.grid && <figure class="model-figure">
+            <div class="model-grid" style={`--model-columns: ${sample.grid[0].length}`}>
+              {sample.grid.map((row, y) => row.map((v, x) => <span class:list={['model-cell', { 'model-selected': sample.selected?.[0] === x && sample.selected?.[1] === y }]}><code>{value(v)}</code></span>))}
+            </div>
+            <figcaption class="text-(length:--text-ui) text-text-2">{caption}</figcaption>
+          </figure>}
+          <dl class:list={['model-values text-(length:--text-ui)', { 'model-atomic': sample.after !== undefined }]}>
+            {sample.before !== undefined && <div><dt>{t.before}</dt><dd><code>{sample.before}</code></dd></div>}
+            <div><dt>{sample.after !== undefined ? t.returned : t.output}</dt><dd data-model-output><code>{sample.output}</code></dd></div>
+            {sample.after !== undefined && <div><dt>{t.after}</dt><dd data-model-after><code>{sample.after}</code></dd></div>}
+          </dl>
+          {sample.word !== undefined && <figure class="model-figure">
+            <figcaption class="text-(length:--text-ui) text-text-2">{t.binary}: <code>{sample.word >>> 0}</code></figcaption>
+            <div class="model-bits" role="img" aria-label={`${t.binary}: ${modelBits(sample.word)}`}>{[...modelBits(sample.word)].map(bit => <span class:list={['model-bit', { 'model-set': bit === '1' }]} aria-hidden="true">{bit}</span>)}</div>
+          </figure>}
+        </div>
+      </details>
+    ))}
+  </div>
+  <p class="guide-note">{t.modelNote} {t.calculationNote}</p>
+  <h2 id="practical-use">{r.demo.useHeading}</h2>
+  <p><Rich text={lesson.use} locale={locale} /></p>
+  <h2 id="input-limits">{r.demo.cautionHeading}</h2>
+  <p><Rich text={lesson.caution} locale={locale} /></p>
+  <p class="guide-note"><Rich text={r.demo.sources} locale={locale} /></p>
+  <h2 id="related-functions">{r.demo.related}</h2>
+  <LinkColumns>{model.related.map(other => <li><a href={localePath(locale, `/reference/functions/${other}/`)}><code>{other}</code></a></li>)}</LinkColumns>
+</section>
+<style>
+  section > h2:first-child { margin-block-start: 28px }
+  .model-setup strong { display: block; font-weight: 600 }
+  .model-setup code { display: block; margin-block-start: 4px; white-space: pre-wrap; overflow-wrap: anywhere }
+  .model-preview { margin-inline-start: 12px; overflow-wrap: anywhere }
+  .model-values { display: grid; gap: 12px; margin-block-start: 12px }
+  .model-values dt { color: var(--color-text-2); font-weight: 600 }
+  .model-values dd { min-inline-size: 0; margin-block-start: 4px; white-space: pre-wrap; overflow-wrap: anywhere }
+  .model-atomic { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+  .model-figure { margin-block-start: 12px; max-inline-size: 352px }
+  .model-figure figcaption { margin-block-start: 8px }
+  .model-grid { display: grid; grid-template-columns: repeat(var(--model-columns), minmax(0, 1fr)); gap: 4px }
+  .model-cell { display: grid; place-items: center; min-block-size: 42px; min-inline-size: 0; padding: 4px; border: 1px solid var(--color-line-2); border-radius: 4px; background: var(--color-surface-1); overflow-wrap: anywhere }
+  .model-selected { border-color: var(--color-accent); background: var(--color-primary-bg); outline: 1px solid var(--color-accent) }
+  .model-bits { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; margin-block-start: 10px; font-family: var(--font-mono); font-size: var(--text-code) }
+  .model-bit { text-align: center; padding-block: 2px; border: 1px solid var(--color-line-2); border-radius: 4px; color: var(--color-text-2) }
+  .model-set { background: var(--color-primary-bg); color: var(--color-accent); border-color: var(--color-accent) }
+  summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 4px }
+  @media (max-width: 30rem) { .model-preview { display: block; margin-inline-start: 0; margin-block-start: 4px } }
+</style>

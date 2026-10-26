@@ -1,0 +1,8 @@
+{
+  "slug": "storagetextureformat",
+  "source": "fe8749acd521183d7fb9a8c265a1cf57559c42d196d64f019f840c94a5b22902",
+  "texts": {
+    "summary": "스토리지 텍스처가 가질 수 있는 텍셀 포맷입니다. STORAGE_BINDING 용도로 쓰이며, 선택 기능 없이도 모든 디바이스가 지원하는 WebGPU 포맷 집합입니다.",
+    "description": "명세에서 옮긴 값이 아니라 측정한 값입니다. 실제 디바이스에 포맷마다, 접근 모드마다 바인드 그룹 레이아웃을 만들게 했습니다. 여기 있는 열여섯 개는 아무 기능도 요청하지 않은 디바이스가 받아들인 포맷입니다. tiered 텍스처 포맷(`r8unorm`, `rg8unorm`, `rgb10a2unorm`, `rg16float` 및 그 동급 포맷)은 여기에 없습니다. 이런 포맷을 쓰는 모듈은 Tint에서 컴파일되지만 `createBindGroupLayout`에서 실패합니다. 진단 없이 잘못된 프로그램이 나가는 셈입니다.\n\n`bgra8unorm`은 여기에 있으며, 열일곱 번째이자 코어가 아닌 유일한 포맷입니다. 이 값도 독립된 Chromium 빌드 두 개에서 측정했습니다. 기능을 요청하지 않은 디바이스는 이 포맷을 거부한다(\"Texture format TextureFormat::BGRA8Unorm does not support storage texture access\nStorageTextureAccess::WriteOnly\"). `bgra8unorm-storage`를 요청한 디바이스는 `write`에서 이 포맷을 받아들입니다. 두 디바이스 모두 `read`와 `read_write`에서는 이 포맷을 거부합니다. Tint는 이 철자를 모두 받아들이므로 컴파일 게이트는 그 차이를 볼 수 없습니다. 그래서 기능이 그 차이를 실어 나릅니다. 이 포맷을 쓰는 모듈에는 `bgra8unormStorage`가 필요하며, `reflect().requiredFeatures`가 그 기능을 요청할 기능으로 호스트에 넘겨 줍니다. [`WRITE_ONLY_STORAGE_FORMATS`](/api/writeonlystorageformats/)는 같은 측정의 접근 쪽 절반입니다."
+  }
+}

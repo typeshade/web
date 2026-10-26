@@ -1,0 +1,8 @@
+{
+  "slug": "ismat",
+  "source": "7be2fb6d33d82670bc80433cb851797a83cd4a3e1e14415a6b92772879102031",
+  "texts": {
+    "summary": "ShaderType을 { kind: 'mat' } 분기로 좁힙니다.",
+    "description": "`ShaderType`을 `{ kind: 'mat' }` 분기로 좁힙니다. `elem: 'f32'`(기본 `matNxN<f32>`)와 `elem: 'f64'`(에뮬레이션이며, double-double 열로 이루어진 구조체로 생성된다) 두 경우 모두에 맞습니다. 두 경우를 구별해야 할 때는 [`isMat64`](/api/ismat64/)를 씁니다. 이항 연산의 타입 결정은 행렬-벡터 곱이나 행렬-행렬 곱을 처리하기 전에 이 함수를 검사합니다."
+  }
+}

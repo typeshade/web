@@ -1,0 +1,208 @@
+---
+// One section of the GLSL ES 3.00 construct set: that section's own tables and nothing else.
+// The index at /guide/language/from-glsl/ says how to read a row and links every section.
+// Every row is measured at build time by src/lib/glsl-mapping.ts, which hands the pinned
+// compiler a `"use typeshade"` file and reads back the GLSL it writes, or the message it
+// throws where that target has no form, so no spelling on this page is typed by hand. The
+// tables render through MappingTable.astro, whose header comment documents its props.
+import Docs from '../../layouts/Docs.astro';
+import MappingTable from '../MappingTable.astro';
+import Rich from '../Rich.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import { glslMapping, type GlslTableId } from '../../lib/glsl-mapping.ts';
+import { editCopy, links, mappingSet } from '../../lib/links.ts';
+import type { MappingRowData } from '../../lib/target-mapping.ts';
+
+type SectionKey = 'types' | 'uniforms' | 'variables' | 'functions';
+interface Props {
+  locale: Locale;
+  section: SectionKey;
+}
+const { locale, section } = Astro.props;
+const c = copyFor(locale).language.mapping.fromGlsl;
+const mapping = glslMapping();
+const entry = mappingSet('languageFromGlsl').sections.find((s) => s.key === section);
+if (!entry) throw new Error(`[from-glsl] there is no section page for '${section}'`);
+
+// A cell the compiler left empty carries a sentence from the copy instead, and a row whose
+// sentence nobody wrote stops the build here: an empty cell in a mapping table reads as a
+// blank the reader has to fill.
+const refusal = (table: GlslTableId, row: MappingRowData): string => {
+  const key = `${table}.${row.id}`;
+  const written = c.refusals[key];
+  if (!written) throw new Error(`[from-glsl] the row '${key}' has an empty cell and no sentence for it`);
+  return written;
+};
+
+const fill = (table: GlslTableId, row: MappingRowData) =>
+  ({ note: row.message.length > 0 ? row.message : refusal(table, row) });
+
+// [GLSL ES 3.00, TypeShade], the two columns every construct table has.
+const pair = (table: GlslTableId) =>
+  mapping.tables[table].map((row) => [row.target ?? fill(table, row), row.source ?? fill(table, row)]);
+
+// The same, with the note the copy carries for that row as a third column.
+const noted = (table: GlslTableId) => {
+  const cells = pair(table);
+  return mapping.tables[table].map((row, i) => [...cells[i]!, { note: c.notes[`${table}.${row.id}`] ?? '' }]);
+};
+
+const glslFirst = ['glsl', 'ts'] as const;
+const twoColumns = [c.colGlsl, c.colSource];
+
+// The capability rows read the other way: the id a module declares, the directive the shader
+// carries for it, and the WebGL2 extension the host turns on.
+const capabilityRows = mapping.tables.capabilities.map((row) => [
+  { name: row.source ?? '' },
+  row.target ?? { note: c.noDirective },
+  { name: row.message },
+]);
+
+const page = c.pages[section];
+const h1 = { types: c.typesH, uniforms: c.uniformsH, variables: c.variablesH, functions: c.functionsH }[section];
+const headings = {
+  types: [
+    { depth: 2, slug: 'scalars', text: c.scalarsH },
+    { depth: 2, slug: 'vectors', text: c.vectorsH },
+    { depth: 2, slug: 'arrays', text: c.arraysH },
+    { depth: 2, slug: 'samplers', text: c.samplersH },
+    { depth: 2, slug: 'no-form', text: c.noFormH },
+  ],
+  uniforms: [
+    { depth: 2, slug: 'varyings', text: c.varyingsH },
+    { depth: 2, slug: 'capabilities', text: c.capabilitiesH },
+  ],
+  variables: [],
+  functions: [],
+}[section];
+---
+
+<Docs
+  locale={locale}
+  path={links[entry.link].href}
+  title={page.title}
+  description={page.description}
+  headings={headings}
+  editHref={editCopy(locale, 'language')}
+>
+  <h1>{h1}</h1>
+
+  {section === 'types' && (
+    <>
+      <p><Rich text={c.typesP} locale={locale} /></p>
+
+      <h2 id="scalars">{c.scalarsH}</h2>
+      <MappingTable locale={locale} caption={c.scalarsH} columns={twoColumns} lang={glslFirst} rows={pair('scalars')} />
+
+      <h2 id="vectors">{c.vectorsH}</h2>
+      <MappingTable locale={locale} caption={c.vectorsH} columns={twoColumns} lang={glslFirst} rows={pair('vectors')} />
+      <p><Rich text={c.vectorsP} locale={locale} /></p>
+
+      <h2 id="arrays">{c.arraysH}</h2>
+      <MappingTable locale={locale} caption={c.matricesH} columns={twoColumns} lang={glslFirst} rows={pair('matrices')} />
+      <p><Rich text={c.matricesP} locale={locale} /></p>
+      <MappingTable locale={locale} caption={c.arraysH} columns={twoColumns} lang={glslFirst} rows={pair('arrays')} />
+      <p><Rich text={c.arraysP} locale={locale} /></p>
+
+      <h2 id="samplers">{c.samplersH}</h2>
+      <p><Rich text={c.samplersP} locale={locale} /></p>
+      <MappingTable locale={locale} caption={c.samplersH} columns={twoColumns} lang={glslFirst} rows={pair('samplers')} />
+      <p><Rich text={c.shadowP} locale={locale} /></p>
+
+      <h2 id="no-form">{c.noFormH}</h2>
+      <p><Rich text={c.noFormP} locale={locale} /></p>
+      <MappingTable
+        locale={locale}
+        caption={c.noFormH}
+        columns={[c.colSource, c.colMessage]}
+        lang={['ts', null]}
+        widths={['0.9fr', '1.3fr']}
+        rows={mapping.tables.noForm.map((row) => [row.source, fill('noForm', row)])}
+      />
+    </>
+  )}
+
+  {section === 'uniforms' && (
+    <>
+      <p><Rich text={c.uniformsP} locale={locale} /></p>
+      <MappingTable
+        locale={locale}
+        caption={c.uniformsH}
+        columns={[c.colGlsl, c.colSource, c.colNote]}
+        lang={['glsl', 'ts', null]}
+        widths={['1fr', '1fr', '1.05fr']}
+        rows={noted('uniforms')}
+      />
+
+      <h2 id="varyings">{c.varyingsH}</h2>
+      <p><Rich text={c.varyingsP} locale={locale} /></p>
+      <MappingTable
+        locale={locale}
+        caption={c.varyingsH}
+        columns={[c.colGlsl, c.colSource, c.colNote]}
+        lang={['glsl', 'ts', null]}
+        widths={['1fr', '0.8fr', '1.2fr']}
+        rows={noted('varyings')}
+      />
+
+      <h2 id="capabilities">{c.capabilitiesH}</h2>
+      <p><Rich text={c.capabilitiesP} locale={locale} /></p>
+      <MappingTable
+        locale={locale}
+        caption={c.capabilitiesH}
+        columns={[c.colCapability, c.colDirective, c.colExtension]}
+        lang={[null, 'glsl', null]}
+        widths={['0.8fr', '1.15fr', '1.15fr']}
+        rows={capabilityRows}
+      />
+      <p><Rich text={c.enablesP} locale={locale} /></p>
+    </>
+  )}
+
+  {section === 'variables' && (
+    <>
+      <p><Rich text={c.variablesP} locale={locale} /></p>
+      <MappingTable
+        locale={locale}
+        caption={c.variablesH}
+        columns={[c.colGlsl, c.colSource, c.colNote]}
+        lang={['glsl', 'ts', null]}
+        widths={['0.75fr', '1.15fr', '1.1fr']}
+        rows={noted('variables')}
+      />
+      <p><Rich text={c.absentP} locale={locale} /></p>
+      <MappingTable
+        locale={locale}
+        caption={c.absentH}
+        columns={[c.colGlsl, c.colInstead]}
+        lang={glslFirst}
+        widths={['0.6fr', '1.6fr']}
+        rows={pair('absentVariables')}
+      />
+    </>
+  )}
+
+  {section === 'functions' && (
+    <>
+      <p><Rich text={c.functionsP} locale={locale} /></p>
+      <MappingTable
+        locale={locale}
+        caption={c.functionsH}
+        columns={[c.colGlsl, c.colSource, c.colNote]}
+        lang={['glsl', 'ts', null]}
+        widths={['1fr', '0.9fr', '1.1fr']}
+        rows={noted('functions')}
+      />
+      <p><Rich text={c.operatorsP} locale={locale} /></p>
+      <MappingTable
+        locale={locale}
+        caption={c.operatorsH}
+        columns={[c.colGlsl, c.colSource, c.colNote]}
+        lang={['glsl', 'ts', null]}
+        widths={['1.1fr', '1fr', '1fr']}
+        rows={noted('operators')}
+      />
+      <p><Rich text={c.restP} locale={locale} /></p>
+    </>
+  )}
+</Docs>

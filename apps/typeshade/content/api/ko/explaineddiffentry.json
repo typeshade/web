@@ -1,0 +1,8 @@
+{
+  "slug": "explaineddiffentry",
+  "source": "0f13ea53ec0e7cd1d22535d3440f01401246b13368ad184c34d6a3ed5f90c65c",
+  "texts": {
+    "summary": "선언된 변환이 설명하는 diff 줄 하나입니다. 기준 쪽에 transform을 적용하자, 이 줄이 버킷에서 사라졌습니다.",
+    "description": "줄은 앞의 `-` 또는 `+` 표시를 그대로 유지합니다. `-` 줄은 변환이 재작성으로 없앤 `a`의 사실입니다. `+` 줄은 변환을 거친 기준 쪽도 이제 갖게 된 `b`의 사실입니다. `transform`은 플러그인의 `identity ?? name`이며, [`emitIdentity`](/api/emitidentity/)가 보고하는 표기와 같습니다."
+  }
+}

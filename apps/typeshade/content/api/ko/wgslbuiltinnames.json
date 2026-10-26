@@ -1,0 +1,8 @@
+{
+  "slug": "wgslbuiltinnames",
+  "source": "63e1531ac7a71990b686713e6f7d730942ec3ffbdbc9894fb0074c2aa3f03683",
+  "texts": {
+    "summary": "WgslBuiltinName 값을 모두 담은 런타임 배열입니다.",
+    "description": "위의 타입은 타입 전용 유니온이며 런타임 값이 없습니다. 그래서 런타임에 어휘가 필요한 호출자는 리터럴을 다시 적는 대신 이 배열을 읽습니다. 컴파일러 프런트엔드의 `@builtin(...)` 허용 목록 검사나 편집기의 자동 완성·호버 목록이 그런 호출자입니다. 이 배열은 미러링하는 타입 바로 옆에 둡니다. 그래서 둘을 함께 고치게 됩니다. `language-service/ambient.test.ts`는 이 파일의 AST를 파싱하고, 이 배열을 `WgslBuiltinName` 유니온 자체와 대조합니다."
+  }
+}

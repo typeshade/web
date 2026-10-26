@@ -1,0 +1,35 @@
+---
+// The file with the wrong field, marked, and the diagnostic the editor reports for it. The
+// message is the compiler's own text, from src/lib/typed-error.ts.
+import { Code } from 'astro-expressive-code/components';
+import { typedError } from '../lib/typed-error.ts';
+import { typedErrorFile } from '../lib/typed-error-shader.ts';
+import CodeFrame from './CodeFrame.astro';
+import { copyFor, type Locale } from '../i18n/index.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copyFor(locale).diagnostic;
+const { snippet, wrongLine, diagnostic } = typedError();
+const TITLE = typedErrorFile;
+---
+
+<div data-diagnostic>
+  <CodeFrame label={t.frameLabel}>
+    <Code code={snippet} lang="ts" title={TITLE} meta={`{${wrongLine}}`} locale={locale} />
+  </CodeFrame>
+  <p class="diagnostic">
+    <b>{t.error(diagnostic.code, diagnostic.line, diagnostic.column)}</b> {diagnostic.message}
+    {diagnostic.truncated && <span>{t.truncated}</span>}
+  </p>
+</div>
+
+<style is:global>
+  [data-diagnostic] .expressive-code .ec-line.mark {
+    text-decoration: underline wavy var(--color-diag);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+</style>

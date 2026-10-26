@@ -1,0 +1,11 @@
+{
+  "slug": "cos",
+  "source": "b599001e73ef596b05f709d1036c78938d749600ce70ef1b3ba9812ba6455857",
+  "texts": {
+    "summary": "cos(x): 라디안 단위 x의 코사인을 성분별로 구합니다.",
+    "description": "WGSL과 GLSL ES 3.00에서 같은 이름으로 씁니다.",
+    "targets.wgsl": "`cos(x)`. 피연산자가 `f64`이면 fp64 패스가 이를 `df64` 헬퍼 호출로 바꿉니다.",
+    "targets.glsl": "`cos(x)`. 피연산자가 `f64`이면 fp64 패스가 이를 `df64` 헬퍼 호출로 바꿉니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

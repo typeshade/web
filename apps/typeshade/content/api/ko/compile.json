@@ -1,0 +1,8 @@
+{
+  "slug": "compile",
+  "source": "35cfa243d7ee94c1cda68789eea5c3283cea5c3f94830c2ea8ddc4e382423562",
+  "texts": {
+    "summary": "TypeShade TypeScript 소스를 컴파일해 모듈과 생성된 셰이더 출력을 만듭니다.",
+    "description": "소스에는 `\"use typeshade\"` 지시문이 있어야 한다(`compileTsSource`의 `requireDirective` 기본값). 지시문이 없으면 결과에는 `MISSING_DIRECTIVE` 오류 하나만 있고 다른 것은 없습니다. 프런트엔드가 오류를 보고하면 백엔드는 전혀 실행되지 않으므로 `wgsl`과 `glsl`은 `undefined`이고, `eval`은 예외를 던집니다. 부분적인 모듈이 셰이더 텍스트로 만들어지는 일은 없습니다. 프런트엔드가 오류를 보고하지 않았는데도 WGSL 생성기가 예외를 던지는 경우가 있다(대상이 표현할 수 없는 리터럴이나 생성기가 거부하는 IR). 이때는 예외 대신 `BACKEND` 오류 진단 하나가 보고되고, `wgsl`과 `glsl`은 다시 `undefined`가 됩니다.\n\nGLSL 생성은 WGSL이 있는 모든 모듈에 대해 시도합니다. 렌더 진입점이 있는 모듈에서 GLSL 생성기가 예외를 던지더라도(GLSL 에뮬레이션이 표현할 수 없는 바인딩이 있는 경우) 모듈의 컴파일은 성공합니다. 이때 `wgsl`은 남고, `glsl`은 `undefined`가 되며, 예외는 카테고리가 `warning`인 `BACKEND` 진단 하나가 됩니다. 렌더 진입점 옆의 컴퓨트 진입점은 패스 프로그램으로서 WebGL2에서 실행된다(변경 0054, 규칙 10.3). 따라서 `glsl`에는 렌더 진입점이 도달하는 내용이 담깁니다. 패스 프로그램이 없는 컴퓨트 진입점은 `BACKEND` 경고를 하나 더 생성합니다. 컴퓨트 전용 모듈은 버텍스 프로그램이나 프래그먼트 프로그램이 없어 누락되는 렌더 프로그램이 없으므로, 진단 없이 `glsl: undefined`를 받습니다. 각 필드는 `CompileResult`에서 확인할 수 있습니다.\n\n`options.fileName`은 소스의 이름을 지정합니다. 기본 임시 이름으로 식별할 수 없는 경우의 동작은 [`CompileOptions.fileName`](/api/compileoptions/)에 설명되어 있습니다."
+  }
+}

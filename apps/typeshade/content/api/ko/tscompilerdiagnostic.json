@@ -1,0 +1,12 @@
+{
+  "slug": "tscompilerdiagnostic",
+  "source": "4657ba31e809a186509d6f41891b3148b4ec6cf9b49d0acaf5be50291a7fd182",
+  "texts": {
+    "summary": "TypeShade가 TypeScript 셰이더 코드를 분석하거나 컴파일할 때 만드는 소스 진단입니다.",
+    "description": "`line`/`character`는 1부터 시작하며, 외부 도구(`language-service.ts`를 포함한다)가 이 값을 읽습니다. 두 값은 문제가 된 노드의 시작 위치를 나타냅니다. `start`와 `length`는 파일 안의 UTF-16 오프셋입니다. 각각 `node.getStart(sourceFile)`과 `node.getEnd() - node.getStart(sourceFile)`에 해당합니다. 그래서 편집기는 글자 하나가 아니라 노드 전체에 밑줄을 그을 수 있습니다. `endLine`/`endCharacter`는 `start + length` 위치를 1부터 세며, `line`/`character`와 같은 규칙을 따릅니다.\n\n노드가 없는 진단(지시문 누락, 모듈 전체 백엔드 실패)은 파일의 첫 문장을 범위로 씁니다. 파일에 문장이 없으면 `start: 0, length: 0`을 씁니다. 구현은 `diagnostic.ts`의 `makeDiagnostic`에 있습니다.",
+    "members.start": "진단 범위가 시작하는 UTF-16 오프셋입니다.",
+    "members.length": "진단 범위의 길이이며, UTF-16 코드 단위로 셉니다.",
+    "members.endLine": "`start + length` 위치의 줄 번호이며, 1부터 시작합니다.",
+    "members.endCharacter": "`start + length` 위치의 문자 번호이며, 1부터 시작합니다."
+  }
+}

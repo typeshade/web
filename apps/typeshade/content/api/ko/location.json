@@ -1,0 +1,12 @@
+{
+  "slug": "location",
+  "source": "650f6263e8d8368e3e3fbb69c217d97a11efbc9d98dcab7dedb927ff36e08788",
+  "texts": {
+    "summary": "진입점 매개변수나 필드에 @location(<n>)을 붙여 속성을 지정합니다. 이 슬롯은 파이프라인이나 이전 스테이지가 공급합니다. 선택 사항으로 @interpolate(<mode>)를 함께 쓸 수 있습니다.",
+    "description": "같은 헬퍼가 [`ioStruct`](/api/iostruct/)의 필드 맵과 [`fn`](/api/fn/)의 매개변수 레코드에 모두 쓰입니다.",
+    "parameters.n": "location 슬롯 번호입니다.",
+    "parameters.type": "필드의 타입입니다.",
+    "parameters.interpolate": "보간 모드입니다. 예를 들어 정수 varying에는 `'flat'`을 지정합니다.",
+    "returns": "`ioStruct` 필드 맵 또는 `fn` 매개변수 레코드에 쓰는 [`FieldSpec`](/api/fieldspec/)입니다."
+  }
+}

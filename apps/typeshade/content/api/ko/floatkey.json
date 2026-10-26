@@ -1,0 +1,8 @@
+{
+  "slug": "floatkey",
+  "source": "b5f912e5905743f579b6c0e41f6434f67c34ef59c952d6dd3fbd3f1339dd84e4",
+  "texts": {
+    "summary": "f32 계열 키입니다. 스칼라 'f32'와 f32 벡터를 가리키며, 부동소수점 전용 성분별 내장 함수가 받는 인수 정의역입니다.",
+    "description": "WGSL과 GLSL ES 3.00은 이 내장 함수를 부동소수점에 대해서만 정의합니다. 그래서 i32, u32 또는 bool 노드는 `tsc` 단계에서 거부됩니다."
+  }
+}

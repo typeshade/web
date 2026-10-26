@@ -1,0 +1,109 @@
+---
+// Language guide: the builtin table. The words live in language.mapping.builtins
+// (src/i18n/en.ts, src/i18n/ko.ts). Every row is generated at build time from the compiler's
+// own spelling registry (src/lib/builtin-table.ts), which runs each entry's WGSL and GLSL
+// template over placeholder arguments, so no spelling on this page is typed by hand and a
+// change upstream arrives with the next pin. The tables render through MappingTable.astro,
+// whose header comment documents its props and the CSS classes it uses.
+import Docs from '../../layouts/Docs.astro';
+import MappingTable from '../MappingTable.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { apiSlugByName } from '../../lib/api-nav.ts';
+import { builtinGroups, builtinHelpers, type BuiltinFamily, type BuiltinRow } from '../../lib/builtin-table.ts';
+import { languageBuiltinPage } from '../../lib/language-reference.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = copyFor(locale).language.mapping.builtins;
+const groups = builtinGroups();
+const helpers = builtinHelpers();
+const slugs = apiSlugByName();
+
+// A row links the page that holds the detail: the language reference's own page for that
+// name where there is one, since this page is written for someone authoring a shader. An id
+// the language surface does not name (the layered texture forms the compiler picks itself,
+// the storage fetches, the fp64 guard) falls back to the compiler's API reference, and an id
+// in neither gets no link, so the page carries none that leads nowhere.
+const pageOf = (name: string): string | undefined => {
+  const entry = languageBuiltinPage(name);
+  if (entry) return localePath(locale, entry);
+  const slug = slugs.get(name);
+  return slug ? localePath(locale, `/api/${slug}/`) : undefined;
+};
+
+// The two families whose names the Math surface also reaches get a fourth column for it.
+const hasMath = (family: BuiltinFamily): boolean => family === 'maths' || family === 'casts';
+const columnsFor = (family: BuiltinFamily): string[] =>
+  hasMath(family) ? [c.colName, c.colWgsl, c.colGlsl, c.colMath] : [c.colName, c.colWgsl, c.colGlsl];
+const langFor = (family: BuiltinFamily) =>
+  hasMath(family) ? ([null, 'wgsl', 'glsl', null] as const) : ([null, 'wgsl', 'glsl'] as const);
+// The names run long (a layered depth comparison is thirty characters before its arguments)
+// and a GLSL cell can hold a whole inlined expression, so those two columns take the width
+// the Math name does not need.
+const widthsFor = (family: BuiltinFamily): string[] =>
+  hasMath(family) ? ['1.15fr', '1fr', '1.1fr', '0.75fr'] : ['1.2fr', '1fr', '1.25fr'];
+
+// A row: the call, then what each backend writes for it. A pre-emit id reaches no backend, so
+// both target cells say what the pass does with it instead of a spelling it never has; a GLSL
+// column that has no form carries the compiler's own message.
+const cellsFor = (family: BuiltinFamily, row: BuiltinRow) => {
+  const target = (text: string | null) =>
+    row.preEmit ? { note: c.preEmit } : (text ?? { note: row.glslMessage.length > 0 ? row.glslMessage : c.noForm });
+  const cells = [{ name: row.call, href: pageOf(row.id) }, target(row.wgsl), target(row.glsl)];
+  return hasMath(family) ? [...cells, row.math ? { name: row.math } : null] : cells;
+};
+
+const headings = [
+  { depth: 2, slug: 'reading', text: c.readingH },
+  { depth: 2, slug: 'precedence', text: c.precedenceH },
+  ...groups.map((g) => ({ depth: 2, slug: g.family, text: c.families[g.family] })),
+  { depth: 2, slug: 'helpers', text: c.helpersH },
+];
+---
+
+<Docs
+  locale={locale}
+  path={links.languageBuiltins.href}
+  title={c.title}
+  description={c.description}
+  headings={headings}
+  editHref={editCopy(locale, 'language')}
+>
+  <h1>{c.h1}</h1>
+  <p>{c.intro}</p>
+
+  <h2 id="reading">{c.readingH}</h2>
+  <p><Rich text={c.readingP} locale={locale} /></p>
+  <p><Rich text={c.idsP} locale={locale} /></p>
+
+  <h2 id="precedence">{c.precedenceH}</h2>
+  <p>{c.precedenceP}</p>
+
+  {groups.map((group) => (
+    <>
+      <h2 id={group.family}>{c.families[group.family]}</h2>
+      <MappingTable
+        locale={locale}
+        caption={c.families[group.family]}
+        columns={columnsFor(group.family)}
+        lang={langFor(group.family)}
+        widths={widthsFor(group.family)}
+        rows={group.rows.map((row) => cellsFor(group.family, row))}
+      />
+      {group.family === 'bits' && <p>{c.bitsP}</p>}
+    </>
+  ))}
+
+  <h2 id="helpers">{c.helpersH}</h2>
+  <p>{c.helpersP}</p>
+  <MappingTable
+    locale={locale}
+    caption={c.helpersH}
+    columns={[c.colBuiltin, c.colHelper]}
+    rows={helpers.map((h) => [{ name: h.id, href: pageOf(h.id) }, { name: h.fn }])}
+  />
+
+  <p><Rich text={c.sourceP} locale={locale} /></p>
+</Docs>

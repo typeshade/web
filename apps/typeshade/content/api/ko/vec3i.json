@@ -1,0 +1,8 @@
+{
+  "slug": "vec3i",
+  "source": "7b63be3b9ce1ab89a10edb7e819b1f28cc936e2301804b571ebba1e38269e705",
+  "texts": {
+    "summary": "vec3<i32> 생성자이며, WGSL 방식으로 vec3i(x, y, z)라고 씁니다.",
+    "description": "일반 숫자 성분은 i32로 승격됩니다. 부호 있는 정수 세 개로 이루어지며, 배열 텍스처 안의 텍셀 좌표가 그 예입니다."
+  }
+}

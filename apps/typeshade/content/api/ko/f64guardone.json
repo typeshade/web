@@ -1,0 +1,11 @@
+{
+  "slug": "f64guardone",
+  "source": "79acb6dc59c126440507c2136356acf4aad850a74c7c8a787ee5117326bb15ab",
+  "texts": {
+    "summary": "f64 에뮬레이션의 fast-math 방지 가드 값입니다. GPU 컴파일러가 컴파일 시점에 값을 알 수 없는 1.0이며, fp64Guard가 선언하는 가드 텍스처에서 텍셀을 읽는 형태로 대상마다 생성됩니다.",
+    "description": "CPU 평가는 정확히 1을 돌려줍니다. f64 에뮬레이션 패스가 이 함수를 스스로 넣으므로, 작성 코드가 직접 호출할 필요는 없습니다.",
+    "targets.wgsl": "`textureLoad(_fp64, vec2<i32>(0, 0), 0).x`로 생성합니다.",
+    "targets.glsl": "`texelFetch(_fp64, ivec2(0, 0), 0).x`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "slug": "capsupport",
+  "source": "80172a58f4bd0e8133a6990c67ff1ae6baad707b2a9a363c77ac3270e13d31b2",
+  "texts": {
+    "summary": "기능 하나가 대상 하나에서 치르는 비용입니다. 백엔드 capProfile의 한 행입니다.",
+    "description": "기능 하나가 대상 하나에서 치르는 비용이며, 백엔드 `capProfile`의 한 행입니다. 두 필드는 모두 선택 사항이고, 뜻도 서로 다릅니다.\n\n빈 행(`{}`)은 대상이 이 기능을 별도 조치 없이 지원한다는 뜻입니다. 지시문도 없고 호스트 활성화도 없습니다. WGSL의 스토리지 버퍼와 WebGPU의 부동소수점 렌더 대상이 여기에 해당합니다.",
+    "members.directive": "대상이 이 기능을 받아들이려면 생성된 소스가 반드시 담아야 하는 토큰입니다. WGSL은 `enable <directive>;`이고, GLSL ES 3.00은 `#extension <directive> : require`이입니다. 이 필드가 없으면 기능이 생성된 소스에 아무것도 더하지 않습니다.",
+    "members.hostFeature": "파이프라인을 만들기 전에 호스트가 활성화해야 하는 항목입니다. WebGL2에서는 `gl.getExtension('<hostFeature>')`이고, WebGPU에서는 `requiredFeatures: ['<hostFeature>']`에 넣는 항목입니다. 이 필드가 없으면 그 대상에서 기능이 코어 사양으로 기본 제공되므로 요청할 것이 없습니다."
+  }
+}

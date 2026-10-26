@@ -1,0 +1,6 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+type Props = HTMLAttributes<'a'> & { href: string; active?: boolean };
+const { active = false, class: className, ...attributes } = Astro.props;
+---
+<a {...attributes} class:list={[className, { 'is-active': active }]} aria-current={active ? 'page' : undefined}><slot /></a>

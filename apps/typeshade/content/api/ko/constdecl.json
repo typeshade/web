@@ -1,0 +1,12 @@
+{
+  "slug": "constdecl",
+  "source": "d5ba71564c7a09b9c79cf5b44164bffc6b0b660d90dbde191043c23828a92c8d",
+  "texts": {
+    "summary": "모듈 수준 스칼라 상수를 선언하고, 그 타입이 지정된 참조를 한 번의 호출로 함께 받습니다.",
+    "description": "WGSL은 `values.wgsl`을 리터럴로 생성합니다. 이 표기는 손으로 쓴 `ConstDecl`이 쓰는 표기와 같다(예: `PI = 3.14159265`). CPU 오라클은 같은 모듈을 CPU에서 배정밀도로 실행하며, `values.cpu`를 JS의 배정밀도 전체 정밀도로 계산합니다. 그래서 WGSL 리터럴을 일부러 짧게 적더라도 패리티 검사의 정밀도는 낮아지지 않습니다.\n\n[`ConstHandle`](/api/consthandle/)을 반환합니다. 그 `.decl`은 `module({ consts })`에 넣거나, 더 흔하게는 `module({ uses })`에 넣습니다. 이 옵션은 자신에게 넘긴 핸들의 `.decl`을 모읍니다. `.node`는 호출 지점에서 쓰는 타입이 지정된 참조입니다. 그래서 이름을 바꾸거나 잘못 적은 상수는 쓰이는 모든 곳에서 `tsc` 오류가 됩니다. `vec4<f32>` 색상이나 `array<vec4<f32>, N>` 팔레트처럼 벡터, 행렬 또는 배열 타입인 상수에는 [`constExpr`](/api/constexpr/)를 씁니다. 이 함수는 WGSL/CPU 값 쌍 대신 상수 폴딩이 가능한 리터럴 노드 하나를 받습니다.",
+    "parameters.name": "생성되는 상수 이름입니다.",
+    "parameters.type": "상수의 스칼라 타입입니다.",
+    "parameters.values": "`wgsl`은 WGSL이 생성하는 리터럴이고, `cpu`는 CPU 오라클이 쓰는 값입니다.",
+    "returns": "[`ConstHandle`](/api/consthandle/)이며, `.decl`과 `.node`를 가집니다."
+  }
+}

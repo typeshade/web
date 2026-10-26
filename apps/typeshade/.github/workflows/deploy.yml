@@ -1,0 +1,359 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  # Every pull request, whatever branch it targets. While this filtered on main, a pull
+  # request stacked on a feature branch ran no checks at all, so a page that threw on its
+  # first line of script could sit behind a green build. Deployment is unchanged: the
+  # cloudflare job below is guarded on the event being something other than a pull request,
+  # so only a push to main and a manual dispatch on main publish.
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# The checks run in three stages, so the slow ones run side by side: `site` builds dist/ and runs
+# the checks that read files; `browser` opens dist/ in Chromium in four parts at once; `build`,
+# the one required check, holds the parts' counts to their floors and passes only when every
+# stage passed. A stage that fails or is skipped fails `build`.
+#
+# A pull request that changes only documents (a `.md` file outside `content/`, `src/` and
+# `public/`, whose Markdown is the site) runs `site`, which reads documents (check-style reads
+# README.md and DESIGN.md, the compiler-bump step reads compiler-changes.md), and skips `browser`
+# and the preview, which open dist/ and read none. `scope` decides from the diff; `build` then
+# passes on `site` alone. A push to main and a dispatch run every job.
+jobs:
+  scope:
+    name: change scope
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: diff
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          code=false
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            case "$f" in
+              content/*|src/*|public/*) code=true ;;
+              *.md) ;;
+              *) code=true ;;
+            esac
+          done < <(git diff --name-only "origin/$BASE...HEAD")
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "Code changed: $code" >> "$GITHUB_STEP_SUMMARY"
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # vendor/shader-dsl is the compiler; the page is built from it.
+          submodules: true
+          persist-credentials: false
+          # The compiler-bump step compares the pin with the one on the base branch, so it needs
+          # both commits of the compiler and the base branch of this repository.
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      # What a compiler bump owes the site. A page, component or script that still names an
+      # export or file the new pin removes fails this step, as does a compiler block whose
+      # ThenChange target is a file here (//typeshade.github.io/...) that this branch did not
+      # change; then the site's own IfChange pairs are held to the diff (vendor/shader-dsl/scripts/downstream-impact.ts
+      # and ifchange.ts). Both run from the pinned compiler, so a pin from before they existed
+      # skips the step.
+      - name: What the compiler bump owes the site
+        if: github.event_name != 'push'
+        env:
+          BASE: ${{ github.base_ref || 'main' }}
+        run: |
+          if [ ! -f vendor/shader-dsl/scripts/downstream-impact.ts ]; then
+            echo "The pinned compiler predates scripts/downstream-impact.ts; nothing to check."
+            exit 0
+          fi
+          bun vendor/shader-dsl/scripts/downstream-impact.ts --repo typeshade.github.io \
+            --submodule vendor/shader-dsl --base "origin/$BASE" --check
+          TYPESHADE_DOCS_ROOT="$PWD" bun vendor/shader-dsl/scripts/ifchange.ts --base "origin/$BASE"
+      # A commit that records a reference note's reading names the note in a line of its own,
+      # `Read-Against: function/pow`: the line says a person read the sections against the values,
+      # and a reviewer reads the reading's diff with them (DESIGN.md, Reference notes).
+      - name: Each reading names the note it was read for
+        if: github.event_name != 'push'
+        env:
+          BASE: ${{ github.base_ref || 'main' }}
+        run: bun scripts/check-reference-notes.ts --trailers "origin/$BASE"
+      # Prettier over the TypeScript, CSS, JSON and Markdown, then the `;` in each component's
+      # frontmatter and <script>, which Prettier does not format (see .prettierignore).
+      - run: bun run format:check
+      # The build runs scripts/check-style.mjs, check-copy.ts and check-api.ts first; see
+      # DESIGN.md.
+      - run: bun run build
+      # The reference notes on the built pages: every section in every language, no token or
+      # marker left in one, and no note section on a page that has no note.
+      - run: bun scripts/check-reference-notes.ts --dist
+      # dist/ for the browser checks and the Cloudflare jobs below, which deploy it with the
+      # Worker (wrangler.jsonc).
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: dist
+          retention-days: 3
+      # The translations are typed against the English copy; a missing string fails here.
+      - run: bun run check:types
+      - run: bun run check:benchmark-catalog
+      - run: bun run check:regression-catalog
+      - name: Playground regressions
+        run: bun test scripts/playground-diagnostics.test.ts scripts/playground-host-default.test.ts scripts/compiler-authoring.test.ts scripts/compute-runtime.test.ts scripts/render-runtime.test.ts scripts/benchmarks.test.ts
+      # Every check of the reference notes fails on a fault planted into a copy of the fixture
+      # note, and passes on the fixture as committed.
+      - name: Reference notes checks fail on their faults
+        run: bun test scripts/reference-notes.test.ts
+      - run: bun run qa:seo
+      # The Worker answers first on the prefixes wrangler.jsonc lists; none may shadow a page.
+      - run: bun run qa:worker-routes
+      # OpenSEO's audit engine over dist, pinned; see scripts/openseo-audit.mts.
+      - run: bun run qa:openseo
+
+  # The Playground is the one page whose worth is that it runs: it is a compiler behind an
+  # editor, and a build stays green while the page throws on its first line. Chromium opens
+  # dist/ and checks it, in four parts: each draws a quarter of the picker's examples and
+  # compares the two engines on them, part 1 runs the Playground's other steps and part 3 the
+  # Korean route (scripts/check-playground.mjs, PLAYGROUND_SHARD). Monaco itself comes from
+  # jsdelivr, so a runner with no route there reports that on its own; see the note at the
+  # top of that script. Part 2 also opens the live examples (scripts/check-live.mjs) and part 4
+  # checks the outbound links, so no part waits on the others.
+  browser:
+    needs: [scope, site]
+    if: needs.scope.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          submodules: true
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run check:playground
+        env:
+          PLAYGROUND_SHARD: ${{ matrix.part }}/4
+          PLAYGROUND_REPORT: playground-part-${{ matrix.part }}.json
+      # The live examples are the other pages whose worth is that they run: an editor, a
+      # canvas and the controls the reflection asks for. Chromium opens one per page and
+      # checks that the canvas mounts, the compiler stays out of the initial bundle, an edit
+      # recompiles and a moved control reaches the frame. See scripts/check-live.mjs.
+      - run: bun run check:live
+        if: matrix.part == 2
+      - run: bun run check:function-demos
+        if: matrix.part == 2
+        timeout-minutes: 15
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.part == 2
+        with:
+          name: function-demo-evidence
+          path: shots/function-demos
+          retention-days: 3
+      - run: bun run check:benchmarks
+        if: matrix.part == 3
+        timeout-minutes: 10
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.part == 3
+        with:
+          name: benchmark-instrument-evidence
+          path: shots/benchmarks
+          retention-days: 3
+      # The MNIST lab must train and infer with real TypeShade GPU passes.
+      - run: bun run check:mnist
+        if: matrix.part == 1
+        timeout-minutes: 15
+      - run: bun run check:standalone-learning
+        if: matrix.part == 4
+        timeout-minutes: 10
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.part == 4
+        with:
+          name: standalone-learning-evidence
+          path: shots/standalone-learning
+          retention-days: 3
+      - run: bun run check:glsl-precision
+        if: matrix.part == 4
+        timeout-minutes: 10
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.part == 4
+        with:
+          name: glsl-precision-evidence
+          path: shots/glsl-precision
+          retention-days: 3
+      - run: bun run check:docs-navigation
+        if: matrix.part == 4
+      - run: bun run check:operation-models
+        if: matrix.part == 4
+      - run: bun run check:operation-lessons
+        if: matrix.part == 4
+        timeout-minutes: 15
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.part == 4
+        with:
+          name: operation-lesson-evidence
+          path: shots/operation-lessons
+          retention-days: 3
+      # Only a 404 or 410 fails this step. A 403, 429 or timeout is a rate-limited runner.
+      - run: bun run qa:links
+        if: matrix.part == 4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: playground-part-${{ matrix.part }}
+          path: playground-part-${{ matrix.part }}.json
+          retention-days: 3
+
+  # The required check. The floors in scripts/check-playground.mjs are totals over the picker,
+  # so they are held here to the sum of the four parts; and this job fails unless `scope`, `site`
+  # and every part of `browser` passed, since a required check that is skipped counts as passed.
+  # The one exception is a documents-only pull request, whose `browser` is skipped on purpose.
+  build:
+    needs: [scope, site, browser]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every stage passed
+        env:
+          SCOPE: ${{ needs.scope.result }}
+          CODE: ${{ needs.scope.outputs.code }}
+          SITE: ${{ needs.site.result }}
+          BROWSER: ${{ needs.browser.result }}
+        run: |
+          echo "scope: $SCOPE (code: $CODE), site: $SITE, browser: $BROWSER"
+          [ "$SCOPE" = success ] && [ "$SITE" = success ] || exit 1
+          [ "$BROWSER" = success ] && exit 0
+          [ "$CODE" = false ] && [ "$BROWSER" = skipped ]
+      - uses: actions/checkout@v5
+        if: needs.scope.outputs.code == 'true'
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        if: needs.scope.outputs.code == 'true'
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+        if: needs.scope.outputs.code == 'true'
+      - uses: actions/download-artifact@v4
+        if: needs.scope.outputs.code == 'true'
+        with:
+          pattern: playground-part-*
+          path: parts
+          merge-multiple: true
+      - run: node scripts/check-playground.mjs --merge parts/playground-part-*.json
+        if: needs.scope.outputs.code == 'true'
+
+  # typeshade.dev on Cloudflare Workers (docs/cloudflare.md): dist/ as static assets and the
+  # Worker in worker/index.ts, which serves the example data in R2; then gallery.typeshade.dev,
+  # the same dist/ under worker/gallery.ts. A manual dispatch on
+  # another branch (pin-compiler.yml sends one for the pull request it opens, which starts no
+  # pull_request run) builds and checks the same way and publishes nothing. Without the
+  # Cloudflare secret (a fork's pull request has none) both jobs say so and pass.
+  cloudflare:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: cloudflare
+      url: https://typeshade.dev/
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist
+      - name: Deploy the Worker and dist/
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::notice::No CLOUDFLARE_API_TOKEN secret; the Worker is not deployed."
+            exit 0
+          fi
+          bunx wrangler d1 migrations apply typeshade --remote
+          bunx wrangler deploy
+          # gallery.typeshade.dev: the same dist/ under the gallery's Worker, after the site's
+          # deploy has applied the migrations it reads (wrangler.gallery.jsonc).
+          bunx wrangler deploy -c wrangler.gallery.jsonc
+
+  # A pull request's own copy of the site, uploaded as a Worker version that serves no traffic
+  # and answers at a preview URL of its own, so a reviewer opens the change running on
+  # Cloudflare, the example data included.
+  cloudflare-preview:
+    needs: [scope, build]
+    if: github.event_name == 'pull_request' && needs.scope.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist
+      - name: Upload a preview version
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::notice::No CLOUDFLARE_API_TOKEN secret; no preview is uploaded."
+            exit 0
+          fi
+          bunx wrangler versions upload --preview-alias "pr-$PR" --message "pull request #$PR" \
+            | tee upload.log
+          url=$(grep -o 'https://[^ ]*workers.dev' upload.log | tail -1)
+          echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"
+          # The gallery's Worker, which takes a version only once its first deploy from main
+          # has created it; until then this says so and the job passes.
+          if bunx wrangler versions upload -c wrangler.gallery.jsonc --preview-alias "pr-$PR" \
+            --message "pull request #$PR" | tee gallery.log; then
+            url=$(grep -o 'https://[^ ]*workers.dev' gallery.log | tail -1)
+            echo "Gallery preview: $url" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::notice::The gallery's Worker took no preview version; it exists once main deploys it."
+          fi

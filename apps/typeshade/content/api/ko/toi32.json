@@ -1,0 +1,11 @@
+{
+  "slug": "toi32",
+  "source": "2b403f23737d20751ae6c783ae861156642220b9ce0eb50c6ecc24f6d7a460bb",
+  "texts": {
+    "summary": "i32로 변환합니다. 명시적인 숫자 캐스트이며, 여기서 i32(/api/i32/)는 JS 숫자에서 리터럴을 만듭니다.",
+    "description": "WGSL에서는 `i32(x)`를, GLSL에서는 `int(x)`를 생성합니다. 계산으로 얻은 f32 또는 u32 노드를 정수 인덱스나 판별값으로 바꿀 때 씁니다.",
+    "targets.wgsl": "`i32(x)`로 생성합니다.",
+    "targets.glsl": "`int(x)`로 생성합니다.",
+    "targets.cpu": "기준값을 내는 오라클이 f64로 계산합니다."
+  }
+}

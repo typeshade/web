@@ -1,0 +1,10 @@
+{
+  "slug": "transpose64",
+  "source": "2d68237e51d0dd17a488e6f60bded1d6b7f94111d0a8d8334a1922cfc3ee8c1d",
+  "texts": {
+    "summary": "에뮬레이션된 배정밀도 행렬의 전치입니다.",
+    "targets.wgsl": "`transpose(m)`로 생성합니다.",
+    "targets.glsl": "`transpose(m)`로 생성합니다.",
+    "targets.cpu": "기준값을 내는 오라클이 f64로 계산합니다."
+  }
+}

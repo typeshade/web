@@ -1,0 +1,10 @@
+{
+  "slug": "trunc",
+  "source": "0cfa41c7abd403aeeb3120fb2d1897487da98e62d9169ec16f41fc30a1d736fc",
+  "texts": {
+    "summary": "trunc(x): 0 쪽으로 절사합니다. 성분마다 적용됩니다.",
+    "targets.wgsl": "`trunc(x)`로 생성합니다.",
+    "targets.glsl": "`trunc(x)`로 생성합니다.",
+    "targets.cpu": "기준값을 내는 오라클이 f64로 계산합니다."
+  }
+}

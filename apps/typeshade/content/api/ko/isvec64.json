@@ -1,0 +1,8 @@
+{
+  "slug": "isvec64",
+  "source": "9e35ad92aaec570cad522ad2c8dabff3e8f2823973456f8dc9918c10ee9af8d0",
+  "texts": {
+    "summary": "ShaderType을 에뮬레이션 배정밀도 벡터 분기(vec2f64T와 그 3성분, 4성분 대응 타입)로 좁힙니다.",
+    "description": "`ShaderType`을 에뮬레이션 배정밀도 벡터 분기([`vec2f64T`](/api/vec2f64t/)와 그 3성분, 4성분 대응 타입)로 좁힙니다. [`isVec`](/api/isvec/)는 기본 `vec` 종류에만 맞고, 에뮬레이션 배정밀도 벡터에는 `false`이므로 이 술어와 구별됩니다. 성분 접근(`.comp()`와 스위즐)은 두 종류 모두 지원하므로 `isVec(t) || isVec64(t)`를 받으며, 각 종류는 고유한 생성 형태로 처리됩니다."
+  }
+}

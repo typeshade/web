@@ -1,0 +1,65 @@
+---
+// The gallery's list, served at gallery.typeshade.dev (docs/cloudflare.md). The build writes
+// this page as a template: worker/gallery.ts fills the grid with the approved entries, marks the
+// order the reader picked and writes every link to the address it answers at, so an approved
+// entry appears without a build. Each card is the entry's still, its title and its line.
+// Without that Worker (astro dev, astro preview) the grid is empty and the empty line shows.
+import Base from '../../layouts/Base.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { links } from '../../lib/links.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copyFor(locale).gallery;
+const words = { by: t.by, views: t.views, viewOne: t.viewOne };
+const list = localePath(locale, links.gallery.href);
+---
+
+<Base locale={locale} path={links.gallery.href} title={t.title} description={t.description} noindex>
+  <main class="gallery-page">
+    <header class="gallery-intro">
+      <div>
+        <h1>{t.h1}</h1>
+        <p>{t.intro}</p>
+        <p><Rich text={t.howTo} locale={locale} /></p>
+      </div>
+      <nav class="gallery-sort" aria-label={t.sortLabel}>
+        <a href={list} data-gallery-sort="recent">{t.sortRecent}</a>
+        <a href={`${list}?sort=popular`} data-gallery-sort="popular">{t.sortPopular}</a>
+      </nav>
+    </header>
+    <p class="gallery-empty" data-gallery-empty>{t.empty}</p>
+    <ul class="gallery-grid" role="list" data-gallery-list data-copy={JSON.stringify(words)} data-locale={locale}></ul>
+  </main>
+</Base>
+
+<style>
+  /* The site's shell, as the Playground page takes it, so the two read as one tool. */
+  .gallery-page { max-inline-size: var(--container); margin-inline: auto; padding: 32px var(--gutter-x) 64px; }
+  .gallery-intro { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 32px; margin-bottom: 24px; }
+  .gallery-intro > div { max-inline-size: 716px; }
+  h1 { margin: 0 0 8px; font-size: 1.5rem; line-height: 1.25; }
+  .gallery-intro p { margin: 0 0 4px; color: var(--color-text-2); font-size: .875rem; line-height: 1.5; }
+  .gallery-intro :global(a) { color: var(--color-accent); }
+  /* The two orders, as a segmented control: links, so an order has an address of its own. */
+  .gallery-sort { display: inline-flex; padding: 2px; border-radius: var(--radius); background: var(--color-surface-2); }
+  .gallery-sort a { padding: 4px 12px; border-radius: var(--radius-sm); color: var(--color-text-2); font-size: .8125rem; line-height: 1.5; text-decoration: none; white-space: nowrap; }
+  .gallery-sort a:hover { color: var(--color-text-1); }
+  .gallery-sort a[aria-current='page'] { background: var(--color-ground); color: var(--color-text-1); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+  .gallery-empty { margin: 0; color: var(--color-text-2); font-size: .875rem; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 20px; margin: 0; padding: 0; list-style: none; }
+  .gallery-grid:empty { display: none; }
+  /* The cards are the Worker's markup, so they are reached through :global(). */
+  .gallery-grid :global(.gallery-card) { display: flex; flex-direction: column; block-size: 100%; overflow: hidden; border: 1px solid var(--color-line-1); border-radius: var(--radius-md); background: var(--color-ground); color: inherit; text-decoration: none; }
+  .gallery-grid :global(.gallery-card:hover) { border-color: var(--color-line-2); }
+  .gallery-grid :global(.gallery-card:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .gallery-grid :global(.gallery-still) { display: block; aspect-ratio: 16 / 9; inline-size: 100%; object-fit: cover; background: var(--color-surface-2); }
+  .gallery-grid :global(.gallery-card-body) { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px 14px; }
+  .gallery-grid :global(h2) { margin: 0; font-size: 1rem; line-height: 1.35; overflow-wrap: anywhere; }
+  .gallery-grid :global(.gallery-card:hover h2) { color: var(--color-accent); }
+  .gallery-grid :global(.gallery-meta) { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 0; color: var(--color-text-3); font-size: .75rem; line-height: 1.4; }
+  @media (min-width: 64rem) { .gallery-page { padding-block-start: 40px; } }
+</style>

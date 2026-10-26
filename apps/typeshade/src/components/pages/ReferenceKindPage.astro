@@ -1,0 +1,86 @@
+---
+// One kind of the language reference: the index over its entries. Every documented name of
+// that kind is a row, with the first sentence the compiler writes about it, and the whole of
+// what the compiler supplies for a name is on that name's own page at
+// /reference/<kind>/<name>/. The functions index runs its rows under the families the
+// spelling registry groups them by, so its outline stays a list a reader can use; the other
+// five carry one list and the outline is the page's own sections.
+import Docs, { type Heading } from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { facts } from '../../lib/examples.ts';
+import { languageEntryPath, languageSection, languageSections, type LanguageEntry, type LanguageKind } from '../../lib/language-reference.ts';
+
+interface Props {
+  locale: Locale;
+  kind: LanguageKind;
+}
+const { locale, kind } = Astro.props;
+const r = copyFor(locale).docs.reference;
+const section = languageSection(kind);
+const named = r.kinds[kind];
+const grouped = section.groups.length > 0;
+const headings: Heading[] = grouped ? section.groups.map((g) => ({ depth: 2, slug: g.family, text: r.families[g.family] })) : [];
+const page = (entry: LanguageEntry): string => localePath(locale, languageEntryPath(kind, entry.name));
+// Previous and next follow the sidebar, which lists the six kinds under the index; next
+// steps into this kind's first entry, so the pager walks the reference name by name.
+const all = languageSections();
+const at = all.findIndex((s) => s.kind === kind);
+const previous = at > 0
+  ? { label: r.kinds[all[at - 1]!.kind].name, href: localePath(locale, `/reference/${all[at - 1]!.slug}/`) }
+  : { label: r.h1, href: localePath(locale, links.reference.href) };
+const first = section.entries[0];
+const next = first ? { label: first.title, href: page(first) } : undefined;
+---
+
+<Docs
+  locale={locale}
+  path={`/reference/${section.slug}/`}
+  title={r.kindTitle(named.name)}
+  description={named.description}
+  headings={headings}
+  editHref={editCopy(locale, 'docs')}
+  previous={previous}
+  next={next}
+  breadcrumbs={[
+    { name: r.reference, href: links.reference.href },
+    { name: named.name, href: `/reference/${section.slug}/` },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  <nav class="api-crumbs" aria-label={r.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, links.reference.href)}>{r.h1}</a>
+  </nav>
+  <h1 lang={locale}>{named.name}</h1>
+  <p class="api-kind" lang={locale}>{r.entries(section.entries.length)}</p>
+  <p class="api-summary" lang={locale}><Rich text={named.summary} locale={locale} /></p>
+  <p class="guide-note" lang={locale}><Rich text={r.note} locale={locale} /></p>
+
+  {grouped
+    ? section.groups.map((group) => (
+        <>
+          <h2 id={group.family} lang={locale}>{r.families[group.family]}</h2>
+          <dl class="api-list api-index">
+            {group.entries.map((entry) => (
+              <>
+                <dt><a href={page(entry)}><code>{entry.title}</code></a></dt>
+                <dd lang="en"><Rich text={entry.line} locale={locale} /></dd>
+              </>
+            ))}
+          </dl>
+        </>
+      ))
+    : (
+        <dl class="api-list api-index">
+          {section.entries.map((entry) => (
+            <>
+              <dt><a href={page(entry)}><code>{entry.title}</code></a></dt>
+              <dd lang="en"><Rich text={entry.line} locale={locale} /></dd>
+            </>
+          ))}
+        </dl>
+      )}
+
+  <p class="guide-note" lang={locale}><Rich text={r.sourceP} locale={locale} /></p>
+</Docs>

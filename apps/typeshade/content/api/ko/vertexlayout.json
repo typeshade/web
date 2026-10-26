@@ -1,0 +1,8 @@
+{
+  "slug": "vertexlayout",
+  "source": "f9fad70eee089237915e4e75482557e27c8a57bb46cf5a3d8e75695b28502e8d",
+  "texts": {
+    "summary": "모듈의 @vertex 진입점이 쓰는 버텍스 버퍼 레이아웃입니다. 모든 @location 입력과, 이 입력들이 채우는 인터리브되고 빈틈없이 배열된 arrayStride를 담습니다.",
+    "description": "[`reflect`](/api/reflect/)는 `module.funcs`에서 찾은 첫 번째 `@vertex` 진입점을 기술합니다. 진입점이 둘 이상인 모듈은 먼저 선언된 진입점의 `VertexLayout`을 받습니다. 모듈에 `@location` 버텍스 매개변수가 없으면 `Reflection.vertex`는 `undefined`이입니다."
+  }
+}

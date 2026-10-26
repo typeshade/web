@@ -1,0 +1,41 @@
+---
+// A type as the reference prints it, with every name that has a page of its own as a link to
+// it. MDN links the type of a parameter, a return value and a property, and this is where the
+// reference does the same: the token is matched against the export names the compiler gives
+// the site (src/lib/api-nav.ts), so a link only ever points at a page that is built. Text
+// inside quotes is a string literal type and is left alone, and the name of the page itself
+// stays plain.
+import { apiSlugByName } from '../lib/api-nav.ts';
+import { localePath, type Locale } from '../i18n/index.ts';
+
+interface Props {
+  locale: Locale;
+  /** The type as text, for example 'readonly BindGroup[]'. */
+  text: string;
+  /** The export this page documents, which does not link to itself. */
+  self?: string;
+}
+const { locale, text, self } = Astro.props;
+const slugs = apiSlugByName();
+// A quoted literal, or an identifier that is not a property after a dot.
+const TOKEN = /'[^']*'|"[^"]*"|[A-Za-z_$][A-Za-z0-9_$]*/g;
+
+interface Part {
+  readonly text: string;
+  readonly href?: string;
+}
+const parts: Part[] = [];
+let at = 0;
+for (const m of text.matchAll(TOKEN)) {
+  const token = m[0];
+  const start = m.index ?? 0;
+  const slug = token.startsWith("'") || token.startsWith('"') || text[start - 1] === '.' || token === self ? undefined : slugs.get(token);
+  if (!slug) continue;
+  if (start > at) parts.push({ text: text.slice(at, start) });
+  parts.push({ text: token, href: localePath(locale, `/api/${slug}/`) });
+  at = start + token.length;
+}
+if (at < text.length) parts.push({ text: text.slice(at) });
+---
+
+<code class="api-type">{parts.map((p) => (p.href ? <a href={p.href}>{p.text}</a> : p.text))}</code>

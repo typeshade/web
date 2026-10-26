@@ -1,0 +1,223 @@
+@media (max-width: 1050px) {
+  .header-inner {
+    gap: 20px;
+    padding-inline: 24px;
+  }
+  .top-nav {
+    gap: 0;
+  }
+  .top-link {
+    padding-inline: 8px;
+    font-size: 12px;
+  }
+  .page-frame {
+    gap: 34px;
+    padding-inline: 24px;
+  }
+  .home-intro {
+    grid-template-columns: minmax(0, 0.9fr) minmax(400px, 1.1fr);
+    gap: 42px;
+  }
+  .home-learning {
+    gap: 42px;
+  }
+}
+@media (max-width: 820px) {
+  .header-inner {
+    min-height: 62px;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    padding: 8px 18px;
+  }
+  .brand {
+    margin-right: auto;
+  }
+  .top-nav {
+    order: 3;
+    flex: 1 0 100%;
+    overflow-x: auto;
+    padding-bottom: 1px;
+  }
+  .header-tools {
+    margin-left: 0;
+  }
+  .page-frame {
+    display: block;
+    padding: 24px 18px 64px;
+  }
+  .docs-sidebar {
+    position: static;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 0 0 15px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sidebar-home,
+  .sidebar-heading,
+  .sidebar-source {
+    display: none;
+  }
+  .sidebar-group {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 3px;
+    margin: 0;
+  }
+  .sidebar-link {
+    flex: 0 0 auto;
+    padding: 6px 9px;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  .home-intro {
+    grid-template-columns: 1fr;
+    gap: var(--ui-space-8);
+    padding: 22px 0 58px;
+  }
+  .home-copy {
+    max-width: 680px;
+  }
+  .home-copy h1 {
+    font-size: clamp(44px, 10vw, 66px);
+  }
+  .home-code {
+    max-width: 720px;
+  }
+  .path-strip article {
+    padding-right: 18px;
+  }
+  .path-strip article + article {
+    padding-left: 18px;
+  }
+  .home-learning {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .home-status {
+    align-items: start;
+    flex-direction: column;
+  }
+  .playground-workbench {
+    grid-template-columns: 1fr;
+  }
+  .playground-controls {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .playground-output {
+    min-height: 330px;
+  }
+}
+@media (max-width: 560px) {
+  .header-inner {
+    padding-inline: 14px;
+  }
+  .top-link {
+    padding: 7px 9px;
+  }
+  .page-frame {
+    padding-inline: 14px;
+  }
+  .site-footer .footer-inner {
+    align-items: start;
+    flex-direction: column;
+    padding: 20px 14px;
+  }
+  .footer-inner div {
+    flex-wrap: wrap;
+    gap: 12px 18px;
+  }
+  .home-copy h1 {
+    font-size: 43px;
+  }
+  .lead {
+    font-size: 15px;
+  }
+  .home-intro {
+    padding-top: 15px;
+  }
+  .section-heading-row {
+    align-items: start;
+    flex-direction: column;
+  }
+  .section-heading-row h2,
+  .learning-copy h2,
+  .home-status h2 {
+    font-size: 29px;
+  }
+  .path-strip {
+    grid-template-columns: 1fr;
+  }
+  .path-strip article {
+    padding: 18px 0;
+  }
+  .path-strip article + article {
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .path-strip p {
+    min-height: 0;
+  }
+  .home-path,
+  .home-learning,
+  .home-status {
+    padding: 44px 0;
+  }
+  .page-heading h1 {
+    font-size: 37px;
+  }
+  .page-heading .lead {
+    font-size: 14px;
+  }
+  .doc-section {
+    padding: 27px 0;
+  }
+  .doc-section h2 {
+    font-size: 20px;
+  }
+  .doc-section p {
+    font-size: 13px;
+  }
+  .code-frame .astro-code {
+    overflow-x: auto;
+    padding: 15px 13px;
+    font-size: 10px;
+  }
+  .api-list li {
+    grid-template-columns: 1fr;
+    gap: var(--ui-space-1);
+  }
+  .api-columns {
+    grid-template-columns: 1fr;
+  }
+  .execution-lanes {
+    grid-template-columns: 1fr;
+  }
+  .execution-lanes > div + div {
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .execution-lanes > div {
+    padding: 16px 0;
+  }
+  .playground-controls,
+  .playground-output {
+    padding: 16px;
+  }
+  .select-grid {
+    grid-template-columns: 1fr;
+  }
+  .playground-disclosure {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .playground-code pre {
+    overflow-x: auto;
+    padding: 15px 13px;
+    font-size: 10px;
+  }
+}

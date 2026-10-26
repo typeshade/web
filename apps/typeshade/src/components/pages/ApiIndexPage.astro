@@ -1,0 +1,50 @@
+---
+// The reference's front door, the way MDN's API landing page works: every category with the
+// number of exports in it and one line on what it holds. The categories and their members
+// come from the compiler (src/lib/api-nav.ts); their names and sentences come from the
+// dictionary, so a Korean reader gets Korean around English identifiers.
+import Docs from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { apiCategories } from '../../lib/api-nav.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { apiCategoryCopy, assertApiCategories, copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { facts } from '../../lib/examples.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+assertApiCategories();
+const t = copyFor(locale);
+const a = t.docs.api;
+const categories = apiCategories().map(({ category, members }) => ({
+  ...apiCategoryCopy(locale, category.slug),
+  href: localePath(locale, `/api/${category.slug}/`),
+  count: members.length,
+}));
+// The page is the first item of the sidebar's Reference group, so previous and next come from
+// that list: the guide's last page, then the first category.
+---
+
+<Docs
+  locale={locale}
+  path={links.api.href}
+  title={a.title}
+  description={a.description}
+  editHref={editCopy(locale)}
+  label={a.h1}
+  breadcrumbs={[{ name: a.reference, href: links.api.href }]}
+  dateModified={facts.pinnedDate}
+>
+  <h1>{a.h1}</h1>
+  <p class="api-summary">{a.intro}</p>
+  <p class="guide-note" lang={locale}><Rich text={a.audience} locale={locale} /></p>
+  <dl class="api-list api-index">
+    {categories.map((c) => (
+      <>
+        <dt><a href={c.href}>{c.name}</a> <span class="api-type">{a.members(c.count)}</span></dt>
+        <dd>{c.summary}</dd>
+      </>
+    ))}
+  </dl>
+</Docs>

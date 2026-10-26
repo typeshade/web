@@ -1,0 +1,8 @@
+{
+  "slug": "vec3u",
+  "source": "7ee8e6898bbed5e7a738187b0c1d591dd81f5b10c2443d097bd8366237dcbd96",
+  "texts": {
+    "summary": "vec3<u32> 생성자이며, WGSL 방식으로 vec3u(x, y, z)라고 씁니다.",
+    "description": "일반 숫자 성분은 u32로 승격됩니다. [`vec3`](/api/vec3/)가 일반 숫자를 f32로 승격하는 것과 다릅니다. 이 타입은 컴퓨트 셰이더의 `global_invocation_id` 내장 값의 타입입니다. 그래서 워크그룹 좌표를 손으로 만들 때는 이 함수를 씁니다."
+  }
+}

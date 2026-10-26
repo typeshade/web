@@ -1,0 +1,8 @@
+{
+  "slug": "isnodevalue",
+  "source": "3c5606e5aabf7c000254acbb5d45d76504cd82c4c2cdd13aa26de2e4e5ba199c",
+  "texts": {
+    "summary": "값이 노드인지 판별하는 런타임 타입 가드입니다.",
+    "description": "값이 노드인지 판별하는 런타임 타입 가드입니다. `instanceof Node` 대신 [`NODE_BRAND`](/api/nodebrand/) 슬롯을 읽습니다. 그래서 이 패키지의 다른 로드 복사본이 만든 노드도 알아봅니다. `instanceof`는 의존성이 두 번 로드되어 프로토타입 객체가 달라지면 이런 노드를 놓칩니다. 값이 다른 복사본에서 올 수 있는 곳에서는 `instanceof` 대신 이 함수를 사용합니다."
+  }
+}

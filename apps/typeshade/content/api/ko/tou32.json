@@ -1,0 +1,11 @@
+{
+  "slug": "tou32",
+  "source": "723c30c20ee1236a6224ebf023805f973bf2088b4e31d5b2a60feeefaf176d72",
+  "texts": {
+    "summary": "u32로 변환합니다. 명시적인 숫자 캐스트이며, 여기서 u32(/api/u32/)는 JS 숫자에서 리터럴을 만듭니다.",
+    "description": "WGSL에서는 `u32(x)`를, GLSL에서는 `uint(x)`를 생성합니다. 버퍼 스트라이드처럼 문맥이 부호 없는 값을 요구하는 자리에서는 [`toI32`](/api/toi32/) 대신 이 함수를 씁니다.",
+    "targets.wgsl": "`u32(x)`로 생성합니다.",
+    "targets.glsl": "`uint(x)`로 생성합니다.",
+    "targets.cpu": "기준값을 내는 오라클이 f64로 계산합니다."
+  }
+}

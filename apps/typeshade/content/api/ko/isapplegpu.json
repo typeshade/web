@@ -1,0 +1,7 @@
+{
+  "slug": "isapplegpu",
+  "source": "b51047d898c26f9cfe44900a5746b84cf613007615c53dd4f8bee63070e797db",
+  "texts": {
+    "summary": "Apple GPU / Metal 기반 컨텍스트를 식별하는 신호가 하나라도 있으면 true입니다."
+  }
+}

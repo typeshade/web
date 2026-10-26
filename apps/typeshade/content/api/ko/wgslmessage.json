@@ -1,0 +1,8 @@
+{
+  "slug": "wgslmessage",
+  "source": "aca9b71e04180debf765f3073ff9b9e869bf84943ed5e4dcf2b30476c1c4853b",
+  "texts": {
+    "summary": "컴파일 메시지 하나를 게이트가 보고하는 내용으로 좁힌 것입니다.",
+    "description": "`GPUCompilationMessage`를 본떴지만 그 타입에 의존하지 않습니다."
+  }
+}

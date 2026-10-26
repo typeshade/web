@@ -1,0 +1,7 @@
+{
+  "slug": "vec3bt",
+  "source": "dff526c6fe603fce32f71bd4fcd8876e2ce7cd5e4129a2d88e1cb40f3228cc13",
+  "texts": {
+    "summary": "vec3<bool>입니다. 3성분 벡터 두 개를 성분별로 비교한 결과 타입입니다."
+  }
+}

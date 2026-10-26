@@ -1,0 +1,11 @@
+---
+import ReferenceEntryPage from '../../../components/pages/ReferenceEntryPage.astro';
+import { languageEntryPaths } from '../../../lib/language-reference.ts';
+
+export function getStaticPaths() {
+  return languageEntryPaths();
+}
+const { kind, name } = Astro.props;
+---
+
+<ReferenceEntryPage locale="en" kind={kind} name={name} />

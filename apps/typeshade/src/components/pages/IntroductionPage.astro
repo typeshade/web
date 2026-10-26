@@ -1,0 +1,43 @@
+---
+// The first conceptual page: explain the language boundary before compiler internals.
+import Docs from '../../layouts/Docs.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import ConceptDoc from '../ConceptDoc.astro';
+import Rich from '../Rich.astro';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const content = copyFor(locale).motivation.use;
+// Korean headings keep their own characters in the slug instead of losing them to a Latin-only pattern.
+const sections = content.sections.map(([h, p]) => ({ h, p, slug: h.toLowerCase().replace(/[^a-z0-9ᄀ-ᇿ㄰-㆏가-힣]+/g, '-').replace(/^-|-$/g, '') })); // i18n-ok
+const headings = [
+  ...sections.map((s) => ({ depth: 2, slug: s.slug, text: s.h.replace(/`/g, '') })),
+  { depth: 2, slug: 'from-typescript', text: content.familiarH },
+  { depth: 2, slug: 'further-reading', text: content.furtherH },
+];
+---
+
+<Docs locale={locale} path={links.motivation.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'motivation')}>
+  <h1>{content.h1}</h1>
+  {sections.map((s) => (
+    <Fragment>
+      <h2 id={s.slug}><Rich text={s.h} locale={locale} /></h2>
+      <p><Rich text={s.p} locale={locale} /></p>
+    </Fragment>
+  ))}
+
+  <h2 id="from-typescript">{content.familiarH}</h2>
+  <p>{content.familiarP}</p>
+  <ConceptDoc locale={locale} rows={content.rows} columns={content.columns} strongTerm />
+
+  <h2 id="further-reading">{content.furtherH}</h2>
+  <p>{content.furtherP}</p>
+  <ul>
+    {content.further.map(([label, href, description]) => (
+      <li><a href={href} target="_blank" rel="noreferrer">{label}</a> — {description}</li>
+    ))}
+  </ul>
+</Docs>

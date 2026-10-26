@@ -1,0 +1,9 @@
+{
+  "slug": "bool",
+  "source": "4e3cfbaf754891c3e8521ec8702919f4c78a99585debc1dc088ebed09d580c40",
+  "texts": {
+    "summary": "bool 리터럴 노드입니다. .select(), select(), 그리고 제어 흐름(If, While)의 조건 타입입니다.",
+    "description": "JS boolean만 받습니다. 그래서 잘못 쓴 `bool(someNode)`는 `true`로 강제 변환되지 않고 호출 지점에서 실패합니다.",
+    "exceptions.TypeError": "`v`가 JS boolean이 아닐 때 발생합니다."
+  }
+}

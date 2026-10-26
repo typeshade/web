@@ -1,0 +1,45 @@
+---
+// A standalone explanation precedes the existing compiler-specific concept material.
+// The examples below are worked reasoning, with no GPU execution or performance claim.
+import Rich from './Rich.astro';
+import TypeShadeCode from './TypeShadeCode.astro';
+import { copyFor, type Locale } from '../i18n/index.ts';
+import type { ConceptLesson } from '../i18n/concept-lessons-en.ts';
+interface Props { locale: Locale; lesson: ConceptLesson; topic: 'bridge' | 'cpuAndGpu' | 'pipeline' | 'webgpuAndWebgl2' | 'wgslAndGlsl' }
+const { locale, lesson, topic } = Astro.props;
+const labels = copyFor(locale).concepts.lessonLabels;
+const elementCount = 130;
+const workgroupSize = 64;
+const workgroups = Math.ceil(elementCount / workgroupSize);
+const reasoning = {
+  bridge: 'input = [1, 2, 3]\ngain = 2\noutput[i] = input[i] * gain\noutput = [2, 4, 6]',
+  cpuAndGpu: `length = ${elementCount}\nworkgroupSize = ${workgroupSize}\nworkgroups = ceil(length / workgroupSize) = ${workgroups}\ninvocations = ${workgroups} * ${workgroupSize} = ${workgroups * workgroupSize}\n0 <= i && i < length`,
+  pipeline: 'a = (1, 0, 0)\nb = (0, 1, 0)\nc = (0, 0, 1)\nweights = (0.5, 0.25, 0.25)\ncolor = 0.5 * a + 0.25 * b + 0.25 * c\ncolor = (0.5, 0.25, 0.25)',
+};
+const availability = `const canvas = document.createElement('canvas');
+const gl = canvas.getContext('webgl2');
+let adapter = null;
+try {
+  adapter = (await navigator.gpu?.requestAdapter()) ?? null;
+} catch {
+  adapter = null;
+}`;
+---
+<section data-concept-lesson={topic} lang={locale}>
+  <h2 id="learning-use">{labels.use}</h2>
+  <p><Rich text={lesson.use} locale={locale} /></p>
+  <h2 id="learning-example">{labels.example}</h2>
+  <p><Rich text={lesson.example} locale={locale} /></p>
+  {topic in reasoning && <TypeShadeCode code={reasoning[topic as keyof typeof reasoning]} lang="text" title={labels.reasoning} />}
+  {topic === 'webgpuAndWebgl2' && <TypeShadeCode code={availability} lang="js" title={labels.availability} />}
+  {topic === 'wgslAndGlsl' && <>
+    <TypeShadeCode code="let value: f32 = mix(0.0, 1.0, 0.25);" lang="wgsl" title={labels.wgsl} />
+    <TypeShadeCode code="float value = mix(0.0, 1.0, 0.25);" lang="glsl" title={labels.glsl} />
+    <p>{labels.result}: <code>value = 0.25</code></p>
+  </>}
+  <h2 id="learning-caveat">{labels.caveat}</h2>
+  <p><Rich text={lesson.caveat} locale={locale} /></p>
+</section>
+<style>
+  section > h2:first-child { margin-block-start: 28px }
+</style>

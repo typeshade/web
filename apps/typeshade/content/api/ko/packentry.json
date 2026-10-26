@@ -1,0 +1,13 @@
+{
+  "slug": "packentry",
+  "source": "2b70f7a22cfc6cc5e73397788a112f3de94cc110c0c22d217c43372f26347bbe",
+  "texts": {
+    "summary": "셰이더 진입점 하나입니다. name과 stage는 packModule()이 항상 제공한 필드입니다.",
+    "members.name": "호스트가 진입점을 호출할 때 쓰는, 작성한 이름입니다.",
+    "members.emitted": "생성된 텍스트가 진입점을 선언한 이름이다(규칙 11.10).",
+    "members.workgroupSize": "컴퓨트 진입점의 `@workgroup_size(x, y, z)`이입니다.",
+    "members.workgroupSizeOverrides": "특수화된 워크그룹 축마다의 override 이름입니다. `null`인 축은 `workgroupSize`를 씁니다.\n`null`은 이 선택적 메타데이터가 JSON 직렬화를 거쳐도 안정적으로 유지되게 합니다.",
+    "members.bindings": "진입점이 호출을 거쳐 닿는 바인딩과, 각 바인딩에 쓰는지 여부입니다.",
+    "members.vertex": "버텍스 진입점의 버텍스 버퍼이입니다. 빈틈없이 패킹되며, 형식을 함께 담습니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "storagetexturelayoutaccess",
+  "source": "dc61854486e0b7e02a01a24abb1dec84f764e5c0a219d5706ad5d8216ac16210",
+  "texts": {
+    "summary": "WGSL 접근 모드에 대응하는 WebGPU의 GPUStorageTextureBindingLayout.access 값입니다.",
+    "description": "두 API는 하이픈과 단어 하나가 다른 표기를 사용합니다. 호스트가 WGSL 철자를 그대로 넘기면 검증 오류가 납니다. 그래서 리플렉션은 호스트 쪽 철자를 함께 실어 보냅니다."
+  }
+}

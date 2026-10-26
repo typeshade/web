@@ -1,0 +1,147 @@
+---
+// The design rules' front door, at /reference/rules/: every rule of the compiler's design
+// document, under the chapter that holds it, each with its first sentence and a badge that
+// says how it is verified. The rules and their lines are the compiler's (src/lib/design-rules.ts,
+// rendered by src/lib/rules-loader.ts); the headings and the sentences around them are
+// docs.rules in every dictionary.
+import { getCollection } from 'astro:content';
+import Docs, { type Heading } from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { facts } from '../../lib/examples.ts';
+import { VERIFICATIONS, assertRuleChapters, assertRuleReadings, ruleChapters, type DesignRule } from '../../lib/design-rules.ts';
+import type { RuleHtml } from '../../lib/rules-loader.ts';
+import { ruleHistory, type RuleChange } from '../../lib/rule-history.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const d = copyFor(locale).docs;
+const r = d.reference;
+const x = d.rules;
+const en = copyFor('en').docs;
+assertRuleChapters(en.rules.chapters, x.chapters);
+assertRuleReadings(copyFor('en'));
+
+const stored = new Map((await getCollection('rules')).map((s) => [s.id, (s.data as { html: RuleHtml }).html]));
+// A row's line is Markdown rendered once, so its links name the English pages.
+const localize = (html: string): string =>
+  locale === 'en' ? html : html.replace(/href="\/(api|reference\/errors|reference\/rules)\//g, `href="/${locale}/$1/`);
+const line = (rule: DesignRule): string => localize(stored.get(rule.slug)?.line ?? '');
+const page = (rule: DesignRule): string => localePath(locale, `/reference/rules/${rule.slug}/`);
+
+const chapters = ruleChapters();
+const id = (n: number): string => `chapter-${n}`;
+// What moved since the previous pin: a lead and three lists, or the one sentence that says why
+// there is nothing to list. The counts the copy states are facts; the lists are the data.
+const history = ruleHistory();
+const ch = x.changes;
+const moved = history.added.length + history.removed.length + history.changed.length;
+const changesP = !history.previous
+  ? ch.first(history.current.commit)
+  : !history.comparable
+    ? ch.predates(history.previous.commit, history.previous.date, history.current.commit)
+    : moved === 0
+      ? ch.none(history.previous.commit, history.current.commit)
+      : `${ch.lead(history.previous.commit, history.previous.date, history.current.commit)} ${ch.counts}`;
+const commitHref = (c: string): string => `${facts.mirrorUrl}/commit/${c}`;
+const previousItem = (n: string): string =>
+  `${facts.mirrorUrl}/blob/${history.previous?.full ?? ''}/reqs/rules/RULE-${n.split('.').map((p) => p.padStart(2, '0')).join('')}.md`;
+const lists: { id: string; label: string; rows: readonly (RuleChange & { from?: DesignRule['verification'] })[]; gone?: true }[] = [
+  { id: 'changes-added', label: ch.addedH, rows: history.added },
+  { id: 'changes-removed', label: ch.removedH, rows: history.removed, gone: true },
+  { id: 'changes-changed', label: ch.changedH, rows: history.changed },
+].filter((l) => l.rows.length > 0);
+
+const headings: Heading[] = [
+  { depth: 2, slug: 'changes', text: ch.h },
+  ...chapters.map((c) => ({ depth: 2, slug: id(c.chapter), text: x.chapterH(c.chapter, x.chapters[c.chapter]!) })),
+];
+const next = { label: x.guarantees.h1, href: localePath(locale, links.rulesGuarantees.href) };
+---
+
+<Docs
+  locale={locale}
+  path={links.rules.href}
+  title={x.title}
+  description={x.description}
+  headings={headings}
+  editHref={editCopy(locale, 'docs')}
+  next={next}
+  breadcrumbs={[
+    { name: r.reference, href: links.reference.href },
+    { name: x.h1, href: links.rules.href },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  <nav class="api-crumbs" aria-label={r.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, links.reference.href)}>{r.h1}</a>
+  </nav>
+  <h1 lang={locale}>{x.h1}</h1>
+  <p class="api-kind" lang={locale}>{x.rulesCount(facts.rules)}</p>
+  <p class="api-summary" lang={locale}><Rich text={x.intro} locale={locale} /></p>
+  <p lang={locale}>{x.verifiedP}</p>
+  <ul class="rule-kinds" lang={locale}>
+    {VERIFICATIONS.map((v) => (
+      <li><span class="api-optional">{x.kinds[v]}</span> <Rich text={x.kindCounts[v]} locale={locale} /></li>
+    ))}
+  </ul>
+  <p lang={locale}><Rich text={x.guaranteesP} locale={locale} /></p>
+  <p class="guide-note" lang={locale}><Rich text={x.note} locale={locale} /></p>
+
+  <h2 id="changes" lang={locale}>{ch.h}</h2>
+  <p lang={locale}>{changesP}</p>
+  {lists.map((l) => (
+    <>
+      <h3 id={l.id} lang={locale}>{l.label}</h3>
+      <ul class="rule-changes">
+        {l.rows.map((c) => (
+          <li>
+            {l.gone ? (
+              <>
+                <a href={previousItem(c.number)} lang={locale}>{x.entry.heading(c.number)}</a>
+                <span class="text-text-3" lang={locale}> ({ch.removedItem})</span>
+              </>
+            ) : (
+              <a href={localePath(locale, `/reference/rules/${c.number.replace('.', '-')}/`)} lang={locale}>{x.entry.heading(c.number)}</a>
+            )}
+            {c.from && <span class="text-text-3" lang={locale}> ({ch.was(x.kinds[c.from])})</span>}
+            {c.commits.length > 0 && (
+              <span class="text-meta text-text-3" lang={locale}>
+                {' '}{ch.commits}{' '}
+                {c.commits.map((h, i) => <>{i > 0 && ', '}<a href={commitHref(h)}><code>{h}</code></a></>)}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </>
+  ))}
+
+  {chapters.map((c) => (
+    <>
+      <h2 id={id(c.chapter)} lang={locale}>{x.chapterH(c.chapter, x.chapters[c.chapter]!)}</h2>
+      <dl class="api-list api-index">
+        {c.rules.map((rule) => (
+          <>
+            <dt>
+              <a href={page(rule)} lang={locale}>{x.entry.heading(rule.number)}</a>
+              <span class="api-optional" lang={locale}>{x.kinds[rule.verification]}</span>
+            </dt>
+            <dd lang="en"><Fragment set:html={line(rule)} /></dd>
+          </>
+        ))}
+      </dl>
+    </>
+  ))}
+</Docs>
+
+<style>
+  /* The four ways a rule is verified, one per row, each led by the badge its rows carry. The
+     list sits in the document column, so its margin outranks `.doc ul`. */
+  .rule-kinds { margin-block-start: 8px; padding-inline-start: 0; list-style: none }
+  .rule-kinds li { margin-block-start: 6px }
+  /* The rules that moved since the previous pin, one per row, in the same measure. */
+  .rule-changes { margin-block-start: 8px; padding-inline-start: 0; list-style: none }
+  .rule-changes li { margin-block-start: 4px }
+</style>

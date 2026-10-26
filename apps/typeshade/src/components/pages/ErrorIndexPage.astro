@@ -1,0 +1,112 @@
+---
+// The error codes' front door, at /reference/errors/: every code in the compiler's two
+// registries, front end first, each family under the groups src/lib/error-codes.ts files it
+// in, with the line each code leads its own page with. A row whose page carries a program
+// compiled at build time is tagged. The codes and their lines are the compiler's; the
+// headings and the sentences around them are docs.errors in every dictionary.
+import Docs, { type Heading } from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { facts } from '../../lib/examples.ts';
+import { assertErrorLines, errorCodes, errorGroups, errorPageOrder, tsRegistryHeader, type ErrorCodeEntry, type ErrorFamily } from '../../lib/error-codes.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const d = copyFor(locale).docs;
+const r = d.reference;
+const x = d.errors;
+assertErrorLines(x.lines);
+
+const all = errorCodes();
+const verified = all.filter((e) => e.example !== null).length;
+const page = (e: ErrorCodeEntry): string => localePath(locale, `/reference/errors/${e.slug}/`);
+// A code the registry documents leads with the registry's sentence, in English; one it does
+// not leads with the dictionary's line, in the page's language.
+const lead = (e: ErrorCodeEntry): { text: string; lang: string } =>
+  e.line ? { text: e.line, lang: 'en' } : { text: (e.name && (x.lines as Record<string, string>)[e.name]) || '', lang: locale };
+
+const families: { family: ErrorFamily; id: string; heading: string; intro: string }[] = [
+  { family: 'ts', id: 'front-end', heading: x.frontEndH, intro: x.frontEndP },
+  { family: 'sd', id: 'core', heading: x.coreH, intro: x.coreP },
+];
+const sections = families.map((f) => ({ ...f, groups: errorGroups(f.family) }));
+const headings: Heading[] = [
+  ...sections.flatMap((s) => [
+    { depth: 2, slug: s.id, text: s.heading },
+    ...s.groups.map((g) => ({ depth: 3, slug: `${s.family}-${g.group}`, text: x.groups[g.group] })),
+  ]),
+  { depth: 2, slug: 'numbering', text: x.numberingH },
+];
+// The header's first paragraph names the file's phase and nothing about the numbers.
+const numbering = tsRegistryHeader().slice(1);
+const first = errorPageOrder()[0];
+const next = first ? { label: first.code, href: page(first) } : undefined;
+---
+
+<Docs
+  locale={locale}
+  path={links.errors.href}
+  title={x.title}
+  description={x.description}
+  headings={headings}
+  editHref={editCopy(locale, 'docs')}
+  next={next}
+  breadcrumbs={[
+    { name: r.reference, href: links.reference.href },
+    { name: x.h1, href: links.errors.href },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  <nav class="api-crumbs" aria-label={r.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, links.reference.href)}>{r.h1}</a>
+  </nav>
+  <h1 lang={locale}>{x.h1}</h1>
+  <p class="api-kind" lang={locale}>{x.codes(all.length)}</p>
+  <p class="api-summary" lang={locale}><Rich text={x.intro} locale={locale} /></p>
+  <p lang={locale}><Rich text={x.verified(verified)} locale={locale} /></p>
+  <p class="guide-note" lang={locale}><Rich text={x.note} locale={locale} /></p>
+
+  {sections.map((s) => (
+    <>
+      <h2 id={s.id} lang={locale}>{s.heading}</h2>
+      <p lang={locale}><Rich text={s.intro} locale={locale} /></p>
+      {s.groups.map((g) => (
+        <>
+          <h3 id={`${s.family}-${g.group}`} lang={locale}>{x.groups[g.group]}</h3>
+          <dl class="api-list api-index">
+            {g.entries.map((e) => {
+              const l = lead(e)
+              return (
+                <>
+                  <dt>
+                    <a href={page(e)}><code>{e.code}</code></a>
+                    {e.name && <span class="api-type"><code>{e.name}</code></span>}
+                    {e.example && <span class="api-optional" lang={locale}>{x.exampleTag}</span>}
+                  </dt>
+                  <dd lang={l.lang}><Rich text={l.text} locale={locale} /></dd>
+                </>
+              )
+            })}
+          </dl>
+        </>
+      ))}
+    </>
+  ))}
+
+  <h2 id="numbering" lang={locale}>{x.numberingH}</h2>
+  <p lang={locale}>{x.numberingP}</p>
+  {numbering.map((p) => <p class="error-quote" lang="en"><Rich text={p} locale={locale} /></p>)}
+</Docs>
+
+<style>
+  /* The registry's header, quoted under the Numbering heading: set off from the page's own
+     sentences by a rule on its leading edge, the way a quotation is. The margin outranks
+     `.doc p`, which is unlayered. */
+  .error-quote {
+    margin-block-start: 12px;
+    padding-inline-start: 14px;
+    border-inline-start: 2px solid var(--color-line-1);
+    color: var(--color-text-2);
+  }
+</style>

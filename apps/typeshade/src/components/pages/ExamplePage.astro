@@ -1,0 +1,297 @@
+---
+// One example, on a page of its own, laid out the way ShaderToy lays one out: one card split
+// in two, the shader running on the left and its text on the right, and nothing else in
+// either pane. The right pane carries its own tab bar over one of four texts, the file first
+// and then each target the compiler emits from it. The gallery's tiles link here, so a reader
+// who clicks an example stays on the site and sees it draw; the file on GitHub is one link in
+// the row at the foot of the page.
+//
+// The card is the front page's own showcase card (cardClass in src/lib/live-card.ts) and
+// the tab bar is the Ant tab head the "one file, two targets" section uses, down to
+// src/scripts/target-tabs.ts driving it. What a reader is told about the frame, which backend
+// drew it or why nothing did, and where the emitted text comes from, is written under the
+// card: a pane with a label in it reads as a figure, and this is a result panel.
+//
+// Everything on it is read at build time by src/lib/example-pages.ts. The emitted text comes
+// from examples/__emit-goldens__/ at the pinned commit, which is the compiler's own output,
+// so a page costs nothing to show and cannot disagree with the compiler.
+import { Code } from 'astro-expressive-code/components';
+import Docs from '../../layouts/Docs.astro';
+import CodeFrame from '../CodeFrame.astro';
+import Rich from '../Rich.astro';
+import Playground from '../Playground.astro';
+import ShaderCanvas from '../ShaderCanvas.astro';
+import type { CanvasText } from '../ShaderCanvas.astro';
+import { copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { cardClass } from '../../lib/live-card.ts';
+import { checkedShade } from '../../lib/shade-examples.ts';
+import { exampleMeta, META_MIN } from '../../lib/example-meta.ts';
+import { examplePage, examplePath, exampleSourceHref, noPictureReasons, type ExamplePage } from '../../lib/example-pages.ts';
+import { TEMPLATE_ID } from '../../lib/example-data.ts';
+
+interface Props {
+  locale: Locale;
+  id: string;
+}
+const { locale, id } = Astro.props;
+const t = copyFor(locale);
+const e = t.examples;
+const p = e.page;
+// The template the Worker fills in for an example newer than the build (worker/index.ts):
+// the page's markup, scripts and styles, with the dictionary's words standing in for the
+// example's and both corpora's halves present, since the Worker keeps the one it needs.
+const template = id === TEMPLATE_ID;
+const example: ExamplePage = template
+  ? { id, corpus: 'shade', file: '', title: '', group: '', drawn: false, source: ' ', entryLine: 0, emitted: { wgsl: ' ', glsl: { vertex: ' ', fragment: ' ' } }, inPlayground: false }
+  : examplePage(id);
+
+// Every reason NO_STILL_REASONS can hand a page has a sentence in this language. A reason
+// added upstream without one would print nothing under an empty frame.
+for (const reason of noPictureReasons) {
+  if (!p.noPicture[reason]) throw new Error(`[example-page] src/i18n has no sentence for the reason '${reason}'`);
+}
+
+// Every example's title and line are written in each dictionary.
+const shadeTitles = checkedShade('title', e.shade.titles);
+const shadeBlurbs = checkedShade('description', e.shade.descriptions);
+const nameOf = (which: string): string => shadeTitles[which]!;
+const blurbOf = (which: string): string => shadeBlurbs[which]!;
+
+const name = template ? p.runtime.name : nameOf(id);
+const blurb = template ? p.runtime.blurb : blurbOf(id);
+
+// The title and the description are composed in src/lib/example-meta.ts, which the example
+// data the Worker serves composes them with too; the bounds the SEO checks want are held here.
+const { title, description } = template ? { title: p.runtime.title, description: p.runtime.description } : exampleMeta(locale, name, blurb);
+const META_MAX = localeSettings[locale].metaDescriptionMax;
+if (!template && (title.length < 45 || title.length > 60)) {
+  throw new Error(`[example-page] '${id}' has a ${title.length}-character title, outside the 45 to 60 the SEO checks want: ${title}`);
+}
+if (description.length < META_MIN || description.length > META_MAX) {
+  throw new Error(`[example-page] '${id}' has a ${description.length}-character description, outside ${META_MIN} to ${META_MAX}`);
+}
+
+const caption: CanvasText = p.canvas(name);
+const sourceHref = exampleSourceHref(example.file);
+const playgroundHref = `${localePath(locale, links.playground.href)}#example=${example.id}`;
+const pager = (which: string | undefined) => (which ? { label: nameOf(which), href: localePath(locale, examplePath(which)) } : undefined);
+const glsl = example.emitted.glsl;
+
+// The tabs, in the order a reader meets them: the file first, then what it becomes. A
+// WGSL-only example has the two it has. The source tab is named by its file, which is not
+// copy and reads the same in every language, the way every code frame on the site names its
+// file; the emitted tabs are named by their target. A GLSL tab carries the language and the
+// stage: four tabs share the card's right half, which is 470px at a 1280 viewport, 490px at
+// 1320, 550px at 1440 and 630px from 1600. The full target name put the head at 569px in
+// English and 573px in Korean, so the last tab was cut off from 1280 to past 1440. The pane
+// under a tab keeps the full name as its own accessible name, and the line under the card says
+// which commit emitted the text.
+const panes = [
+  { key: 'source', label: example.file, region: `${p.source}, ${example.file}`, code: example.source, lang: 'ts' },
+  { key: 'wgsl', label: p.wgsl, region: p.wgsl, code: example.emitted.wgsl, lang: 'wgsl' },
+  ...(glsl
+    ? [
+        { key: 'vertex', label: p.glslVertexTab, region: p.glslVertex, code: glsl.vertex, lang: 'glsl' },
+        { key: 'fragment', label: p.glslFragmentTab, region: p.glslFragment, code: glsl.fragment, lang: 'glsl' },
+      ]
+    : []),
+];
+const paneId = (key: string): string => `example-pane-${key}`;
+
+// A `.shade.ts` example is a `"use typeshade"` file, which is what the Playground's editor
+// compiles, so its page carries the Playground itself, seeded with that file and editable.
+// Every page the build writes is one. The card of stills and baked goldens below stays for the
+// template alone: the Worker fills it for a record of the `fn()` registry, which a release
+// published before that registry left the site may still hold.
+const editable = example.corpus === 'shade';
+---
+
+<Docs
+  locale={locale}
+  path={examplePath(id)}
+  title={title}
+  description={description}
+  editHref={editCopy(locale, 'examples')}
+  label={name}
+  noindex={template}
+  previous={pager(example.previous)}
+  next={pager(example.next)}
+>
+  <h1 data-runtime="name">{name}</h1>
+  <p data-runtime="blurb"><Rich text={blurb} locale={locale} /></p>
+  {template && <p class="max-inline-(--content) text-label text-text-2">{p.runtime.note}</p>}
+
+  {editable && (
+    <div class="example-playground" data-runtime-corpus={template ? 'shade' : undefined}>
+      {template ? <Playground locale={locale} runtime /> : <Playground locale={locale} seed={id} still={example.drawn ? `/stills/${id}.webp` : undefined} />}
+      <p class="max-inline-(--content) text-label text-text-2">{p.editable}</p>
+    </div>
+  )}
+  {(template || !editable) && (
+    <div class="example-stage @container mbs-6" data-front-tabs data-shader-scope data-runtime-corpus={template ? 'registry' : undefined}>
+      <div class={cardClass}>
+        <div class="example-stage-body grid grid-cols-1">
+          <div class="example-stage-view min-inline-0 min-block-0 bg-surface-2">
+            {example.drawn ? (
+              <ShaderCanvas locale={locale} example={example.id} aspect="auto" caption={caption} eager externalCaption />
+            ) : (
+              <div class="figure-frame">
+                <span class="no-still">
+                  <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+                    <rect x="3.75" y="8.75" width="32.5" height="22.5" rx="3" />
+                    <path d="M3.75 24.5l7.5-6.5 6 5 5.5-4.5 13.5 11" />
+                    <circle cx="14.5" cy="15.5" r="2.25" />
+                  </svg>
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div class="example-stage-code flex block-[360px] min-inline-0 min-block-0 flex-col border-bs border-bs-line-1 bg-(--color-elevated)">
+            <div class="tabs-head" role="tablist" aria-label={p.tabs} data-example-tabs>
+              {panes.map((pane, i) => (
+                <button
+                  type="button"
+                  role="tab"
+                  id={`${paneId(pane.key)}-tab`}
+                  aria-controls={paneId(pane.key)}
+                  aria-selected={i === 0 ? 'true' : 'false'}
+                  data-runtime-tab={template ? pane.key : undefined}
+                >{pane.label}</button>
+              ))}
+            </div>
+            {/* The tab already names the pane, so the frame inside it carries no title bar of
+                its own; the label stays as the code region's accessible name. The source pane
+                opens on the line the shader starts at (src/scripts/example-stage.ts). */}
+            <div class="example-stage-panels" data-example-panels>
+              {panes.map((pane) => (
+                <div
+                  class="tabs-panel"
+                  role="tabpanel"
+                  id={paneId(pane.key)}
+                  aria-labelledby={`${paneId(pane.key)}-tab`}
+                  data-entry-line={pane.key === 'source' ? String(example.entryLine) : undefined}
+                  data-runtime-pane={template ? pane.key : undefined}
+                >
+                  <CodeFrame label={pane.region}>{template ? <pre class="runtime-code" tabindex="0" data-runtime-code></pre> : <Code code={pane.code} lang={pane.lang} locale={locale} wrap />}</CodeFrame>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="example-stage-notes mbs-3 max-inline-(--content) text-label text-text-2">
+        {!template && <p>{example.drawn ? <span data-shader-caption>{caption.neutral}</span> : p.noPicture[example.reason!]}</p>}
+        {!template && <p><Rich text={p.emittedNote} locale={locale} /></p>}
+      </div>
+    </div>
+  )}
+
+  <p class="flex flex-wrap gap-x-6 gap-y-4">
+    <a href={sourceHref} data-runtime="source-link">{p.github}</a>
+    {example.inPlayground && !editable && <a href={playgroundHref}>{p.playground}</a>}
+  </p>
+</Docs>
+
+<style>
+  /* The tool takes the document column the card took, and the line under it sits where the
+     card's own notes sit. */
+  .example-playground { margin-block-start: 24px }
+
+  /* One example's page, in the shape ShaderToy gives one: a single card split down the middle,
+     the picture on the left and the code on the right, and nothing else in either pane. The
+     card is the showcase card the front page's hero already is (.live-card), and the right
+     pane's tab bar is the site's Ant tab head. What a reader is told about the frame and about
+     where the emitted text comes from is written under the card, because a label inside a
+     pane makes that pane read as a figure.
+
+     The card is its own container, because the width it gets depends on the sidebar and the
+     page's own measure; the split follows the card's width and not the window's. */
+
+  /* Left: the picture, edge to edge. ShaderCanvas writes a <figure> around its frame and the
+     page places the caption itself, so the figure carries no box of its own here. */
+  .example-stage-view :global(.figure) { display: contents }
+  .example-stage-view :global(.figure-frame) {
+    block-size: clamp(220px, 68cqi, 420px); border: 0; border-radius: 0; background: var(--color-surface-2);
+  }
+
+  /* Right: one pane showing one of four texts, under a bar of its own. These outrank the
+     shared .tabs-head in global.css. */
+  .example-stage .tabs-head {
+    --tab-gap: 20px;
+    flex: none; align-items: stretch; gap: var(--tab-gap); block-size: 44px; padding-inline: 16px;
+    overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+    border-block-end: 1px solid var(--color-line-1); background: var(--color-surface-1);
+  }
+  /* At the head's trailing edge is the 32px fade the panels under it carry at their foot, for
+     the widths where the tabs are wider than the pane and the head scrolls. It is a sticky
+     strip of the head's own ground and not a mask, because a mask over the box would take the
+     hairline under the tabs with it for those 32px. Its negative start margin is the strip and
+     the gap in front of it, so the strip costs the head no width of its own. The head carries
+     data-overflow while there is somewhere to scroll to (src/scripts/example-stage.ts): a fade
+     on a head whose tabs fit would sit over the last tab's own letters. */
+  .example-stage .tabs-head[data-overflow]::after {
+    content: ''; flex: none; position: sticky; inset-inline-end: 0;
+    inline-size: 32px; margin-inline-start: calc(-32px - var(--tab-gap));
+    background: linear-gradient(to right, transparent, var(--color-surface-1));
+  }
+  .example-stage .tabs-head::-webkit-scrollbar { display: none }
+  .example-stage .tabs-head button { flex: none; block-size: auto; white-space: nowrap }
+  /* The file is where the pane rests, so it leads and a rule sets it apart from the three
+     texts the compiler makes out of it. It is also the one tab whose text the site does not
+     choose: the longest file name on a card page is 22 characters, which puts the four tabs
+     at 465px in English and 469px in Korean, inside the head's 470px at a 1280 viewport, 490px
+     at 1320 and 630px from 1600. A longer file name would put them past it, so the file is the tab
+     that gives way, and the three the compiler emits stay whole, since a tab a reader cannot
+     read is a text they will not know the page holds. Its floor is 16 characters: under about
+     450px of head the four tabs do not fit however far the file gives way, so the head scrolls
+     there whatever the floor is, and 16 characters keep the example's own name in the tab. */
+  .example-stage .tabs-head button:first-child {
+    padding-inline-end: var(--tab-gap); position: relative;
+    flex: 0 1 auto; min-inline-size: calc(16ch + var(--tab-gap)); overflow: hidden; text-overflow: ellipsis;
+  }
+  .example-stage .tabs-head button:first-child::after {
+    content: ''; position: absolute; inset-block: 13px; inset-inline-end: 0;
+    inline-size: 1px; background: var(--color-line-1);
+  }
+  /* A 32px fade at the foot hands the cut line to the mask instead of slicing a row of glyphs
+     in half; the head fades the same way once the pane has been scrolled off its first line,
+     which is how a reader is told the banner comment is still up there. With no script the
+     head bar stays hidden and every panel is in this scroller, stacked, which is what the
+     search index reads. */
+  .example-stage-panels {
+    flex: 1; min-block-size: 0; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--color-line-2) transparent;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+  }
+  .example-stage-panels[data-scrolled] {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 32px), transparent);
+  }
+  /* The template's panes (worker/index.ts writes the text in): plain text in the site's mono
+     face, set the way Expressive Code sets a frame's lines. */
+  .example-stage-code :global(.runtime-code) {
+    margin: 0; padding: 16px 20px; font-family: var(--font-mono); font-size: var(--text-code); line-height: var(--text-code--line-height); white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .example-stage-code :global(.expressive-code) { margin: 0; --ec-brdRad: 0; --ec-brdWd: 0; --ec-frm-shdCol: transparent }
+  /* The notes are three short paragraphs, and these outrank the document's own `.doc p`. */
+  .example-stage-notes p { margin: 0 }
+  .example-stage-notes p + p { margin-block-start: 4px }
+  @container (min-width: 44rem) {
+    /* One height for the row, read off the card's own width, so both panes grow with the page. */
+    .example-stage-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); block-size: clamp(360px, 48cqi, 680px) }
+    .example-stage-view :global(.figure-frame) { block-size: 100% }
+    .example-stage-code { block-size: auto; border-block-start: 0; border-inline-start: 1px solid var(--color-line-1) }
+  }
+</style>
+
+<script>
+  // The tabs over the source and the emitted targets, shared with the front page's own
+  // section, and then the code pane opened on the line the shader starts at. The order
+  // matters: the pane has to be the selected one before it can be measured.
+  import '../../scripts/target-tabs.ts';
+  import '../../scripts/example-stage.ts';
+</script>

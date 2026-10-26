@@ -1,0 +1,10 @@
+{
+  "slug": "gradcheckresult",
+  "source": "cc909e5adb0e5b098716525f095c63e401a94750769060effc9d6093e183cc11",
+  "texts": {
+    "summary": "gradCheck가 반환하는 값입니다.",
+    "members.ok": "모든 편미분이 허용 오차 이내일 때 `true`입니다.",
+    "members.checked": "비교한 편미분의 개수입니다.",
+    "members.worst": "허용 오차를 기준으로 가장 멀리 벗어난 편미분입니다. 도함수와 중심 차분이 갈라지는 위치도 담깁니다. `ok`이면 이 값은 없습니다."
+  }
+}

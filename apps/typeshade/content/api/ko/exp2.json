@@ -1,0 +1,10 @@
+{
+  "slug": "exp2",
+  "source": "e85d216b5667ff311826ce1a68b3b17757ade37f324f6adaeae4dcd364dea0e8",
+  "texts": {
+    "summary": "exp2(x): 2ˣ를 성분별로 구합니다. log2의 역함수입니다.",
+    "targets.wgsl": "`exp2(x)`.",
+    "targets.glsl": "`exp2(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

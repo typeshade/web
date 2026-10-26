@@ -1,0 +1,9 @@
+{
+  "slug": "emitfragment",
+  "source": "b5e8e2e0d3bb1089dceb1dc741405c7a50ae899081f2df9d845ec95adaa49284",
+  "texts": {
+    "summary": "호스트가 최종 모듈을 직접 조립하는 경우를 위해, ModuleDecl을 WGSL 조각으로 생성합니다. 선언과 헬퍼 함수는 담되, enable 지시문 머리말은 뺍니다. opts.entryPoints가 true가 아니면 스테이지 진입점도 뺍니다.",
+    "description": "GLSL이 `#include`를 쓸 자리에서, WGSL 호스트는 조각을 이어 붙여 조합합니다. 그래서 모듈 맨 위에 두어야 하는 지시문은 결과의 `preamble` 필드로 돌아옵니다. 조각이 선언하고 필요로 하는 것도 함께 돌아옵니다. 자세한 내용은 [`EmitFragment`](/api/emitfragment-interface/)에 설명되어 있습니다.\n\n[`emitFuncs`](/api/emitfuncs/)와 [`emitConst`](/api/emitconst/)의 출력을 이어 붙이는 방식보다 이 함수를 쓰는 편이 좋습니다. 이 함수는 [`emitModule`](/api/emitmodule/)과 같은 검증과 기능 검사를 수행합니다. 그래서 [`validate`](/api/validate/)나 기능 검사가 거부했을 모듈을 쓰는 일이 없습니다.",
+    "targets.wgsl": "WebGPU용 WGSL을 씁니다."
+  }
+}

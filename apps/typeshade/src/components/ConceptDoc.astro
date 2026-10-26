@@ -1,0 +1,71 @@
+---
+// The "you already know / TypeShade adds" pattern, in one place. A row names a concept, then
+// says what a TypeScript developer already knows about it and what TypeShade adds. The pages
+// that carry the pattern had their own copy of this markup; they all render through here now.
+// Backticked copy goes through Rich, so an identifier keeps the code font and a link written
+// as [text](key) resolves, and a sample under the rows goes through TypeShadeCode.
+import Rich from './Rich.astro';
+import TypeShadeCode from './TypeShadeCode.astro';
+import type { Locale } from '../i18n/index.ts';
+
+/** A concept and one or two things said about it, in the order the columns name. */
+export type ConceptRow = readonly string[];
+
+interface Props {
+  locale: Locale;
+  rows: readonly ConceptRow[];
+  /** One heading per cell of a row. A table needs them; cards use the first as the row's own. */
+  columns?: readonly string[];
+  /** Cards read as prose, a table reads as a reference. */
+  layout?: 'table' | 'cards';
+  /** What a card's last cell is introduced with, for example "TypeShade adds". */
+  addsLabel?: string;
+  /** The first cell of every table row in bold, where the page already set it that way. */
+  strongTerm?: boolean;
+  /** A sample under the rows. */
+  code?: string;
+  codeLang?: 'ts' | 'wgsl' | 'glsl' | 'text';
+  codeTitle?: string;
+}
+const { locale, rows, columns = [], layout = 'table', addsLabel, strongTerm = false, code, codeLang = 'ts', codeTitle } = Astro.props;
+---
+
+{layout === 'cards' ? (
+  <div class="concept-doc">
+    {rows.map((row) => (
+      <article>
+        <h3><Rich text={row[0]!} locale={locale} /></h3>
+        {row.slice(1, -1).map((cell) => <p><Rich text={cell} locale={locale} /></p>)}
+        {row.length > 1 && (
+          <p>{addsLabel && <strong>{addsLabel}</strong>}{addsLabel ? ' ' : ''}<Rich text={row[row.length - 1]!} locale={locale} /></p>
+        )}
+      </article>
+    ))}
+  </div>
+) : (
+  <table>
+    <thead><tr>{columns.map((c) => <th>{c}</th>)}</tr></thead>
+    <tbody>
+      {rows.map((row) => (
+        <tr>
+          {row.map((cell, i) => (
+            <td data-label={columns[i]}>
+              {strongTerm && i === 0 ? <strong><Rich text={cell} locale={locale} /></strong> : <Rich text={cell} locale={locale} />}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+{code && <TypeShadeCode code={code} lang={codeLang} title={codeTitle} />}
+
+<style>
+  /* The rows as cards in the document column: two across, one under 40rem. */
+  .concept-doc { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-block-start: 16px }
+  .concept-doc article { padding: 16px 20px; border: 1px solid var(--color-line-1); border-radius: var(--radius-md) }
+  .concept-doc h3 { margin-block: 0 8px }
+  .concept-doc p { margin-block-start: 8px; color: var(--color-text-2) }
+  .concept-doc strong { color: var(--color-text-1) }
+  @media (max-width: 40rem) { .concept-doc { grid-template-columns: 1fr } }
+</style>

@@ -1,0 +1,12 @@
+{
+  "slug": "fwidth",
+  "source": "4c56615a37eab3dd074f5745d4b8b3801b6bdf1c6a16a65472d36f53cef59060",
+  "texts": {
+    "summary": "fwidth(x): abs(dpdx(x)) + abs(dpdy(x))이며, 화면 공간 미분의 크기를 성분별로 구합니다.",
+    "description": "`fwidth(x)`는 `abs(dpdx(x)) + abs(dpdy(x))`이며, 화면 공간 미분의 크기를 성분별로 구합니다. 이 함수는 GPU에만 있고, 프래그먼트 셰이더에서만 쓸 수 있다(CPU 평가는 0을 돌려줍니다). 생성할 때마다 실행되는 `fragment-only-builtin` 린트 규칙은 이 함수가 버텍스 또는 컴퓨트 스테이지에 나타나면 `SD0109`를 보고합니다. 이런 스테이지에서는 이 값을 호스트에서 계산해 넘깁니다.",
+    "exceptions.SD0109": "GPU에만 있고 프래그먼트 셰이더에서만 쓸 수 있습니다. 생성할 때마다 실행되는 fragment-only-builtin 린트 규칙은 버텍스 또는 컴퓨트 스테이지에 나타나면 SD0109를 보고합니다.",
+    "targets.wgsl": "`fwidth(x)`로 생성합니다.",
+    "targets.glsl": "`fwidth(x)`로 생성합니다.",
+    "targets.cpu": "오라클에는 텍스처 메모리도 이웃 프래그먼트도 없습니다. 모듈을 `{ gpuStubs: true }`로 컴파일하지 않았다면 이 호출은 예외를 던집니다. 이 옵션으로 컴파일하면 플레이스홀더를 돌려줍니다."
+  }
+}

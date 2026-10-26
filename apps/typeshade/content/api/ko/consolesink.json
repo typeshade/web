@@ -1,0 +1,7 @@
+{
+  "slug": "consolesink",
+  "source": "0b391be68123f654c8fab5300f99412bb33946dc98972ea7dccd8552f9879aee",
+  "texts": {
+    "summary": "Playground, 테스트, 편집기 디버그 어댑터가 쓰는 호스트 콜백입니다."
+  }
+}

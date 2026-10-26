@@ -1,0 +1,102 @@
+---
+// One host example (compiler change 0061), on a page of its own at /guide/examples/<id>/: the
+// `"use typeshade"` module and the `host.ts` that runs it, under the tab head the front page's
+// "one file, two targets" section uses (src/scripts/target-tabs.ts), and the tiers the host
+// runs on. Both files and the tiers are the compiler's at the pinned commit, read by
+// src/lib/host-example-pages.ts; the words around them are `examples.host` in every dictionary.
+//
+// No frame is drawn here. The host runs through the Vite plugin's generated module and
+// `typeshade/runtime`, which the site's own canvas (src/lib/shader-runtime.ts) does not load.
+import { Code } from 'astro-expressive-code/components';
+import Docs from '../../layouts/Docs.astro';
+import CodeFrame from '../CodeFrame.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import { editCopy } from '../../lib/links.ts';
+import { exampleMeta, META_MIN } from '../../lib/example-meta.ts';
+import { examplePath, exampleSourceHref } from '../../lib/example-pages.ts';
+import { checkedHost, hostExamplePage } from '../../lib/host-example-pages.ts';
+
+interface Props {
+  locale: Locale;
+  id: string;
+}
+const { locale, id } = Astro.props;
+const t = copyFor(locale);
+const h = t.examples.host;
+const hp = h.page;
+const example = hostExamplePage(id);
+
+const titles = checkedHost('title', h.titles);
+const blurbs = checkedHost('blurb', h.blurbs);
+const name = titles[id]!;
+const blurb = blurbs[id]!;
+
+// The title has its own suffixes (the page shows two files and no emitted code); the
+// description is composed the way every example page's is, and both are held to the bounds the
+// SEO checks want.
+const title = hp.title(name);
+const { description } = exampleMeta(locale, name, blurb);
+const META_MAX = localeSettings[locale].metaDescriptionMax;
+if (title.length < 45 || title.length > 60) {
+  throw new Error(`[host-example-page] '${id}' has a ${title.length}-character title, outside the 45 to 60 the SEO checks want: ${title}`);
+}
+if (description.length < META_MIN || description.length > META_MAX) {
+  throw new Error(`[host-example-page] '${id}' has a ${description.length}-character description, outside ${META_MIN} to ${META_MAX}`);
+}
+
+const pager = (which: string | undefined) => (which ? { label: titles[which]!, href: localePath(locale, examplePath(which)) } : undefined);
+const base = (file: string): string => file.slice(file.lastIndexOf('/') + 1);
+
+// The module first, since the host imports it, then the host. Each tab is named by its file,
+// which is not copy and reads the same in every language; the pane keeps the role in its
+// accessible name.
+const panes = [
+  { key: 'module', label: base(example.shadeFile), region: `${hp.module}, ${base(example.shadeFile)}`, code: example.shadeSource, href: exampleSourceHref(example.shadeFile) },
+  { key: 'host', label: base(example.hostFile), region: `${hp.host}, ${base(example.hostFile)}`, code: example.hostSource, href: exampleSourceHref(example.hostFile) },
+];
+const paneId = (key: string): string => `host-pane-${key}`;
+// An Ant tag per tier, the one the examples page sets beside a single-target example's name.
+const tag = 'inline-block rounded-sm border border-line-2 bg-surface-1 px-[7px] text-label whitespace-nowrap text-text-2';
+---
+
+<Docs
+  locale={locale}
+  path={examplePath(id)}
+  title={title}
+  description={description}
+  editHref={editCopy(locale, 'examples')}
+  label={name}
+  previous={pager(example.previous)}
+  next={pager(example.next)}
+>
+  <h1>{name}</h1>
+  <p><Rich text={blurb} locale={locale} /></p>
+  <p class="flex flex-wrap items-center gap-x-2 gap-y-2">
+    <span class="text-ui text-text-2">{hp.tiersLabel}</span>
+    {example.tiers.map((tier) => <span class={tag}>{hp.tiers[tier]}</span>)}
+  </p>
+  <p class="text-label text-text-2"><Rich text={hp.tiersNote} locale={locale} /></p>
+
+  <div class="mbs-6 flex min-inline-0 flex-col gap-4" data-front-tabs>
+    <div class="tabs-head" role="tablist" aria-label={hp.files}>
+      {panes.map((pane, i) => (
+        <button type="button" role="tab" id={`${paneId(pane.key)}-tab`} aria-controls={paneId(pane.key)} aria-selected={i === 0 ? 'true' : 'false'}>{pane.label}</button>
+      ))}
+    </div>
+    {panes.map((pane) => (
+      <div class="tabs-panel" role="tabpanel" id={paneId(pane.key)} aria-labelledby={`${paneId(pane.key)}-tab`}>
+        <CodeFrame label={pane.region}><Code code={pane.code} lang="ts" locale={locale} wrap /></CodeFrame>
+      </div>
+    ))}
+  </div>
+  <p class="text-label text-text-2"><Rich text={hp.filesNote} locale={locale} /></p>
+
+  <p class="flex flex-wrap gap-x-6 gap-y-4">
+    {panes.map((pane) => <a href={pane.href}>{pane.key === 'module' ? hp.moduleLink : hp.hostLink}</a>)}
+  </p>
+</Docs>
+
+<script>
+  import '../../scripts/target-tabs.ts';
+</script>

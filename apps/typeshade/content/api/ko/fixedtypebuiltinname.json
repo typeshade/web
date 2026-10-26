@@ -1,0 +1,8 @@
+{
+  "slug": "fixedtypebuiltinname",
+  "source": "1085bdf83fc79035af48915a9c361b164d20b8a8bc53d189fa373e3124cf7c22",
+  "texts": {
+    "summary": "WGSL이 타입을 고정하는 WgslBuiltinName 식별자들입니다. 이 목록은 clip_distances를 제외한 모든 식별자이며, clip_distances의 array<f32, N> 길이는 작성자가 고릅니다.",
+    "description": "이 목록의 식별자를 쓴 [`builtin`](/api/builtin/) 호출에서는 타입 토큰을 생략할 수 있습니다."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "slug": "chunkrate",
+  "source": "26084dba1a31ff43ac1ea17e07a151d5c688195b663e60a8a0b31cd564eb114d",
+  "texts": {
+    "summary": "디바이스가 청크 키 하나에 대해 잰 값입니다. 지금까지의 청크로 측정한 단위당 실행 시간, 실행한 청크 수, 가장 긴 청크의 시간, 마지막 청크의 단위 수를 담습니다.",
+    "description": "`device.chunkRates`는 청크로 나눈 계획이 지정한 키마다 이 값을 하나씩 가집니다.",
+    "members.msPerUnit": "단위 하나에 걸리는 밀리초입니다. 첫 청크에서는 잰 속도이고, 그 뒤로는 이전 속도와 잰 속도의 평균입니다.",
+    "members.chunks": "디바이스가 이 키로 실행한 청크 수입니다.",
+    "members.longestMs": "이 키의 청크 하나가 걸린 가장 긴 시간이며, 밀리초 단위입니다.",
+    "members.lastUnits": "마지막 청크의 단위 수이며, 1 이상입니다."
+  }
+}

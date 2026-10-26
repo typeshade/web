@@ -1,0 +1,12 @@
+{
+  "slug": "stencilfacestate",
+  "source": "7f927db029050dce769937a51cdeb51edc3c756831c054a4020f78f46a56203d",
+  "texts": {
+    "summary": "WebGPU의 GPUStencilFaceState입니다. 한 면의 스텐실 검사와 세 가지 연산입니다.",
+    "description": "생략한 필드는 기본값을 씁니다.",
+    "members.compare": "compare입니다. 검사가 참조 값과 저장된 값을 비교하는 방식이며, 둘 다 `readMask`로 마스킹합니다. 기본값은 `'always'`이입니다.",
+    "members.failOp": "failOp입니다. 스텐실 검사에 실패한 프래그먼트가 저장된 값에 하는 일입니다. 기본값은 `'keep'`이입니다.",
+    "members.depthFailOp": "depthFailOp입니다. 스텐실 검사는 통과하고 깊이 검사에 실패한 프래그먼트가 하는 일입니다. 기본값은 `'keep'`이입니다.",
+    "members.passOp": "passOp입니다. 두 검사를 모두 통과한 프래그먼트가 하는 일입니다. 기본값은 `'keep'`이입니다."
+  }
+}

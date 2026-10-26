@@ -1,0 +1,11 @@
+{
+  "slug": "arrayof",
+  "source": "a9e8e7d07283e56c2191760d877e39d835bd4a9eac85ec4849c099fc3df4c9ce",
+  "texts": {
+    "summary": "uniformStruct 필드 맵 안에 길이가 고정된 배열 필드를 선언합니다.",
+    "description": "배열은 항상 선언된 `count`를 가진 `array<T, N>`이입니다. 길이가 런타임에 정해지는 `array<T>`는 최상위 [`storageBuffer`](/api/storagebuffer/) 바인딩이며, 이 바인딩은 count를 받지 않습니다. 적용할 오버로드는 `element`의 형태에 따라 정해집니다. 구조체 핸들([`structDecl`](/api/structdecl/) 또는 [`ioStruct`](/api/iostruct/)가 만들며 `.of` 메서드로 구별한다)이면 [`HandleArray`](/api/handlearray/)를 반환합니다. 이 객체의 필드 `.at(i)`는 타입 정보가 있는 필드 프록시를 줍니다. 일반 `ShaderType`이면 [`TypeArray`](/api/typearray/)를 반환합니다. 이 객체의 필드 `.at(i)`는 원소 값을 바로 줍니다.",
+    "parameters.element": "원소입니다. 구조체 핸들 또는 셰이더 타입입니다.",
+    "parameters.count": "배열의 길이입니다.",
+    "returns": "구조체 핸들이면 [`HandleArray`](/api/handlearray/), 셰이더 타입이면 [`TypeArray`](/api/typearray/)를 반환합니다."
+  }
+}

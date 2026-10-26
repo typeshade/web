@@ -1,0 +1,7 @@
+{
+  "slug": "axisvalues",
+  "source": "dbeff1699c221f2e259f9838d6f1eda30249215cdda41a7886d820aa0930cb4e",
+  "texts": {
+    "summary": "축 공간의 한 점입니다. 각 축 이름을 그 축에 선언된 값 가운데 하나에 대응시킨 객체입니다."
+  }
+}

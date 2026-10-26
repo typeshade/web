@@ -1,0 +1,37 @@
+---
+// A page that exists only to be photographed: every `.shade.ts` example the runtime can draw,
+// one framed canvas each at the tile aspect the gallery and the front page use.
+// scripts/capture-stills.ts opens it, and the build removes it from dist afterwards
+// (astro.config.mjs), so it is never served.
+import '../styles/global.css';
+import ShaderCanvas from '../components/ShaderCanvas.astro';
+import { SHADE_STILL_EXAMPLES } from '../../scripts/artifacts.mjs';
+import { shadeExampleList } from '../lib/shade-examples.ts';
+
+const tiles = SHADE_STILL_EXAMPLES.map((id) => {
+  const example = shadeExampleList.find((e) => e.id === id);
+  if (!example) throw new Error(`[stills] '${id}' is not in the .shade.ts corpus`);
+  return { id, title: example.title };
+});
+const caption = (title: string) => ({ neutral: title, webgpu: title, webgl2: title, none: title });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1440" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Still capture, TypeShade</title>
+  </head>
+  <body>
+    <main class="stills-sheet">
+      {tiles.map((tile) => (
+        <ShaderCanvas locale="en" example={tile.id} aspect="3/2" caption={caption(tile.title)} />
+      ))}
+    </main>
+    <style>
+      .stills-sheet { display: grid; grid-template-columns: repeat(3, 396px); gap: 24px; padding: 24px }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "slug": "vec3it",
+  "source": "bd23d8fb7e40ce7573e38aa1cb34e6f11a8f59f22ee5e9c8272cd658118944ff",
+  "texts": {
+    "summary": "기본 vec3<i32>입니다. vec3uT에 대응하는 부호 있는 정수 타입이며, 배열 텍스처의 텍셀 좌표나 부호 있는 격자 셀을 담습니다.",
+    "description": "[`vec3i`](/api/vec3i/) 생성자로 값을 만듭니다."
+  }
+}

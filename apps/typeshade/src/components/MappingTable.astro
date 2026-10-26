@@ -1,0 +1,154 @@
+---
+// A construct table whose cells are code: one column per language, one row per construct,
+// each code cell an Expressive Code frame highlighted for that column's language. It sits
+// beside ConceptDoc.astro, which renders its cells through Rich; use ConceptDoc where a cell
+// is a short backticked spelling, and this where a cell is a whole line, a multi-line form or
+// text that should carry the column's own syntax colours. The markup follows the front page's
+// .front-map-list: a code frame with the chrome taken off, sized to its own content.
+//
+// Props
+//   locale    the page's locale, passed on to <Code> so the copy button speaks it.
+//   columns   the column headings, in order, from the dictionary. The heading is what a cell
+//             shows above itself once the table stacks, so it is copy and is never typed here.
+//   lang      one entry per column: 'ts', 'wgsl', 'glsl' or 'text' makes the column a code
+//             column, and null makes it a prose column rendered through Rich, where a cell may
+//             carry backticked code and [text](linkKey) links. A shorter array than `columns`
+//             leaves the remaining columns prose, and so does leaving it out.
+//   rows      one array of cells per row, each no longer than `columns`. A cell is
+//               'source text'                a code cell in a code column, Rich prose in a
+//                                            prose column
+//               { note: 'text' }             Rich prose whatever the column's lang is: what a
+//                                            target with no form for this row says
+//               { name: 'abs', href: '/…/' } one identifier in the code font, a link when href
+//                                            is given and plain text when it is not
+//               null                         an empty cell
+//   widths    one CSS grid track per column, for a table whose columns should not share the
+//             width evenly, for example ['1.2fr', '1fr', '1.3fr']. Leaving it out gives every
+//             column minmax(0, 1fr).
+//   wrap      long lines wrap inside a code cell (the default), breaking mid-identifier when
+//             a cell is narrower than one name. false lets a cell scroll inside its own frame
+//             instead, which keeps every row the same height.
+//   caption   an accessible name for the table, for a page that carries more than one.
+//
+// CSS: src/styles/global.css, under "The mapping table". The classes are .mapping-table,
+// .mapping-head, .mapping-heading, .mapping-row, .mapping-cell, .mapping-note and
+// .mapping-name. The column count rides on the --mapping-columns custom property and the
+// tracks on --mapping-tracks, so a table of three columns and one of four need no rule of
+// their own. Below 45rem a row stacks and
+// each cell shows its column heading from data-label, the way .doc table does.
+import { Code } from 'astro-expressive-code/components';
+import Rich from './Rich.astro';
+import type { Locale } from '../i18n/index.ts';
+
+// The object shapes are named on lines of their own: the Astro compiler hoists an exported
+// type alias by taking the text up to its last closing brace, so a union that ends after one
+// (`… | { … } | null`) loses its tail and leaves a stray `| null` behind in the component.
+export type MappingLang = 'ts' | 'wgsl' | 'glsl' | 'text' | null;
+export type MappingNote = { readonly note: string };
+export type MappingName = { readonly name: string; readonly href?: string };
+export type MappingCell = string | MappingNote | MappingName | null;
+export type MappingRow = readonly MappingCell[];
+
+interface Props {
+  locale: Locale;
+  columns: readonly string[];
+  rows: readonly MappingRow[];
+  lang?: readonly MappingLang[];
+  widths?: readonly string[];
+  wrap?: boolean;
+  caption?: string;
+}
+const { locale, columns, rows, lang = [], widths, wrap = true, caption } = Astro.props;
+
+if (widths && widths.length !== columns.length) {
+  throw new Error(`[MappingTable] ${widths.length} column widths for ${columns.length} columns`);
+}
+// Every column is minmax(0, …), so the grid stays inside the document column (DESIGN.md, the
+// Container Rule) and a line too long for its cell wraps or scrolls inside its own frame.
+const tracks = widths ? widths.map((w) => `minmax(0, ${w})`).join(' ') : `repeat(${columns.length}, minmax(0, 1fr))`;
+// The head and every row are a grid of the same columns.
+const grid = 'grid grid-cols-(--mapping-grid) items-start gap-x-4 gap-y-2';
+
+const wide = rows.find((row) => row.length > columns.length);
+if (wide) throw new Error(`[MappingTable] a row has ${wide.length} cells and the table has ${columns.length} columns`);
+
+// Each cell resolved to one shape the template renders, so the markup below stays a list of
+// four cases and the decision about a cell is made once, here.
+type Empty = { readonly heading: string; readonly kind: 'empty' };
+type Name = { readonly heading: string; readonly kind: 'name'; readonly name: string; readonly href?: string };
+type Prose = { readonly heading: string; readonly kind: 'prose'; readonly text: string };
+type CodeCell = { readonly heading: string; readonly kind: 'code'; readonly text: string; readonly lang: 'ts' | 'wgsl' | 'glsl' | 'text' };
+type Cell = Empty | Name | Prose | CodeCell;
+
+const body: Cell[][] = rows.map((row) =>
+  columns.map((heading, i): Cell => {
+    const cell = row[i] ?? null;
+    if (cell === null) return { heading, kind: 'empty' };
+    if (typeof cell === 'object') {
+      return 'name' in cell
+        ? { heading, kind: 'name', name: cell.name, href: cell.href }
+        : { heading, kind: 'prose', text: cell.note };
+    }
+    const columnLang = lang[i] ?? null;
+    return columnLang === null ? { heading, kind: 'prose', text: cell } : { heading, kind: 'code', text: cell, lang: columnLang };
+  }),
+);
+---
+
+<div class="mapping-table mbs-6 block max-inline-(--wide) overflow-x-auto text-ui" role="table" aria-label={caption} style={`--mapping-grid: ${tracks}`}>
+  <div class={`mapping-head ${grid} border-be border-be-line-1 bg-surface-1 px-4 py-3`} role="row">
+    {columns.map((heading) => <span class="font-semibold text-text-1" role="columnheader">{heading}</span>)}
+  </div>
+  {body.map((cells) => (
+    <div class={`mapping-row ${grid} border-be border-be-line-1 px-4 py-2.5 transition-[background-color] hover:bg-(--fill-4)`} role="row">
+      {cells.map((cell) => (
+        <div class="mapping-cell min-inline-0" role="cell" data-label={cell.heading}>
+          {cell.kind === 'name' && cell.href && <a class="mapping-name block pbs-[9px] wrap-anywhere" href={cell.href}><code>{cell.name}</code></a>}
+          {cell.kind === 'name' && !cell.href && <span class="mapping-name block pbs-[9px] text-text-1 wrap-anywhere"><code>{cell.name}</code></span>}
+          {cell.kind === 'prose' && <p class="mapping-note"><Rich text={cell.text} locale={locale} /></p>}
+          {cell.kind === 'code' && <Code code={cell.text} lang={cell.lang} locale={locale} wrap={wrap} />}
+        </div>
+      ))}
+    </div>
+  ))}
+</div>
+
+<style>
+  /* A construct table whose cells are code. A code cell is an Expressive Code frame with the
+     chrome taken off, the way the front page's map sets one, so the cell reads as a spelling
+     and not as a file. A name that links takes the document's own link colours. */
+
+  /* A prose cell sits level with the first line inside a code cell beside it: the frame's own
+     border and block padding. This outranks `.doc p`, whose space above would push a note
+     below the frame beside it. */
+  .mapping-note { margin: 0; padding-block-start: 9px; color: var(--color-text-2) }
+  /* This outranks `.doc .expressive-code`, whose 24px of space above would open a gap between
+     a cell and the frame in it. */
+  .mapping-cell :global(.expressive-code) {
+    margin: 0; --ec-brdRad: var(--radius-md); --ec-brdCol: var(--color-line-1); --ec-frm-shdCol: transparent;
+    --ec-codePadBlk: 8px; --ec-codePadInl: 12px; --ec-codeFontSize: var(--text-code); --ec-codeLineHt: 1.6;
+  }
+  .mapping-cell :global(.expressive-code .copy) { display: none }
+  /* A cell is narrow and a builtin's name can be longer than it: wrapping at spaces alone
+     leaves `textureSampleCompareLevelCubeArray(` hanging past the frame, where the frame clips
+     it, so a line breaks wherever it has to. The width is reset because Expressive Code marks a
+     wrapping block `pre.wrap`, and the site's own layout class of that name would give it the
+     page's measure inside a table cell. */
+  .mapping-cell :global(.expressive-code pre.wrap) { inline-size: auto; margin-inline: 0 }
+  .mapping-cell :global(.expressive-code .ec-line .code) { overflow-wrap: anywhere; min-inline-size: 0 }
+  /* No copy button, so the first line keeps no room for one at its end. */
+  .mapping-cell :global(.expressive-code :nth-child(1 of .ec-line) .code) { padding-inline-end: var(--ec-codePadInl) }
+
+  /* Below 45rem a row stacks and each cell shows its column heading again, which is what
+     `.doc table` does with data-label. A stacked row runs 270px tall, where one hairline
+     between two runs of labels reads as one more label, so the space around the rule grows
+     until it is wider than the space between the cells inside a row, and the row reads as
+     one block. */
+  @media (max-width: 44.999rem) {
+    .mapping-head { display: none }
+    .mapping-row { display: block; padding: 18px 0 }
+    .mapping-cell + .mapping-cell { margin-block-start: 8px }
+    .mapping-note, .mapping-name { padding-block-start: 0 }
+    .mapping-cell[data-label]::before { content: attr(data-label); display: block; margin-block-end: 4px; font-size: var(--text-ui); color: var(--color-text-3) }
+  }
+</style>

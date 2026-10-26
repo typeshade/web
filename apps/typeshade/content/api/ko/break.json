@@ -1,0 +1,7 @@
+{
+  "slug": "break",
+  "source": "f3e5094aa71a583de8b8849f41942d5d34a48a5ffc5530c281d09a40574c0406",
+  "texts": {
+    "summary": "가장 안쪽 스코프에 break; 문을 추가하여, 가장 가까운 둘러싼 Loop를 즉시 빠져나가게 합니다. Continue와 같은 중첩 규칙이 적용됩니다. 루프 안에 중첩된 If는 그 자체로 break의 경계가 되지 않습니다."
+  }
+}

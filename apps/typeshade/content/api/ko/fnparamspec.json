@@ -1,0 +1,8 @@
+{
+  "slug": "fnparamspec",
+  "source": "51d8d8871907efe9a6eec4c9f782814984f16e50f39278cf640ee357f3dd1753",
+  "texts": {
+    "summary": "fn()이 받는 매개변수 레코드입니다.",
+    "description": "각 키는 매개변수 이름이고, 각 값은 세 가지 중 하나입니다. 일반 매개변수는 일반 [`ShaderType`](/api/shadertype/)입니다. 스테이지 속성을 가진 진입점 매개변수에는 [`builtin`](/api/builtin/) 또는 [`location`](/api/location/) 지정을 씁니다. 마지막으로 [`structDecl`](/api/structdecl/) 또는 [`ioStruct`](/api/iostruct/) 핸들을 쓸 수 있으며, 이때 본문은 그 구조체의 타입이 지정된 필드 프록시를 받습니다. 레코드 형태 하나로 일반 헬퍼와 `@vertex`, `@fragment`, `@compute` 진입점을 모두 다룹니다. 레코드가 만드는 호출 인터페이스는 [`FnHandle`](/api/fnhandle/)에서 설명합니다."
+  }
+}

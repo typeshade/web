@@ -1,0 +1,10 @@
+{
+  "slug": "ifchain",
+  "source": "cbf008c24c90c38bb307081fe72251575c4e16e43b5bb2b78dc10aebb4216eaa",
+  "texts": {
+    "summary": "Builder.if와 If(/api/if/)가 돌려주는 체인 객체입니다. 그래서 .elif(...)와 .else(...)를 작성한 순서대로 위에서 아래로 읽을 수 있습니다.",
+    "description": "[`Builder.if`](/api/builder/)와 [`If`](/api/if/)가 돌려주는 체인 객체입니다. 그래서 `.elif(...)`와 `.else(...)`를 작성한 순서대로 위에서 아래로 읽을 수 있습니다. 이 객체는 체인을 시작하는 호출로만 얻습니다. 체인의 메서드는 같은 `if` 문을 제자리에서 확장합니다. 첫 번째 분기에서 한 번만 추가하므로, 끝에 `.else`가 없는 체인도 `else` 블록이 없는 올바른 `if` / `else if` 문을 생성합니다.",
+    "members.elif": "`else if (cond) { body }` 분기를 추가합니다. 체인을 돌려줍니다. 값을 돌려주는 본문은 `SD0115`로 거부됩니다. 처리 방식은 [`Builder.if`](/api/builder/)와 같습니다.",
+    "members.else": "`else { body }` 블록을 추가하고 체인을 끝냅니다. 값을 돌려주는 본문은 `SD0115`로 거부됩니다. 처리 방식은 [`Builder.if`](/api/builder/)와 같습니다."
+  }
+}

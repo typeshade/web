@@ -1,0 +1,8 @@
+{
+  "slug": "return",
+  "source": "015af45b9e9717642995d62a096968dc458aab761e9dae9845bcf99d412b16c2",
+  "texts": {
+    "summary": "가장 안쪽 스코프에 명시적인 반환 값을 추가합니다.",
+    "description": "`If`, `Loop` 또는 `Switch` 제어 흐름 안에서 값을 반환할 때는 모두 이 함수를 사용합니다. 중첩된 본문 콜백 안의 JavaScript `return`은 그 클로저만 빠져나가고 아무것도 생성하지 않습니다. 그래서 조기 종료처럼 보이는 코드가 아래로 떨어집니다. JavaScript `return value`가 제대로 동작하는 곳은 본문의 마지막 최상위 return 하나뿐이며, 이 return은 `fn()`이 대신 붙여 줍니다. 조건이 성립하면 일찍 반환하는 흔한 형태에는 [`ReturnIf`](/api/returnif/)가 더 읽기 쉬운 가드 절 표기입니다."
+  }
+}

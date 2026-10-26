@@ -1,0 +1,8 @@
+{
+  "slug": "stmt",
+  "source": "38b52c12a36ba998d0816bf12858fb58bfb07be71ba2bcbe57dd8d02a4b4a3d4",
+  "texts": {
+    "summary": "IR이 담을 수 있는 모든 문장 형태입니다. FuncDecl.body를 이루는, 순서가 정해진 readonly Stmt[]입니다.",
+    "description": "[`Expr`](/api/expr/)처럼 이 타입도 판별 유니온이며(판별 키는 `s`), 이를 뒷받침하는 클래스가 없습니다. 그래서 tsc가 백엔드의 생성 switch에 모든 경우가 빠짐없이 있는지 검사할 수 있고, 패스는 일반 데이터를 매핑하여 본문을 다시 만들 수 있습니다. 이 객체 리터럴을 직접 만들 필요는 없습니다. [`fn`](/api/fn/) 본문의 두 번째 콜백 인자로 전달되는 [`Builder`](/api/builder/)가 한 번에 하나씩 추가한다(`b.let(...)`, `b.var(...)`, `b.if(...)`, `b.ret(...)`, …). 그러므로 본문은 항상 소스 순서대로 조립됩니다."
+  }
+}

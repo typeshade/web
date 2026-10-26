@@ -1,0 +1,8 @@
+{
+  "slug": "vec4ft",
+  "source": "34d326c9aacf0b6aef271df2a588abfabfccea9713c11263dad89478243eaba1",
+  "texts": {
+    "summary": "기본 vec4<f32> 타입입니다. RGBA 색상 또는 동차 클립 공간 위치를 담습니다.",
+    "description": "`pos: builtin('position', vec4fT)` 버텍스 출력 필드, `location(0, vec4fT)` 프래그먼트 출력 필드, 그리고 모든 RGBA 유니폼 필드의 타입을 정합니다."
+  }
+}

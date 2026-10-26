@@ -1,0 +1,8 @@
+{
+  "slug": "texturedepthmultisampled2dt",
+  "source": "22fe41ae8141f1d5d29ecab77b609cd47c45ce45862403ee51224a9d0473e45d",
+  "texts": {
+    "summary": "다중 샘플 깊이 텍스처입니다. MSAA 렌더 타깃의 깊이 어태치먼트이며, textureLoad로 샘플을 하나씩 읽습니다. 샘플링하거나 비교하지 않습니다.",
+    "description": "`msaaTextureLoad` 기능이 있을 때만 WebGPU에서 쓸 수 있습니다.\nGLSL ES 3.00에는 `sampler2DMS`가 없다(이는 ES 3.10의 기능입니다)."
+  }
+}

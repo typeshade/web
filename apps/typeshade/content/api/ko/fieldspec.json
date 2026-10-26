@@ -1,0 +1,13 @@
+{
+  "slug": "fieldspec",
+  "source": "e7c2cf5f7b456b4c20e35a1a7ed4968258580178104e80e82965cce58e13b322",
+  "texts": {
+    "summary": "스테이지 속성을 가진 구조체 필드 또는 진입점 매개변수 하나입니다.",
+    "description": "스테이지 속성을 가진 구조체 필드 또는 진입점 매개변수 하나입니다. [`builtin`](/api/builtin/)과 [`location`](/api/location/)의 반환 타입이며, [`ioStruct`](/api/iostruct/)의 필드 맵과 [`fn`](/api/fn/) 진입점 매개변수 레코드의 값 타입입니다. 그래서 스테이지 속성이 붙은 매개변수와 IO 구조체 필드를 같은 방식으로 작성합니다.\n\n`attr`은 WGSL 텍스트로 된 속성입니다. `location`, `builtin`, `interpolate`는 백엔드가 읽는 구조화된 형태입니다. 백엔드는 기능 검사와, [`reflect`](/api/reflect/)가 만드는 버텍스 속성 표, 그리고 GLSL `flat` 한정자에 이 값을 씁니다. 필드 하나는 내장 속성 또는 location 속성 중 하나만 가지며, 둘을 함께 가질 수 없습니다. `builtin(name, type)` 또는 `location(n, type, interpolate?)`로 만듭니다.",
+    "members.type": "필드의 셰이더 타입입니다.",
+    "members.attr": "WGSL 텍스트로 된 속성입니다. 아래 구조화된 필드가 백엔드가 읽는 값입니다.",
+    "members.location": "필드에 location 속성이 있을 때의 `@location(n)` 슬롯입니다.",
+    "members.builtin": "필드에 builtin 속성이 있을 때의 `@builtin(name)` 식별자입니다.",
+    "members.interpolate": "지정된 경우의 `@interpolate(mode)` 모드입니다."
+  }
+}

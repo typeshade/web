@@ -1,0 +1,25 @@
+---
+import type { SidebarNode } from '../lib/docs-navigation.ts';
+import { containsPage } from '../lib/docs-navigation.ts';
+interface Props { nodes: readonly SidebarNode[]; here: string; overview: string; nested?: boolean }
+const { nodes, here, overview, nested = false } = Astro.props;
+---
+<ul class:list={['sidebar-tree', { 'sidebar-tree-nested': nested }]}>
+  {nodes.map(node => <li>
+    {node.children.length ? <div class="sidebar-branch">
+      <p class:list={['sidebar-branch-title', { 'sidebar-branch-current': containsPage(node, here) }]}>{node.label}</p>
+      <ul class="sidebar-overview"><li><a href={node.href} aria-current={node.href === here ? 'page' : undefined}>{overview}</a></li></ul>
+      <Astro.self nodes={node.children} here={here} overview={overview} nested />
+    </div> : <a class:list={{ 'sidebar-code': node.code }} href={node.href} aria-current={node.href === here ? 'page' : undefined}>{node.label}</a>}
+  </li>)}
+</ul>
+<style>
+  .sidebar-tree { margin: 0; padding: 0; list-style: none }
+  .sidebar-tree li { margin-block-start: 2px }
+  .sidebar-tree-nested { margin-inline-start: 16px; padding-inline-start: 4px; border-inline-start: 1px solid var(--color-line-2) }
+  .sidebar-branch-title { margin: 0; padding: 10px 12px; color: var(--color-text-2); overflow-wrap: anywhere }
+  .sidebar-tree a { padding-inline: 12px; overflow-wrap: anywhere }
+  .sidebar-tree .sidebar-code { font-family: var(--font-mono); font-size: var(--text-code) }
+  .sidebar-tree .sidebar-branch-current { color: var(--color-text-1); font-weight: 600 }
+  .sidebar-overview { margin-inline-start: 16px; list-style: none }
+</style>

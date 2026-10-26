@@ -1,0 +1,8 @@
+{
+  "slug": "mat2f64t",
+  "source": "6cdbb1842661a81dfba2794ff9602f0d94a6c20fb61c0ea97ec95d75c05e561f",
+  "texts": {
+    "summary": "2×2 에뮬레이션 배정밀도 행렬이며, 논리적으로는 mat2x2<f64>입니다.",
+    "description": "생성 전에 이 행렬은 [`vec2f64T`](/api/vec2f64t/) 열 두 개로 이루어진 구조체로 다시 쓰입니다. 이 행렬에 대한 [`mulMat64`](/api/mulmat64/), [`transformMat64`](/api/transformmat64/), [`transpose64`](/api/transpose64/)는 [`vec2f64T`](/api/vec2f64t/)의 `length`와 `dot`이 하는 방식과 같이, 스칼라 double-double 무오차 변환을 조합합니다."
+  }
+}

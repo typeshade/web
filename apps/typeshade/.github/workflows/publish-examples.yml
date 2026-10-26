@@ -1,0 +1,82 @@
+name: publish-examples
+
+# The examples as data (docs/cloudflare.md). The site's build pins the compiler, so an example
+# merged upstream reached typeshade.dev only after a pin bump and a build. This job reads the
+# compiler's examples at its main, gives each the site's words where the dictionaries have
+# them, and uploads the release to R2; the Worker serves it, so the gallery, the Playground and
+# a page of its own show the new example within the hour, and the next build takes over.
+#
+# It builds nothing and commits nothing: scripts/publish-examples.ts reads, writes under
+# .cache/ and uploads. A run whose two commits are the current release uploads nothing.
+
+on:
+  schedule:
+    - cron: '23,53 * * * *'
+  workflow_dispatch:
+    inputs:
+      compiler_ref:
+        description: 'Compiler commit or branch to publish (default: main)'
+        type: string
+        default: main
+      force:
+        description: 'Upload even when the release is already current'
+        type: boolean
+        default: false
+  # The compiler, or anyone with a token, can ask for a release straight after a merge, the
+  # same event pin-compiler.yml answers.
+  repository_dispatch:
+    types: [compiler-updated]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-examples
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # The one credential; the account is wrangler.jsonc's account_id.
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Check for the Cloudflare secrets
+        id: secrets
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::notice::The CLOUDFLARE_API_TOKEN secret is not set; nothing is published."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v5
+        if: steps.secrets.outputs.ok == 'true'
+        with:
+          submodules: true
+          persist-credentials: false
+          # The dictionaries the words step reads count the rules changed since the previous
+          # pin (src/lib/rule-history.ts), which walks this repository's history.
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        if: steps.secrets.outputs.ok == 'true'
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+        if: steps.secrets.outputs.ok == 'true'
+      - name: Read the examples at the compiler's commit
+        if: steps.secrets.outputs.ok == 'true'
+        env:
+          REF: ${{ inputs.compiler_ref || 'main' }}
+        run: |
+          git -C vendor/shader-dsl fetch --quiet origin "$REF"
+          git -C vendor/shader-dsl checkout --quiet FETCH_HEAD
+          bun scripts/publish-examples.ts read
+      - name: Give them the site's words, at the pin
+        if: steps.secrets.outputs.ok == 'true'
+        run: |
+          git submodule update --quiet vendor/shader-dsl
+          bun scripts/publish-examples.ts words
+      - name: Upload the release
+        if: steps.secrets.outputs.ok == 'true'
+        run: bun scripts/publish-examples.ts upload ${{ inputs.force && '--force' || '' }}

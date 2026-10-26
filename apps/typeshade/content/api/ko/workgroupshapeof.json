@@ -1,0 +1,8 @@
+{
+  "slug": "workgroupshapeof",
+  "source": "5600dc7fd92a72c98726134c61de4f45292ff13cb86cfc049e6621643b991d57",
+  "texts": {
+    "summary": "컴퓨트 진입점의 워크그룹 모양입니다. 구조화된 workgroupShape 필드를 먼저 쓰고, 없으면 [workgroupSize, 1, 1]을 쓰며, 그것도 없으면 @workgroup_size(x, y, z) 속성 문자열의 크기를 씁니다. 어느 것도 없으면 undefined입니다.",
+    "description": "격자 크기가 필요한 모든 코드(CPU 디스패치, [`reflect`](/api/reflect/), 러너)는 이 값을 읽습니다. 따라서 세 차원의 크기는 같은 정의를 따릅니다."
+  }
+}

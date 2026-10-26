@@ -1,0 +1,93 @@
+---
+// Concepts: WebGPU and WebGL2, at /guide/concepts/webgpu-and-webgl2/. The two APIs side by
+// side, then what the host application owns, what the compiler owns, and how reflection joins
+// the two, for each of the three ways a host uses a module: compiled into its own code,
+// imported and called, or loaded into the program runtime (compiler surface §69). Copy lives
+// in `concepts.webgpuAndWebgl2` (src/i18n/en.ts, src/i18n/ko.ts); the code sample is not
+// copy, so it stays here.
+import Docs from '../../layouts/Docs.astro';
+import { fitDescription } from '../../lib/meta-description.ts';
+import ConceptLesson from '../ConceptLesson.astro';
+import ConceptDoc from '../ConceptDoc.astro';
+import Rich from '../Rich.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import { copyFor, localeSettings, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { slugify } from '../../lib/slug.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = copyFor(locale).concepts.webgpuAndWebgl2;
+const lesson = copyFor(locale).concepts.lessons.webgpuAndWebgl2;
+const learningLabels = copyFor(locale).concepts.lessonLabels;
+const learningHeadings = [
+  { depth: 2, slug: 'learning-use', text: learningLabels.use },
+  { depth: 2, slug: 'learning-example', text: learningLabels.example },
+  { depth: 2, slug: 'learning-caveat', text: learningLabels.caveat },
+];
+// The title is measured here, as the reference's entry pages measure theirs.
+if (c.title.length < 45 || c.title.length > 60) throw new Error(`[concepts] the WebGPU and WebGL2 page has a ${c.title.length}-character title, outside the 45 to 60 the SEO checks want: ${c.title}`);
+const headings = [...learningHeadings, ...[c.compareH, c.ownsH, c.importH, c.loadH, c.reflectionH, c.runtimeH, c.webgl2H, c.furtherH].map((h) => ({ depth: 2, slug: slugify(h), text: h }))];
+---
+
+<Docs locale={locale} path={links.conceptsWebgpu.href} title={c.title} description={fitDescription(`${lesson.meaning} ${lesson.use}`, localeSettings[locale].metaDescriptionMax)} headings={headings} editHref={editCopy(locale, 'concepts')} breadcrumbs={[{ name: copyFor(locale).docs.labels.sidebarGroups.concepts, href: links.concepts.href }, { name: c.h1, href: links.conceptsWebgpu.href }]}>
+  <h1>{c.h1}</h1>
+  <p><Rich text={lesson.meaning} locale={locale} /></p>
+  <ConceptLesson locale={locale} lesson={lesson} topic="webgpuAndWebgl2" />
+  <p>{c.lead}</p>
+
+  <section>
+    <h2 id={slugify(c.compareH)}>{c.compareH}</h2>
+    <ConceptDoc locale={locale} rows={c.compareRows} columns={c.compareColumns} strongTerm />
+  </section>
+
+  <section>
+    <h2 id={slugify(c.ownsH)}>{c.ownsH}</h2>
+    <p>{c.usesP}</p>
+    <p>{c.ownsP}</p>
+    <ConceptDoc locale={locale} rows={c.ownsRows} columns={c.ownsColumns} strongTerm />
+  </section>
+
+  <section>
+    <h2 id={slugify(c.importH)}>{c.importH}</h2>
+    <p><Rich text={c.importP} locale={locale} /></p>
+    <p><Rich text={c.overrideP} locale={locale} /></p>
+    <p><Rich text={c.overrideLimitsP} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.loadH)}>{c.loadH}</h2>
+    <p><Rich text={c.loadP} locale={locale} /></p>
+    <TypeShadeCode code={`import { createRuntime } from 'typeshade/runtime'\nimport scene from './scene.shade.ts' // the manifest\n\nconst rt = await createRuntime({ device })\nconst format = navigator.gpu.getPreferredCanvasFormat()\ncontext.configure({ device, format })\nconst draw = await rt.load(scene).render({ targets: [format] })\n\nconst frame = rt.frame()\nframe.pass({ color: [context] }, (pass) => {\n  pass.draw(draw, { u: { time } }, { count: 3 })\n})\nawait frame.submit()`} />
+    <p><Rich text={c.loadOwnsP} locale={locale} /></p>
+    <p><Rich text={c.loadOptionsP} locale={locale} /></p>
+    <p><Rich text={c.loadEmitP} locale={locale} /></p>
+    <p>{c.loadNote}</p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.reflectionH)}>{c.reflectionH}</h2>
+    <p><Rich text={c.reflectionP} locale={locale} /></p>
+    <TypeShadeCode code={`const shader = emitModule(paintModule)\nconst layout = reflect(paintModule)\n\nfor (const group of layout.bindGroups) {\n  for (const entry of group.entries) {\n    // entry.group, entry.binding, entry.space, entry.access, entry.resourceKind\n  }\n}\n\nfor (const struct of layout.uniforms) {\n  for (const field of struct.fields) {\n    // field.name, field.type, field.offset, field.size\n  }\n}`} />
+    <p>{c.reflectionNote}</p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.runtimeH)}>{c.runtimeH}</h2>
+    <p><Rich text={c.runtimeP} locale={locale} /></p>
+    <p><Rich text={c.runtimeOwnerP} locale={locale} /></p>
+    <p><Rich text={c.runtimeInfoP} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.webgl2H)}>{c.webgl2H}</h2>
+    <p>{c.webgl2P}</p>
+    <ul>{c.webgl2Items.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ul>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.furtherH)}>{c.furtherH}</h2>
+    <ul>{c.furtherItems.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ul>
+    <p><Rich text={c.nextP} locale={locale} /></p>
+  </section>
+</Docs>

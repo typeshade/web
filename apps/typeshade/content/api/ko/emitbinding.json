@@ -1,0 +1,8 @@
+{
+  "slug": "emitbinding",
+  "source": "e6c73875138d2606909b5a1e4948fe92227da3c0dbe25855d3046092caab3688",
+  "texts": {
+    "summary": "BindingDecl 하나를 WGSL의 @group(…) @binding(…) var 줄로 생성합니다.",
+    "targets.wgsl": "WebGPU용 WGSL을 씁니다."
+  }
+}

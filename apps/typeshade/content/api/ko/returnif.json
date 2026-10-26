@@ -1,0 +1,10 @@
+{
+  "slug": "returnif",
+  "source": "a1e546b416be0653d068ccb02833f2df27fcbcf65e39b3c618bcc632c7eabcab",
+  "texts": {
+    "summary": "가드 절이다: if (cond) { return value; }. \"cond이면 value를 반환\"으로 읽히는 명시적 조기 반환입니다.",
+    "description": "이 함수는 `if (cond) { return value; }` 형태의 가드 절을 만듭니다. \"cond이면 value를 반환\"으로 읽히는 명시적 조기 반환입니다. 생성하는 문장은 `If(cond, () => Return(value))`와 같습니다. `If` 본문 안의 JavaScript `return`은 아무것도 생성하지 않습니다. 그러므로 분기에서 조기 반환하려면 이 두 형태 가운데 하나로 써야 합니다.",
+    "parameters.cond": "가드 조건입니다.",
+    "parameters.value": "반환할 값입니다. 생략하면 값 없는 `return;`을 씁니다."
+  }
+}

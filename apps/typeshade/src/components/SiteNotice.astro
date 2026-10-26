@@ -1,0 +1,40 @@
+---
+// The notice over every page: one line under the header, the way a library site announces a
+// release. Its text is a row in D1 the Worker serves at /data/notice/ (docs/cloudflare.md), so
+// it changes with no build. The bar stays hidden until there is a notice, and a reader who
+// closes it does not see that notice again in that browser. Without the Worker (astro dev,
+// astro preview) there is never one.
+import { copyFor, type Locale } from '../i18n/index.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copyFor(locale).notice;
+---
+
+<div class="site-notice" data-site-notice data-locale={locale} role="region" aria-label={t.label} data-pagefind-ignore hidden>
+  <div class="site-notice-in">
+    <p data-notice-text></p>
+    <button type="button" aria-label={t.dismiss} data-notice-dismiss>
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  import { initNotice } from '../scripts/site-notice.ts';
+  initNotice();
+</script>
+
+<style>
+  .site-notice { border-bottom: 1px solid var(--color-line-1); background: var(--color-surface-1); }
+  .site-notice[hidden] { display: none; }
+  /* The shell's measure and gutter, so the line starts where the header's name does. */
+  .site-notice-in { display: flex; align-items: center; gap: 12px; max-inline-size: var(--container); margin-inline: auto; padding: 8px var(--gutter-x); }
+  .site-notice p { flex: 1; margin: 0; color: var(--color-text-1); font-size: .8125rem; line-height: 1.5; text-align: center; }
+  .site-notice p :global(a) { color: var(--color-accent); text-decoration: underline; text-underline-offset: 2px; }
+  .site-notice button { display: grid; flex: none; place-items: center; inline-size: 28px; block-size: 28px; border: 0; border-radius: var(--radius-sm); padding: 0; background: none; color: var(--color-text-2); cursor: pointer; }
+  .site-notice button:hover { background: var(--color-surface-2); color: var(--color-text-1); }
+  .site-notice svg { inline-size: 16px; block-size: 16px; }
+</style>

@@ -1,0 +1,8 @@
+{
+  "slug": "readwritestorageformats",
+  "source": "0ef692f8895dce65eb054892533ec4125eae5d7ac104a76668f3e5a0d4862976",
+  "texts": {
+    "summary": "장치가 read_write 접근을 허용하는 형식입니다. 단일 채널 32비트 형식 세 가지이며, 다른 형식은 없다(측정한 값이며, StorageTextureFormat의 설명과 같습니다).",
+    "description": "그 밖의 모든 형식은\n`write` 또는 `read` 중 한 번에 하나만 쓸 수 있습니다. Tint는 `texture_storage_2d<rgba8unorm,\nread_write>`를 문제없이 컴파일합니다. 그래서 이 목록만이 그 표기와, 컴파일 게이트가 확인하지 못하는 장치 오류로 이어지는 일을 막습니다."
+  }
+}

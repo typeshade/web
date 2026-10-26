@@ -1,0 +1,14 @@
+{
+  "slug": "emitglslfragment",
+  "source": "a43f7652cee5933f6bd14111f238f9fc1d2df539dfc2338e93cd34c7701856d8",
+  "texts": {
+    "summary": "프로그램 전체를 맡은 호스트가 쓰도록 모듈을 GLSL ES 3.00 모듈 조각으로 생성합니다. 선언과 헬퍼 함수만 담고, #version 줄과 정밀도 줄은 제외합니다. 기본값으로는 스테이지 진입점도 제외합니다.",
+    "description": "호스트는 반환된 `source`를 자신이 조립하는 프로그램에 끼워 넣습니다.\n\n헤더가 담았을 내용은 [`EmitFragment.preamble`](/api/emitfragment-interface/)에 데이터로 돌아옵니다. 여기에는 `#version` 줄, 선언된 기능이 필요로 하는 `#extension … : require`, 그리고 정밀도 줄이 있습니다. 정밀도 줄에는 모듈의 텍스처 바인딩에서 유도된 정수형과 배열 샘플러 타입의 줄도 포함됩니다. 호스트는 조립하는 모듈 조각 전체에서 이 값들을 합치고 중복을 제거합니다.\n\n`opts.entryPoints`가 `true`가 아니면 진입점은 생략합니다. 진입점은 어느 경우에도 `declares.entryPoints`에 나열되며, 여전히 스테이지 범위를 정합니다. 그래서 모듈 조각에는 스테이지의 진입점이 도달하는 헬퍼 함수, 구조체, 바인딩만 들어갑니다.",
+    "parameters.m": "생성할 모듈입니다.",
+    "parameters.stage": "생성할 스테이지의 범위입니다. 모듈 전체를 생성하려면 생략합니다.",
+    "parameters.opts": "[`GlslEmitOptions`](/api/glslemitoptions/)입니다. 진입점을 유지하려면 `entryPoints`를 추가로 넣습니다.",
+    "returns": "모듈 조각입니다. `source`, `preamble`, `declares`와 `requires`를 담습니다.",
+    "exceptions.Error": "[`emitGlslModule`](/api/emitglslmodule/)과 같은 오류가 발생합니다.",
+    "targets.glsl": "WebGL2용 GLSL ES 3.00을 생성합니다."
+  }
+}

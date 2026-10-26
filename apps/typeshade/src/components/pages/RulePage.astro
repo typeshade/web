@@ -1,0 +1,250 @@
+---
+// One design rule on a page of its own, at /reference/rules/<n-m>/. The rule's text leads,
+// then the three parts the design document writes under every rule (Rationale, Derives from,
+// and how it is verified, with the files that verify it at the pin), the sections of the
+// surface document that explain it, the error codes that enforce it, See also, and the Source.
+// A section with nothing true in it is left out. Everything about the rule is
+// src/lib/design-rules.ts, rendered by src/lib/rules-loader.ts; the words around it are
+// docs.rules in every dictionary.
+import { getEntry } from 'astro:content';
+import Docs, { type Heading } from '../../layouts/Docs.astro';
+import LinkColumns from '../LinkColumns.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import { facts } from '../../lib/examples.ts';
+import { errorCode, errorCodePath } from '../../lib/error-codes.ts';
+import { assertRuleChapters, assertRuleReadings, designRule, designRules, rulePath } from '../../lib/design-rules.ts';
+import type { RuleHtml } from '../../lib/rules-loader.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { META_MIN, fitDescription } from '../../lib/meta-description.ts';
+
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+const { locale, slug } = Astro.props;
+const d = copyFor(locale).docs;
+const r = d.reference;
+const x = d.rules;
+const e = x.entry;
+const en = copyFor('en').docs;
+assertRuleChapters(en.rules.chapters, x.chapters);
+assertRuleReadings(copyFor('en'));
+
+const rule = designRule(slug);
+const stored = await getEntry('rules', slug);
+if (!stored) throw new Error(`[rules] the rules collection has no entry '${slug}'`);
+const path = rulePath(rule.number)!;
+// Markdown is rendered once, so its links name the English pages; a Korean page keeps the
+// reader in Korean chrome by prefixing them. A rule never links to itself.
+const localize = (html: string): string => {
+  const own = new RegExp(`<a href="${path}">([^<]*)</a>`, 'g');
+  const unlinked = html.replace(own, '$1');
+  return locale === 'en' ? unlinked : unlinked.replace(/href="\/(api|reference\/errors|reference\/rules)\//g, `href="/${locale}/$1/`);
+};
+const raw = (stored.data as { html: RuleHtml }).html;
+const html = {
+  text: localize(raw.text),
+  rationale: localize(raw.rationale),
+  derives: localize(raw.derives),
+  enforced: localize(raw.enforced),
+};
+
+const chapterName = x.chapters[rule.chapter]!;
+const heading = e.heading(rule.number);
+const title = e.title(rule.number, chapterName);
+if (title.length < 45 || title.length > 60) {
+  throw new Error(`[rules] Rule ${rule.number} has a ${title.length}-character title, outside the 45 to 60 the SEO checks want: ${title}`);
+}
+const plain = (text: string): string => text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/`/g, '').replace(/\*\*|__/g, '');
+const composed = e.description(rule.number, chapterName, plain(rule.line));
+const description = fitDescription(composed.length < META_MIN ? `${composed} ${e.fill}` : composed, localeSettings[locale].metaDescriptionMax);
+
+const commit = facts.pinnedCommit;
+const blob = (file: string, line?: number): string => `${facts.mirrorUrl}/blob/${commit}/${file}${line ? `#L${line}` : ''}`;
+const surfaceHref = (anchor: string): string => `${links.surfaceSource.href}#${anchor}`;
+
+// The codes that enforce it, each with the line its own page leads with.
+const codes = rule.codes.map((code) => {
+  const entry = errorCode(code.toLowerCase());
+  const line = entry.line
+    ? { text: entry.line, lang: 'en' }
+    : { text: (entry.name && (d.errors.lines as Record<string, string>)[entry.name]) || '', lang: locale };
+  return { code, name: entry.name, href: localePath(locale, errorCodePath(code)!), line };
+});
+
+// See also: the rules on either side of it, the rules its text names, and the index.
+const all = designRules();
+const at = all.findIndex((o) => o.number === rule.number);
+const around = [all[at - 1], all[at + 1]].filter((o) => o !== undefined);
+const cited = rule.cites.filter((n) => !around.some((o) => o.number === n));
+const index = { label: x.h1, href: localePath(locale, links.rules.href) };
+const ruleLink = (n: string): { label: string; href: string } => ({ label: e.heading(n), href: localePath(locale, rulePath(n)!) });
+
+const sections = [
+  { id: 'rationale', label: e.rationaleH, show: rule.rationale !== '' },
+  { id: 'derives-from', label: e.derivesH, show: rule.derives !== '' },
+  { id: 'how-it-is-verified', label: e.verifiedH, show: true },
+  { id: 'explained-in', label: e.explainedH, show: rule.sections.length > 0 },
+  { id: 'error-codes', label: e.codesH, show: codes.length > 0 },
+  { id: 'see-also', label: e.seeAlsoH, show: true },
+  { id: 'source', label: e.sourceH, show: true },
+].filter((s) => s.show);
+const headings: Heading[] = sections.map((s) => ({ depth: 2, slug: s.id, text: s.label }));
+
+// Previous and next walk the rules in the design document's order, and step out to what is
+// guaranteed at the front, which follows the index, and to the API reference at the end, which
+// is what the sidebar lists next.
+const before = all[at - 1];
+const after = all[at + 1];
+const guarantees = { label: x.guarantees.h1, href: localePath(locale, links.rulesGuarantees.href) };
+const previous = before ? ruleLink(before.number) : guarantees;
+const next = after ? ruleLink(after.number) : { label: d.api.h1, href: localePath(locale, links.api.href) };
+const kind = x.kinds[rule.verification];
+---
+
+<Docs
+  locale={locale}
+  path={path}
+  title={title}
+  description={description}
+  headings={headings}
+  editHref={editCopy(locale, 'docs')}
+  previous={previous}
+  next={next}
+  label={heading}
+  meta={`title:${heading}`}
+  breadcrumbs={[
+    { name: r.reference, href: links.reference.href },
+    { name: x.h1, href: links.rules.href },
+    { name: heading, href: path },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  <nav class="api-crumbs" aria-label={r.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, links.reference.href)}>{r.h1}</a>
+    <span aria-hidden="true">›</span>
+    <a href={index.href}>{x.h1}</a>
+  </nav>
+  <h1 lang={locale}>{heading}</h1>
+  <p class="api-kind" lang={locale}>
+    {e.kindLine(rule.chapter, chapterName)}
+    <span class="api-optional ms-2.5" data-pagefind-meta={`${e.kindMeta}:${kind}`}>{kind}</span>
+  </p>
+  <div class="rule-text rule-md api-summary" lang="en"><Fragment set:html={html.text} /></div>
+  <p class="guide-note" lang={locale}><Rich text={x.note} locale={locale} /></p>
+
+  {rule.rationale && (
+    <section>
+      <h2 id="rationale" lang={locale}>{e.rationaleH}</h2>
+      <div class="rule-md" lang="en"><Fragment set:html={html.rationale} /></div>
+    </section>
+  )}
+
+  {rule.derives && (
+    <section>
+      <h2 id="derives-from" lang={locale}>{e.derivesH}</h2>
+      <div class="rule-md" lang="en"><Fragment set:html={html.derives} /></div>
+    </section>
+  )}
+
+  <section>
+    <h2 id="how-it-is-verified" lang={locale}>{e.verifiedH}</h2>
+    <p lang={locale}><Rich text={e.how[rule.verification]} locale={locale} /></p>
+    <p lang={locale}>{e.enforcedP}</p>
+    <div class="rule-quote rule-md" lang="en"><Fragment set:html={html.enforced} /></div>
+    {rule.files.length > 0 && (
+      <>
+        <p lang={locale}>{e.filesP(commit)}</p>
+        <ul class="rule-files">
+          {rule.files.map((f) => (
+            <li>
+              <a href={blob(f.file, f.line)}><code>{`${f.file}:${f.line}`}</code></a>
+              {f.evidence && <span class="text-text-3" lang={locale}> ({e.evidence})</span>}
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+  </section>
+
+  {rule.sections.length > 0 && (
+    <section>
+      <h2 id="explained-in" lang={locale}>{e.explainedH}</h2>
+      <p lang={locale}>{e.explainedP(commit)}</p>
+      <LinkColumns>
+        {rule.sections.map((s) => (
+          <li><a href={surfaceHref(s.anchor)} lang="en"><Rich text={e.section(s.section, s.title)} locale={locale} /></a></li>
+        ))}
+      </LinkColumns>
+    </section>
+  )}
+
+  {codes.length > 0 && (
+    <section>
+      <h2 id="error-codes" lang={locale}>{e.codesH}</h2>
+      <p lang={locale}>{e.codesP}</p>
+      <dl class="api-list api-index">
+        {codes.map((c) => (
+          <>
+            <dt>
+              <a href={c.href}><code>{c.code}</code></a>
+              {c.name && <span class="api-type"><code>{c.name}</code></span>}
+            </dt>
+            <dd lang={c.line.lang}><Rich text={c.line.text} locale={locale} /></dd>
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
+
+  <section>
+    <h2 id="see-also" lang={locale}>{e.seeAlsoH}</h2>
+    <LinkColumns>
+      {around.map((o) => <li><a href={ruleLink(o.number).href} lang={locale}>{ruleLink(o.number).label}</a> <span class="text-text-3" lang={locale}>{x.kinds[o.verification]}</span></li>)}
+      {cited.map((n) => <li><a href={ruleLink(n).href} lang={locale}>{ruleLink(n).label}</a></li>)}
+      <li><a href={index.href} lang={locale}>{x.h1}</a></li>
+      <li><a href={localePath(locale, links.errors.href)} lang={locale}>{d.errors.h1}</a></li>
+    </LinkColumns>
+  </section>
+
+  <section>
+    <h2 id="source" lang={locale}>{e.sourceH}</h2>
+    <p lang={locale}>{e.sourceP(commit)}</p>
+    <ul class="rule-files">
+      <li><a href={blob('docs/language-design.md', rule.sourceLine)}><code>{`docs/language-design.md:${rule.sourceLine}`}</code></a> <span class="text-text-3" lang={locale}>({e.designDoc})</span></li>
+      <li><a href={blob(`reqs/rules/${rule.uid}.md`)}><code>{`reqs/rules/${rule.uid}.md`}</code></a> <span class="text-text-3" lang={locale}>({e.item})</span></li>
+    </ul>
+  </section>
+</Docs>
+
+<style>
+  /* The compiler's Markdown on this page names long paths in code spans
+     (`src/compiler/ts/compile.contract.test.ts`), which would push a phone's page sideways;
+     a span breaks anywhere before it does. */
+  .rule-md :global(code) { overflow-wrap: anywhere }
+  /* The rule's Markdown sits in a box of its own, which the document's measure does not reach,
+     so its paragraphs and lists take the text measure here. A table inside it keeps the
+     document's own rules. */
+  .rule-md :global(:is(p, ul, ol)) { max-inline-size: var(--content) }
+  /* The rule's text under the heading, in the lead's size. It is Markdown, so a list or a
+     table inside it keeps the document's own rules; only the gap after the heading is set. */
+  .rule-text { margin-block-start: 12px }
+  .rule-text :global(p) { margin-block-start: 8px }
+  .rule-text :global(p:first-child) { margin-block-start: 0 }
+  /* Where the rule says it is enforced, quoted: set off from the page's own sentences by a
+     rule on its leading edge, the way the error index quotes the registry's header. */
+  .rule-quote {
+    margin-block-start: 12px;
+    padding-inline-start: 14px;
+    border-inline-start: 2px solid var(--color-line-1);
+    color: var(--color-text-2);
+  }
+  .rule-quote :global(p:first-child), .rule-quote :global(ul:first-child) { margin-block-start: 0 }
+  /* The files, one per row, in the code face at the code size, the way an error code's
+     Source lists its lines. The list sits in the document column, so its margin outranks
+     `.doc ul`. */
+  .rule-files { margin-block-start: 12px; padding-inline-start: 0; list-style: none }
+  .rule-files li { margin-block-start: 4px }
+  .rule-files code { font-size: var(--text-code); overflow-wrap: anywhere }
+</style>

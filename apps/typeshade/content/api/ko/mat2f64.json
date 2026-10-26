@@ -1,0 +1,8 @@
+{
+  "slug": "mat2f64",
+  "source": "a973ac90b5e2a68c112701c2bd039bc5a4c0ecbf5819f8b6c4a57ab6c3553ec7",
+  "texts": {
+    "summary": "에뮬레이션 배정밀도 mat2x2<f64> 생성자이며 열 우선입니다. 열마다 vec2<f64> 인자 하나를 받습니다. WGSL의 mat2x2와 같은 규칙입니다.",
+    "description": "f64 행렬-벡터 곱과 행렬-행렬 곱에는 [`transformMat64`](/api/transformmat64/)와\n[`mulMat64`](/api/mulmat64/)를 씁니다. 일반 `.mul`은 행렬 피연산자를 거부합니다."
+  }
+}

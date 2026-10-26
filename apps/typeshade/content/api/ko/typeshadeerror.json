@@ -1,0 +1,11 @@
+{
+  "slug": "typeshadeerror",
+  "source": "6758d2c781d72a4d9c1c2b38d1bf2ca1b7ffbe6acf4bc9c2fdf0e5c9faced8bb",
+  "texts": {
+    "summary": "이 패키지가 던지는 오류 클래스입니다.",
+    "description": "코드가 붙은 실패는 작성 시점의 타입 불일치든, 검증 실패든, 백엔드가 생성할 수 없는 기능이든 모두 이 클래스나 그 하위 클래스로 옵니다. 그래서 `catch (e) { if (e instanceof TypeShadeError) … }` 하나로 모두 처리할 수 있습니다.\n\n오류는 [`TypeShadeError.code`](/api/typeshadeerror/)로 구분합니다. 코드는 추가만 하는 카탈로그 `CODES`의 `SD####` 문자열입니다. 코드는 번호가 바뀌지 않으므로 오류에서 안정적인 부분은 코드입니다. `.message`는 카탈로그의 요약과 이번 실패의 세부 내용을 합친 것이며, 릴리스 사이에 문구가 바뀔 수 있습니다.\n\n`hint`는 카탈로그에 그 코드의 한 줄짜리 해결책이 있을 때 그 내용입니다. `loc`는 노드를 만든 TypeScript, 곧 작성자가 직접 쓴 호출의 파일, 줄, 열을 가리킵니다. 노드를 만들 때 소스 위치 추적이 켜져 있었을 때만 있습니다. 소스 위치 추적은 `typeshade/dev`의 `setSourceTracing(true)`로 켭니다. 두 필드 모두 없는 경우도 처리해야 합니다.",
+    "members.code": "안정적인 `SD####` 카탈로그 코드입니다. 오류 분류에는 이 필드를 사용합니다.",
+    "members.hint": "카탈로그에 그 코드의 한 줄짜리 해결책이 있을 때 그 내용입니다. 없으면 이 필드도 없습니다.",
+    "members.loc": "문제가 된 노드를 작성자의 TypeScript 어디에서 만들었는지 나타냅니다. 그 시점에 소스 위치 추적(`typeshade/dev`의 `setSourceTracing(true)`)이 켜져 있었을 때만 있으므로, 없는 경우도 처리해야 합니다."
+  }
+}

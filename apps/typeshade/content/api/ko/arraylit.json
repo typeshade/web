@@ -1,0 +1,8 @@
+{
+  "slug": "arraylit",
+  "source": "e404a22ae28366a059b6165663e63ef618868df500784dba561de4f4e132a915",
+  "texts": {
+    "summary": "고정 길이 배열 리터럴, array<elemKey, N>(...)입니다.",
+    "description": "결과 키에 원소 키와 원소 수가 들어갑니다. 그래서 `arrayLit(f32T, a, b, c)`는 `Node<'array<f32,3>'>`이며, 이는 [`typeKey`](/api/typekey/)가 그 런타임 타입에 대해 만드는 키와 같습니다."
+  }
+}

@@ -1,0 +1,69 @@
+---
+// The bridge page at /guide/typescript-and-webgpu/, on the documentation layout like every
+// other guide page. Copy lives in `concepts` (src/i18n/en.ts, src/i18n/ko.ts); the shader
+// sample is not copy, and it lives in src/lib/concepts-emit.ts, which compiles it to the WGSL
+// shown under it while the page is built.
+import Docs from '../../layouts/Docs.astro';
+import { fitDescription } from '../../lib/meta-description.ts';
+import ConceptLesson from '../ConceptLesson.astro';
+import ConceptDoc from '../ConceptDoc.astro';
+import Rich from '../Rich.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import { copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { slugify } from '../../lib/slug.ts';
+import { bridgeSample, bridgeWgsl } from '../../lib/concepts-emit.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).concepts;
+const lesson = copyFor(locale).concepts.lessons.bridge;
+const learningLabels = copyFor(locale).concepts.lessonLabels;
+const learningHeadings = [
+  { depth: 2, slug: 'learning-use', text: learningLabels.use },
+  { depth: 2, slug: 'learning-example', text: learningLabels.example },
+  { depth: 2, slug: 'learning-caveat', text: learningLabels.caveat },
+];
+if (content.title.length < 45 || content.title.length > 60) {
+  throw new Error(`[concepts] the bridge page has a ${content.title.length}-character title, outside the 45 to 60 the SEO checks want: ${content.title}`);
+}
+const headings = [...learningHeadings, ...[content.startH, content.modelH, content.fitH, content.typesH, content.orderH].map((h) => ({ depth: 2, slug: slugify(h), text: h }))];
+---
+
+<Docs locale={locale} path={links.concepts.href} title={content.title} description={fitDescription(`${lesson.meaning} ${lesson.use}`, localeSettings[locale].metaDescriptionMax)} headings={headings} editHref={editCopy(locale, 'concepts')} breadcrumbs={[{ name: content.h1, href: links.concepts.href }]}>
+  <h1>{content.h1}</h1>
+  <p><Rich text={lesson.meaning} locale={locale} /></p>
+  <ConceptLesson locale={locale} lesson={lesson} topic="bridge" />
+  <p><Rich text={content.lead} locale={locale} /></p>
+
+  <section>
+    <h2 id={slugify(content.startH)}>{content.startH}</h2>
+    <TypeShadeCode code={bridgeSample} />
+    <TypeShadeCode code={bridgeWgsl.trimEnd()} lang="wgsl" title={content.startWgslLabel} />
+    <p><Rich text={content.startP} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(content.modelH)}>{content.modelH}</h2>
+    <ConceptDoc locale={locale} rows={content.model} layout="cards" addsLabel={content.adds} />
+  </section>
+
+  <section>
+    <h2 id={slugify(content.fitH)}>{content.fitH}</h2>
+    <p><Rich text={content.fitP} locale={locale} /></p>
+    <ul>
+      {content.fitLinks.map(([label, href]) => <li><a href={href}>{label}</a></li>)}
+      <li><a href={localePath(locale, links.playground.href)}>{content.playgroundLink}</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 id={slugify(content.typesH)}>{content.typesH}</h2>
+    <p><Rich text={content.typesP} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(content.orderH)}>{content.orderH}</h2>
+    <ol>{content.orderItems.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ol>
+  </section>
+</Docs>

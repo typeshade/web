@@ -1,0 +1,35 @@
+---
+// Language guide: Types. Content lives in language.topics.types (src/i18n/en.ts, src/i18n/ko.ts);
+// the code samples are not copy, so they stay here.
+import Docs from '../../layouts/Docs.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import ConceptDoc from '../ConceptDoc.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).language.topics.types;
+const headings = [
+  ['ts', content.ts], ['alias', content.alias], ['struct', content.struct], ['attrs', content.attrs],
+  ['boundary', content.boundary], ['mapping', content.mapping], ['example', content.example],
+].map(([slug, text]) => ({ depth: 2, slug, text }));
+---
+
+<Docs locale={locale} path={links.languageTypes.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
+  <h1>{content.h1}</h1><p>{content.intro}</p>
+  <h2 id="ts">{content.ts}</h2><p>{content.tsP}</p>
+  <h2 id="alias">{content.alias}</h2><p>{content.aliasP}</p>
+  <TypeShadeCode code={`type Camera = {\n  view: mat4\n  pos: vec3\n}`} />
+  <h2 id="struct">{content.struct}</h2><p><Rich text={content.structP} locale={locale} /></p>
+  <TypeShadeCode code={`class VsIn {\n  position: vec3\n  uv: vec2\n}`} />
+  <h2 id="attrs">{content.attrs}</h2><p><Rich text={content.attrsP} locale={locale} /></p>
+  <TypeShadeCode code={`class VsOut {\n  @builtin("position") position: vec4\n  @location(0) uv: vec2\n}`} />
+  <h2 id="boundary">{content.boundary}</h2><ul>{content.boundaryItems.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ul>
+  <h2 id="mapping">{content.mapping}</h2>
+  <ConceptDoc locale={locale} rows={content.mappingRows.slice(1)} columns={content.mappingRows[0]} />
+  <h2 id="example">{content.example}</h2><p>{content.exampleP}</p>
+  <TypeShadeCode code={`class VsIn {\n  @location(0) position: vec3\n}\n\n@vertex\nexport function vs(vin: VsIn): vec4 {\n  return vec4(vin.position, 1)\n}`} />
+  <p><a href={localePath(locale, links.languageFunctions.href)}>{content.next}</a></p>
+</Docs>

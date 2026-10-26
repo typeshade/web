@@ -1,0 +1,11 @@
+---
+import RulePage from '../../../../components/pages/RulePage.astro';
+import { rulePaths } from '../../../../lib/design-rules.ts';
+
+export function getStaticPaths() {
+  return rulePaths();
+}
+const { slug } = Astro.props;
+---
+
+<RulePage locale="ko" slug={slug} />

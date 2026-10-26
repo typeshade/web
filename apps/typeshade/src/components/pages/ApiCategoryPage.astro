@@ -1,0 +1,75 @@
+---
+// One category of the reference: every export in it, alphabetically, with its kind and the
+// sentence its own JSDoc opens with. MDN's landing page for a group of interfaces has the
+// same shape. The sidebar opens this category, so the members are in reach from here on.
+import Docs from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { apiCategories, apiCategory } from '../../lib/api-nav.ts';
+import { apiEntries } from '../../lib/api.ts';
+import { apiTranslationStatus } from '../../lib/api-translations.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { apiCategoryCopy, assertApiCategories, copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import { fitDescription } from '../../lib/meta-description.ts';
+import { facts } from '../../lib/examples.ts';
+
+interface Props {
+  locale: Locale;
+  /** The category's slug, for example 'authoring'. */
+  slug: string;
+}
+const { locale, slug } = Astro.props;
+assertApiCategories();
+const t = copyFor(locale);
+const a = t.docs.api;
+const named = apiCategoryCopy(locale, slug);
+const { members } = apiCategory(slug);
+const all = apiCategories();
+const at = all.findIndex((c) => c.category.slug === slug);
+const previous = at > 0 ? all[at - 1]!.category.slug : undefined;
+const first = members[0];
+// Each member's sentence in this locale where its translation is current (src/lib/api-translations.ts),
+// the JSDoc's English where it is not.
+const current = locale === 'en' ? new Map() : apiTranslationStatus(locale, apiEntries()).current;
+const lead = (slug: string, english: string): { text: string; lang: string } => {
+  const text = current.get(slug)?.texts.get('summary');
+  return text ? { text, lang: locale } : { text: english, lang: 'en' };
+};
+const allTranslated = members.every((m) => current.has(m.slug));
+---
+
+<Docs
+  locale={locale}
+  path={`/api/${slug}/`}
+  title={a.categoryTitle(named.name)}
+  description={fitDescription(a.categoryDescription(named.name, named.summary), localeSettings[locale].metaDescriptionMax)}
+  editHref={editCopy(locale)}
+  openCategory={slug}
+  previous={previous
+    ? { label: apiCategoryCopy(locale, previous).name, href: localePath(locale, `/api/${previous}/`) }
+    : { label: a.h1, href: localePath(locale, links.api.href) }}
+  next={first ? { label: first.name, href: localePath(locale, `/api/${first.slug}/`) } : undefined}
+  breadcrumbs={[
+    { name: a.reference, href: links.api.href },
+    { name: named.name, href: `/api/${slug}/` },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  <nav class="api-crumbs" aria-label={a.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, links.api.href)}>{a.reference}</a>
+  </nav>
+  <h1 lang={locale}>{named.name}</h1>
+  <p class="api-kind" lang={locale}>{a.members(members.length)}</p>
+  <p class="api-summary" lang={locale}>{named.summary}</p>
+  <p class="guide-note" lang={locale}><Rich text={allTranslated ? a.translatedNote : a.note} locale={locale} /></p>
+  <dl class="api-list api-index">
+    {members.map((m) => (
+      <>
+        <dt>
+          <a href={localePath(locale, `/api/${m.slug}/`)}><code>{m.name}</code></a>
+          <span class="api-type" lang={locale}>{a.kinds[m.kind]}</span>
+        </dt>
+        <dd lang={lead(m.slug, m.summary).lang}>{lead(m.slug, m.summary).text}</dd>
+      </>
+    ))}
+  </dl>
+</Docs>

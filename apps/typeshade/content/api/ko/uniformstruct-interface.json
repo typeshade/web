@@ -1,0 +1,14 @@
+{
+  "slug": "uniformstruct-interface",
+  "source": "2d0b336e84309fe63f6cfbf8eda16a1be934caee7d72a68ed4e03603b79f7d03",
+  "texts": {
+    "summary": "uniformStruct가 반환하는 핸들이며, 구조체와 그 바인딩을 함께 선언합니다.",
+    "description": "`.struct`(`.decl`로도 쓴다)는 `module({ structs })`에, `.binding`은 `module({ bindings })`에 씁니다. `.field`는 타입이 있고 읽기 전용인 필드 접근을 제공합니다. WGSL에서 유니폼은 읽기 전용이므로 `.field.x.assign(...)`은 `tsc` 오류입니다. `F`에는 고정 크기 [`arrayOf`](/api/arrayof/) 필드를 넣을 수 있습니다. 구조체 원소 배열이나 일반 타입 배열이 여기에 해당합니다. 이 모양은 [`PlainStruct`](/api/plainstruct/)로 표현할 수 없는 유일한 필드 모양입니다.\n\n이 타입은 내보내져 있으므로, 다른 코드가 이를 제네릭 제약으로 받아 구조체의 모양 `F`를 다시 선언하지 않고 그 위에서 확장할 수 있습니다. 호스트는 `u.struct`에서 CPU 쪽 std140 버퍼 쓰기 코드를 유도할 수 있습니다. 헬퍼 함수가 `UniformStruct<{ time: ...; resolution: ... } & F>`를 반환하면, 기본 유니폼 레이아웃을 호출자의 추가 필드와 합쳐 타입 검사를 거치는 하나의 구조체를 만들 수 있습니다.",
+    "members.struct": "`module({ structs })`에 넘기는 구조체 선언입니다.",
+    "members.decl": "`struct`와 같은 선언입니다. 이 모듈의 다른 핸들이 쓰는 이름이므로, `structs: [U.decl, VsOut.decl]`처럼 일관되게 읽힙니다.",
+    "members.type": "구조체의 `ShaderType`이입니다.",
+    "members.binding": "`module({ bindings })`에 넘기는 바인딩 선언입니다.",
+    "members.node": "직접 만든 `member(...)` 읽기에 쓰는 원시 바인딩 접근 노드입니다.",
+    "members.field": "타입이 있고 읽기 전용인 필드 접근입니다. [`arrayOf`](/api/arrayof/)로 선언한 필드는 `.at(i)`를 노출합니다."
+  }
+}

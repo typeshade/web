@@ -1,0 +1,8 @@
+{
+  "slug": "resourcekind",
+  "source": "f9b55865305f407d39e811973e6f34cd9b1f2e95e043bf6c7b502a40a5209835",
+  "texts": {
+    "summary": "호스트 API에서 본 바인드 항목의 종류입니다. 이 종류는 항목을 선언한 WGSL 주소 공간이나 타입과 무관합니다.",
+    "description": "호스트는 이 필드를 보고 GPU 리소스 타입을 고릅니다. `'uniform-buffer'`와 `'storage-buffer'`는 모두 버퍼로 뒷받침됩니다. `access`는 스토리지 버퍼에만 있으며, 이를 읽기 전용과 읽기-쓰기로 더 나눕니다. `'texture'`와 `'sampler'`는 버퍼만 다루는 호스트가 거부해야 하는 두 종류입니다. GLSL ES 3.00 백엔드에서 `'sampler'` 항목은 짝을 이루는 `'texture'` 항목의 결합 `sampler2D` 유니폼에 합쳐지며, 자체 선언을 받지 않습니다. 그래도 리플렉션은 모듈의 구조를 보고하므로 `bindGroups`에는 나타납니다. 다만 호스트가 따로 바인딩할 항목은 없습니다."
+  }
+}

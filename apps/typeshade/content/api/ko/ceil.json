@@ -1,0 +1,11 @@
+{
+  "slug": "ceil",
+  "source": "0d95114f37a8e4370933e2e2c1c001c00f99396169ffa80d73b0ddb8a855fea2",
+  "texts": {
+    "summary": "ceil(x): +∞ 방향으로 올림한 값을 성분별로 구합니다.",
+    "description": "[`floor`](/api/floor/)는 반대 방향으로 내림합니다.",
+    "targets.wgsl": "`ceil(x)`.",
+    "targets.glsl": "`ceil(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

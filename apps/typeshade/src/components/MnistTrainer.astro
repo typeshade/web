@@ -1,0 +1,159 @@
+---
+// Compiler work happens once at the site build, and only the JSON Pack crosses to
+// the browser. The client uses the compiler repository's shared browser session.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { compile, packModule } from '../../vendor/shader-dsl/src/index.ts';
+import { copyFor, type Locale } from '../i18n/index.ts';
+import TypeShadeCode from './TypeShadeCode.astro';
+import { facts } from '../lib/examples.ts';
+import { mnistEpochs } from '../lib/mnist-settings.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const words = copyFor(locale).mnist.demo;
+const source = readFileSync(path.resolve('vendor/shader-dsl/journeys/mnist/softmax.shade.ts'), 'utf8');
+const compiled = compile(source);
+const errors = compiled.diagnostics.filter((d) => d.category === 'error');
+if (errors.length > 0 || !compiled.module) {
+  throw new Error('[mnist-browser] TypeShade shader compilation failed: ' + errors.map((d) => d.message).join('; '));
+}
+const packJson = JSON.stringify(packModule(compiled.module)).replace(/</g, '\\u003c');
+const forwardStart = source.indexOf('@compute([64])\nexport function forward(');
+const forwardEnd = source.indexOf('@compute([64])\nexport function objective(', forwardStart);
+if (forwardStart < 0 || forwardEnd < 0)
+  throw new Error('[mnist-lab] Forward stage no longer matches the visible code');
+const forwardExample = source.slice(forwardStart, forwardEnd).trim();
+
+const sourceUrl = 'https://github.com/typeshade/typeshade/blob/' + facts.pinnedCommit + '/journeys/mnist/softmax.shade.ts';
+---
+
+<section class="mnist-app" data-mnist-trainer data-copy={JSON.stringify(words)} aria-labelledby="mnist-lab-title">
+  <h3 id="mnist-lab-title">{words.title}</h3>
+  <p>{words.description}</p>
+  <div class="mnist-code-preview" data-mnist-code-preview>
+    <h4>{words.codePreviewTitle}</h4>
+    <p class="mnist-note">{words.codePreviewExplanation}</p>
+    <TypeShadeCode lang="ts" code={forwardExample} title="softmax.shade.ts — forward" />
+    <p class="mnist-note"><a href="#model">{words.codeWalkthroughLink}</a></p>
+  </div>
+  <details class="mnist-source" data-mnist-source>
+    <summary>{words.sourceToggle}</summary>
+    <p class="mnist-note">{words.sourceDescription}</p>
+    <TypeShadeCode lang="ts" code={source} title="journeys/mnist/softmax.shade.ts" />
+    <p class="mnist-note"><a href={sourceUrl} target="_blank" rel="noopener noreferrer">{words.sourceGitHub}</a></p>
+  </details>
+  <div class="mnist-fields">
+    <label>{words.backend}
+      <select data-tier>
+        <option value="auto">{words.auto}</option>
+        <option value="webgpu">{words.webgpu}</option>
+        <option value="webgl2">{words.webgl2}</option>
+      </select>
+    </label>
+    <label>{words.samples}
+      <select data-count>
+        <option value="128">128</option>
+        <option value="256" selected>256</option>
+        <option value="512">512</option>
+        <option value="1024">1024</option>
+      </select>
+    </label>
+    <label>{words.epochs}
+      <input type="number" data-epochs min={mnistEpochs.min} max={mnistEpochs.max} step="1" value={mnistEpochs.default} required aria-describedby="mnist-epochs-help mnist-epochs-error" aria-invalid="false" />
+    </label>
+  </div>
+  <p id="mnist-epochs-help" class="mnist-note">{words.epochsHelp}</p>
+  <p id="mnist-epochs-error" data-epochs-error role="alert" class="text-diagnostic" hidden></p>
+  <p class="mnist-note">{words.resourceNote}</p>
+  <div class="mnist-actions">
+    <button class="button button-primary" type="button" data-start>{words.start}</button>
+    <button class="button" type="button" data-cancel disabled>{words.cancel}</button>
+  </div>
+  <p class="mnist-note">{words.dataNote}</p>
+  <p role="status" aria-live="polite" class="mnist-status" data-status>{words.idle}</p>
+  <progress class="mnist-progress" max="768" value="0" data-progress aria-label={words.trainingProgress}></progress>
+  <p class="mnist-note">{words.progressNote}</p>
+  <div class="mbs-6" data-learning>
+    <h4>{words.learningTitle}</h4>
+    <p class="mnist-note">{words.learningExplanation}</p>
+    <p class="mnist-note" data-learning-phase aria-live="polite">{words.idle}</p>
+    <p class="mnist-note" data-training-batch></p>
+    <p class="mnist-note" data-evaluation-batch></p>
+    <p class="mnist-note">{words.metricsExplanation}</p>
+    <figure class="m-0 mbs-4">
+      <figcaption class="text-ui">{words.lossCurve}</figcaption>
+      <svg data-loss-chart role="img" aria-label={words.lossCurve} viewBox="0 0 400 140" class="w-full h-auto"><title>{words.lossCurve}</title></svg>
+    </figure>
+    <figure class="m-0 mbs-4">
+      <figcaption class="text-ui">{words.accuracyCurve}</figcaption>
+      <svg data-accuracy-chart role="img" aria-label={words.accuracyCurve} viewBox="0 0 400 140" class="w-full h-auto"><title>{words.accuracyCurve}</title></svg>
+    </figure>
+  </div>
+  <div class="mnist-panels">
+    <div class="mnist-canvas-panel">
+      <h4>{words.canvas}</h4>
+      <p class="mnist-note">{words.drawNote}</p>
+      <canvas width="280" height="280" data-draw aria-label={words.canvas}></canvas>
+      <div class="mnist-actions">
+        <button class="button" type="button" data-clear>{words.clear}</button>
+        <button class="button" type="button" data-sample disabled>{words.sample}</button>
+      </div>
+      <p data-ground-truth class="mnist-label"></p>
+    </div>
+    <div class="mnist-output">
+      <h4>{words.distribution}</h4>
+      <p class="mnist-guess" aria-live="polite" data-guess></p>
+      <ol class="mnist-probabilities" data-probabilities aria-label={words.distribution}></ol>
+      <h4>{words.resultHeading}</h4>
+      <ol data-results class="mnist-results"></ol>
+    </div>
+  </div>
+  <p class="mnist-note">{words.computeNote}</p>
+  <script type="application/json" is:inline data-pack set:html={packJson}></script>
+</section>
+
+<script>
+  import { mountMnist } from '../scripts/mnist-browser.ts';
+  for (const element of document.querySelectorAll<HTMLElement>('[data-mnist-trainer]')) mountMnist(element);
+</script>
+
+<style>
+  .mnist-app {
+    border: 1px solid var(--color-line-1);
+    border-radius: var(--radius-md);
+    background: var(--color-ground);
+    padding: clamp(16px, 3vw, 28px);
+    margin-block: 24px 28px;
+  }
+  .mnist-app h3 { font-size: 1.25rem; margin-block: 0 10px; }
+  .mnist-app h4 { font-size: 1rem; margin-block: 0 12px; }
+  .mnist-app > p { margin-block: 10px; }
+  .mnist-code-preview { margin-block: 18px 24px; }
+  .mnist-code-preview h4 { margin: 0 0 6px; }
+  .mnist-code-preview :global(pre) { max-width: 100%; overflow-x: auto; }
+  .mnist-code-preview :global(.expressive-code) { margin-block: 12px; }
+  .mnist-source { margin-block: 18px; padding: 12px 16px; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); }
+  .mnist-source summary { cursor: pointer; font-weight: 700; }
+  .mnist-source[open] summary { margin-bottom: 12px; }
+  .mnist-source :global(pre) { max-height: 32rem; overflow: auto; }
+  .mnist-fields { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 12px; margin-block: 20px; }
+  .mnist-fields label { display: flex; flex-direction: column; gap: 6px; font-size: .85rem; font-weight: 600; }
+  .mnist-fields select, .mnist-fields input { inline-size: 100%; min-block-size: 40px; padding: 7px 9px; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); background: var(--color-ground); color: var(--color-text-1); }
+  .mnist-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-block: 12px; }
+  .mnist-actions button:disabled { opacity: .5; cursor: not-allowed; }
+  .mnist-note { max-inline-size: var(--content); font-size: .85rem; line-height: 1.6; color: var(--color-text-2); }
+  .mnist-status { min-block-size: 2.75em; font-size: .9rem; overflow-wrap: anywhere; }
+  .mnist-progress { inline-size: 100%; block-size: 10px; accent-color: var(--color-accent); }
+  .mnist-panels { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: clamp(18px, 4vw, 36px); margin-block: 24px; }
+  .mnist-canvas-panel, .mnist-output { min-inline-size: 0; }
+  canvas { display: block; inline-size: min(100%,280px); aspect-ratio: 1; border: 1px solid var(--color-line-2); border-radius: 8px; background: black; cursor: crosshair; touch-action: none; }
+  .mnist-guess { font-size: 1.05rem; font-weight: 700; min-block-size: 2em; }
+  .mnist-label { font-size: .9rem; color: var(--color-text-2); }
+  .mnist-probabilities { display: grid; gap: 4px; margin: 0 0 28px; padding: 0; list-style: none; }
+  .mnist-probabilities :global(li) { display: grid; grid-template-columns: 1.25em minmax(0,1fr) 4em; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; font-size: .8rem; }
+  .mnist-probabilities :global(meter) { inline-size: 100%; }
+  .mnist-probabilities :global(li span:last-child) { text-align: right; }
+  .mnist-results { display: grid; gap: 7px; padding-inline-start: 22px; font-size: .85rem; line-height: 1.5; }
+  @media (max-width: 42rem) { .mnist-panels { grid-template-columns: minmax(0,1fr); } }
+</style>

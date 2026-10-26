@@ -1,0 +1,7 @@
+{
+  "slug": "workgroupshape",
+  "source": "d40c0422cdcb3f0758d045d57ced4c7f2ed209146bd466968ba683caa2189e8d",
+  "texts": {
+    "summary": "컴퓨트 진입점 워크그룹의 x, y, z 크기입니다. WGSL의 @workgroup_size(x, y, z)에 해당합니다."
+  }
+}

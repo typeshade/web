@@ -1,0 +1,10 @@
+{
+  "slug": "cross",
+  "source": "04b553ce5d6b289c0712baa9830355edb9d91928dbf7146d801a3bf758c8e86b",
+  "texts": {
+    "summary": "cross(a, b): 두 vec3<f32> 값의 3차원 외적입니다.",
+    "targets.wgsl": "`cross(a, b)`.",
+    "targets.glsl": "`cross(a, b)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

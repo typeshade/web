@@ -1,0 +1,7 @@
+{
+  "slug": "diagnosticdirective",
+  "source": "f0c1ac941cc33e305a45b6ff48fc14c1a524d272ab7dd8d1848a0604f8d3d8ff",
+  "texts": {
+    "summary": "WGSL 진단 하나를 나타내는 지시문입니다."
+  }
+}

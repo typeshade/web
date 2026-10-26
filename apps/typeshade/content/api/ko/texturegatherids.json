@@ -1,0 +1,8 @@
+{
+  "slug": "texturegatherids",
+  "source": "13c4e770567c6c57471ccd25b17f6ebee501a2c8de507bb1399c3943e8b11df4",
+  "texts": {
+    "summary": "textureGather / textureGatherCompare 호출이 하향 변환되는 중립 id입니다. WGSL 인자 구조마다 id가 하나씩 있습니다.",
+    "description": "capability pass가 두 번째 목록 없이 호출에서 `textureGather`를 도출할 수 있도록 내보낸 값입니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "atomicu32t",
+  "source": "aae7312542316f80638efd80db9f5aa0c402e57c8d6b6cb0a4ea583c3f7dde8f",
+  "texts": {
+    "summary": "atomic<u32>: 스토리지 메모리에 있는 부호 없는 32비트 정수입니다. 여러 호출이 atomic* 내장 함수를 통해 동시에 갱신합니다.",
+    "description": "`atomic<u32>`: 스토리지 메모리에 있는 부호 없는 32비트 정수입니다. 여러 호출이 `atomic*` 내장 함수(`atomicAdd`, `atomicLoad`, ...)로 동시에 갱신합니다. 이 타입은 값이 아니라 위치입니다. 직접 읽거나, 대입하거나, 산술 연산에 쓸 수 없습니다."
+  }
+}

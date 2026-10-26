@@ -1,0 +1,12 @@
+{
+  "slug": "uniformstruct",
+  "source": "313927ca76b0533fd7bf314fa8b0b769eaaef24b118cc8a3d1d4bdbce645aa57",
+  "texts": {
+    "summary": "필드 맵 하나로 유니폼 버퍼 구조체와 그 바인딩을 함께 선언합니다.",
+    "description": "구조체, 바인딩, 그리고 모든 필드 읽기가 같은 선언에서 나오므로, 슬롯이나 필드 타입이 둘 사이에서 어긋날 수 없습니다.\n\n반환되는 핸들은 다음을 담고 있다:\n\n- `.struct`(`.decl`로도 쓴다)는 `module({ structs })`에, `.binding`은 `module({ bindings })`에 씁니다. 핸들을 `uses`에 넣으면 둘 다 추가됩니다.\n- `.field.<name>`은 타입이 있는 필드 접근을 제공하며, 이 접근은 값 인터페이스로 바로 이어집니다. 예: `U.field.raster_params.x`, `U.field.mvp.mul(v)`. [`arrayOf`](/api/arrayof/)로 선언한 필드는 대신 `.at(i)`를 노출합니다. 유니폼은 읽기 전용이므로 `U.field.opacity.assign(...)`은 tsc 오류입니다.\n- `.node`는 원시 바인딩 접근 노드입니다. 직접 만든 `member(...)` 읽기에 필요하며, 그 밖에는 거의 쓰지 않습니다.\n- `.type`은 구조체의 셰이더 타입입니다.\n\n바이트 오프셋은 std140 기준이며 `reflect(m).uniforms`에서 가져오므로, 호스트가 오프셋을 직접 셀 필요가 없습니다.",
+    "parameters.typeName": "생성되는 구조체 이름입니다.",
+    "parameters.at": "`group`과 `binding` 슬롯, 그리고 `as`이입니다. 모든 필드 읽기가 이 이름으로 쓰이는 생성 변수 이름입니다.",
+    "parameters.fields": "필드 맵입니다. 셰이더 타입이거나 [`arrayOf`](/api/arrayof/) 배열 필드입니다.",
+    "returns": "위에서 설명한 [`UniformStruct`](/api/uniformstruct-interface/) 핸들입니다."
+  }
+}

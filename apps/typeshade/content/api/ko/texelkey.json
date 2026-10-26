@@ -1,0 +1,8 @@
+{
+  "slug": "texelkey",
+  "source": "b10c6c492a6d5d830cb3c175821f9ff5dc1d3827dbee83f897b0eaafec0ac6a7",
+  "texts": {
+    "summary": "텍스처 키 K에서 텍셀 로드를 하면 나오는 vec4<…> 키입니다. 불러온 원소는 텍스처 키의 원소이므로, texture_2d<u32>를 로드하면 vec4<u32>가 나옵니다.",
+    "description": "키에서 이 타입을 유도하면 결과 타입과 텍스처가 서로 어긋나지 않습니다. 정수 텍스처에서 `vec4<f32>` 결과를 얻는 것은 두 GPU 컴파일러가 모두 거부하므로, [`textureLoad`](/api/textureload/)로는 그런 결과를 만들 수 없습니다."
+  }
+}

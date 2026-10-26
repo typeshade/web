@@ -1,0 +1,8 @@
+{
+  "slug": "vec4i",
+  "source": "d1b91edb6d4b51b559295d87bdb800bc4136fd60e396f694cb3f2540493e76e8",
+  "texts": {
+    "summary": "vec4<i32> 생성자이며, WGSL 방식으로 vec4i라고 씁니다.",
+    "description": "일반 숫자 성분은 i32로 승격됩니다. [`vec4u`](/api/vec4u/)의 부호 있는 짝이며, `texture_2d<i32>`의 텍셀 타입입니다."
+  }
+}

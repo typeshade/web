@@ -1,0 +1,11 @@
+{
+  "slug": "clamp",
+  "source": "1f5ee9494f64f4cf1a545c2c8a0603b708d1d6c672e0b56788892fd2725954b2",
+  "texts": {
+    "summary": "clamp(x, lo, hi): x를 [lo, hi] 범위로 제한합니다. 성분별로 적용합니다.",
+    "description": "`lo`와 `hi`에는 벡터 `x`에 맞춰 브로드캐스트되는 스칼라를 쓸 수 있습니다. 정의역이 `[-1, 1]`인 [`asin`](/api/asin/)과 [`acos`](/api/acos/) 앞에 두는 표준 가드입니다. 부동소수점 반올림으로 범위 안의 값이 경계를 조금 넘는 일을 막습니다.",
+    "targets.wgsl": "`clamp(x, lo, hi)`.",
+    "targets.glsl": "`clamp(x, lo, hi)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "typeshadelanguageserviceoptions",
+  "source": "fbfcf9c5645fc4ff30f9dd535c47cf3d0e20a6ef25536f4c78adda2de79821fa",
+  "texts": {
+    "summary": "Typeshade 언어 서비스 인스턴스의 설정입니다.",
+    "members.fileName": "소스 텍스트를 파싱할 때 쓰는 파일 이름입니다. 파일 시스템에서 갖는 의미는 없습니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "nodebrand",
+  "source": "0d306378fff6c29b3f8b9b81b744b4f6aee23739113b3c9f5231a879915cc7a2",
+  "texts": {
+    "summary": "모든 노드가 브랜드로 지니는 심볼입니다. ReadonlyNode 프로토타입에 한 번 설치됩니다.",
+    "description": "모든 노드가 브랜드로 지니는 심볼이며, [`ReadonlyNode`](/api/readonlynode/) 프로토타입에 한 번 설치됩니다. `Symbol.for`로 만들어지므로 전역 심볼 레지스트리를 통해 해석됩니다. 그래서 번들러가 이 패키지의 복사본을 두 개 불러오더라도, 한 복사본이 만든 노드는 다른 복사본이 확인하는 브랜드를 여전히 지닙니다. `instanceof Node`는 그런 보장을 하지 않습니다. 프로토타입의 동일성이 복사본마다 다르기 때문입니다. [`isNodeValue`](/api/isnodevalue/)가 이 슬롯을 읽습니다."
+  }
+}

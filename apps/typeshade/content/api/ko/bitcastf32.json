@@ -1,0 +1,11 @@
+{
+  "slug": "bitcastf32",
+  "source": "7983ec4c80bee77ed42f8e8cda89e02ba918f93228abec69b957f6a4a1c39dce",
+  "texts": {
+    "summary": "u32의 비트 패턴을 f32로 재해석합니다. bitcastU32의 역연산입니다.",
+    "description": "WGSL에서는 `bitcast<f32>(x)`로, GLSL에서는 `uintBitsToFloat(x)`로 생성합니다. f32에서 u32를 거쳐 다시 f32로 바꾸는 변환은 fast-math 최적화의 장벽이 됩니다. 정수 영역은 부동소수점 재결합이나 축약의 대상이 아니기 때문입니다. [`optBarrier`](/api/optbarrier/)가 이 패턴을 묶어 제공합니다.",
+    "targets.wgsl": "`bitcast<f32>(v)`.",
+    "targets.glsl": "`uintBitsToFloat(v)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

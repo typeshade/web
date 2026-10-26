@@ -1,0 +1,12 @@
+{
+  "slug": "buildregistry",
+  "source": "df1462d32292593f025c394bfc0c9a2d174ff9de9ff1f580c7a50dc1689dd7af",
+  "texts": {
+    "summary": "발견한 모듈 집합을 지정된 순서에 맞춰 검증하고, 그 집합으로 레지스트리 모듈을 생성합니다. 생성된 모듈에는 id의 유니온 타입, id에서 모듈로 대응하는 레코드, 그리고 이 레코드를 채우는 import가 들어갑니다.",
+    "description": "이 함수는 파일 시스템에 접근하지 않습니다. 호출하는 쪽이 자신의 디렉터리를 검색하고, 모듈마다 [`RegistryEntry`](/api/registryentry/)를 하나씩 만든 뒤, 돌려받은 소스를 파일에 씁니다.\n\n```ts\n// `scanExamples` and `CURATED_IDS` are the caller's: a directory walk that returns\n// RegistryEntry[], and the hand-written id order it must agree with.\nconst { source } = buildRegistry(scanExamples('./examples'), {\n  order: CURATED_IDS,\n  valueType: 'ShaderExample',\n  imports: [\"import type { ShaderExample } from './_shared.js'\"],\n  regenerateWith: 'bun scripts/gen-registry.ts > examples/registry.generated.ts',\n})\n```",
+    "parameters.entries": "호출하는 쪽의 검색이 찾은 모든 모듈입니다.",
+    "parameters.opts": "지정된 순서, 이름 규칙, 배너의 세부 사항입니다.",
+    "returns": "렌더링된 소스와 파일에 나타나는 순서의 id들입니다.",
+    "exceptions.Error": "두 항목이 같은 id를 가질 때, 내보내기 이름이 식별자가 아닐 때, 또는 `order`와 발견한 집합이 양방향으로 어긋날 때 발생합니다. 어긋나는 방향은 두 가지입니다. 모듈을 가리키지 않는 등록 목록의 id가 있거나, 어떤 등록 목록의 id도 가리키지 않는 모듈이 있습니다. 오류 메시지는 두 종류의 불일치를 모두 나열하며, `regenerateWith` 명령이 주어졌다면 그 명령도 함께 보여 줍니다."
+  }
+}

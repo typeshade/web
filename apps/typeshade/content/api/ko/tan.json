@@ -1,0 +1,11 @@
+{
+  "slug": "tan",
+  "source": "a1316eafde0a919303bbb7fda6ff84bdb332b9734e2d72bd205f799bf7917079",
+  "texts": {
+    "summary": "tan(x): 라디안 단위 x의 탄젠트를 성분별로 계산합니다.",
+    "description": "WGSL과 GLSL ES 3.00에서 같은 이름을 사용합니다.",
+    "targets.wgsl": "`tan(x)`.",
+    "targets.glsl": "`tan(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

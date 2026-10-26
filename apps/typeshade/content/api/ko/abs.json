@@ -1,0 +1,11 @@
+{
+  "slug": "abs",
+  "source": "d40f0feefd9f2b841cb08bae7fadb85dff61f83ee6fe57148e9b971f130a1df0",
+  "texts": {
+    "summary": "abs(x): 성분별 절댓값을 구합니다.",
+    "description": "부호 없는 피연산자에는 이식 가능한 `abs` 대신 `absU` id가 쓰입니다. GLSL ES 3.00에는 `abs(uint)` 오버로드가 없어서 WebGL2 드라이버가 이 호출을 거부하기 때문입니다. 이 선택은 `divergentIntegerId`가 정하며, `\"use typeshade\"` 작성 인터페이스와 이를 공유합니다. 그래서 두 작성 인터페이스가 같은 결과를 생성합니다. 그 밖의 피연산자는 이식 가능한 표기를 그대로 유지합니다.",
+    "targets.wgsl": "`abs(a)`. `f64` 피연산자이면 fp64 패스가 이를 자체 `df64` 헬퍼로 다시 씁니다.",
+    "targets.glsl": "`abs(a)`. `f64` 피연산자이면 fp64 패스가 이를 자체 `df64` 헬퍼로 다시 씁니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "slug": "texturesamplelevel",
+  "source": "c554bde50ef94b94ca6763d8053d019e7d106b237b16ef21979a79435f322207",
+  "texts": {
+    "summary": "2D 텍스처를 명시한 밉 레벨에서 샘플링하여 vec4<f32>를 반환합니다.",
+    "description": "명시한 밉 레벨에서 2D 텍스처를 샘플링하여 `vec4<f32>`를 반환합니다. 미분이 필요 없으므로 모든 스테이지에서 쓸 수 있으며, 버텍스나 컴퓨트 셰이더는 [`textureSample`](/api/texturesample/) 대신 이 형태를 씁니다. 예를 들어 버텍스 셰이더에서 변위 맵을 읽는 경우입니다. JS 숫자 `level`은 f32 리터럴로 승격됩니다. WGSL에서는 `textureSampleLevel(t, s, uv, l)`로, GLSL에서는 `textureLod(t, uv, l)`로 적습니다. GLSL에서는 샘플러가 텍스처의 일부입니다. CPU 평가는 `gpuStubs` 옵션이 켜져 있으면 플레이스홀더를 반환합니다.",
+    "targets.wgsl": "`textureSampleLevel(tex, smp, uv, level)`.",
+    "targets.glsl": "`textureLod(tex, uv, level)`.",
+    "targets.cpu": "오라클에는 텍스처 메모리와 이웃 프래그먼트가 없습니다. `{ gpuStubs: true }`로 모듈을 컴파일하지 않으면 이 호출은 예외를 던집니다. 그 옵션으로 컴파일하면 플레이스홀더를 반환합니다."
+  }
+}

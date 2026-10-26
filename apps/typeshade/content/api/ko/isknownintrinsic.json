@@ -1,0 +1,9 @@
+{
+  "slug": "isknownintrinsic",
+  "source": "76184a0e0d34e3c051c2388301f00285f15287b8e207460c5a8c72c8b9a7c1be",
+  "texts": {
+    "summary": "name이 레지스트리가 모든 대상에서 표기할 수 있는 내장 함수이면 true를 반환합니다. 그런 내장 함수는 INTRINSICS 항목이 있는 id이거나 PORTABLE_INTRINSICS의 멤버입니다.",
+    "description": "두 조건 중 어느 쪽도 해당하지 않는 id는 사용자 정의 함수나 외부 함수이거나, 아직 아무도 분류하지 않은 내장 함수입니다. 사용자 정의 함수와 외부 함수는 어디서나 같은 방식으로 표기됩니다. [`PRE_EMIT_INTRINSICS`](/api/preemitintrinsics/)에 있는 id는 false를 반환합니다. 이 id들은 생성 전에 제거되므로 표기가 없습니다.",
+    "parameters.name": "테스트할 `call` id입니다."
+  }
+}
