@@ -138,6 +138,20 @@ try {
         "rgb(255, 255, 255)",
         "Primary action styles resolve",
       );
+      const actionFont = await page
+        .locator(".button-primary")
+        .first()
+        .evaluate((node) =>
+          getComputedStyle(node).fontFamily.split(",")[0].trim(),
+        );
+      const bodyFont = await page.evaluate(() =>
+        getComputedStyle(document.body).fontFamily.split(",")[0].trim(),
+      );
+      assert.equal(
+        actionFont,
+        bodyFont,
+        "Shared actions preserve the site font",
+      );
       if (process.env.UI_SCREENSHOTS) {
         await mkdir(process.env.UI_SCREENSHOTS, { recursive: true });
         await page.screenshot({

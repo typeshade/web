@@ -70,6 +70,7 @@
 }
 
 :root {
+  --ui-font-sans: var(--font-sans);
   color-scheme: light dark;
   /* What holds the page off the screen under the cap below, where the shell is the whole
      viewport. It is as small as a focus ring and a code frame's border can sit in. */
