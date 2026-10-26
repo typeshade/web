@@ -64,6 +64,8 @@ implementation files in this repository.
 The TypeShade website's original Git history is retained as a merge parent. Its
 compiler-rule history reader recognizes both the original and relocated gitlink
 paths, so the documentation can still compare the previous pinned compiler.
+`apps/typeshade/history.json` records the immutable legacy history boundary;
+new pins are read from this repository's first-parent history.
 TypeCV and TypeNN website snapshots include the shared-UI refactor from the
 migration workspace; their library implementation history remains upstream.
 
