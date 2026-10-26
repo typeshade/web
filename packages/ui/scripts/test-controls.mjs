@@ -23,6 +23,46 @@ try {
     () => !document.querySelector("astro-island[ssr]"),
   );
   const run = page.getByRole("button", { name: "Run model", exact: true });
+  // Real emitted CSS catches missing workspace @source registration and recipe
+  // conflicts that string-only snapshots would miss.
+  assert.deepEqual(
+    await run.evaluate((node) => {
+      const style = getComputedStyle(node);
+      return [
+        style.backgroundColor,
+        style.color,
+        style.borderRadius,
+        style.minHeight,
+      ];
+    }),
+    ["rgb(9, 88, 217)", "rgb(255, 255, 255)", "6px", "36px"],
+  );
+  for (const id of ["astro-override", "react-override"]) {
+    assert.deepEqual(
+      await page.getByTestId(id).evaluate((node) => {
+        const style = getComputedStyle(node);
+        return [
+          style.paddingLeft,
+          style.paddingRight,
+          style.minHeight,
+          style.borderRadius,
+        ];
+      }),
+      ["24px", "24px", "52px", "0px"],
+      `${id}: consumer utilities override recipe defaults`,
+    );
+  }
+  for (const [name, expected] of [
+    ["Small action", "28px"],
+    ["Large action", "44px"],
+  ]) {
+    assert.equal(
+      await page
+        .getByRole("button", { name, exact: true })
+        .evaluate((node) => getComputedStyle(node).minHeight),
+      expected,
+    );
+  }
   await run.click();
   assert.equal(
     await page.getByTestId("actions-result").textContent(),

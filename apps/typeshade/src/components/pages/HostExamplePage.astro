@@ -1,4 +1,6 @@
 ---
+import TabList from "@typeshade/site-ui/astro/TabList";
+import Tab from "@typeshade/site-ui/astro/Tab";
 import '../CodeTabs.css';
 // One host example (compiler change 0061), on a page of its own at /guide/examples/<id>/: the
 // `"use typeshade"` module and the `host.ts` that runs it, under the tab head the front page's
@@ -80,11 +82,11 @@ const tag = 'inline-block rounded-sm border border-line-2 bg-surface-1 px-[7px] 
   <p class="text-label text-text-2"><Rich text={hp.tiersNote} locale={locale} /></p>
 
   <div class="mbs-6 flex min-inline-0 flex-col gap-4" data-front-tabs>
-    <div class="tabs-head ui-tablist" role="tablist" aria-label={hp.files}>
+    <TabList class="tabs-head" aria-label={hp.files}>
       {panes.map((pane, i) => (
-        <button type="button" role="tab" id={`${paneId(pane.key)}-tab`} aria-controls={paneId(pane.key)} aria-selected={i === 0 ? 'true' : 'false'}>{pane.label}</button>
+        <Tab id={`${paneId(pane.key)}-tab`} aria-controls={paneId(pane.key)} aria-selected={i === 0 ? 'true' : 'false'}>{pane.label}</Tab>
       ))}
-    </div>
+    </TabList>
     {panes.map((pane) => (
       <div class="tabs-panel" role="tabpanel" id={paneId(pane.key)} aria-labelledby={`${paneId(pane.key)}-tab`}>
         <CodeFrame label={pane.region}><Code code={pane.code} lang="ts" locale={locale} wrap /></CodeFrame>

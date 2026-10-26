@@ -1,0 +1,22 @@
+.ui-tooltip-host {
+  display: inline-flex;
+  max-inline-size: 100%;
+}
+.ui-tooltip-content {
+  position: fixed;
+  z-index: 1000;
+  max-inline-size: min(28rem, calc(100vw - 16px));
+  padding: 6px 10px;
+  border: 1px solid var(--ui-border-control);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.2);
+  font: 13px/1.5 var(--ui-font-sans);
+  overflow-wrap: anywhere;
+}
+.ui-tooltip-host[hidden],
+.ui-tooltip-content[hidden],
+.ui-tooltip-host:has(> button[hidden]) {
+  display: none;
+}

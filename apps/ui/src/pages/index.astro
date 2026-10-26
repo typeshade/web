@@ -1,9 +1,10 @@
 ---
-import Button from '@typeshade/site-ui/astro/Button';
-import LinkButton from '@typeshade/site-ui/astro/LinkButton';
-import Examples from '../components/Examples';
-import '../styles.css';
+import Button from "@typeshade/site-ui/astro/Button";
+import LinkButton from "@typeshade/site-ui/astro/LinkButton";
+import Examples from "../components/Examples";
+import "../styles.css";
 ---
+
 <!doctype html>
 <html lang="en" data-theme="light">
   <head>
@@ -16,13 +17,26 @@ import '../styles.css';
     <main id="main">
       <a href="/patterns/">Interaction patterns</a>
       <h1>TypeShade UI workbench</h1>
-      <p>Shared controls in their interactive, disabled, loading and error states.</p>
+      <p>
+        Shared controls in their interactive, disabled, loading and error
+        states.
+      </p>
       <section aria-labelledby="astro-heading">
         <h2 id="astro-heading">Astro actions</h2>
         <div class="example-row">
-          <Button variant="primary" data-testid="astro-button">Static action</Button>
+          <Button variant="primary" data-testid="astro-button">
+            Static action
+          </Button>
           <Button disabled>Unavailable static action</Button>
-          <LinkButton href="#forms-heading" variant="primary">Open form examples</LinkButton>
+          <Button
+            class="px-ui-6 min-h-[52px] rounded-none"
+            data-testid="astro-override"
+          >
+            Custom spacing
+          </Button>
+          <LinkButton href="#forms-heading" variant="primary">
+            Open form examples
+          </LinkButton>
         </div>
       </section>
       <Examples client:load />

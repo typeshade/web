@@ -1,10 +1,10 @@
 ---
-import "../styles/compositions.css";
+import { cn, panelStyles } from "../recipes";
 import type { HTMLAttributes } from "astro/types";
 type Props = HTMLAttributes<"section">;
 const { class: className, ...attributes } = Astro.props;
 ---
 
-<section {...attributes} class:list={["ui-panel", className]}>
+<section {...attributes} class={cn(panelStyles, className)}>
   <slot />
 </section>

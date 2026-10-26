@@ -1,0 +1,32 @@
+/* Workspace packages are outside Tailwind's automatic app source detection. */
+@source "../recipes";
+@source "../astro";
+@source "../react";
+
+/* Inline mappings keep each site's runtime theme and system preference intact. */
+@theme inline {
+  --color-ui-surface: var(--ui-surface);
+  --color-ui-surface-muted: var(--ui-surface-muted);
+  --color-ui-text: var(--ui-text);
+  --color-ui-text-muted: var(--ui-text-muted);
+  --color-ui-border: var(--ui-border);
+  --color-ui-border-control: var(--ui-border-control);
+  --color-ui-accent: var(--ui-accent);
+  --color-ui-accent-hover: var(--ui-accent-hover);
+  --color-ui-accent-active: var(--ui-accent-active);
+  --color-ui-on-accent: var(--ui-on-accent);
+  --color-ui-danger: var(--ui-danger);
+  --color-ui-success: var(--ui-success);
+  --color-ui-focus: var(--ui-focus);
+  --color-ui-disabled-text: var(--ui-disabled-text);
+  --font-ui-sans: var(--ui-font-sans);
+  --radius-ui-control: var(--ui-radius-control);
+  --radius-ui-panel: var(--ui-radius-panel);
+  --spacing-ui-2: var(--ui-space-2);
+  --spacing-ui-3: var(--ui-space-3);
+  --spacing-ui-4: var(--ui-space-4);
+  --spacing-ui-6: var(--ui-space-6);
+  --spacing-ui-control: var(--ui-control-height);
+  --spacing-ui-control-small: var(--ui-control-height-small);
+  --spacing-ui-control-large: var(--ui-control-height-large);
+}

@@ -1,0 +1,11 @@
+---
+import { cn, tabListStyles } from "../recipes";
+import type { HTMLAttributes } from "astro/types";
+type Props = Omit<HTMLAttributes<"div">, "role"> &
+  ({ "aria-label": string } | { "aria-labelledby": string });
+const { class: className, ...attributes } = Astro.props;
+---
+
+<div {...attributes} role="tablist" class={cn(tabListStyles, className)}>
+  <slot />
+</div>

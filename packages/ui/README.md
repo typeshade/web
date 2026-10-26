@@ -11,17 +11,39 @@ React or Ant Design; these are optional peers supplied by interactive apps.
 - `astro/`: native HTML primitives and the product header, composed with slots.
 - `react/`: document-theme subscription and Ant Design integration for islands.
 - `styles/semantics.css`: surface, text, action, danger, focus and control roles.
-- `styles/controls.css`: shared action styling, field states and accessibility modes.
+- `recipes/`: Tailwind classes and typed CVA variants shared by Astro and React.
+- `styles/tailwind.css`: semantic token mappings and explicit workspace source detection.
+- `styles/controls.css`: the small Ant Design focus bridge.
+- `styles/tooltip.css`: positioning and visibility for the DOM tooltip controller.
 - `react/controls.tsx`: Button, IconButton, Link, Field, Input, TextArea, NumberInput,
   Select and Checkbox. Numeric and choice interaction is backed by Ant Design.
 
-Import tokens, semantics and the site's theme adapter in that order globally.
+Use Tailwind CSS v4 with the Vite plugin. Import the shared integration in each
+app's main stylesheet; it registers the package sources that automatic app
+detection does not scan:
+
+```css
+@import "tailwindcss";
+@import "@typeshade/site-ui/tokens.css";
+@import "@typeshade/site-ui/semantics.css";
+@import "@typeshade/site-ui/tailwind.css";
+/* Import the site's theme adapter after the shared defaults. */
+```
+
 A site adapter overrides roles, not individual component internals.
 Wrap React controls in ThemeProvider so the Ant controls read the same semantic
-roles as native Astro/React actions. Components import their own control,
-composition or shell stylesheet. Use `react/theme` for theme-only islands so
-their dependency graph does not include all interactive controls. CSS exports
-remain available for markup that explicitly implements the shared contracts.
+roles as native Astro/React actions. Native controls and compositions use the
+same Tailwind recipes in both renderers. CVA defines typed size/tone/variant
+choices; `cn` combines conditional classes with `clsx` and resolves conflicting
+utilities with `tailwind-merge`. Consumer `class`/`className` comes last, so
+`class="px-ui-6"` overrides button padding consistently in Astro and React.
+Keep complete class literals in recipes; dynamically constructing partial
+utility names would make Tailwind source detection miss them.
+
+Use `react/theme` for theme-only islands. Shell, generated prose/code, tooltips
+and the Ant Design DOM bridge retain owner-imported CSS where selectors need
+to reach markup outside the component. Do not add duplicate CSS skins for
+components already covered by recipes.
 
 ```tsx
 import { Field, NumberInput, Button } from '@typeshade/site-ui/react';
@@ -71,7 +93,9 @@ content; set `live` only for a new status or error. Toolbar is a labelled group,
 so its actions retain ordinary Tab order.
 
 Astro exports include `Field`, `Checkbox`, `IconButton`, `Dialog`, `Toolbar`,
-`Panel` and `Alert`. Native Field requires an explicit `id` and `label`; use
+`Panel`, `Alert`, `TabList` and `Tab`. The tab primitives render the shared
+appearance and roles; IDs, panels and the DOM controller remain explicit.
+Native Field requires an explicit `id` and `label`; use
 `as="select"` with option children or `as="textarea"` with text children. Set
 `hidden` on Field to hide the label and control together. Native IconButton adds
 a focus/hover tooltip using `description` (or the required label).

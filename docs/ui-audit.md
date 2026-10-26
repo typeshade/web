@@ -139,3 +139,27 @@ cover inserted-prelude mapping, independent editor instances, clearing mapping
 when a program changes, and provider state after a file rename/client reconnect.
 Browser smoke coverage includes EN/KO documentation/API routes in addition to
 home, lab and playground. No production deployment is part of this change.
+
+## Tailwind component recipes
+
+Shared native controls and compositions now use Tailwind v4 utilities. A single
+`packages/ui/recipes` module defines CVA button/alert variants and field, panel,
+toolbar, dialog and tab classes for both Astro and React. The existing semantic
+CSS variables map to `ui-*` theme utilities, preserving site palettes and runtime
+theme switching. `@source` declarations explicitly register the workspace package;
+the UI workbench now uses the same Tailwind Vite plugin as the production apps.
+
+`cn` combines clsx and tailwind-merge. It registers the custom spacing and radius
+scales so consumer utilities actually replace recipe defaults. Browser checks
+verify emitted primary colors, sizes, radius and Astro/React padding/height/radius
+overrides, in addition to existing interaction, accessibility and theme checks.
+Native code/output tablists adopt shared TabList/Tab primitives while each app
+keeps its panel and editor behavior. Complete class literals live in the recipes;
+no runtime construction of partial utility names or safelist is required.
+
+The old control and composition skins are removed. Owner CSS remains for the
+Ant Design focus bridge, dynamically positioned tooltips, product reading/home
+surfaces, generated Markdown/code and complex editor/graph styling. Existing Ant
+Design controls retain their validated interaction behavior. This migration uses
+Tailwind as the default for shared primitives; it does not claim that every page
+selector or application state machine has been replaced.

@@ -74,6 +74,12 @@ export default function Examples() {
           <Button size="small">Small action</Button>
           <Button>Default action</Button>
           <Button size="large">Large action</Button>
+          <Button
+            className="px-ui-6 min-h-[52px] rounded-none"
+            data-testid="react-override"
+          >
+            Custom spacing
+          </Button>
           <Button variant="primary" lang="ko">
             선택한 데이터셋으로 새로운 모델 학습을 시작합니다
           </Button>

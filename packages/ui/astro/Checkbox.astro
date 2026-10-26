@@ -1,12 +1,11 @@
 ---
-import "../styles/compositions.css";
-import "../styles/controls.css";
+import { cn, checkboxStyles } from "../recipes";
 import type { HTMLAttributes } from "astro/types";
 type Props = Omit<HTMLAttributes<"input">, "type"> & { label: string };
 const { label, class: className, ...attributes } = Astro.props;
 ---
 
-<label class:list={["ui-native-checkbox", className]}>
-  <input {...attributes} type="checkbox" />
+<label class={cn(checkboxStyles.root, className)}>
+  <input {...attributes} class={checkboxStyles.input} type="checkbox" />
   <span>{label}</span>
 </label>

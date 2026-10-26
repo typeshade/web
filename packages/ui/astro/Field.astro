@@ -1,6 +1,5 @@
 ---
-import "../styles/compositions.css";
-import "../styles/controls.css";
+import { cn, fieldStyles, nativeControlStyles } from "../recipes";
 import type { HTMLAttributes } from "astro/types";
 type Props = HTMLAttributes<"input"> & {
   id: string;
@@ -28,14 +27,19 @@ const descriptionIds =
 const props = {
   ...attributes,
   id,
-  class: ["ui-native-control", className].filter(Boolean).join(" "),
+  class: cn(nativeControlStyles, className),
   "aria-describedby": descriptionIds,
   "aria-invalid": error ? "true" : attributes["aria-invalid"],
 };
 ---
 
-<div class="ui-field" hidden={hidden} data-invalid={error ? true : undefined}>
-  <label class="ui-field-label" for={id}>
+<div
+  class={fieldStyles.root}
+  data-disabled={attributes.disabled || undefined}
+  hidden={hidden}
+  data-invalid={error ? true : undefined}
+>
+  <label class={fieldStyles.label} for={id}>
     {label}
     {attributes.required && <span aria-hidden="true"> *</span>}
   </label>
@@ -49,11 +53,11 @@ const props = {
     <input {...props} />
   )}
   {description && (
-    <p class="ui-field-description" id={`${id}-description`}>
+    <p class={fieldStyles.description} id={`${id}-description`}>
       {description}
     </p>
   )}
-  <p class="ui-field-error" id={`${id}-error`} role="alert" hidden={!error}>
+  <p class={fieldStyles.error} id={`${id}-error`} role="alert" hidden={!error}>
     {error}
   </p>
 </div>

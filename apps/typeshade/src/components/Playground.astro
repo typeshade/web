@@ -1,4 +1,7 @@
 ---
+import {nativeControlStyles} from "@typeshade/site-ui/recipes";
+import TabList from "@typeshade/site-ui/astro/TabList";
+import Tab from "@typeshade/site-ui/astro/Tab";
 import './GalleryTile.css';
 import Button from '@typeshade/site-ui/astro/Button';
 import Field from '@typeshade/site-ui/astro/Field';
@@ -187,14 +190,14 @@ const { t, host, examples, seeded, library, opening, importsBefore, importsAfter
         paints nothing and re-runs nothing. */}
     <div class="result-column">
       <div class="pane-title result-head">
-        <div class="output-tabs ui-tablist" role="tablist" aria-label={t.output}>
-          <button type="button" role="tab" id="pg-tab-result" aria-controls="pg-panel-result" data-target="result" aria-selected="true" tabindex="0">{t.resultTab}</button>
-          <button type="button" role="tab" id="pg-tab-wgsl" aria-controls="pg-output" data-target="wgsl" aria-selected="false" tabindex="-1">{t.wgslTab}</button>
-          <button type="button" role="tab" id="pg-tab-glslVertex" aria-controls="pg-output" data-target="glslVertex" aria-selected="false" tabindex="-1">{t.glslVertexTab}</button>
-          <button type="button" role="tab" id="pg-tab-glslFragment" aria-controls="pg-output" data-target="glslFragment" aria-selected="false" tabindex="-1">{t.glslFragmentTab}</button>
-          <button type="button" role="tab" id="pg-tab-reflection" aria-controls="pg-panel-reflection" data-target="reflection" aria-selected="false" tabindex="-1">{t.reflection}</button>
-          <button type="button" role="tab" id="pg-tab-console" aria-controls="pg-panel-console" data-target="console" aria-selected="false" tabindex="-1">{t.consoleTab}</button>
-        </div>
+        <TabList class="output-tabs" aria-label={t.output}>
+          <Tab id="pg-tab-result" aria-controls="pg-panel-result" data-target="result" aria-selected="true" tabindex="0">{t.resultTab}</Tab>
+          <Tab id="pg-tab-wgsl" aria-controls="pg-output" data-target="wgsl" aria-selected="false" tabindex="-1">{t.wgslTab}</Tab>
+          <Tab id="pg-tab-glslVertex" aria-controls="pg-output" data-target="glslVertex" aria-selected="false" tabindex="-1">{t.glslVertexTab}</Tab>
+          <Tab id="pg-tab-glslFragment" aria-controls="pg-output" data-target="glslFragment" aria-selected="false" tabindex="-1">{t.glslFragmentTab}</Tab>
+          <Tab id="pg-tab-reflection" aria-controls="pg-panel-reflection" data-target="reflection" aria-selected="false" tabindex="-1">{t.reflection}</Tab>
+          <Tab id="pg-tab-console" aria-controls="pg-panel-console" data-target="console" aria-selected="false" tabindex="-1">{t.consoleTab}</Tab>
+        </TabList>
         {/* The controls the selected tab owns, one group per tab, in the row the tabs are in. */}
         <div class="canvas-meta" data-meta="result">
           <Field as="select" id="playground-engine" label={t.engine} data-engine>
@@ -204,7 +207,7 @@ const { t, host, examples, seeded, library, opening, importsBefore, importsAfter
             <option value="cpu">{t.engineCpu}</option>
           </Field>
           <label for="playground-resolution" data-cpu-only hidden>{t.resolution}</label>
-          <select class="ui-native-control" id="playground-resolution" data-resolution data-cpu-only hidden>
+          <select class={nativeControlStyles} id="playground-resolution" data-resolution data-cpu-only hidden>
             <option value="64">64 × 48</option>
             <option value="128">128 × 96</option>
             <option value="192" selected>192 × 144</option>

@@ -33,7 +33,7 @@ try {
           ),
         ].some(
           (tab) =>
-            tab.textContent === name &&
+            tab.textContent.trim() === name &&
             tab.getAttribute("aria-selected") === "true",
         ),
       { label: await list.getAttribute("aria-label"), name },

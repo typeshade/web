@@ -9,6 +9,7 @@ const common = new Set([
   "antd/dist/reset.css",
   "@typeshade/site-ui/tokens.css",
   "@typeshade/site-ui/semantics.css",
+  "@typeshade/site-ui/tailwind.css",
   "@typeshade/site-ui/motion.css",
 ]);
 const local = new Set([

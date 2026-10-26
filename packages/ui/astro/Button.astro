@@ -1,11 +1,7 @@
 ---
-import "../styles/controls.css";
+import { cn, buttonVariants, type ButtonVariants } from "../recipes";
 import type { HTMLAttributes } from "astro/types";
-type Props = HTMLAttributes<"button"> & {
-  variant?: "primary" | "secondary" | "quiet";
-  tone?: "neutral" | "danger";
-  size?: "small" | "default" | "large";
-};
+type Props = HTMLAttributes<"button"> & ButtonVariants;
 const {
   variant = "secondary",
   tone = "neutral",
@@ -19,7 +15,7 @@ const {
 <button
   {...attributes}
   type={type}
-  class:list={["ui-button", className]}
+  class={cn(buttonVariants({ variant, tone, size }), className)}
   data-variant={variant}
   data-tone={tone}
   data-size={size}

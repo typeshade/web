@@ -1,48 +1,51 @@
+@import "tailwindcss";
 @import "@typeshade/site-ui/tokens.css";
 @import "@typeshade/site-ui/semantics.css";
-@import "@typeshade/site-ui/controls.css";
-@import "@typeshade/site-ui/compositions.css";
-:root {
-  --ui-font-sans: system-ui, sans-serif;
-}
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-  background: var(--ui-surface);
-  color: var(--ui-text);
-  font-family: var(--ui-font-sans);
-  line-height: 1.6;
-}
-a {
-  color: var(--ui-link);
-}
-main {
-  max-inline-size: 1100px;
-  margin-inline: auto;
-  padding: 24px;
-}
-h1 {
-  font-size: clamp(1.6rem, 5vw, 2.2rem);
-}
-h2 {
-  font-size: 1.25rem;
-}
-section {
-  border-block-start: 1px solid var(--ui-border);
-  padding-block: 20px;
-}
-.example-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-block: 16px;
-}
-.example-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-  gap: 24px;
-  margin-block: 24px;
+@import "@typeshade/site-ui/tailwind.css";
+
+@layer base {
+  :root {
+    --ui-font-sans: system-ui, sans-serif;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    font-family: var(--ui-font-sans);
+    line-height: 1.6;
+  }
+  a {
+    color: var(--ui-link);
+  }
+  main {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding: 24px;
+  }
+  h1 {
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+  }
+  h2 {
+    font-size: 1.25rem;
+  }
+  section {
+    border-block-start: 1px solid var(--ui-border);
+    padding-block: 20px;
+  }
+  .example-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-block: 16px;
+  }
+  .example-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 24px;
+    margin-block: 24px;
+  }
 }

@@ -1,5 +1,5 @@
 ---
-import "../styles/compositions.css";
+import { cn, toolbarStyles } from "../recipes";
 import type { HTMLAttributes } from "astro/types";
 type Props = HTMLAttributes<"div"> & { label: string };
 const { label, class: className, ...attributes } = Astro.props;
@@ -7,7 +7,7 @@ const { label, class: className, ...attributes } = Astro.props;
 
 <div
   {...attributes}
-  class:list={["ui-toolbar", className]}
+  class={cn(toolbarStyles, className)}
   role="group"
   aria-label={label}
 >

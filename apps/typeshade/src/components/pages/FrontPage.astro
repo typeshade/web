@@ -1,4 +1,6 @@
 ---
+import TabList from "@typeshade/site-ui/astro/TabList";
+import Tab from "@typeshade/site-ui/astro/Tab";
 import '../DocAlert.css';
 import '../CodeTabs.css';
 import '../GalleryTile.css';
@@ -130,10 +132,10 @@ const quickStart = localePath(locale, links.quickStart.href);
         </CodeFrame>
       </div>
       <div class="flex min-inline-0 flex-col gap-4 lg:gap-6" data-front-tabs>
-        <div class="tabs-head ui-tablist" role="tablist" aria-label={f.targets.h}>
-          <button type="button" role="tab" id="targets-tab-wgsl" aria-controls="targets-panel-wgsl" aria-selected="true">{f.targets.wgsl}</button>
-          <button type="button" role="tab" id="targets-tab-glsl" aria-controls="targets-panel-glsl" aria-selected="false">{f.targets.glsl}</button>
-        </div>
+        <TabList class="tabs-head" aria-label={f.targets.h}>
+          <Tab id="targets-tab-wgsl" aria-controls="targets-panel-wgsl" aria-selected="true">{f.targets.wgsl}</Tab>
+          <Tab id="targets-tab-glsl" aria-controls="targets-panel-glsl" aria-selected="false">{f.targets.glsl}</Tab>
+        </TabList>
         {/* The tab already names the target, so the frame inside the panel carries no title
             bar of its own; the label stays as the code region's accessible name. */}
         <div class="tabs-panel" role="tabpanel" id="targets-panel-wgsl" aria-labelledby="targets-tab-wgsl">
