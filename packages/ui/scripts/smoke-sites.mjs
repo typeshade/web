@@ -1,7 +1,8 @@
+import AxeBuilder from "@axe-core/playwright";
+import { serve } from "./serve.mjs";
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
-import { readFile, stat, mkdir } from "node:fs/promises";
-import { resolve, extname, sep } from "node:path";
+import { stat, mkdir } from "node:fs/promises";
+import { resolve } from "node:path";
 import { chromium } from "playwright";
 
 const roots = process.argv.slice(2).map((directory) => resolve(directory));
@@ -10,47 +11,15 @@ const browser = await chromium.launch({
   executablePath: process.env.UI_CHROMIUM || undefined,
   args: ["--no-sandbox"],
 });
-const mime = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-  ".wasm": "application/wasm",
-};
 try {
   for (const root of roots) {
-    const server = createServer(async (request, response) => {
-      try {
-        let file = resolve(
-          root,
-          "." +
-            decodeURIComponent(
-              new URL(request.url, "http://localhost").pathname,
-            ),
-        );
-        assert.ok(file === root || file.startsWith(root + sep));
-        if ((await stat(file)).isDirectory())
-          file = resolve(file, "index.html");
-        response.setHeader(
-          "Content-Type",
-          mime[extname(file)] ?? "application/octet-stream",
-        );
-        response.end(await readFile(file));
-      } catch {
-        response.writeHead(404);
-        response.end();
-      }
-    });
-    await new Promise((done) => server.listen(0, "127.0.0.1", done));
-    const base = `http://127.0.0.1:${server.address().port}`;
+    const { server, base } = await serve(root);
     const context = await browser.newContext({ colorScheme: "light" });
     const page = await context.newPage();
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     try {
-      for (const route of ["/", "/ko/", "/playground/", "/lab/"]) {
+      for (const route of ["/", "/ko/", "/playground/", "/lab/", "/ko/lab/"]) {
         try {
           await stat(resolve(root, "." + route, "index.html"));
         } catch {
@@ -72,6 +41,51 @@ try {
             await page.locator('a[href="#main"]').count(),
             "Skip link exists",
           );
+        }
+        if (
+          route.endsWith("/lab/") &&
+          (root.includes("typenn") || root.includes("typecv"))
+        ) {
+          await page.waitForFunction(
+            () => !document.querySelector("astro-island[ssr]"),
+          );
+          const wiring = await page.locator(".ui-field").evaluateAll((fields) =>
+            fields.map((field) => {
+              const label = field.querySelector("label");
+              const control = label && document.getElementById(label.htmlFor);
+              return Boolean(
+                label?.textContent &&
+                control &&
+                field.contains(control) &&
+                (control.getAttribute("aria-describedby") || "")
+                  .split(" ")
+                  .filter(Boolean)
+                  .every((id) => document.getElementById(id)),
+              );
+            }),
+          );
+          assert.ok(
+            wiring.length > 0 && wiring.every(Boolean),
+            `${route} field associations`,
+          );
+          const audit = await new AxeBuilder({ page })
+            .include(root.includes("typenn") ? ".lab-form" : ".sfm-inputs")
+            .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+            .analyze();
+          assert.deepEqual(
+            audit.violations.map((v) => ({
+              id: v.id,
+              targets: v.nodes.map((n) => n.target),
+            })),
+            [],
+            `${route} form accessibility`,
+          );
+          if (root.includes("typecv")) {
+            const focal = page.getByRole("spinbutton");
+            await focal.fill("1.5");
+            await page.keyboard.press("Tab");
+            assert.equal(await focal.inputValue(), "1.5");
+          }
         }
       }
       if (root.includes("typenn")) {

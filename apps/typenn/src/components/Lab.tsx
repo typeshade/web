@@ -1,5 +1,11 @@
-import { ThemeProvider } from "@typeshade/site-ui/react";
-import { Button, InputNumber, Progress, Select, Table } from "antd";
+import {
+  ThemeProvider,
+  Button,
+  Field,
+  NumberInput,
+  Select,
+} from "@typeshade/site-ui/react";
+import { Progress, Table } from "antd";
 import { useTrainingLab } from "../hooks/useTrainingLab";
 import {
   copyJson,
@@ -164,77 +170,69 @@ export default function Lab({ locale }: { locale: Locale }) {
         <section className="lab-section" aria-labelledby="lab-model">
           <h2 id="lab-model">{words.modelTitle}</h2>
           <div className="lab-form">
-            <label className="lab-field">
-              {words.preset}
+            <Field
+              label={words.preset}
+              disabled={running || presets.length < 2}
+            >
               <Select<Preset>
                 value={form.model}
-                disabled={running || presets.length < 2}
                 onChange={(value) => setForm({ ...form, model: value })}
                 options={(presets.length ? presets : [form.model]).map((p) => ({
                   value: p,
                   label: words[p],
                 }))}
               />
-            </label>
-            <label className="lab-field">
-              {words.hidden}
-              <InputNumber
+            </Field>
+            <Field
+              label={words.hidden}
+              disabled={running || form.model === "cnn"}
+            >
+              <NumberInput
                 min={1}
                 max={4096}
                 step={16}
                 value={form.hidden}
-                disabled={running || form.model === "cnn"}
                 onChange={(v) => v && setForm({ ...form, hidden: v })}
               />
-            </label>
-            <label className="lab-field">
-              {words.optimizer}
+            </Field>
+            <Field label={words.optimizer} disabled={running}>
               <Select
                 value={form.optimizer}
-                disabled={running}
                 onChange={(v) => setForm({ ...form, optimizer: v })}
                 options={[
                   { value: "adam", label: "Adam" },
                   { value: "sgd", label: "SGD" },
                 ]}
               />
-            </label>
-            <label className="lab-field">
-              {words.learningRate}
-              <InputNumber
+            </Field>
+            <Field label={words.learningRate} disabled={running}>
+              <NumberInput
                 min={0.00001}
                 max={1}
                 step={0.0001}
                 value={form.learningRate}
-                disabled={running}
                 onChange={(v) => v && setForm({ ...form, learningRate: v })}
               />
-            </label>
-            <label className="lab-field">
-              {words.batchSize}
-              <InputNumber
+            </Field>
+            <Field label={words.batchSize} disabled={running}>
+              <NumberInput
                 min={1}
                 max={1024}
                 value={form.batchSize}
-                disabled={running}
                 onChange={(v) => v && setForm({ ...form, batchSize: v })}
               />
-            </label>
-            <label className="lab-field">
-              {words.epochs}
-              <InputNumber
+            </Field>
+            <Field label={words.epochs} disabled={running}>
+              <NumberInput
                 min={1}
                 max={100}
                 value={form.epochs}
-                disabled={running}
                 onChange={(v) => v && setForm({ ...form, epochs: v })}
               />
-            </label>
-            <label className="lab-field">
-              {words.tier}
+            </Field>
+            <Field label={words.tier} disabled={running}>
               <Select<TierPreference>
                 value={form.tier}
-                disabled={running}
                 onChange={(v) => setForm({ ...form, tier: v })}
                 options={[
                   { value: "auto", label: words.auto },
@@ -243,7 +241,7 @@ export default function Lab({ locale }: { locale: Locale }) {
                   { value: "webgl2", label: words.webgl2 },
                 ]}
               />
-            </label>
+            </Field>
           </div>
           {info && (
             <p className="lab-note">
@@ -263,7 +261,7 @@ export default function Lab({ locale }: { locale: Locale }) {
           <div className="lab-run-bar">
             {running ? (
               <Button
-                danger
+                tone="danger"
                 onClick={() => {
                   stopRef.current = true;
                   setStopping(true);
@@ -274,7 +272,7 @@ export default function Lab({ locale }: { locale: Locale }) {
               </Button>
             ) : (
               <Button
-                type="primary"
+                variant="primary"
                 onClick={() =>
                   void runTraining({ ...form, dataset: selected }).catch(
                     () => undefined,
@@ -482,7 +480,7 @@ export default function Lab({ locale }: { locale: Locale }) {
             ) : (
               <div className="lab-run-bar">
                 <Button
-                  type="primary"
+                  variant="primary"
                   onClick={() => void activateModel(selected)}
                 >
                   {words.loadModel}
@@ -496,7 +494,7 @@ export default function Lab({ locale }: { locale: Locale }) {
               </p>
               <div className="lab-run-bar">
                 <Button
-                  type="primary"
+                  variant="primary"
                   onClick={trainQuick}
                   disabled={!info || !manifest}
                 >

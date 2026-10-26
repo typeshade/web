@@ -11,7 +11,7 @@
   padding: 14px 18px;
   color: #fff;
   font:
-    500 11px 'IBM Plex Mono',
+    500 11px "IBM Plex Mono",
     monospace;
   border-bottom: 1px solid var(--ui-white) 1c;
 }
@@ -33,7 +33,7 @@
   padding: 12px;
   color: #fff;
   font:
-    12px 'IBM Plex Mono',
+    12px "IBM Plex Mono",
     monospace;
 }
 .home-path .section-intro {
@@ -67,7 +67,7 @@
 .path-strip a > span {
   color: var(--brand);
   font:
-    11px 'IBM Plex Mono',
+    11px "IBM Plex Mono",
     monospace;
 }
 .path-strip strong {
@@ -90,7 +90,7 @@
 }
 .home-status strong {
   font:
-    600 26px 'IBM Plex Mono',
+    600 26px "IBM Plex Mono",
     monospace;
 }
 .home-status small {
@@ -100,29 +100,6 @@
   padding: 24px;
   border: 1px solid var(--line);
   border-radius: var(--ui-radius-panel);
-  background: var(--panel);
-}
-.button-primary,
-.button-secondary {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 9px 15px;
-  border: 1px solid var(--line);
-  border-radius: var(--ui-radius-control);
-  font-size: 13px;
-  font-weight: 550;
-}
-.button-primary {
-  color: #fff;
-  border-color: var(--brand);
-  background: var(--brand);
-}
-.button-primary:hover {
-  color: #fff;
-  filter: brightness(0.92);
-}
-.button-secondary {
   background: var(--panel);
 }
 .lab-main {
@@ -186,7 +163,7 @@
   padding: 7px 10px;
   color: var(--muted);
   font:
-    11px 'IBM Plex Mono',
+    11px "IBM Plex Mono",
     monospace;
 }
 .playground-page {
@@ -242,7 +219,7 @@
 .metrics dd {
   margin: 5px 0 0;
   font:
-    600 19px 'IBM Plex Mono',
+    600 19px "IBM Plex Mono",
     monospace;
 }
 .result-grid {

@@ -1,0 +1,44 @@
+/* Site adapters supply existing surface/text aliases; components consume only ui-* roles. */
+:root {
+  --ui-surface: var(--panel, var(--color-ground, #fff));
+  --ui-surface-muted: var(--soft, var(--color-surface-1, #fafafa));
+  --ui-text: var(--ink, var(--color-text-1, #141414));
+  --ui-text-muted: var(--muted, var(--color-text-2, #595959));
+  --ui-border: var(--line, var(--color-line-2, #d9d9d9));
+  /* Control borders must remain visible against the container. */
+  --ui-border-control: #8c8c8c;
+  --ui-accent: #0958d9;
+  --ui-accent-hover: #003eb3;
+  --ui-accent-active: #002c8c;
+  --ui-on-accent: #fff;
+  --ui-danger: #b42318;
+  --ui-focus: #0958d9;
+  --ui-disabled-text: #707070;
+  --ui-control-height: 36px;
+  --ui-control-height-small: 28px;
+  --ui-control-height-large: 44px;
+  --ui-font-size-control: 14px;
+  --ui-font-size-label: 13px;
+  --ui-focus-width: 2px;
+  --ui-focus-offset: 3px;
+}
+:root[data-theme="dark"] {
+  --ui-border-control: #8c8c8c;
+  --ui-accent: #1668dc;
+  --ui-accent-hover: #1554ad;
+  --ui-accent-active: #15325b;
+  --ui-danger: #ff7875;
+  --ui-focus: #91caff;
+  --ui-disabled-text: #999999;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ui-border-control: #8c8c8c;
+    --ui-accent: #1668dc;
+    --ui-accent-hover: #1554ad;
+    --ui-accent-active: #15325b;
+    --ui-danger: #ff7875;
+    --ui-focus: #91caff;
+    --ui-disabled-text: #999999;
+  }
+}

@@ -12,3 +12,6 @@
 @import "./responsive.css";
 @import "./training.css";
 @import "./graph.css";
+
+@import "@typeshade/site-ui/semantics.css";
+@import "@typeshade/site-ui/controls.css";

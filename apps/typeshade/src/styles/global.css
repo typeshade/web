@@ -12,3 +12,6 @@
 @import './footer.css';
 @import './reference.css';
 @import './accessibility.css';
+
+@import '@typeshade/site-ui/semantics.css';
+@import '@typeshade/site-ui/controls.css';

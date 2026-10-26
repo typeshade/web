@@ -14,3 +14,16 @@
   font-size: 13px;
   line-height: 1.5;
 }
+
+.sfm-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--ui-space-4);
+  align-items: start;
+}
+.sfm-inputs > * {
+  min-inline-size: 0;
+}
+.sfm-inputs .ui-button {
+  inline-size: 100%;
+}
