@@ -78,21 +78,21 @@
   font-size: 12px;
   line-height: 1.6;
 }
-:where(.cv-home) .home-status {
+:where(.cv-home) .experiment-summary {
   display: block;
 }
-:where(.cv-home) .home-status strong,
-:where(.cv-home) .home-status span,
-:where(.cv-home) .home-status small {
+:where(.cv-home) .experiment-summary strong,
+:where(.cv-home) .experiment-summary span,
+:where(.cv-home) .experiment-summary small {
   display: block;
   margin: 9px 0;
 }
-:where(.cv-home) .home-status strong {
+:where(.cv-home) .experiment-summary strong {
   font:
     600 26px "IBM Plex Mono",
     monospace;
 }
-:where(.cv-home) .home-status small {
+:where(.cv-home) .experiment-summary small {
   color: var(--ui-text-muted);
 }
 :where(.cv-home) .home-learning > div + div {
@@ -123,16 +123,8 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :where(.cv-home) html {
-    scroll-behavior: auto;
-  }
-
-  :where(.cv-home) *,
-  :where(.cv-home) *::before,
-  :where(.cv-home) *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+:where(.cv-home) .home-note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--ui-text-muted);
 }
