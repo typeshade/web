@@ -46,6 +46,38 @@ try {
           await page.locator("h1").first().waitFor();
           assert.equal(await page.locator("h1").count(), 1, route);
           await page.evaluate(() => document.fonts.ready);
+          if (await page.locator(".ui-home").count()) {
+            const typography = await page.evaluate(() => ({
+              heading: parseFloat(
+                getComputedStyle(document.querySelector(".home-copy h1"))
+                  .fontSize,
+              ),
+              codePadding: parseFloat(
+                getComputedStyle(
+                  document.querySelector(".code-frame .astro-code"),
+                ).paddingLeft,
+              ),
+            }));
+            assert.ok(
+              typography.heading >= 42,
+              "Home heading survives reset and stylesheet import order",
+            );
+            assert.ok(
+              typography.codePadding >= 13,
+              "Code block keeps its readable inset",
+            );
+          }
+          if (await page.locator(".page-heading h1").count()) {
+            assert.ok(
+              await page
+                .locator(".page-heading h1")
+                .evaluate(
+                  (node) => parseFloat(getComputedStyle(node).fontSize) >= 36,
+                ),
+              "PageHeading owns its title typography",
+            );
+          }
+
           assert.ok(
             await page.evaluate(
               () => document.documentElement.scrollWidth <= innerWidth + 1,

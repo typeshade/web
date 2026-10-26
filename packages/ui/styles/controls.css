@@ -1,3 +1,4 @@
+@layer theme, base, antd, components, utilities;
 @layer components {
   /* Ant Design renders these focus targets internally. Keep its DOM bridge local. */
   .ui-field :is(input, textarea, .ant-select-selector):focus-visible,

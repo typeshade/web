@@ -214,3 +214,8 @@ can override it. It retains product typography, code and generated content rules
 global entries continue to contain base layers only. This improves ownership,
 not a promise to minimize generated Tailwind CSS bytes or to replace every
 domain-specific stylesheet.
+
+Layered component styles declare the same layer order before their first block,
+including when a component import is emitted before the global entry. Browser
+smoke checks assert home/page heading size and code padding to detect reset
+precedence regressions; DOM structure and overflow checks alone miss them.

@@ -1,3 +1,4 @@
+@layer theme, base, antd, components, utilities;
 @layer components {
   :where(.ui-reading) .lead {
     max-width: 66ch;
