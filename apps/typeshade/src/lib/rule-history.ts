@@ -7,7 +7,7 @@
 // verifying files) moved. Nothing here is typed by hand, and a history the build cannot read
 // stops the build: an empty list would say that nothing changed.
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import legacy from '../../history.json';
 import { byNumber, frontMatter, type Verification } from './design-rules.ts';
 
 const SUBMODULE = 'vendor/shader-dsl';
@@ -66,9 +66,6 @@ function pinOf(full: string): Pin {
  *  current one, or undefined when the history holds no other. A shallow clone that stops before
  *  it cannot tell the two apart, so it stops the build. */
 function previousPin(current: string): string | undefined {
-  const legacy = JSON.parse(
-    readFileSync(new URL('../../history.json', import.meta.url), 'utf8'),
-  ) as { legacyHead: string; legacyPath: string };
   const histories = [
     { ref: 'HEAD', path: git(['rev-parse', '--show-prefix']) + SUBMODULE },
     { ref: legacy.legacyHead, path: legacy.legacyPath },
