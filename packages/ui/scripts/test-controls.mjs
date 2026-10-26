@@ -23,6 +23,19 @@ try {
     () => !document.querySelector("astro-island[ssr]"),
   );
   const run = page.getByRole("button", { name: "Run model", exact: true });
+  for (const selector of [".ui-number-input", ".ui-select"]) {
+    const widths = await page
+      .locator(selector)
+      .first()
+      .evaluate((node) => [
+        node.getBoundingClientRect().width,
+        node.closest(".ui-field").getBoundingClientRect().width,
+      ]);
+    assert.ok(
+      Math.abs(widths[0] - widths[1]) < 1,
+      `${selector}: Tailwind sizing wins over the Ant default width`,
+    );
+  }
   // Real emitted CSS catches missing workspace @source registration and recipe
   // conflicts that string-only snapshots would miss.
   assert.deepEqual(

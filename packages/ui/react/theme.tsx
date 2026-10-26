@@ -1,4 +1,5 @@
 import "../styles/theme-switch.css";
+import { StyleProvider } from "@ant-design/cssinjs";
 import { ConfigProvider, Switch, theme, type ThemeConfig } from "antd";
 import { useEffect, useState, type ReactNode } from "react";
 
@@ -64,14 +65,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     });
   }, [dark]);
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
-        token: tokens,
-      }}
-    >
-      {children}
-    </ConfigProvider>
+    <StyleProvider layer>
+      <ConfigProvider
+        theme={{
+          algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+          token: tokens,
+        }}
+      >
+        {children}
+      </ConfigProvider>
+    </StyleProvider>
   );
 }
 

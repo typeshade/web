@@ -163,3 +163,10 @@ surfaces, generated Markdown/code and complex editor/graph styling. Existing Ant
 Design controls retain their validated interaction behavior. This migration uses
 Tailwind as the default for shared primitives; it does not claim that every page
 selector or application state machine has been replaced.
+
+The cascade order is declared before imports as `theme, base, antd, components,
+utilities`. Ant's reset is imported into `base`, and ThemeProvider uses the
+existing Ant CSS-in-JS package's official `StyleProvider layer` support. This
+keeps its default input sizing below consumer utilities without important rules.
+The browser suite checks that numeric/select controls fill their field, and the
+source boundary check protects the reset/layer order.

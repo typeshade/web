@@ -1,5 +1,6 @@
+@layer theme, base, antd, components, utilities;
 @import "tailwindcss";
-@import "antd/dist/reset.css";
+@import "antd/dist/reset.css" layer(base);
 @import "@typeshade/site-ui/tokens.css";
 @import "@typeshade/site-ui/semantics.css";
 @import "@typeshade/site-ui/tailwind.css";

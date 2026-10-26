@@ -33,7 +33,8 @@
     "antd": ">=5 <6",
     "astro": ">=6 <8",
     "react": ">=19 <20",
-    "react-dom": ">=19 <20"
+    "react-dom": ">=19 <20",
+    "@ant-design/cssinjs": ">=1.24 <2"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -43,6 +44,9 @@
       "optional": true
     },
     "react-dom": {
+      "optional": true
+    },
+    "@ant-design/cssinjs": {
       "optional": true
     }
   },

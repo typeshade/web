@@ -23,6 +23,7 @@ app's main stylesheet; it registers the package sources that automatic app
 detection does not scan:
 
 ```css
+@layer theme, base, antd, components, utilities;
 @import "tailwindcss";
 @import "@typeshade/site-ui/tokens.css";
 @import "@typeshade/site-ui/semantics.css";
@@ -31,6 +32,11 @@ detection does not scan:
 ```
 
 A site adapter overrides roles, not individual component internals.
+If using Ant's reset, import it with `layer(base)`. `ThemeProvider` uses
+`@ant-design/cssinjs`'s `StyleProvider layer`, so Ant styles sit in the `antd`
+layer and consumer utilities can override their sizing. React consumers supply
+the optional `@ant-design/cssinjs` peer alongside Ant Design. Keep the layer order
+before imports; declaring it after Tailwind would put Ant above the utilities.
 Wrap React controls in ThemeProvider so the Ant controls read the same semantic
 roles as native Astro/React actions. Native controls and compositions use the
 same Tailwind recipes in both renderers. CVA defines typed size/tone/variant
