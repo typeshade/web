@@ -204,6 +204,12 @@ starter races, workspace disposal and nested import paths. The browser suite
 adds nested file creation/rename/deletion, import updates, actual CPU worker
 rendering, playback controls and explicit host execution/stop.
 
+Monaco is pinned to 0.57.0, which handles cancellation of its occurrence-highlight
+timer during model changes. The browser regression switches file tabs within
+the pending timer; it reproduced an unhandled `Canceled` rejection on 0.52.2.
+The newer AMD entry owns its worker URLs and Blob shims, replacing the obsolete
+`workerMain.js` shim. Client exceptions remain test failures.
+
 Product pages use shared Tailwind `Eyebrow`, `TextLink`, `Breadcrumbs`, `LinkList`,
 `LinkItem`, `PageHeading`, `HomeHero`, `HomeSection` and `StepGrid` components.
 PageHeading owns its h1 and optional description; HomeSection owns its default,

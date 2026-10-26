@@ -121,6 +121,17 @@ export function fs(@location(0) uv: vec2): Color {
     "The renamed Monaco model is disposed",
   );
 
+  // Switch during Monaco's delayed occurrence highlight, before its 50ms timer
+  // runs. Older Monaco versions rejected the disposed timer without a handler.
+  await page.evaluate(() => {
+    const editor = window.monaco.editor.getEditors()[0];
+    editor.focus();
+    editor.setPosition({ lineNumber: 2, column: 3 });
+    document.querySelector('[data-file-tab="main.shade.ts"]').click();
+    editor.setPosition({ lineNumber: 3, column: 2 });
+    document.querySelector('[data-file-tab="lib/colors.shade.ts"]').click();
+  });
+
   // A real worker-pool draw verifies that the moved worker URL is bundled by Vite.
   await page.locator('[data-target="result"]').click();
   await page.locator("[data-engine]").selectOption("cpu");
