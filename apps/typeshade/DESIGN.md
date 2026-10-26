@@ -196,12 +196,12 @@ and has a matching Korean cut.
 ## Shared implementation
 
 The primitive palette, spacing, radius and motion values live in
-`packages/site-ui/styles/tokens.css`. Site-specific semantic roles and theme
+`../../packages/ui/styles/tokens.css`. Site-specific semantic roles and theme
 choices live in `src/styles/tokens.css`. `src/styles/global.css` imports the
 stylesheets in cascade order. The style checker covers every CSS file in that
 directory. Shared Astro components come from `@typeshade/site-ui/astro/*`;
 they render native HTML without a React runtime. Package update instructions
-are in `packages/site-ui/README.md`.
+are in `../../packages/ui/README.md`.
 
 ## Styling
 
