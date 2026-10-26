@@ -60,7 +60,7 @@ jobs:
           cache: pnpm
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.4
+          bun-version: 1.4.3
       - run: pnpm install --frozen-lockfile
       - if: matrix.site != 'typeshade'
         run: pnpm prepare:source ${{ matrix.site }}

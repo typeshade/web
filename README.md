@@ -1,7 +1,7 @@
 # TypeShade web
 
 Websites and shared UI for TypeShade, TypeNN and TypeCV. Node 24, pnpm 10.28.2
-and Bun 1.4.4 are used by CI. Each website builds and deploys independently.
+and Bun 1.4.3 are used by CI. Each website builds and deploys independently.
 
 | Workspace | Domain | Source |
 | --- | --- | --- |
