@@ -14,9 +14,9 @@
 .playground-workbench {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-panel);
-  background: var(--panel);
+  background: var(--ui-surface);
 }
 .playground-controls,
 .playground-output {
@@ -24,7 +24,7 @@
   padding: 22px;
 }
 .playground-controls {
-  border-right: 1px solid var(--line);
+  border-right: 1px solid var(--ui-border);
 }
 .control-heading,
 .output-header {
@@ -65,10 +65,10 @@
   gap: var(--ui-space-2);
   max-width: 300px;
 }
-.matrix-input-grid .ant-input {
+.matrix-input-grid .ui-input {
   height: 39px;
-  color: var(--ink);
-  background: var(--soft);
+  color: var(--ui-text);
+  background: var(--ui-surface-muted);
   font-family: "IBM Plex Mono", monospace;
   font-size: 13px;
 }
@@ -78,28 +78,13 @@
   gap: var(--ui-space-3);
   margin-top: 5px;
 }
-.field-label {
-  min-width: 0;
-  display: grid;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 11px;
-}
-.field-label .ant-select {
-  width: 100%;
-  color: var(--ink);
-}
-.field-label .ant-select-selector {
-  min-height: 38px !important;
-  background: var(--soft) !important;
-}
 .run-button {
   width: 100%;
   margin-top: 20px;
   font-weight: 550;
 }
 .field-help {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 10px;
   line-height: 1.6;
 }
@@ -115,9 +100,9 @@
   align-items: center;
   gap: 7px;
   padding: 5px 8px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: 20px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
 }
@@ -135,20 +120,8 @@
   align-items: center;
   text-align: center;
 }
-.result-empty {
-  padding: 20px;
-  border: 1px dashed var(--line);
-  border-radius: var(--ui-radius-control);
-  background: var(--soft);
-}
-.result-empty p {
-  max-width: 30ch;
-  margin: 12px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-}
 .empty-mark {
-  color: var(--brand);
+  color: var(--ui-link);
   font-family: "IBM Plex Mono", monospace;
   font-size: 29px;
   font-weight: 400;
@@ -158,14 +131,14 @@
   height: 3px;
   overflow: hidden;
   border-radius: 3px;
-  background: color-mix(in srgb, var(--brand) 20%, var(--line));
+  background: color-mix(in srgb, var(--ui-link) 20%, var(--ui-border));
 }
 .loading-line::after {
   content: "";
   display: block;
   width: 40%;
   height: 100%;
-  background: var(--brand);
+  background: var(--ui-link);
   animation: loading-sweep 0.8s ease-in-out infinite alternate;
 }
 @keyframes loading-sweep {
@@ -181,7 +154,7 @@
   text-align: left;
 }
 .result-caption {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 10px;
 }
 .result-grid {
@@ -192,10 +165,10 @@
 }
 .result-grid output {
   padding: 18px 10px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: 5px;
-  background: var(--soft);
-  color: var(--ink);
+  background: var(--ui-surface-muted);
+  color: var(--ui-text);
   font-family: "IBM Plex Mono", monospace;
   font-size: 19px;
   text-align: center;
@@ -205,38 +178,14 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: var(--success);
+  color: var(--ui-success);
   font-size: 11px;
 }
 .readback-note {
   margin: 14px 0 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 10px;
   line-height: 1.6;
-}
-.result-error {
-  min-height: 230px;
-  align-items: stretch;
-  gap: var(--ui-space-2);
-  padding: 17px;
-  border: 1px solid color-mix(in srgb, var(--danger) 30%, var(--line));
-  border-radius: var(--ui-radius-control);
-  background: color-mix(in srgb, var(--danger) 4%, var(--panel));
-  text-align: left;
-}
-.result-error strong {
-  color: var(--danger);
-  font-size: 13px;
-}
-.result-error code {
-  overflow-wrap: anywhere;
-  color: var(--ink);
-  font-size: 11px;
-}
-.result-error p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 11px;
 }
 .playground-code pre {
   max-height: 310px;
@@ -259,12 +208,12 @@
 }
 .playground-disclosure p {
   margin: 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 11px;
   line-height: 1.7;
 }
 .playground-disclosure strong {
-  color: var(--ink);
+  color: var(--ui-text);
   font-weight: 550;
 }
 .playground-code .token.comment {
@@ -291,5 +240,7 @@
 }
 :root[data-theme="dark"] .execution-result,
 :root[data-theme="dark"] .playground-workbench {
-  background: var(--panel);
+  background: var(--ui-surface);
 }
+
+.playground-workbench > .ui-panel { border: 0; border-radius: 0; }

@@ -4,6 +4,10 @@ import {
   Field,
   NumberInput,
   Select,
+  Tabs,
+  EmptyState,
+  Alert,
+  Toolbar,
 } from "@typeshade/site-ui/react";
 import { Progress, Table } from "antd";
 import { useTrainingLab } from "../hooks/useTrainingLab";
@@ -71,9 +75,9 @@ export default function Lab({ locale }: { locale: Locale }) {
       <div className="lab-app">
         <p className="lab-intro">{words.intro}</p>
         {notice && (
-          <p className="lab-error" role="alert">
+          <Alert tone="danger" live>
             {notice}
-          </p>
+          </Alert>
         )}
 
         <section className="lab-section" aria-labelledby="lab-dataset">
@@ -339,7 +343,7 @@ export default function Lab({ locale }: { locale: Locale }) {
               {words.graphReadme} ↗
             </a>
           </p>
-          <div className="lab-graph-actions">
+          <Toolbar className="lab-graph-actions" label={words.graphTitle}>
             <Button
               onClick={() => void captureGraph("forward")}
               disabled={running || graphBusy !== null || activating !== null}
@@ -354,42 +358,39 @@ export default function Lab({ locale }: { locale: Locale }) {
             >
               {words.graphStep}
             </Button>
-          </div>
+          </Toolbar>
           {graphSource && (
             <p className="lab-note" data-testid="graph-source">
               {graphSource} {graphBatch}
             </p>
           )}
           {graphError && (
-            <p className="lab-error" role="alert">
+            <Alert tone="danger" live>
               {graphError}
-            </p>
+            </Alert>
           )}
-          {graphTabs.length > 1 && (
-            <div className="kg-tabs" role="tablist">
-              {graphTabs.map((tab, index) => (
-                <button
-                  key={tab.title}
-                  type="button"
-                  role="tab"
-                  aria-selected={graphTab === index}
-                  onClick={() => setGraphTab(index)}
-                >
-                  {tab.title}
-                </button>
-              ))}
-            </div>
-          )}
-          {graphTabs[graphTab] ? (
-            <KernelGraph
-              key={`${graphTab}-${graphTabs[graphTab]!.title}`}
-              snapshot={graphTabs[graphTab]!.snapshot}
-              plan={graphTabs[graphTab]!.plan}
-              locale={locale}
-              label={`${words.graphTitle}: ${graphTabs[graphTab]!.title}`}
+          {graphTabs.length ? (
+            <Tabs
+              label={words.graphTitle}
+              value={String(graphTab)}
+              onChange={(value) => setGraphTab(Number(value))}
+              items={graphTabs.map((tab, index) => ({
+                key: String(index),
+                label: tab.title,
+                children:
+                  graphTab === index ? (
+                    <KernelGraph
+                      key={`${index}-${tab.title}`}
+                      snapshot={tab.snapshot}
+                      plan={tab.plan}
+                      locale={locale}
+                      label={`${words.graphTitle}: ${tab.title}`}
+                    />
+                  ) : null,
+              }))}
             />
           ) : (
-            <p className="lab-note">{words.graphEmpty}</p>
+            <EmptyState>{words.graphEmpty}</EmptyState>
           )}
           {graphKind === "step" && (
             <p className="lab-note">
@@ -402,7 +403,7 @@ export default function Lab({ locale }: { locale: Locale }) {
         <section className="lab-section" aria-labelledby="lab-results">
           <h2 id="lab-results">{words.resultsTitle}</h2>
           {results.length === 0 ? (
-            <p className="lab-note">{words.noResults}</p>
+            <EmptyState>{words.noResults}</EmptyState>
           ) : (
             <Table
               size="small"

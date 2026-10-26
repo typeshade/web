@@ -1,0 +1,11 @@
+/* Match the system/explicit theme defaults while keeping TypeShade's Tailwind palette. */
+:root[data-theme], :root:not([data-theme]) {
+  --ui-font-sans: var(--font-sans);
+  --ui-page: var(--color-ground);
+  --ui-surface: var(--color-ground);
+  --ui-surface-muted: var(--color-surface-1);
+  --ui-text: var(--color-text-1);
+  --ui-text-muted: var(--color-text-2);
+  --ui-border: var(--color-line-2);
+  --ui-link: var(--color-accent);
+}

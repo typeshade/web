@@ -1,9 +1,9 @@
 @import "tailwindcss";
 @import "antd/dist/reset.css";
 @import "@typeshade/site-ui/tokens.css";
+@import "@typeshade/site-ui/semantics.css";
 @import "./tokens.css";
 @import "./base.css";
-@import "./integrations.css";
 @import "./cv-features.css";
 @import "./shell.css";
 @import "./home.css";
@@ -12,5 +12,6 @@
 @import "./responsive.css";
 @import "./lab.css";
 
-@import "@typeshade/site-ui/semantics.css";
 @import "@typeshade/site-ui/controls.css";
+
+@import "@typeshade/site-ui/compositions.css";

@@ -6,7 +6,8 @@
   "files": [
     "astro",
     "react",
-    "styles"
+    "styles",
+    "dom"
   ],
   "exports": {
     "./tokens.css": "./styles/tokens.css",
@@ -16,7 +17,9 @@
     "./product-theme.css": "./styles/product-theme.css",
     "./semantics.css": "./styles/semantics.css",
     "./controls.css": "./styles/controls.css",
-    "./react/controls": "./react/controls.tsx"
+    "./react/controls": "./react/controls.tsx",
+    "./compositions.css": "./styles/compositions.css",
+    "./dom/*": "./dom/*.ts"
   },
   "peerDependencies": {
     "astro": ">=6 <8",

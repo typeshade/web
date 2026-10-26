@@ -37,10 +37,10 @@ copying or npm publishing is needed. The app-specific GPU, learning and editor
 logic stays in the app. See [UI architecture](packages/ui/README.md).
 
 Run `pnpm dev:ui` for the component workbench at http://localhost:4324/.
-`pnpm check:ui && pnpm build:ui && pnpm test:controls` verifies control states,
+`pnpm check:ui && pnpm build:ui && pnpm test:controls && pnpm test:patterns` verifies control states,
 keyboard interactions and automated accessibility. CI checks the workbench on each
 PR and retains screenshots as an artifact. It has no production deployment.
-See [the UI audit and adoption plan](docs/ui-audit.md) for scope and remaining work.
+See [the UI audit and adoption plan](docs/ui-audit.md) for adoption scope and app ownership boundaries.
 
 ## CI and deployment
 

@@ -1,4 +1,8 @@
 ---
+import Button from '@typeshade/site-ui/astro/Button';
+import Field from '@typeshade/site-ui/astro/Field';
+import Dialog from '@typeshade/site-ui/astro/Dialog';
+import Toolbar from '@typeshade/site-ui/astro/Toolbar';
 // The dialog every Report a problem link opens: a title, a description if the reader has one,
 // images, and Send. The Worker files the report as an issue on GitHub (worker/index.ts,
 // /data/issues/, docs/cloudflare.md), in the repository the link names (`data-report`); the
@@ -18,18 +22,16 @@ const t = copyFor(locale).issue;
 ---
 
 <template data-issue-template>
-  <dialog class="issue-dialog" aria-labelledby="issue-dialog-heading" data-issue-dialog data-pagefind-ignore>
+  <Dialog class="issue-dialog" aria-labelledby="issue-dialog-heading" data-issue-dialog data-pagefind-ignore>
     <form method="dialog" class="issue-form" data-issue-form data-compiler={facts.pinnedCommit} data-copy={JSON.stringify(t.runtime)} data-send={t.send} data-close={t.close} data-cancel={t.cancel}>
       <h2 id="issue-dialog-heading">{t.heading}</h2>
-      <label for="issue-title">{t.titleLabel}</label>
-      <input class="issue-input" id="issue-title" name="title" type="text" required maxlength={ISSUE_TITLE_MAX} autocomplete="off" />
-      <label for="issue-text">{t.textLabel}</label>
+      <Field id="issue-title" label={t.titleLabel} name="title" type="text" required maxlength={ISSUE_TITLE_MAX} autocomplete="off" />
       <div class="issue-box" data-issue-drop>
-        <textarea class="issue-text" id="issue-text" name="text" rows="5" maxlength={ISSUE_TEXT_MAX}></textarea>
-        <button type="button" class="issue-add" data-issue-add>
+        <Field as="textarea" id="issue-text" label={t.textLabel} name="text" rows={5} maxlength={ISSUE_TEXT_MAX} />
+        <Button type="button" class="issue-add" data-issue-add>
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4" /><circle cx="15.5" cy="9" r="1.5" fill="currentColor" /></svg>
           {t.addImages}
-        </button>
+        </Button>
         <input type="file" accept={ISSUE_IMAGE_TYPES.join(',')} multiple hidden data-issue-files />
       </div>
       <ul class="issue-attached" role="list" data-issue-attached hidden></ul>
@@ -39,12 +41,12 @@ const t = copyFor(locale).issue;
       <div data-issue-challenge hidden></div>
       <p class="issue-status" role="status" data-issue-status></p>
       <p class="issue-note">{t.note}</p>
-      <div class="issue-actions">
-        <button type="button" class="button" data-issue-cancel>{t.cancel}</button>
-        <button type="submit" class="button button-primary" data-issue-send>{t.send}</button>
-      </div>
+      <Toolbar class="issue-actions" label={t.heading}>
+        <Button type="button" data-issue-cancel>{t.cancel}</Button>
+        <Button type="submit" variant="primary" data-issue-send>{t.send}</Button>
+      </Toolbar>
     </form>
-  </dialog>
+  </Dialog>
 </template>
 
 <script>
@@ -60,41 +62,14 @@ const t = copyFor(locale).issue;
 </script>
 
 <style>
-  /* Ant's Modal on the search dialog's ground: an elevated card over a dimmed page, the title
-     at 16px, the controls at 14px, and the two buttons at the right of the foot. */
-  .issue-dialog {
-    inline-size: min(520px, 100vw - 2 * var(--gutter-x)); max-block-size: calc(100dvh - 2 * var(--gutter-x));
-    margin: 10vh auto auto; padding: 20px 24px; overflow: auto;
-    border: 0; border-radius: var(--radius-md); background: var(--color-elevated); color: var(--color-text-1);
-    box-shadow: var(--shadow-elevated); font-size: var(--text-ui); line-height: var(--text-ui--line-height);
-  }
-  .issue-dialog::backdrop { background: rgb(0 0 0 / 0.45); }
-  :global(:root[data-theme='dark']) .issue-dialog::backdrop { background: rgb(0 0 0 / 0.72); }
-  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme='light'])) .issue-dialog::backdrop { background: rgb(0 0 0 / 0.72); } }
-  @media (max-width: 40rem) { .issue-dialog { margin-block-start: var(--gutter-x); } }
   .issue-form { display: flex; flex-direction: column; }
   /* Sent: the heading, the thanks, and Close. */
   .issue-form[data-done] > :not(h2, .issue-status, .issue-actions) { display: none; }
   h2 { margin: 0 0 16px; font-size: var(--text-h5); line-height: var(--text-h5--line-height); font-weight: 600; }
-  label { margin: 0 0 4px; color: var(--color-text-1); }
-  .issue-input, .issue-box {
-    margin: 0 0 16px; border: 1px solid var(--color-line-2); border-radius: var(--radius);
-    background: var(--color-ground); transition: border-color var(--motion);
-  }
-  .issue-input { padding: 4px 11px; color: var(--color-text-1); font: inherit; }
-  .issue-input:hover, .issue-box:hover { border-color: var(--color-primary-hover); }
-  /* The box is the textarea and its foot, one control the way GitHub's comment box is one. */
+  /* The attachment drop target groups the text field and image action. */
   .issue-box { display: flex; flex-direction: column; margin-block-end: 8px; }
-  .issue-box:focus-within { border-color: var(--color-accent); box-shadow: var(--ring); }
-  .issue-box[data-dragging] { border-color: var(--color-accent); background: var(--color-primary-bg); }
-  .issue-text { display: block; padding: 4px 11px; border: 0; border-radius: var(--radius) var(--radius) 0 0; background: transparent; color: var(--color-text-1); font: inherit; resize: vertical; }
-  .issue-text:focus-visible { outline: 0; box-shadow: none; }
-  .issue-add {
-    display: flex; align-items: center; gap: 6px; padding: 5px 11px; border: 0; border-block-start: 1px dashed var(--color-line-2);
-    border-radius: 0 0 var(--radius) var(--radius); background: var(--color-surface-1); color: var(--color-text-2);
-    font: inherit; font-size: var(--text-label); line-height: var(--text-label--line-height); text-align: start; cursor: pointer;
-  }
-  .issue-add:hover { color: var(--color-primary-hover); }
+  .issue-box[data-dragging] { outline: 2px solid var(--ui-focus); background: var(--color-primary-bg); }
+  .issue-add { align-self: start; }
   .issue-add svg { flex: none; inline-size: 14px; block-size: 14px; }
   .issue-attached { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; padding: 0; list-style: none; }
   .issue-attached :global(li) { position: relative; display: flex; align-items: center; gap: 6px; block-size: 48px; border: 1px solid var(--color-line-1); border-radius: var(--radius); background: var(--color-surface-1); }

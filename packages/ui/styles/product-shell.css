@@ -6,8 +6,8 @@
   transform: translateY(-150%);
   padding: 8px 12px;
   border-radius: var(--ui-radius-control);
-  background: var(--panel);
-  color: var(--ink);
+  background: var(--ui-surface);
+  color: var(--ui-text);
   box-shadow: 0 4px 14px #0002;
 }
 .skip-link:focus {
@@ -17,8 +17,8 @@
   position: sticky;
   z-index: 10;
   top: 0;
-  border-bottom: 1px solid var(--line);
-  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  border-bottom: 1px solid var(--ui-border);
+  background: color-mix(in srgb, var(--ui-surface) 94%, transparent);
   backdrop-filter: blur(12px);
 }
 .header-inner {
@@ -37,7 +37,7 @@
   flex: 1;
 }
 .top-link.is-active {
-  color: var(--brand);
+  color: var(--ui-link);
 }
 .header-tools {
   display: flex;
@@ -85,32 +85,32 @@
   display: block;
   padding: 6px 10px;
   border-radius: 5px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 13px;
 }
 .sidebar-link:hover {
-  color: var(--ink);
-  background: var(--soft);
+  color: var(--ui-text);
+  background: var(--ui-surface-muted);
 }
 .sidebar-link.is-active {
-  color: var(--brand);
-  background: color-mix(in srgb, var(--brand) 9%, var(--panel));
+  color: var(--ui-link);
+  background: color-mix(in srgb, var(--ui-link) 9%, var(--ui-surface));
   font-weight: 550;
 }
 .sidebar-source {
   display: block;
   margin: 24px 10px 0;
   padding-top: 16px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
+  border-top: 1px solid var(--ui-border);
+  color: var(--ui-text-muted);
   font-size: 12px;
 }
 .site-main {
   min-width: 0;
 }
 .site-footer {
-  border-top: 1px solid var(--line);
-  background: var(--panel);
+  border-top: 1px solid var(--ui-border);
+  background: var(--ui-surface);
 }
 .footer-inner {
   display: flex;
@@ -120,7 +120,7 @@
   max-width: 1440px;
   margin: auto;
   padding: 22px 32px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 12px;
 }
 .footer-inner div {
@@ -129,5 +129,5 @@
   flex: 0 0 auto;
 }
 .footer-inner a:hover {
-  color: var(--brand);
+  color: var(--ui-link);
 }

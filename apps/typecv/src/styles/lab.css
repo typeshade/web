@@ -10,7 +10,7 @@
 }
 
 .lab-status {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -27,3 +27,5 @@
 .sfm-inputs .ui-button {
   inline-size: 100%;
 }
+
+.sfm-notice { margin-block-start: var(--ui-space-4); }

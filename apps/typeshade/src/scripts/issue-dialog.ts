@@ -1,3 +1,4 @@
+import { controlDialog } from '@typeshade/site-ui/dom/dialog';
 // The issue dialog (src/components/IssueDialog.astro). Its template's script imports this on
 // the first Report a problem click. The Worker says first whether it takes reports here
 // (/data/issues/, worker/index.ts): where it does, the dialog opens and Send posts the title,
@@ -107,6 +108,7 @@ function makeDialog(): Dialog | undefined {
   const element = template?.content.firstElementChild?.cloneNode(true);
   if (!(element instanceof HTMLDialogElement)) return undefined;
   const dialog = element;
+  const modal = controlDialog(dialog);
   document.body.append(dialog);
   const find = <T extends Element>(selector: string): T => dialog.querySelector<T>(selector)!;
   const form = find<HTMLFormElement>('[data-issue-form]');
@@ -293,7 +295,7 @@ function makeDialog(): Dialog | undefined {
     say('');
   };
 
-  cancel.addEventListener('click', () => dialog.close());
+  cancel.addEventListener('click', () => modal.close());
   dialog.addEventListener('close', () => {
     if (done) reset();
   });
@@ -349,8 +351,7 @@ function makeDialog(): Dialog | undefined {
       applyStatus(answer);
       program = await readProgram(await currentProgram());
       paint();
-      if (!dialog.open) dialog.showModal();
-      title.focus();
+      modal.open(link, title);
     },
   };
 }

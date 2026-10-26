@@ -1,0 +1,22 @@
+---
+import type { HTMLAttributes } from "astro/types";
+type Props = HTMLAttributes<"div"> & {
+  tone?: "info" | "danger" | "success";
+  live?: boolean;
+};
+const {
+  tone = "info",
+  live = false,
+  class: className,
+  ...attributes
+} = Astro.props;
+---
+
+<div
+  {...attributes}
+  class:list={["ui-alert", className]}
+  data-tone={tone}
+  role={live ? (tone === "danger" ? "alert" : "status") : undefined}
+>
+  <slot />
+</div>

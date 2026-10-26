@@ -1,3 +1,5 @@
+import { bindTabs } from '@typeshade/site-ui/dom/tabs';
+import { controlDialog } from '@typeshade/site-ui/dom/dialog';
 import { packModule } from '../../vendor/shader-dsl/src/index.ts';
 // The Playground's browser half. Astro puts this module through Vite, so it can import the
 // compiler and the language service from the vendored checkout. The component's own
@@ -923,7 +925,7 @@ function mount(root: HTMLElement): void {
   };
   const share = root.querySelector('[data-share]');
   const copyOutput = root.querySelector('[data-copy-output]');
-  const sizeLabel = root.querySelector('[data-size]');
+  const sizeLabel = root.querySelector('[data-output-size]');
   const levelPicker = root.querySelector('[data-opt-level]');
   const parensPicker = root.querySelector('[data-opt-parens]');
   const precisionPicker = root.querySelector('[data-opt-precision]');
@@ -3636,14 +3638,15 @@ function mount(root: HTMLElement): void {
       submitStatus.textContent = text;
       submitStatus.hidden = !text;
     };
+    const submitModal = controlDialog(submitDialog);
     submitButton.addEventListener('click', () => {
       say('');
       submitSend.hidden = false;
       submitSend.disabled = false;
       submitCancel.textContent = copy.submit.cancel;
-      submitDialog.showModal();
+      submitModal.open(submitButton);
     });
-    submitCancel.addEventListener('click', () => submitDialog.close());
+    submitCancel.addEventListener('click', () => submitModal.close());
     submitForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const fields = new FormData(submitForm);
@@ -5487,22 +5490,7 @@ export function wave(x: f32, t: f32): f32 {
           else drawOnCpu();
         });
       }
-      tabs.forEach((tab, index) => {
-        tab.addEventListener('click', () => selectView((tab.dataset.target ?? 'result') as View));
-        tab.addEventListener('keydown', (event) => {
-          const steps: Record<string, number> = {
-            ArrowRight: index + 1,
-            ArrowLeft: index - 1,
-            Home: 0,
-            End: tabs.length - 1,
-          };
-          const next = steps[event.key];
-          if (next === undefined) return;
-          event.preventDefault();
-          const moved = tabs[(next + tabs.length) % tabs.length];
-          selectView((moved.dataset.target ?? 'result') as View, true);
-        });
-      });
+      bindTabs(tabs, (index, focus) => selectView((tabs[index].dataset.target ?? 'result') as View, focus));
       reset.addEventListener('click', () => {
         if (openedExample === '' && linkedOpening) reopenLinked();
         else if (openedExample === '' && blankSource) openBlank();

@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import '@typeshade/site-ui/tokens.css';
+@import "@typeshade/site-ui/semantics.css";
 @import './tokens.css';
+@import './ui-theme.css';
 @import './fonts.css';
 @import './base.css';
 @import './header.css';
@@ -13,5 +15,6 @@
 @import './reference.css';
 @import './accessibility.css';
 
-@import '@typeshade/site-ui/semantics.css';
 @import '@typeshade/site-ui/controls.css';
+
+@import "@typeshade/site-ui/compositions.css";

@@ -87,6 +87,7 @@ const GLOBAL_CLASS_ROOTS = {
     'guide-note',
   ],
   shared: [
+    'ui',
     'button',
     'alert',
     'figure',

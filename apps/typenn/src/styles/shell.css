@@ -23,7 +23,7 @@
 }
 .top-link,
 .language-link {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 13px;
   font-weight: 500;
   padding: 8px 10px;
@@ -32,13 +32,13 @@
 }
 .top-link:hover,
 .language-link:hover {
-  color: var(--ink);
-  background: var(--soft);
+  color: var(--ui-text);
+  background: var(--ui-surface-muted);
 }
 .sidebar-heading {
   padding: 0 10px;
   margin: 0 0 5px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;

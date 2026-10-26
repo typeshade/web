@@ -1,0 +1,14 @@
+---
+import type { HTMLAttributes } from "astro/types";
+type Props = HTMLAttributes<"div"> & { label: string };
+const { label, class: className, ...attributes } = Astro.props;
+---
+
+<div
+  {...attributes}
+  class:list={["ui-toolbar", className]}
+  role="group"
+  aria-label={label}
+>
+  <slot />
+</div>

@@ -1946,7 +1946,7 @@ async function checkRoute(browser, origin, route) {
 
       // ── the emit options ────────────────────────────────────────────────────────────────
       const atO2 = await wgslPane(page);
-      const shownSize = (await page.innerText('[data-size]')).trim();
+      const shownSize = (await page.innerText('[data-output-size]')).trim();
       if (!/^[0-9]+ B$/.test(shownSize))
         problems.push(`the output pane shows no byte count: "${shownSize}"`);
       else if (Math.abs(Number(shownSize.replace(' B', '')) - atO2.length) > 2) {

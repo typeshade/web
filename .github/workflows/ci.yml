@@ -27,6 +27,9 @@ jobs:
       - run: pnpm test:controls
         env:
           UI_SCREENSHOTS: artifacts/ui
+      - run: pnpm test:patterns
+        env:
+          UI_SCREENSHOTS: artifacts/ui
       - uses: actions/upload-artifact@v4
         with:
           name: ui-workbench

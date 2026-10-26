@@ -3,17 +3,12 @@ import {
   Button,
   Field,
   NumberInput,
+  Panel,
+  Alert,
+  Toolbar,
 } from "@typeshade/site-ui/react";
 import { useSfmLab } from "../hooks/useSfmLab";
-import {
-  Alert,
-  Card,
-  Progress,
-  Space,
-  Statistic,
-  Typography,
-  Upload,
-} from "antd";
+import { Progress, Statistic, Typography, Upload } from "antd";
 import { lazy, Suspense } from "react";
 const SfmViewer = lazy(() => import("./SfmViewer"));
 
@@ -55,7 +50,7 @@ export default function SfmLab({ locale = "en" }: { locale?: "en" | "ko" }) {
   return (
     <ThemeProvider>
       <div className="lab-app">
-        <Card className="lab-panel">
+        <Panel className="lab-panel">
           <Title level={4}>{ko ? "영상 입력" : "Video input"}</Title>
           <div className="sfm-inputs">
             <Upload
@@ -135,21 +130,18 @@ export default function SfmLab({ locale = "en" }: { locale?: "en" | "ko" }) {
               {ko ? "프레임" : "frames"}
             </p>
           )}
-          <Alert
-            style={{ marginTop: 18 }}
-            type="info"
-            showIcon
-            message={
-              ko
+          <Alert className="sfm-notice">
+            <strong>
+              {ko
                 ? "영상은 브라우저 안에서만 처리됩니다."
-                : "Video stays in this browser."
-            }
-            description={
-              ko
+                : "Video stays in this browser."}
+            </strong>
+            <p>
+              {ko
                 ? "프레임 특징 추출, BRIEF 매칭과 기하 복원은 TypeShade WebGPU로 실행합니다. 화면 표시는 Three.js를 사용합니다."
-                : "Frame features, BRIEF matching and geometric reconstruction run through TypeShade WebGPU. Three.js renders the result."
-            }
-          />
+                : "Frame features, BRIEF matching and geometric reconstruction run through TypeShade WebGPU. Three.js renders the result."}
+            </p>
+          </Alert>
           <div className="lab-status" role="status" aria-live="polite">
             {status ||
               (ko
@@ -241,7 +233,9 @@ export default function SfmLab({ locale = "en" }: { locale?: "en" | "ko" }) {
                     ? `미등록 시점: ${unregistered.length ? unregistered.join(", ") : "없음"}`
                     : `Unregistered views: ${unregistered.length ? unregistered.join(", ") : "none"}`}
                 </Text>
-                <Space>
+                <Toolbar
+                  label={ko ? "복원 결과 작업" : "Reconstruction actions"}
+                >
                   <Button size="small" onClick={() => download("ply")}>
                     Export PLY
                   </Button>
@@ -254,11 +248,11 @@ export default function SfmLab({ locale = "en" }: { locale?: "en" | "ko" }) {
                     </summary>
                     <pre>{JSON.stringify(stages, null, 2)}</pre>
                   </details>
-                </Space>
+                </Toolbar>
               </div>
             </>
           )}
-        </Card>
+        </Panel>
         <video ref={videoRef} muted playsInline hidden />
         <canvas ref={canvasRef} hidden />
         <Text type="secondary">

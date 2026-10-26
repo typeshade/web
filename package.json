@@ -22,7 +22,8 @@
     "dev:ui": "pnpm --filter @typeshade/ui-preview dev",
     "build:ui": "pnpm --filter @typeshade/ui-preview build",
     "check:ui": "pnpm --filter @typeshade/ui-preview check",
-    "test:controls": "node packages/ui/scripts/test-controls.mjs apps/ui/dist"
+    "test:controls": "node packages/ui/scripts/test-controls.mjs apps/ui/dist",
+    "test:patterns": "node packages/ui/scripts/test-patterns.mjs apps/ui/dist"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

@@ -15,7 +15,7 @@
 }
 .eyebrow {
   margin: 0 0 13px;
-  color: var(--brand);
+  color: var(--ui-link);
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.075em;
@@ -31,12 +31,12 @@
   letter-spacing: -0.052em;
 }
 .home-copy h1 span {
-  color: var(--muted);
+  color: var(--ui-text-muted);
 }
 .lead {
   max-width: 66ch;
   margin: 20px 0 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 18px;
   line-height: 1.65;
 }
@@ -48,7 +48,7 @@
 }
 .release-note {
   margin: 20px 0 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 12px;
 }
 .home-code {
@@ -58,9 +58,9 @@
 .playground-code {
   overflow: hidden;
   margin: 0;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-panel);
-  background: var(--code-bg);
+  background: var(--ui-code-bg);
   box-shadow: 0 14px 36px #10182816;
 }
 .code-caption {
@@ -101,14 +101,14 @@
   gap: 9px;
   margin-top: 10px;
   padding: 12px 14px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-control);
-  color: var(--muted);
-  background: var(--panel);
+  color: var(--ui-text-muted);
+  background: var(--ui-surface);
   font-size: 11px;
 }
 .execution-result code {
-  color: var(--ink);
+  color: var(--ui-text);
   font-size: 11px;
 }
 .result-dot,
@@ -118,7 +118,7 @@
   height: 7px;
   display: inline-block;
   border-radius: 50%;
-  background: var(--success);
+  background: var(--ui-success);
 }
 .result-label {
   margin-left: auto;
@@ -127,7 +127,7 @@
 .home-learning,
 .home-status {
   padding: 64px 0;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
 }
 .section-heading-row {
   display: flex;
@@ -150,7 +150,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--ui-space-2);
-  color: var(--brand);
+  color: var(--ui-link);
   font-size: 13px;
   font-weight: 550;
 }
@@ -161,8 +161,8 @@
 .path-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
+  border-bottom: 1px solid var(--ui-border);
 }
 .path-strip article {
   min-width: 0;
@@ -170,10 +170,10 @@
 }
 .path-strip article + article {
   padding-left: 28px;
-  border-left: 1px solid var(--line);
+  border-left: 1px solid var(--ui-border);
 }
 .path-index {
-  color: var(--brand);
+  color: var(--ui-link);
   font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
 }
@@ -186,15 +186,15 @@
   max-width: 39ch;
   min-height: 50px;
   margin: 0 0 14px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 13px;
 }
 .path-strip code {
-  color: var(--ink);
+  color: var(--ui-text);
   font-size: 10px;
 }
 .fine-print {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 11px;
   line-height: 1.6;
 }
@@ -210,14 +210,14 @@
 .home-status > div > p:last-child {
   max-width: 62ch;
   margin: 18px 0 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 14px;
   line-height: 1.75;
 }
 .learning-links,
 .link-list,
 .next-links {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
 }
 .learning-links a,
 .link-list a,
@@ -227,12 +227,12 @@
   align-items: center;
   gap: 20px;
   padding: 16px 4px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--ui-border);
 }
 .learning-links a:hover strong,
 .link-list a:hover strong,
 .next-links a:hover strong {
-  color: var(--brand);
+  color: var(--ui-link);
 }
 .learning-links strong,
 .link-list strong,
@@ -246,13 +246,13 @@
 .next-links small {
   display: block;
   margin-top: 3px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 12px;
 }
 .learning-links b,
 .link-list b,
 .next-links b {
-  color: var(--brand);
+  color: var(--ui-link);
   font-size: 15px;
   font-weight: 400;
 }
@@ -262,6 +262,6 @@
   justify-content: space-between;
   gap: var(--ui-space-8);
 }
-.home-status .button {
+.home-status .ui-button {
   flex: 0 0 auto;
 }
