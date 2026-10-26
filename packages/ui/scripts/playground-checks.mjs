@@ -43,12 +43,6 @@ export async function checkPlayground(page, base, site) {
       await page.locator("[data-open-blank]").click();
       const tabs = page.locator('.output-tabs [role="tab"]');
       await tabs.first().waitFor();
-      await page.waitForFunction(
-        () =>
-          document.querySelector("[data-status]")?.textContent !== "Loading…",
-        undefined,
-        { timeout: 60000 },
-      );
       // Compilation/editor mounting is asynchronous; wait until the output handlers respond.
       await page.waitForFunction(
         () => !!document.querySelector(".monaco-editor"),
@@ -73,6 +67,18 @@ export async function checkPlayground(page, base, site) {
             ?.getAttribute("aria-selected") === "true",
       );
       assert.ok(await page.locator("#pg-output").isVisible());
+      await page.waitForFunction(
+        () =>
+          /^[0-9]+ B$/.test(
+            document.querySelector("[data-output-size]")?.textContent ?? "",
+          ),
+        undefined,
+        { timeout: 60000 },
+      );
+      assert.ok(
+        await page.locator("[data-run]").isVisible(),
+        "The output byte count must not replace an action",
+      );
       await page.locator("[data-opt-minify]").check();
       assert.ok(await page.locator("[data-numbers-field]").isVisible());
       await page.locator("[data-opt-minify]").uncheck();
