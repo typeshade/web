@@ -7,7 +7,7 @@ dist/
 .dev.vars*
 *.log
 .DS_Store
-artifacts/
+/artifacts/
 apps/typecv/public/runtime/
 apps/typecv/public/docs/
 apps/typecv/public/version.json
