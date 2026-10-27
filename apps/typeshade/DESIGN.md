@@ -172,7 +172,8 @@ enforces the parts that can be checked mechanically and runs at the start of eve
 ## Voice
 
 - Say what the tool does. The front page states what; a linked page explains how or why.
-- The second sentence a reader meets carries a number.
+- Include quantities when they help explain a capability or limitation. Do not require a
+  number at a particular position in a paragraph.
 - Short sentences. One idea per sentence. Plain verbs: "emits", "runs", "checks".
 - Numbers come from the build (`src/lib/examples.ts`). A number that is not measured is not on the page.
 - Do not praise the page or the tool. Words like "honest", "measured" and "proven" go. <!-- ok -->
@@ -182,6 +183,13 @@ enforces the parts that can be checked mechanically and runs at the start of eve
 - No lists of three for rhythm. Use the number of items there are.
 - Headings are short nouns in sentence case: Quick start, Motivation, Checks. A heading is
   never a slogan and never a full sentence.
+- Write the factual explanation before choosing its heading or layout. Name the input,
+  result and relevant support conditions; avoid counting them for a paired slogan.
+- Home headings name the language or section content. The intro accepts a complete title
+  and lets it wrap; copy does not have to fit a pair of display lines.
+- Review each locale as a standalone page. Remove repeated claims and link prompts that
+  add no information. Copy checks verify consistency and known patterns; an editor still
+  needs to judge clarity, accuracy and tone in context.
 - Comments in code say why in one or two lines. They do not cite design documents.
 
 ## The system
@@ -1083,7 +1091,7 @@ reaches both the packed uniform bytes and the rendered frame.
 
 `.claude/skills/readable-korean/SKILL.md` governs Korean wording and register. Use neutral,
 Wikipedia-like explanations with familiar terms and clear sentences. Published explanatory
-prose uses `~이다` and `~한다`. Headings name their content with ordinary labels such as
+prose uses neutral polite endings such as `~입니다` and `~합니다`. Headings name their content with ordinary labels such as
 활용, 예제 and 주의사항. Keep established English names or technical explanations when
 English improves recognition or precision. Preserve technical meaning and give the reader
 adequate context. Include quantities when they explain the subject; Korean explanatory prose

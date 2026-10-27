@@ -1338,16 +1338,16 @@ export const en = {
 
   front: {
     searchTitle: 'TypeShade',
-    hero: { before: 'Shader code,', accent: 'in TypeScript.' },
-    lede: `A shader language with TypeScript syntax and editor support. One source emits WGSL for WebGPU and ${glsl} for WebGL2.`,
+    hero: 'A shader language with TypeScript syntax',
+    lede: `TypeShade compiles shaders written in TypeScript syntax. It generates WGSL for WebGPU and ${glsl} for WebGL2, with support for TypeScript editor tools.`,
     playground: 'Open Playground',
     quickStart: 'Get started',
     why: 'About the language',
     source: 'Authoring language',
     language: {
-      h: 'The language',
+      h: 'Language features',
       p: 'Types, resources and entry points expressed in TypeScript syntax. The compiler checks the GPU rules.',
-      more: 'Read the language guide',
+      more: 'Language guide',
       rows: [
         {
           title: 'Types and layouts',
@@ -1367,8 +1367,8 @@ export const en = {
       ],
     },
     targets: {
-      h: 'Source and output',
-      p: 'One intermediate representation, two shader targets. Inspect the complete source and the code it produces.',
+      h: 'Compiler output',
+      p: 'Compare the .shade.ts source with its compiled WGSL and GLSL code.',
       summary: 'Compare source, WGSL and GLSL',
       count: `${facts.shadeRenderable} of ${facts.shadeExamples} repository examples emit both targets.`,
       source: 'hello.shade.ts',
@@ -1376,21 +1376,21 @@ export const en = {
       glsl: `${glsl} fragment`,
     },
     oracle: {
-      h: 'Verification',
+      h: 'Compiler verification',
       p: 'The CPU backend evaluates the same module in f64. The test suite checks compiler algebra, compiles WGSL with Tint and links GLSL with WebGL2.',
-      more: 'Explore the checks',
+      more: 'Verification docs',
       caption: 'Build-time captures of the same gradient shader.',
     },
     gallery: {
       h: 'Examples',
-      p: 'Open a shader, inspect its source and run it in the Playground.',
-      all: 'Browse all examples',
+      p: 'Each example includes source code and a link to run it in the Playground.',
+      all: 'All examples',
     },
     install: {
-      h: 'Start with TypeShade',
-      p: 'Install from the Git repository. The quick start walks through a shader and the host code that runs it.',
+      h: 'Installation',
+      p: 'Install from the Git repository. The quick start covers writing a shader and running it from host code.',
       note: `The ${facts.nextVersion} registry release is not published yet.`,
-      more: 'Follow the quick start',
+      more: 'Quick start',
     },
   },
   quickStart: {

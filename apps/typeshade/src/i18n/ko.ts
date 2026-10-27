@@ -1288,16 +1288,16 @@ export const ko: Copy = {
 
   front: {
     searchTitle: 'TypeShade',
-    hero: { before: '셰이더 코드,', accent: 'TypeScript로.' },
-    lede: `TypeScript 문법과 편집기를 사용하는 셰이더 언어입니다. 소스 하나로 WebGPU용 WGSL과 WebGL2용 ${glsl}을 생성합니다.`,
+    hero: 'TypeScript 문법의 셰이더 언어',
+    lede: `TypeShade는 TypeScript 문법으로 작성한 셰이더를 컴파일합니다. WebGPU용 WGSL과 WebGL2용 ${glsl}을 생성하며, TypeScript 편집기 도구를 사용할 수 있습니다.`,
     playground: 'Playground 열기',
     quickStart: '시작하기',
     why: '언어 소개',
     source: '작성 언어',
     language: {
-      h: '언어',
+      h: '언어 기능',
       p: '타입, 리소스, 엔트리 포인트를 TypeScript 문법으로 표현합니다. 컴파일러가 GPU 규칙을 검사합니다.',
-      more: '언어 가이드 읽기',
+      more: '언어 가이드',
       rows: [
         {
           title: '타입과 레이아웃',
@@ -1317,8 +1317,8 @@ export const ko: Copy = {
       ],
     },
     targets: {
-      h: '소스와 출력',
-      p: '하나의 중간 표현에서 두 셰이더 타깃으로 변환합니다. 전체 소스와 생성된 코드를 비교해 보세요.',
+      h: '컴파일 결과',
+      p: '.shade.ts 소스와 컴파일된 WGSL, GLSL 코드를 비교할 수 있습니다.',
       summary: '소스, WGSL, GLSL 비교하기',
       count: `저장소 예제 ${facts.shadeExamples}개 중 ${facts.shadeRenderable}개가 두 타깃을 모두 생성합니다.`,
       source: 'hello.shade.ts',
@@ -1326,21 +1326,21 @@ export const ko: Copy = {
       glsl: `${glsl} 프래그먼트`,
     },
     oracle: {
-      h: '검증',
+      h: '컴파일러 검증',
       p: 'CPU 백엔드가 같은 모듈을 f64로 평가합니다. 테스트는 컴파일러의 대수 연산을 검사하고, WGSL을 Tint로 컴파일하고 GLSL을 WebGL2로 링크합니다.',
-      more: '검증 방식 살펴보기',
+      more: '검증 문서',
       caption: '같은 그라디언트 셰이더를 빌드 시점에 캡처한 결과입니다.',
     },
     gallery: {
       h: '예제',
-      p: '셰이더의 소스를 살펴보고 Playground에서 실행해 보세요.',
-      all: '모든 예제 둘러보기',
+      p: '각 예제에는 소스 코드와 Playground 실행 링크가 있습니다.',
+      all: '예제 목록',
     },
     install: {
-      h: 'TypeShade 시작하기',
-      p: 'Git 저장소에서 설치하세요. 빠른 시작에서 셰이더와 이를 실행하는 호스트 코드를 함께 작성합니다.',
+      h: '설치',
+      p: 'Git 저장소에서 설치할 수 있습니다. 빠른 시작 문서는 셰이더 작성부터 호스트 코드에서 실행하는 방법까지 설명합니다.',
       note: `${facts.nextVersion} 레지스트리 릴리스는 아직 게시되지 않았습니다.`,
-      more: '빠른 시작 따라하기',
+      more: '빠른 시작',
     },
   },
   quickStart: {

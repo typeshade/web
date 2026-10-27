@@ -1,9 +1,8 @@
 ---
 interface Props {
-  before: string;
-  accent: string;
+  title: string;
 }
-const { before, accent } = Astro.props;
+const { title } = Astro.props;
 ---
 
 <section
@@ -14,8 +13,7 @@ const { before, accent } = Astro.props;
     id="front-title"
     class="m-0 text-[clamp(2.5rem,5.4vw,5rem)] font-semibold leading-[1.08] tracking-[-0.055em]"
   >
-    <span class="block">{before}</span>
-    <span class="block">{accent}</span>
+    {title}
   </h1>
   <div class="max-inline-[44ch] lg:pbe-1">
     <div class="text-[17px] leading-[1.7] text-text-2">

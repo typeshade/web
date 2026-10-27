@@ -41,7 +41,7 @@ const textLink =
 
 <Base locale={locale} path="/" searchable searchTitle={f.searchTitle}>
   <div class="front-page mx-auto max-w-[1280px] px-5 sm:px-8 lg:px-12">
-    <HomeIntro before={f.hero.before} accent={f.hero.accent}>
+    <HomeIntro title={f.hero}>
       <p>{f.lede}</p>
       <Fragment slot="actions">
         <LinkButton variant="primary" size="large" href={quickStart}>
