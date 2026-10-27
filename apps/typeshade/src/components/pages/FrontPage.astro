@@ -1,23 +1,16 @@
 ---
-import TabList from "@typeshade/site-ui/astro/TabList";
-import Tab from "@typeshade/site-ui/astro/Tab";
+import TabList from '@typeshade/site-ui/astro/TabList';
+import Tab from '@typeshade/site-ui/astro/Tab';
 import '../DocAlert.css';
 import '../CodeTabs.css';
-import '../GalleryTile.css';
 import '../ShaderFigure.css';
 import Alert from '@typeshade/site-ui/astro/Alert';
 import LinkButton from '@typeshade/site-ui/astro/LinkButton';
-// The front page: a two-column hero in Ant Design's grammar. The headline, the sentence and
-// the actions on the left; on the right the showcase card, where the file that draws the
-// picture sits beside the picture and can be edited in place. Then the same idea at the
-// compiler's scale: one file and the two targets it emits, the repository's own examples
-// running as tiles, what carries over from TypeScript, the gradient pass drawn by each
-// backend, and the command that installs it.
+// The home introduces the language; runnable examples have their own pages.
 import { Code } from 'astro-expressive-code/components';
 import Base from '../../layouts/Base.astro';
 import CodeFrame from '../CodeFrame.astro';
 import InstallCommand from '../InstallCommand.astro';
-import LiveShader from '../LiveShader.astro';
 import Rich from '../Rich.astro';
 import ShaderCanvas from '../ShaderCanvas.astro';
 import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
@@ -36,42 +29,12 @@ const { locale } = Astro.props;
 const t = copyFor(locale);
 const f = t.front;
 
-// The front page's own file. Code is not copy, so it lives here, the way every live example
-// keeps its sample beside the page that shows it. `time` and `mouse` are filled by the page;
-// the other three fields get a control each.
-const first = `"use typeshade"
-
-class Uniforms {
-  time: f32
-  mouse: vec2
-  warp: f32
-  ink: vec3
-  paper: vec3
-}
-
-declare const u: uniform<Uniforms>
-
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
-  const p = uv * 4.0 - u.mouse * 2.0
-  const a = sin(p.x + u.time * 0.5) + cos(p.y - u.time * 0.3)
-  const b = sin(p.y * u.warp + a) * cos(p.x * u.warp - a)
-  const t = b * 0.5 + 0.5
-  const s = t * t * (3.0 - 2.0 * t)
-  return vec4(mix(u.ink, u.paper, s * s * (3.0 - 2.0 * s)), 1.0)
-}
-`;
-
-/** The tiles, in the order they read. Every id is a `.shade.ts` example with a still; a
- *  missing one stops the build here, before a blank frame could. A tile shows the still
- *  captured from the shader at build time and links to that example's own page, the way a
- *  gallery tile does: the front page is a first visit, and nine shaders compiling and
- *  animating on it is GPU work every visitor pays for. The showcase card above is the one
- *  thing on the page that runs. */
-const TILE_IDS = ['domain-warp-twin', 'plasma-twin', 'voronoi-twin', 'julia-twin', 'ocean-twin', 'starfield-twin', 'tunnel-twin', 'kaleidoscope-twin', 'mandelbrot-twin'] as const;
+// A short preview links into the complete example collection.
+const TILE_IDS = ['domain-warp-twin', 'ocean-twin', 'julia-twin'] as const;
 const tileTitles = checkedShade('title', t.examples.shade.titles);
 const tiles = TILE_IDS.map((id) => {
-  if (!(SHADE_STILL_EXAMPLES as readonly string[]).includes(id)) throw new Error(`[front] tile '${id}' has no still`);
+  if (!(SHADE_STILL_EXAMPLES as readonly string[]).includes(id))
+    throw new Error(`[front] tile '${id}' has no still`);
   return { id, title: tileTitles[id]!, href: localePath(locale, examplePath(id)) };
 });
 
@@ -85,65 +48,78 @@ const quickStart = localePath(locale, links.quickStart.href);
 ---
 
 <Base locale={locale} path="/" searchable searchTitle={f.searchTitle}>
-  <div class="wide-in grid grid-cols-1 gap-10 pbs-12 sm:pbs-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12 lg:pbs-16">
-    <div class="self-center">
-      <h1 class="front-title m-0 text-[clamp(2rem,1.4rem+2.4vw,3rem)] leading-[1.15] font-semibold tracking-[-0.02em] text-balance min-[90rem]:text-[3.25rem]">{f.title}</h1>
-      <p class="front-lede mbs-4 max-inline-[52ch] text-prose text-text-2 text-pretty lg:mbs-5"><Rich text={f.lede} locale={locale} /></p>
+  <section class="front-hero wide-in pbs-12 sm:pbs-16 lg:pbs-20" aria-labelledby="front-title">
+    <div class="max-inline-[56rem]">
+      <h1
+        id="front-title"
+        class="front-title max-inline-[28ch] m-0 text-[clamp(2rem,1.4rem+2.4vw,3rem)] leading-[1.15] font-semibold tracking-[-0.02em] text-balance min-[90rem]:text-[3.25rem]"
+      >
+        {f.title}
+      </h1>
+      <p class="front-lede mbs-4 max-inline-[68ch] text-prose text-text-2 text-pretty lg:mbs-5">
+        <Rich text={f.lede} locale={locale} />
+      </p>
       <p class="mbs-8 flex flex-wrap gap-3">
         <LinkButton variant="primary" size="large" href={playground}>
           {f.playground}
-          <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13.025 1l-2.847 2.828 6.176 6.176h-16.354v3.992h16.354l-6.176 6.176 2.847 2.828 10.975-11z" /></svg>
+          <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M13.025 1l-2.847 2.828 6.176 6.176h-16.354v3.992h16.354l-6.176 6.176 2.847 2.828 10.975-11z" />
+          </svg>
         </LinkButton>
-        <LinkButton variant="secondary" size="large" href={quickStart}>{f.quickStart}</LinkButton>
-        <LinkButton variant="secondary" size="large" href={localePath(locale, links.why.href)}>{t.docs.why}</LinkButton>
+        <LinkButton variant="secondary" size="large" href={quickStart}>
+          {f.quickStart}
+        </LinkButton>
+        <LinkButton variant="secondary" size="large" href={localePath(locale, links.why.href)}>
+          {t.docs.why}
+        </LinkButton>
       </p>
     </div>
-
-    <section class="min-inline-0" aria-label={f.stageAria}>
-      <LiveShader
-        variant="hero"
-        locale={locale}
-        id="front-first"
-        title={f.first.title}
-        code={first}
-        caption={f.first.caption}
-        file="first.shade.ts"
-        aspect="4/3"
-        controls={{
-          warp: { label: f.first.warp, min: 0.5, max: 4, step: 0.1, value: 2.4 },
-          ink: { label: f.first.ink, color: true, value: [0.07, 0.13, 0.55] },
-          paper: { label: f.first.paper, color: true, value: [1, 0.62, 0.18] },
-        }}
-      />
-    </section>
-  </div>
+  </section>
 
   <section class={section}>
     <h2 class={heading}>{f.targets.h}</h2>
-    <p class={lead}><Rich text={f.targets.p} locale={locale} /></p>
+    <p class={lead}>
+      <Rich text={f.targets.p} locale={locale} />
+    </p>
     <div class="front-targets-grid mbs-6 grid max-inline-[calc(2*var(--wide)+24px)] gap-4 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:gap-6">
       {/* The file name is the source column's own head, in the shape the tabs opposite make
-          and the one the hero card gives the same file. The frame under it carries no title
+          and aligns it with the emitted code. The frame under it carries no title
           bar of its own, so the first line of code sits at the same height in both columns. */}
       <div class="front-targets-src flex min-inline-0 flex-col gap-4 lg:gap-6">
-        <p class="flex block-[41px] items-center gap-4 border-be border-be-line-1"><span class={fileClass}>hello.shade.ts</span></p>
+        <p class="flex block-[41px] items-center gap-4 border-be border-be-line-1">
+          <span class={fileClass}>hello.shade.ts</span>
+        </p>
         <CodeFrame label={f.targets.source}>
           <Code code={useTypeshadeSample} lang="ts" locale={locale} wrap />
         </CodeFrame>
       </div>
       <div class="flex min-inline-0 flex-col gap-4 lg:gap-6" data-front-tabs>
         <TabList class="tabs-head" aria-label={f.targets.h}>
-          <Tab id="targets-tab-wgsl" aria-controls="targets-panel-wgsl" aria-selected="true">{f.targets.wgsl}</Tab>
-          <Tab id="targets-tab-glsl" aria-controls="targets-panel-glsl" aria-selected="false">{f.targets.glsl}</Tab>
+          <Tab id="targets-tab-wgsl" aria-controls="targets-panel-wgsl" aria-selected="true">
+            {f.targets.wgsl}
+          </Tab>
+          <Tab id="targets-tab-glsl" aria-controls="targets-panel-glsl" aria-selected="false">
+            {f.targets.glsl}
+          </Tab>
         </TabList>
         {/* The tab already names the target, so the frame inside the panel carries no title
             bar of its own; the label stays as the code region's accessible name. */}
-        <div class="tabs-panel" role="tabpanel" id="targets-panel-wgsl" aria-labelledby="targets-tab-wgsl">
+        <div
+          class="tabs-panel"
+          role="tabpanel"
+          id="targets-panel-wgsl"
+          aria-labelledby="targets-tab-wgsl"
+        >
           <CodeFrame label={f.targets.wgsl}>
             <Code code={useTypeshadeHero.wgsl} lang="wgsl" locale={locale} wrap />
           </CodeFrame>
         </div>
-        <div class="tabs-panel" role="tabpanel" id="targets-panel-glsl" aria-labelledby="targets-tab-glsl">
+        <div
+          class="tabs-panel"
+          role="tabpanel"
+          id="targets-panel-glsl"
+          aria-labelledby="targets-tab-glsl"
+        >
           <CodeFrame label={f.targets.glsl}>
             <Code code={useTypeshadeHero.glsl} lang="glsl" locale={locale} wrap />
           </CodeFrame>
@@ -152,20 +128,38 @@ const quickStart = localePath(locale, links.quickStart.href);
     </div>
   </section>
 
-  <section class={section}>
-    <div class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6">
-      <h2 class={heading}>{f.gallery.h}</h2>
-      <a class="text-(length:--text-ui) font-semibold whitespace-nowrap text-accent no-underline transition-[color] hover:text-(--color-primary-text-hover)" href={localePath(locale, links.examples.href)}>{f.gallery.all}</a>
-      <p class={`front-gallery-lead col-span-full ${lead}`}><Rich text={f.gallery.p} locale={locale} /></p>
+  <section class={`front-examples ${section}`} aria-labelledby="front-examples-title">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+      <h2 id="front-examples-title" class="m-0 text-h4 font-semibold">
+        {f.gallery.h}
+      </h2>
+      <a
+        class="text-ui font-semibold text-accent no-underline hover:underline"
+        href={localePath(locale, links.examples.href)}
+      >
+        {f.gallery.all}
+      </a>
     </div>
-    <ul class="mbs-6 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+    <p class="mbs-2 max-inline-[68ch] text-ui text-text-2">
+      <Rich text={f.gallery.p} locale={locale} />
+    </p>
+    <ul class="mbs-4 grid gap-x-8 sm:grid-cols-3">
       {tiles.map((tile) => (
-        <li class="front-tile min-inline-0 overflow-hidden rounded-md border border-line-1 bg-(--color-elevated) transition-[box-shadow,border-color]">
-          <a class="group block rounded-md text-inherit no-underline" href={tile.href}>
-            <span class="tile-cover">
-              <img src={`/stills/${tile.id}.webp`} alt="" loading="lazy" decoding="async" />
-            </span>
-            <span class="block p-4 text-h5 font-semibold text-text-1 transition-[color] group-hover:text-accent">{tile.title}</span>
+        <li class="min-inline-0 border-be border-be-line-1">
+          <a
+            class="group flex items-center gap-4 py-4 text-text-1 no-underline hover:text-accent"
+            href={tile.href}
+          >
+            <img
+              class="block h-16 w-24 shrink-0 rounded-sm object-cover"
+              src={`/stills/${tile.id}.webp`}
+              alt=""
+              width="96"
+              height="64"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="text-ui font-semibold">{tile.title}</span>
           </a>
         </li>
       ))}
@@ -174,14 +168,22 @@ const quickStart = localePath(locale, links.quickStart.href);
 
   <section class={section}>
     <h2 class={heading}>{f.map.h}</h2>
-    <p class={lead}><Rich text={f.map.p} locale={locale} /></p>
+    <p class={lead}>
+      <Rich text={f.map.p} locale={locale} />
+    </p>
     <dl class="mbs-6">
       {f.map.rows.map(([ts, shade, body]) => (
         <div class="front-map-row grid gap-x-8 gap-y-2 border-be border-be-line-1 py-5 first:border-bs first:border-bs-line-1 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] md:items-start">
-          <dt class="self-start justify-self-start max-inline-full min-inline-0"><Code code={ts} lang="ts" locale={locale} wrap /></dt>
+          <dt class="self-start justify-self-start max-inline-full min-inline-0">
+            <Code code={ts} lang="ts" locale={locale} wrap />
+          </dt>
           <dd class="pbs-[2px]">
-            <strong class="block text-h5 font-semibold text-text-1"><Rich text={shade} locale={locale} /></strong>
-            <p class="mbs-1 max-inline-(--content) leading-[1.5714] text-text-2"><Rich text={body} locale={locale} /></p>
+            <strong class="block text-h5 font-semibold text-text-1">
+              <Rich text={shade} locale={locale} />
+            </strong>
+            <p class="mbs-1 max-inline-(--content) leading-[1.5714] text-text-2">
+              <Rich text={body} locale={locale} />
+            </p>
           </dd>
         </div>
       ))}
@@ -190,10 +192,27 @@ const quickStart = localePath(locale, links.quickStart.href);
 
   <section class={`front-oracle ${section}`}>
     <h2 class={heading}>{f.oracle.h}</h2>
-    <p class={lead}><Rich text={f.oracle.p} locale={locale} /></p>
+    <p class={lead}>
+      <Rich text={f.oracle.p} locale={locale} />
+    </p>
     <div class="figure-pair">
-      <ShaderCanvas locale={locale} example="gradient-twin" aspect="3/1" still caption={f.oracle.webgpu} stillId="gradient" />
-      <ShaderCanvas locale={locale} example="gradient-twin" aspect="3/1" still forceWebGl2 caption={f.oracle.webgl2} stillId="gradient-webgl2" />
+      <ShaderCanvas
+        locale={locale}
+        example="gradient-twin"
+        aspect="3/1"
+        still
+        caption={f.oracle.webgpu}
+        stillId="gradient"
+      />
+      <ShaderCanvas
+        locale={locale}
+        example="gradient-twin"
+        aspect="3/1"
+        still
+        forceWebGl2
+        caption={f.oracle.webgl2}
+        stillId="gradient-webgl2"
+      />
     </div>
   </section>
 
@@ -204,69 +223,131 @@ const quickStart = localePath(locale, links.quickStart.href);
         <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z" />
         <path d="M464 336a48 48 0 1096 0 48 48 0 10-96 0zm72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z" />
       </svg>
-      <p><Rich text={f.install.p} locale={locale} /></p>
+      <p>
+        <Rich text={f.install.p} locale={locale} />
+      </p>
     </Alert>
     <InstallCommand locale={locale} />
     {/* A paragraph of the section like the others, so it keeps the lead's measure and type. */}
     <p class="mbs-6 flex max-inline-[62ch] flex-wrap gap-3 text-prose text-text-2 text-pretty">
-      <LinkButton variant="primary" size="large" href={playground}>{f.playground}</LinkButton>
-      <LinkButton variant="secondary" size="large" href={quickStart}>{f.quickStart}</LinkButton>
+      <LinkButton variant="primary" size="large" href={playground}>
+        {f.playground}
+      </LinkButton>
+      <LinkButton variant="secondary" size="large" href={quickStart}>
+        {f.quickStart}
+      </LinkButton>
     </p>
   </section>
 </Base>
 
 <style>
   /* What the utilities in the markup cannot say: the Korean type the global :lang(ko) heading
-     rule would otherwise take, the children Rich and Expressive Code render, and the tiles'
-     hover state. */
-  .front-title:lang(ko) { letter-spacing: -0.01em; line-height: 1.3 }
-  .front-section h2:lang(ko) { letter-spacing: 0; line-height: 1.4 }
-  /* Inline code in the copy. Expressive Code's own `pre > code` keeps its face and size. */
-  .front-lede :global(code), .front-section :global(:not(pre) > code) { font-family: var(--font-mono); font-size: 0.9em }
-  .front-section > p :global(a:not(.ui-button)), .front-gallery-lead :global(a:not(.ui-button)), .front-map-row dd :global(a) {
-    color: var(--color-accent); text-decoration: none; transition: color var(--motion);
+     rule would otherwise take, the children Rich and Expressive Code render, and code frames. */
+  .front-title:lang(ko) {
+    letter-spacing: -0.01em;
+    line-height: 1.3;
   }
-  .front-section > p :global(a:not(.ui-button):hover), .front-gallery-lead :global(a:not(.ui-button):hover), .front-map-row dd :global(a:hover) {
+  .front-section h2:lang(ko) {
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+  /* Inline code in the copy. Expressive Code's own `pre > code` keeps its face and size. */
+  .front-lede :global(code),
+  .front-section :global(:not(pre) > code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+  .front-section > p :global(a:not(.ui-button)),
+  .front-map-row dd :global(a) {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color var(--motion);
+  }
+  .front-section > p :global(a:not(.ui-button):hover),
+  .front-map-row dd :global(a:hover) {
     color: var(--color-primary-text-hover);
   }
-  .front-section :global(.expressive-code) { margin: 0 }
+  .front-section :global(.expressive-code) {
+    margin: 0;
+  }
   /* The two columns read as one row: each is a 40px head over a code frame, so the first line
      of code sits at the same height on both sides, and the frames stretch to the taller of the
      two, which is the source at 21 lines. A pane whose emit is shorter sits against the same
-     box and a longer one scrolls inside it, the way the hero card's code pane does, so the
+     box and a longer one scrolls inside it, so the
      section keeps its height when the tab changes. */
-  .front-targets-src > :global(.expressive-code) { flex: 1 1 auto; min-block-size: 0 }
+  .front-targets-src > :global(.expressive-code) {
+    flex: 1 1 auto;
+    min-block-size: 0;
+  }
   /* One selector deeper than Expressive Code's own `.expressive-code .frame`, whose stylesheet
      is injected after this one and would otherwise keep the frame a block box. */
-  .front-targets-grid :global(.expressive-code .frame) { display: flex; flex-direction: column; block-size: 100% }
-  .front-targets-grid :global(.expressive-code .frame pre) { flex: 1 1 auto; min-block-size: 0; overflow: auto }
-  /* The tile gains depth without gaining weight, and the still scales under a fine pointer. */
-  .front-tile:hover, .front-tile:has(a:focus-visible) { border-color: transparent; box-shadow: var(--shadow-elevated) }
-  @media (hover: hover) and (pointer: fine) { .front-tile a:hover .tile-cover img { transform: scale(1.03) } }
+  .front-targets-grid :global(.expressive-code .frame) {
+    display: flex;
+    flex-direction: column;
+    block-size: 100%;
+  }
+  .front-targets-grid :global(.expressive-code .frame pre) {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    overflow: auto;
+  }
   /* What carries over: the TypeScript is an Expressive Code frame with the chrome taken off
      (no copy button, the chip's own padding) so it reads as a tag, not a file. */
   .front-map-row dt :global(.expressive-code) {
-    margin: 0; --ec-brdRad: var(--radius-md); --ec-brdCol: var(--color-line-1); --ec-frm-shdCol: transparent;
-    --ec-codePadBlk: 10px; --ec-codePadInl: 14px; --ec-codeFontSize: var(--text-code); --ec-codeLineHt: 1.6;
+    margin: 0;
+    --ec-brdRad: var(--radius-md);
+    --ec-brdCol: var(--color-line-1);
+    --ec-frm-shdCol: transparent;
+    --ec-codePadBlk: 10px;
+    --ec-codePadInl: 14px;
+    --ec-codeFontSize: var(--text-code);
+    --ec-codeLineHt: 1.6;
   }
-  .front-map-row dt :global(.expressive-code .copy) { display: none }
-  .front-map-row dd strong :global(code) { font-size: 0.95em }
+  .front-map-row dt :global(.expressive-code .copy) {
+    display: none;
+  }
+  .front-map-row dd strong :global(code) {
+    font-size: 0.95em;
+  }
   /* No copy button, so the first line keeps no room for one at its end. */
-  .front-map-row dt :global(.expressive-code :nth-child(1 of .ec-line) .code) { padding-inline-end: var(--ec-codePadInl) }
+  .front-map-row dt :global(.expressive-code :nth-child(1 of .ec-line) .code) {
+    padding-inline-end: var(--ec-codePadInl);
+  }
   /* Nor the band a touch screen keeps above the first line for the copy button that stays on
      screen there (global.css, under hover: none). One selector heavier than that rule. */
-  @media (hover: none) { .front-map-row dt :global(.expressive-code .frame pre > code) { padding-block-start: var(--ec-codePadBlk) } }
+  @media (hover: none) {
+    .front-map-row dt :global(.expressive-code .frame pre > code) {
+      padding-block-start: var(--ec-codePadBlk);
+    }
+  }
   /* The gradient pass drawn by each backend: two cards, the picture as the cover. */
   .front-oracle :global(.figure) {
-    gap: 0; overflow: hidden;
-    border: 1px solid var(--color-line-1); border-radius: var(--radius-md); background: var(--color-elevated);
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-line-1);
+    border-radius: var(--radius-md);
+    background: var(--color-elevated);
   }
-  .front-oracle :global(.figure-frame) { border: 0; border-radius: 0; border-block-end: 1px solid var(--color-line-1) }
-  .front-oracle :global(.figure-caption) { padding: 16px; font-size: var(--text-ui); color: var(--color-text-2) }
+  .front-oracle :global(.figure-frame) {
+    border: 0;
+    border-radius: 0;
+    border-block-end: 1px solid var(--color-line-1);
+  }
+  .front-oracle :global(.figure-caption) {
+    padding: 16px;
+    font-size: var(--text-ui);
+    color: var(--color-text-2);
+  }
   /* The close: the one command, and the action again. Both outrank the alert's and the
      section's own margins. */
-  .front-install > .alert { max-inline-size: 760px; margin-block-start: 12px }
-  .front-install :global(.expressive-code) { margin-block-start: 24px; max-inline-size: 760px }
+  .front-install > .alert {
+    max-inline-size: 760px;
+    margin-block-start: 12px;
+  }
+  .front-install :global(.expressive-code) {
+    margin-block-start: 24px;
+    max-inline-size: 760px;
+  }
 </style>
 
 <script>
@@ -275,14 +356,13 @@ const quickStart = localePath(locale, links.quickStart.href);
 </script>
 
 <style>
-.button-icon {
-  inline-size: 12px;
-  block-size: 12px;
-  fill: currentColor;
-  transition: transform var(--motion);
-}
-.ui-button:hover .button-icon {
-  transform: translateX(2px);
-}
-
+  .button-icon {
+    inline-size: 12px;
+    block-size: 12px;
+    fill: currentColor;
+    transition: transform var(--motion);
+  }
+  .ui-button:hover .button-icon {
+    transform: translateX(2px);
+  }
 </style>

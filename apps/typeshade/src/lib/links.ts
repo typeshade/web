@@ -392,14 +392,14 @@ export function editGuideTranslation(locale: Locale, id: string): string {
   return `${siteRepo}/blob/main/${translationDir(locale)}/${id}.md`;
 }
 
-export function navLinks(locale: Locale): readonly Destination[] {
+export function navLinks(locale: Locale): readonly (Destination & { group: 'learn' | 'build' })[] {
   const labels = copyFor(locale).docs.labels.nav;
   return [
-    { label: labels.docs, href: localePath(locale, links.quickStart.href) },
-    { label: labels.playground, href: localePath(locale, links.playground.href) },
-    { label: labels.language, href: localePath(locale, links.guide.href) },
-    { label: labels.reference, href: localePath(locale, links.reference.href) },
-    { label: labels.examples, href: localePath(locale, links.examples.href) },
+    { label: labels.docs, href: localePath(locale, links.quickStart.href), group: 'learn' },
+    { label: labels.language, href: localePath(locale, links.guide.href), group: 'learn' },
+    { label: labels.reference, href: localePath(locale, links.reference.href), group: 'learn' },
+    { label: labels.playground, href: localePath(locale, links.playground.href), group: 'build' },
+    { label: labels.examples, href: localePath(locale, links.examples.href), group: 'build' },
   ];
 }
 

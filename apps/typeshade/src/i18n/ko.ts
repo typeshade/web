@@ -1292,15 +1292,6 @@ export const ko: Copy = {
     lede: `TypeShade는 TypeScript의 문법과 타입, 편집기를 그대로 쓰는 독립된 언어입니다. \`"use typeshade"\`로 시작하는 파일 하나가 WebGPU용 WGSL과 WebGL2용 ${glsl}을 냅니다. 저장소의 예제 ${facts.shadeExamples}개 가운데 ${facts.shadeRenderable}개가 파일 하나로 둘 다 냅니다.`,
     playground: 'Playground',
     quickStart: 'Quick Start',
-    stageAria: '그것을 그리는 파일 옆에서 실행되는 셰이더',
-    first: {
-      title: '굽은 띠',
-      caption:
-        '왼쪽 파일을 오른쪽에 그립니다. 한 줄을 고치거나 컨트롤을 움직이면 그림이 따라옵니다.',
-      warp: '띠가 휘는 정도',
-      ink: '첫 번째 색',
-      paper: '두 번째 색',
-    },
     targets: {
       h: '파일 하나, 출력 둘',
       p: '컴파일러는 `hello.shade.ts`를 하나의 중간 표현으로 변환한 뒤 두 타깃의 코드를 생성합니다. 이 파일은 다른 파일을 가져오지 않으므로 그 자체가 프로그램 전부이고, 옆 창에는 호스트가 WebGPU나 WebGL2에 넘기는 WGSL과 GLSL ES 3.00 프래그먼트가 탭 하나씩으로 들어 있습니다.',
@@ -1309,8 +1300,8 @@ export const ko: Copy = {
       glsl: `${glsl} 프래그먼트`,
     },
     gallery: {
-      h: '더 많은 셰이더',
-      p: `컴파일러에는 지도 렌더링 패스부터 컴퓨트 커널까지 예제 ${facts.shadeExamples}개가 들어 있습니다. 각 타일은 빌드할 때 그 셰이더가 그린 화면이고, 누르면 그 예제를 실행하는 페이지로 갑니다.`,
+      h: '예제',
+      p: `컴파일러에는 지도 렌더링 패스부터 컴퓨트 커널까지 예제 ${facts.shadeExamples}개가 들어 있습니다. 전체 목록을 둘러보거나 아래 예제를 열어 보세요.`,
       all: '예제 전체',
       tile: (title: string) => ({
         neutral: `${title}. 빌드할 때 그린 화면입니다.`,

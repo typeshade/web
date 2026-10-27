@@ -617,17 +617,14 @@ The front page answers "what is it" in about 350 words, the length of comparable
 front pages (htmx, esbuild, wgpu, TypeGPU are 250 to 350). Everything that explains how or
 why lives on its own page.
 
-- `/`: a two-column hero, the headline and a one-sentence lede on the left over two large
-  buttons (Open the Playground, filled; Quick start, the default face), and on the right the
-  showcase card, where `first.shade.ts` sits beside the picture it draws and the reader edits
-  it in place. Then one section per idea, each a heading, a sentence and its evidence: one
-  file and two targets, with `hello.shade.ts` beside the WGSL and the GLSL ES 3.00 it emits;
-  nine of the repository's examples as tiles, each a card with that example's build-time still
-  as its cover, the example's name under it, and the whole card a link to the page that runs
-  it; what carries over from TypeScript, as a list whose left
-  column is the TypeScript in a code chip and whose right column is what it becomes; the
-  gradient pass drawn by each backend as two cards; and the install command with the two
-  buttons again.
+- `/`: a text-led hero with the language introduction and links to the Playground,
+  Quick Start and motivation. Runnable editing lives in the Playground and example pages.
+  The source-to-target section shows `hello.shade.ts` beside its WGSL and GLSL output.
+  Three small example thumbnails link into the complete collection. The remaining sections
+  explain the TypeScript mapping, compare the backends and show the installation command.
+  The header keeps documentation links and build/example links in separate groups beside
+  the brand, with search and preferences aligned to the opposite edge. Mobile navigation
+  preserves those groups. Both locales use the same front-page component.
 - `/guide/…`: the documentation, on the layout every documentation site uses (VitePress,
   Docusaurus): a sidebar on the left with six groups, the document in the middle, and on a
   wide screen an outline of the page on the right. Under 64rem the sidebar is a bar under the

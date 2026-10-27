@@ -1342,15 +1342,6 @@ export const en = {
     lede: `TypeShade is a language of its own, with TypeScript's syntax, types and editor. A file that starts with \`"use typeshade"\` emits WGSL for WebGPU and ${glsl} for WebGL2. ${facts.shadeRenderable} of the ${facts.shadeExamples} examples in the repository emit both from one file.`,
     playground: 'Playground',
     quickStart: 'Quick Start',
-    stageAria: 'A shader running beside the file that draws it',
-    first: {
-      title: 'Warped bands',
-      caption:
-        'The file on the left, drawn on the right. Edit a line or move a control and the picture follows.',
-      warp: 'how much the bands bend',
-      ink: 'first colour',
-      paper: 'second colour',
-    },
     targets: {
       h: 'One file, two targets',
       p: 'The compiler lowers `hello.shade.ts` to one intermediate representation and emits both targets from it. The file imports nothing, so it is the whole program; the pane beside it holds the WGSL and the GLSL ES 3.00 fragment a host hands to WebGPU or WebGL2, one tab each.',
@@ -1359,8 +1350,8 @@ export const en = {
       glsl: `${glsl} fragment`,
     },
     gallery: {
-      h: 'More shaders',
-      p: `${facts.shadeExamples} examples ship with the compiler, from cartographic passes to compute kernels. Each tile is the frame its shader drew at build time, and opens the page that runs it.`,
+      h: 'Examples',
+      p: `${facts.shadeExamples} examples ship with the compiler, from cartographic passes to compute kernels. Browse the collection or open an example below.`,
       all: 'All examples',
       /** What a canvas of one example says under it, by what drew the frame. The front page's
        *  tiles are stills and carry none of this; the example's own page runs the shader. */
