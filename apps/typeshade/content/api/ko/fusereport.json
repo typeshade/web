@@ -4,7 +4,7 @@
   "texts": {
     "summary": "fuse 스코프에서 계획을 실행한 결과를 담은 보고서입니다.",
     "description": "이 개수는 계획이 장치에 보낸 호출만 세며, 다른 것은 세지 않습니다. `dispatches`는 WebGPU의 디스패치 하나 또는 WebGL2의 드로 하나입니다. `submissions`는 `queue.submit` 한 번이며, 계획이 필요로 한 `Resident` 읽기도 포함됩니다.\n\n`typeshade/fuse`, `typeshade/runtime`, 패키지 루트가 모두 내보낸다(변경 0071, 수정안 2). 그래서 보고서를 다루는 호스트는 플래너를 가져오지 않고도 타입을 붙일 수 있습니다.",
-    "members.tier": "계획의 호출 가운데 실행된 가장 앞선 tier입니다. 순서는 WebGPU, WebGL2, CPU tier이며, 어떤 호출도 장치에서 실행되지 않으면 `'cpu'`이입니다. 각 호출은 `configure({ prefer })`의 tier 가운데 실행할 수 있는 첫 번째 tier에서 실행됩니다. 스코프 밖의 호출이 그렇게 실행되는 것과 같습니다.",
+    "members.tier": "계획의 호출 가운데 실행된 가장 앞선 tier입니다. 순서는 WebGPU, WebGL2, CPU tier이며, 어떤 호출도 장치에서 실행되지 않으면 `'cpu'`입니다. 각 호출은 `configure({ prefer })`의 tier 가운데 실행할 수 있는 첫 번째 tier에서 실행됩니다. 스코프 밖의 호출이 그렇게 실행되는 것과 같습니다.",
     "members.dispatches": "계획이 만든 디스패치 수입니다. CPU tier에서는 없습니다.",
     "members.submissions": "계획이 WebGPU 큐에 명령을 넘긴 횟수입니다. 다른 tier에서는 없습니다. 호출이 모두 WebGPU에서 실행되는 스코프는 1입니다. reduce하는 호출도 여기에 들어갑니다. 리덕션의 루프, 부분 결과를 접는 디스패치, 접은 값을 복사하는 작업이 모두 그 제출 하나에 담깁니다. WebGL2나 CPU tier에서 실행되는 호출은 배열을 호스트에서 읽으므로, 계획이 그 전에 들고 있는 값을 먼저 제출합니다. 그 호출이 필요로 하는 `Resident`를 디바이스에서 읽는 일도 제출 하나씩입니다.",
     "members.groups": "호출의 그룹이 순서대로 나열됩니다. 각 그룹은 커널 함수의 이름으로 표시됩니다. `fused`인 그룹은 디스패치 하나입니다. `why`에는 작성한 코드에 대응하는 용어로 그룹이 앞 그룹과 왜 구분되는지가 적힙니다. 적을 내용이 없는 그룹에서는 이 항목이 빠집니다.",

@@ -6,6 +6,7 @@ import "../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import CodeBlock from "../../components/CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
 const code = `const device = await nn.device({ device: "auto" });
 const x = device.tensor([1, 2, 3, 4], { shape: [2, 2] });
 const y = x.relu().softmax();
@@ -45,27 +46,27 @@ await device.dispose();`;
         />
         <ul class="api-list">
           <li>
-            <code>device(options?)</code>
+            <InlineTypeScript code="device(options?)" />
             <span>
               Open a Device using auto, cpu, webgpu, or webgl2 selection.
             </span>
           </li>
           <li>
-            <code>Device.tensor(values, &#123; shape &#125;)</code>
+            <InlineTypeScript code="Device.tensor(values, { shape })" />
             <span>Create an input tensor with a checked shape.</span>
           </li>
           <li>
-            <code>Tensor.data()</code>
+            <InlineTypeScript code="Tensor.data()" />
             <span>
               Materialize the requested graph result and return host values.
             </span>
           </li>
           <li>
-            <code>Tensor.disposeGraph(preserve?)</code>
+            <InlineTypeScript code="Tensor.disposeGraph(preserve?)" />
             <span>Release graph tensors while retaining selected values.</span>
           </li>
           <li>
-            <code>Device.dispose()</code>
+            <InlineTypeScript code="Device.dispose()" />
             <span>Wait for pending work and release runtime resources.</span>
           </li>
         </ul>
@@ -76,7 +77,7 @@ await device.dispose();`;
           <div>
             <h3>Linear algebra</h3>
             <p>
-              <code>matmul(other, options?)</code>
+              <InlineTypeScript code="matmul(other, options?)" />
               <br />
               Rank-2 matrix multiply with transpose options.
             </p>
@@ -101,7 +102,7 @@ await device.dispose();`;
             <h3>Loss and gradients</h3>
             <p>
               <code>softmaxCrossEntropyWithLogits</code>,{" "}
-              <code>backward()</code>, and selected Tensor graph gradient rules.
+              <InlineTypeScript code="backward()" />, and selected Tensor graph gradient rules.
             </p>
           </div>
         </div>
@@ -123,14 +124,14 @@ await device.dispose();`;
           <li>
             <code>optim.SGD</code>, <code>optim.Adam</code>
             <span>
-              Update parameter gradients on CPU or through GPU kernels,
-              depending on Device tier.
+              Compute gradients and update parameters in one device plan. Use{" "}
+              <code>alsoRead</code> to read additional Tensors in the same plan.
             </span>
           </li>
           <li>
             <code>CrossEntropyLoss</code>
             <span>
-              Loss module for logits and integer class labels in the MNIST path.
+              Loss module for logits and integer class labels in the MNIST example.
             </span>
           </li>
         </ul>

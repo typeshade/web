@@ -24,6 +24,7 @@
     "check:ui": "pnpm --filter @typeshade/ui-preview check",
     "test:controls": "node packages/ui/scripts/test-controls.mjs apps/ui/dist",
     "test:patterns": "node packages/ui/scripts/test-patterns.mjs apps/ui/dist",
+    "test:code": "node --test packages/ui/code/highlight.test.mjs",
     "test:styles": "node scripts/check-style-ownership.mjs"
   },
   "devDependencies": {

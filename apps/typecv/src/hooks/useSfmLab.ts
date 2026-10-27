@@ -94,7 +94,8 @@ export function useSfmLab(locale: 'en' | 'ko') {
         );
         await new Promise<void>((resolve, reject) => {
           video.onseeked = () => resolve();
-          video.onerror = () => reject(new Error('Video seek failed.'));
+          video.onerror = () =>
+            reject(new Error(ko ? '영상 프레임 이동에 실패했습니다.' : 'Could not seek to the video frame.'));
           video.currentTime = Math.min(time, duration - 0.05);
         });
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -142,8 +143,9 @@ export function useSfmLab(locale: 'en' | 'ko') {
     setReconstruction(undefined);
     setDiagnostics(undefined);
     try {
-      if (input.size > 64 * 1024 * 1024) throw new RangeError('Frame bundle exceeds 64 MiB.');
-      const prepared = parsePreparedVideo(await input.text());
+      if (input.size > 64 * 1024 * 1024)
+        throw new RangeError(ko ? '프레임 묶음은 64 MiB를 초과할 수 없습니다.' : 'Frame bundle exceeds 64 MiB.');
+      const prepared = parsePreparedVideo(await input.text(), ko ? 'ko' : 'en');
       const canvas = canvasRef.current!;
       const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
       const sampled: SampledFrame[] = [];
@@ -151,7 +153,7 @@ export function useSfmLab(locale: 'en' | 'ko') {
         const bitmap = await createImageBitmap(await (await fetch(frame.image)).blob());
         try {
           if (bitmap.width !== frame.width || bitmap.height !== frame.height)
-            throw new RangeError('Encoded frame dimensions do not match the bundle.');
+            throw new RangeError(ko ? '인코딩된 프레임의 크기가 묶음 정보와 일치하지 않습니다.' : 'Encoded frame dimensions do not match the bundle.');
           canvas.width = frame.width;
           canvas.height = frame.height;
           ctx.drawImage(bitmap, 0, 0);
@@ -200,7 +202,8 @@ export function useSfmLab(locale: 'en' | 'ko') {
         sampled: SampledFrame[] = [];
       for (let i = 0; i < times.length; i++) {
         const response = await fetch(`/sample/pyramid/frame-${String(i).padStart(2, '0')}.jpg`);
-        if (!response.ok) throw new Error(`Sample frame ${i + 1} could not be loaded.`);
+        if (!response.ok)
+          throw new Error(ko ? `샘플 프레임 ${i + 1}을(를) 불러오지 못했습니다.` : `Sample frame ${i + 1} could not be loaded.`);
         const bitmap = await createImageBitmap(await response.blob());
         canvas.width = bitmap.width;
         canvas.height = bitmap.height;

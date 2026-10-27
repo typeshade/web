@@ -6,6 +6,7 @@ import "../../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 import CodeBlock from "../../../components/CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
 const code = `const model = new SimpleMLP().to(device);
 const parameters = model.parameters();
 const criterion = new nn.CrossEntropyLoss();
@@ -102,31 +103,35 @@ const modelCode = `export class SimpleMLP extends nn.Module {
         />
       </section>
       <section class="doc-section">
-        <h2>GPU 실행 경로</h2>
+        <h2>학습 단계에서 실행되는 일</h2>
         <p>
           모든 계층에서 순전파와 역전파 연산은 TypeShade 커널 함수로 실행되고,{" "}
-          <code>data()</code> 호출마다 fuse 범위 하나가 실행됩니다.{" "}
-          <code>optimizer.step()</code>은 기울기 계산과 파라미터·Adam 모멘트
+          요청한 Tensor에 계산된 배열이 없으면 <InlineTypeScript
+            code="data()"
+          />가 필요한 커널을 실행합니다. <InlineTypeScript code="optimizer.step()" />은
+          기울기 계산과 파라미터·Adam 모멘트
           갱신을 장치에서 계획 하나로 실행합니다. 기울기를 읽어오지 않고
           파라미터를 올리지도 않습니다. 계층의 <code>weight</code>와{" "}
           <code>bias</code> 배열은 호스트 사본입니다.{" "}
-          <code>await model.sync()</code>가 사본을 갱신하고,{" "}
-          <code>parameter.data()</code>는 파라미터 하나를 읽어옵니다.
+          <InlineTypeScript code="await model.sync()" />가 사본을 갱신하고,
+          <InlineTypeScript code="parameter.data()" />는 파라미터 하나를
+          읽어옵니다.
           SwiftShader에서는 장치 갱신이 대체한 호스트 반복문보다 빠르지
           않습니다.
         </p>
         <div class="note">
           <strong>명시적으로 읽은 값은 호스트로 전달됩니다.</strong>
           <span>
-            <code>loss.data()</code>와 <code>parameter.data()</code>는 CPU
-            결과를 요청합니다. 위 루프는 매 단계 손실만 읽어옵니다.
+            <InlineTypeScript code="loss.data()" />와{" "}
+            <InlineTypeScript code="parameter.data()" />는 호스트 결과를
+            요청합니다. 위 루프는 매 단계 손실만 읽어옵니다.
           </span>
         </div>
       </section>
       <section class="doc-section">
         <h2>각 배치 그래프 해제</h2>
         <p>
-          <code>disposeGraph(model.parameters())</code>는 모델 파라미터를
+          <InlineTypeScript code="disposeGraph(model.parameters())" />는 모델 파라미터를
           보존하고 임시 Tensor를 해제합니다. 학습 세션이 끝나고 대기 중 작업을
           마친 다음 Device를 해제하세요.
         </p>
@@ -139,9 +144,9 @@ const modelCode = `export class SimpleMLP extends nn.Module {
       <section class="doc-section">
         <h2>현재 지원 범위</h2>
         <p>
-          Tensor 자동 미분은 선택된 연산을 지원합니다. Module 학습 예제를 현재
-          지원 범위로 보고, 임의 사용자 커널이나 모든 그래프 연산의 미분이
-          지원된다고 가정하지 마세요.
+          Tensor 그래프 자동 미분은 선택된 연산의 기울기를 계산합니다. 이
+          가이드는 MNIST Module 예제를 설명하며, 임의의 사용자 정의 커널이나 모든
+          Tensor 연산의 기울기를 지원한다고 말하지 않습니다.
         </p>
         <nav class="doc-pagination">
           <a href="/ko/guide/execution/">

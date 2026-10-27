@@ -98,6 +98,10 @@ export const links = {
   fromGlslFunctions: { label: 'Functions', href: '/guide/language/from-glsl/functions/' },
   languageBuiltins: { label: 'Builtin functions', href: '/guide/language/builtins/' },
   legacyAuthoring: { label: 'Compiler authoring guide', href: '/guide/authoring/' },
+  authoringCapabilities: {
+    label: 'Capabilities and extensions',
+    href: '/guide/authoring/capabilities-extensions/',
+  },
   internals: { label: 'Compiler internals', href: '/guide/internals/' },
   internalsGlslShader: {
     label: 'Migrating a GLSL shader',

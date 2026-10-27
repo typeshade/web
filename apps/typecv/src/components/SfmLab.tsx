@@ -83,7 +83,7 @@ export default function SfmLab({ locale = "en" }: { locale?: "en" | "ko" }) {
               </Button>
             </Upload>
             <Field
-              label={ko ? "초점거리 / 영상 너비" : "Focal length / image width"}
+              label={ko ? "초점거리 / 원본 너비 비율" : "Focal length / source width ratio"}
               description={
                 ko
                   ? "기본값 1.2는 가정값이며 실제 카메라 보정 데이터가 아닙니다."
@@ -120,8 +120,8 @@ export default function SfmLab({ locale = "en" }: { locale?: "en" | "ko" }) {
           </div>
           <p className="field-help">
             {ko
-              ? "18K 등 브라우저 디코더 한도를 넘는 원본은 python scripts/prepare-sfm-video.py input.mkv frames.json으로 준비한 뒤 JSON을 선택하세요. 기본 분석 해상도는 긴 변 512픽셀입니다."
-              : "For sources such as 18K above browser decoder limits, run python scripts/prepare-sfm-video.py input.mkv frames.json and select the JSON. Default analysis resolution is 512 pixels on the long edge."}
+              ? "18K 영상처럼 브라우저 디코더 한도를 넘는 원본은 python scripts/prepare-sfm-video.py input.mkv frames.json으로 프레임 묶음을 만든 뒤 JSON 파일을 선택하세요. 기본 분석 해상도는 긴 변 512픽셀입니다."
+              : "For 18K video or other sources beyond browser decoder limits, create a frame bundle with python scripts/prepare-sfm-video.py input.mkv frames.json, then choose the JSON file. The default analysis resolution is 512 pixels on the long edge."}
           </p>
           {source && frameData.length > 0 && (
             <p className="field-help">
@@ -215,18 +215,21 @@ export default function SfmLab({ locale = "en" }: { locale?: "en" | "ko" }) {
                 </Title>
                 <Text type="secondary">
                   {ko
-                    ? "마우스로 회전·확대할 수 있습니다. 점은 랜드마크, 주황색 선은 카메라입니다."
-                    : "Drag to orbit and zoom. Points are landmarks; orange lines mark cameras."}
+                    ? "마우스로 회전하고 확대하세요. 점은 랜드마크, 주황색 선은 카메라의 시야를 나타냅니다."
+                    : "Drag to rotate and zoom. Points mark landmarks; orange lines show camera frustums."}
                 </Text>
               </div>
               <Suspense
                 fallback={
                   <div className="viewer viewer-loading">
-                    Loading 3D viewer…
+                    {ko ? "3D 뷰어를 불러오는 중…" : "Loading the 3D viewer…"}
                   </div>
                 }
               >
-                <SfmViewer reconstruction={reconstruction} />
+                <SfmViewer
+                  reconstruction={reconstruction}
+                  label={ko ? "카메라 위치가 표시된 희소 3D 복원" : "Sparse 3D reconstruction with camera positions"}
+                />
               </Suspense>
               <div className="run-details">
                 <Text>
@@ -238,10 +241,10 @@ export default function SfmLab({ locale = "en" }: { locale?: "en" | "ko" }) {
                   label={ko ? "복원 결과 작업" : "Reconstruction actions"}
                 >
                   <Button size="small" onClick={() => download("ply")}>
-                    Export PLY
+                    {ko ? "PLY 내보내기" : "Export PLY"}
                   </Button>
                   <Button size="small" onClick={() => download("json")}>
-                    Export JSON
+                    {ko ? "JSON 내보내기" : "Export JSON"}
                   </Button>
                   <details>
                     <summary>

@@ -7,7 +7,7 @@ import Field from "@typeshade/site-ui/astro/Field";
 import Button from "@typeshade/site-ui/astro/Button";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 const intro =
-  "보정된 합성 대응점을 생성한 뒤 실제 TypeCV 이미지 쌍 검증을 브라우저에서 실행합니다.";
+  "보정된 합성 장면에서 대응점을 생성하고 브라우저에서 TypeCV 이미지 쌍 검증을 실행합니다.";
 ---
 
 <SiteLayout
@@ -20,8 +20,8 @@ const intro =
     <div class="lab-main playground-page">
       <header class="lab-header">
         <Eyebrow>TYPECV / PLAYGROUND</Eyebrow>
-        <h1>대응점을 검증하고 결과를 확인하세요.</h1>
-        <p>{intro} 입력과 연산은 브라우저 안에서 처리됩니다.</p>
+        <h1>두 이미지의 대응점을 검증합니다</h1>
+        <p>{intro} 생성한 입력과 연산은 브라우저 안에서 처리됩니다.</p>
       </header>
       <form id="pair-form" class="lab-panel lab-controls">
         <Field as="select" id="pair-backend" name="backend" label="실행 환경">
@@ -69,6 +69,9 @@ const intro =
           <canvas id="second-image" width="960" height="600"></canvas>
         </figure>
       </div>
+      <p class="small muted">
+        파랑: E 추정에서 채택 · 빨강: 제외 · 회색: 아직 검증하지 않음
+      </p>
       <div id="results" hidden>
         <h2>결과</h2>
         <dl id="summary" class="metrics"></dl>

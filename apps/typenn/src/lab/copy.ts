@@ -5,13 +5,13 @@ export const text = {
     datasetTitle: "1. Dataset",
     download: "Download",
     downloading: "Downloading",
-    loaded: "Loaded in this page",
+    loaded: "Ready to use on this page",
     fromKeras: "Downloaded from the Keras dataset storage.",
     mirrorDown:
       "The CIFAR mirror on data.typeshade.dev is not available now. The five Keras datasets still work.",
     fromMirror: "Mirrored on data.typeshade.dev from cs.toronto.edu.",
     cachedNote: "Cached in this browser. No download is needed.",
-    notCached: "Not cached yet. The first download fetches the files.",
+    notCached: "Not cached yet. Download the dataset to use it.",
     bytes: "Size",
     residency: "Batches built",
     residencyDevice: "On the device, {shards} shards, {size} held",
@@ -136,14 +136,14 @@ export const text = {
     datasetTitle: "1. 데이터셋",
     download: "내려받기",
     downloading: "내려받는 중",
-    loaded: "이 페이지에 적재됨",
+    loaded: "이 페이지에서 사용할 수 있음",
     fromKeras: "Keras 데이터셋 저장소에서 내려받습니다.",
     mirrorDown:
       "data.typeshade.dev의 CIFAR 사본을 지금 불러올 수 없습니다. Keras 데이터셋 다섯 개는 그대로 사용할 수 있습니다.",
     fromMirror:
       "cs.toronto.edu의 원본을 data.typeshade.dev에 사본으로 두었습니다.",
     cachedNote: "이 브라우저에 저장되어 있습니다. 다시 내려받지 않습니다.",
-    notCached: "아직 저장되지 않았습니다. 처음 내려받을 때 파일을 가져옵니다.",
+    notCached: "아직 저장되지 않았습니다. 데이터셋을 내려받아 사용할 수 있습니다.",
     bytes: "크기",
     residency: "배치를 만드는 곳",
     residencyDevice: "장치에서, 샤드 {shards}개, {size} 보관",
@@ -263,3 +263,68 @@ export const text = {
     fallback: "대체 실행",
   },
 };
+
+export function datasetTitle(
+  id: string,
+  title: string,
+  locale: "en" | "ko",
+): string {
+  if (locale === "en") return title;
+  return (
+    {
+      mnist: "MNIST 손글씨 숫자",
+      fashion_mnist: "Fashion-MNIST 의류 이미지",
+      cifar10: "CIFAR-10 소형 이미지",
+      cifar100: "CIFAR-100 소형 이미지 (세부 레이블)",
+      imdb: "IMDB 영화 리뷰 감정 분류",
+      reuters: "Reuters 뉴스 주제 분류",
+      california_housing: "캘리포니아 주택 가격 회귀",
+    }[id] ?? title
+  );
+}
+
+export function datasetLicense(
+  id: string,
+  license: string,
+  locale: "en" | "ko",
+): string {
+  if (locale === "en") return license;
+  return (
+    {
+      mnist: "Keras 문서에 따른 Creative Commons 저작자표시-동일조건변경허락 3.0 (CC BY-SA 3.0).",
+      fashion_mnist: "MIT 라이선스, Zalando SE (github.com/zalandoresearch/fashion-mnist).",
+      cifar10: "명시된 라이선스를 찾지 못했습니다. Krizhevsky (2009) 기술 보고서와 함께 공개되었으며, 데이터셋 페이지는 해당 보고서 인용을 요청합니다.",
+      cifar100: "명시된 라이선스를 찾지 못했습니다. Krizhevsky (2009) 기술 보고서와 함께 공개되었으며, 데이터셋 페이지는 해당 보고서 인용을 요청합니다.",
+      imdb: "확인된 명시적 라이선스가 없습니다. Maas 외 (2011)가 ACL 논문과 함께 공개했으며 논문을 인용하세요.",
+      reuters: "Reuters-21578: Reuters Ltd.와 Carnegie Group은 readme에 따라 연구 목적으로 자유롭게 배포했습니다. 표준 라이선스는 아닙니다.",
+      california_housing: "Keras에서 배포한 StatLib 데이터셋입니다. 명시적 라이선스를 찾지 못했으므로 논문을 인용하세요.",
+    }[id] ?? license
+  );
+}
+
+export function datasetClasses(
+  id: string,
+  classes: readonly string[],
+  locale: "en" | "ko",
+): readonly string[] {
+  if (locale === "en") return classes;
+  const translations: Record<string, readonly string[]> = {
+    imdb: ["부정", "긍정"],
+    fashion_mnist: ["티셔츠/상의", "바지", "풀오버", "드레스", "코트", "샌들", "셔츠", "운동화", "가방", "앵클 부츠"],
+  };
+  return translations[id] ?? classes;
+}
+
+export function taskTitle(
+  task: string,
+  locale: "en" | "ko",
+): string {
+  if (locale === "en") return task;
+  return (
+    {
+      "image-classification": "이미지 분류",
+      "text-classification": "텍스트 분류",
+      regression: "회귀",
+    }[task] ?? task
+  );
+}

@@ -4,8 +4,8 @@
   "texts": {
     "summary": "하나의 @vertex, @fragment 또는 @compute 진입점입니다. 스테이지와, 매개변수 및 반환 타입을 DSL 타입 키로 담습니다. 타입 키는 typeKey가 돌려주는 문자열입니다. @compute 진입점에 한해서는 워크그룹 크기도 담으며, 진입점이 크기를 선언하지 않으면 기본값 64를 씁니다. 이 기본값은 WGSL 백엔드 자체의 기본값과 같습니다.",
     "description": "[`semanticDiff`](/api/semanticdiff/)는 이 형태로 모듈의 공개 인터페이스에 지문을 만듭니다. 이 형태에서 진입점이 서로 다른 두 모듈은, 생성된 소스의 나머지 바이트가 모두 같더라도 서로 다른 파이프라인 계약을 가집니다.",
-    "members.name": "진입점을 작성한 이름입니다. 호스트는 이 이름으로 진입점을 호출한다(규칙 11.10).",
-    "members.emitted": "생성된 텍스트에 쓰인 진입점 이름이다(규칙 11.10). 대상 언어가 작성한 그대로 쓸 수 있으면 `name`과 같습니다.",
+    "members.name": "진입점을 작성한 이름입니다. 호스트는 이 이름으로 진입점을 호출합니다(규칙 11.10).",
+    "members.emitted": "생성된 텍스트에 쓰인 진입점 이름입니다(규칙 11.10). 대상 언어가 작성한 그대로 쓸 수 있으면 `name`과 같습니다.",
     "members.workgroupSize": "compute 진입점의 `x` 축 워크그룹 크기입니다. 디스패치 크기를 정하는 호스트는 [`EntryInfo.workgroupShape`](/api/entryinfo/)를 읽으며, 그 필드에는 `y`와 `z`도 들어 있습니다.",
     "members.workgroupShape": "compute 진입점의 `[x, y, z]` 워크그룹 크기입니다. WGSL의 `@workgroup_size(x, y, z)`와 같으며, 값이 없는 축은 1로 봅니다. 한 축에서 `n`개의 인보케이션을 디스패치하려면 그 축에 `ceil(n / extent)`개의 워크그룹이 필요합니다.",
     "members.workgroupSizeOverrides": "`workgroupShape`의 해당 축에 대응하는 오버라이드 식별자입니다. 호스트가 compute 파이프라인을 만들 때 선택된 각 값이 해당 축의 기본 크기를 대신합니다.",

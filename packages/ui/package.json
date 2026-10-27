@@ -5,6 +5,7 @@
   "type": "module",
   "files": [
     "astro",
+    "code",
     "react",
     "styles",
     "dom",
@@ -18,11 +19,13 @@
     "./semantics.css": "./styles/semantics.css",
     "./react/controls": "./react/controls.tsx",
     "./dom/*": "./dom/*.ts",
+    "./code/highlight": "./code/highlight.mjs",
     "./product-header.css": "./styles/product-header.css",
     "./product-footer.css": "./styles/product-footer.css",
     "./product-frame.css": "./styles/product-frame.css",
     "./product-sidebar.css": "./styles/product-sidebar.css",
     "./product-reading.css": "./styles/product-reading.css",
+    "./code-highlight.css": "./styles/code-highlight.css",
     "./product-home.css": "./styles/product-home.css",
     "./motion.css": "./styles/motion.css",
     "./react/theme": "./react/theme.tsx",
@@ -58,6 +61,7 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.7.0"
+    "tailwind-merge": "^3.7.0",
+    "shiki": "4.5.0"
   }
 }

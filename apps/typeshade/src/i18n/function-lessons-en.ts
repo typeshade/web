@@ -100,14 +100,14 @@ export const functionLessons = {
   },
   exp: {
     meaning:
-      'The exponential function raises the natural base to the input power. Equal input steps multiply the output by equal factors.',
+      'The exponential function raises e to the input power. Equal input steps multiply the output by the same factor.',
     use: 'Use it for continuous growth, decay, and exponential attenuation.',
     try: 'Compare equal steps on the negative and positive sides of the plot.',
     caution:
       'Large positive inputs can overflow. Very negative inputs can lose magnitude through underflow.',
   },
   exp2: {
-    meaning: 'This exponential function raises the binary base to the input power.',
+    meaning: 'This exponential function raises 2 to the input power.',
     use: 'Use it for binary scale changes, exposure stops, and logarithmic level calculations.',
     try: 'Move x through evenly spaced positions and compare the changing output height.',
     caution:

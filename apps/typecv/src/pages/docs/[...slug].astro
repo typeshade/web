@@ -1,30 +1,72 @@
 ---
 import "../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import "@typeshade/site-ui/code-highlight.css";
+import {
+  prepareMarkedHighlights,
+} from "@typeshade/site-ui/code/highlight";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import { Marked, Renderer } from "marked";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { markdownFiles } from "../../../scripts/docs.mjs";
+import {
+  assertReviewedSourceRevision,
+  selectDocumentationFile,
+  typecvSourceUrl,
+} from "../../../scripts/doc-overrides.mjs";
 const docsRoot = path.resolve(process.cwd(), "../../sources/typecv/docs");
+const overridesRoot = path.resolve(process.cwd(), "docs-overrides");
+const overrideManifest = JSON.parse(
+  await readFile(path.join(overridesRoot, "manifest.json"), "utf8"),
+);
 export async function getStaticPaths() {
   const root = path.resolve(process.cwd(), "../../sources/typecv/docs");
-  return (await markdownFiles(root)).map((file: string) => {
-    const rel = path
-      .relative(root, file)
-      .replaceAll(path.sep, "/")
-      .replace(/\.md$/, "")
-      .replace(/\/README$/, "");
-    const slug = rel === "README" ? undefined : rel;
-    return { params: { slug }, props: { file, markdown: "" } };
-  });
+  const overrides = path.resolve(process.cwd(), "docs-overrides");
+  const manifest = JSON.parse(
+    await readFile(path.join(overrides, "manifest.json"), "utf8"),
+  );
+  const actualSourceRevision = execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: root,
+    encoding: "utf8",
+  }).trim();
+  assertReviewedSourceRevision(actualSourceRevision, manifest);
+  return Promise.all(
+    (await markdownFiles(root)).map(async (source: string) => {
+      const rel = path
+        .relative(root, source)
+        .replaceAll(path.sep, "/")
+        .replace(/\.md$/, "")
+        .replace(/\/README$/, "");
+      const slug = rel === "README" ? undefined : rel;
+      const sourceRel = path.relative(root, source);
+      const override = path.join(overrides, sourceRel);
+      const { file, edited } = await selectDocumentationFile(
+        source,
+        override,
+        sourceRel.replaceAll(path.sep, "/"),
+        manifest,
+      );
+      return { params: { slug }, props: { file, edited, markdown: "" } };
+    }),
+  );
 }
-const { file } = Astro.props as { file: string };
+const { file, edited = false } = Astro.props as {
+  file: string;
+  edited?: boolean;
+};
 const markdown = await readFile(file, "utf8");
-const rel = path.relative(docsRoot, file).replaceAll(path.sep, "/");
+const overrideRel = path.relative(overridesRoot, file);
+const isOverride = overrideRel !== ".." && !overrideRel.startsWith(`..${path.sep}`);
+const rel = (isOverride ? overrideRel : path.relative(docsRoot, file)).replaceAll(
+  path.sep,
+  "/",
+);
 const title = markdown.match(/^#\s+(.+)$/m)?.[1] ?? rel.replace(/\.md$/, "");
 const renderer = new Renderer();
 const slugs = new Map();
+const highlighted = new Map<string, string>();
 renderer.heading = ({ text, depth }) => {
   const base = text
     .replace(/<[^>]*>/g, "")
@@ -44,12 +86,10 @@ renderer.link = function ({ href, title, tokens }) {
     const resolved = path.posix.normalize(
       path.posix.join(path.posix.dirname(rel), local),
     );
-    if (resolved.endsWith(".md")) {
+    if (resolved.endsWith(".md") && !resolved.startsWith("../")) {
       const route = resolved.replace(/\.md$/, "").replace(/\/README$/, "");
       target = route === "README" ? "/docs/" : `/docs/${route}/`;
-    } else if (resolved.startsWith("docs/") && resolved.endsWith(".json"))
-      target = `/${resolved}`;
-    else target = `https://github.com/typeshade/typecv/blob/main/${resolved}`;
+    } else target = typecvSourceUrl(resolved, overrideManifest.sourceRevision);
     if (fragment) target += `#${fragment}`;
   }
   const safeTitle = title
@@ -57,7 +97,19 @@ renderer.link = function ({ href, title, tokens }) {
     : "";
   return `<a href="${target.replaceAll("&", "&amp;").replaceAll('"', "&quot;")}"${safeTitle}>${this.parser.parseInline(tokens)}</a>`;
 };
-const body = await new Marked({ gfm: true, renderer }).parse(markdown);
+renderer.codespan = ({ text }) =>
+  highlighted.get(`inline:${text}`) ?? `<code>${text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</code>`;
+renderer.code = ({ text, lang }) => {
+  if (/^(?:ts|typescript|tsx)$/.test((lang ?? "").trim().toLowerCase()))
+    return highlighted.get(`block:${lang}:${text}`) ?? `<pre><code>${text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</code></pre>\n`;
+  const safe = text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  return `<pre><code${lang ? ` class="language-${lang.replaceAll('"', "&quot;")}"` : ""}>${safe}</code></pre>\n`;
+};
+const preparer = new Marked({ gfm: true, async: true });
+const prepared = await prepareMarkedHighlights(preparer, markdown);
+for (const [key, value] of prepared.highlighted) highlighted.set(key, value);
+const { tokens } = prepared;
+const body = new Marked({ gfm: true, renderer }).parser(tokens);
 const links = [
   ["docs/README.md", "Documentation"],
   ["docs/sfm-quickstart.md", "SfM quickstart"],
@@ -87,18 +139,31 @@ const links = [
           {links.map(([href, label]) => (
             <a
               class="sidebar-link"
-              href={`/${href.replace(".md", "").replace("README", "")}/`}
+              href={
+                href === "docs/README.md"
+                  ? "/docs/"
+                  : `/${href.replace(".md", "")}/`
+              }
             >
               {label}
             </a>
           ))}
         </div>
-        <a
-          class="sidebar-source"
-          href={`https://github.com/typeshade/typecv/blob/main/${file.split("/").slice(-2).join("/")}`}
-        >
-          View source ↗
-        </a>
+        {edited ? (
+          <div class="sidebar-source">
+            <p>This page is an edited website copy.</p>
+            <a href={typecvSourceUrl(rel, overrideManifest.sourceRevision)}>
+              Compare with the upstream source ↗
+            </a>
+          </div>
+        ) : (
+          <a
+            class="sidebar-source"
+            href={typecvSourceUrl(rel, overrideManifest.sourceRevision)}
+          >
+            View source ↗
+          </a>
+        )}
       </aside>
       <article class="doc-article" set:html={body} />
     </div>

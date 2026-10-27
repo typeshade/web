@@ -141,7 +141,7 @@ r.requiredLanguageFeatures // the WGSL language features the browser must implem
 r.requires // host-provided globals the module references and does not declare
 ```
 
-`uniforms`는 유니폼 블록의 std140 레이아웃이고, `storage`는 스토리지 버퍼의 std430 레이아웃입니다. 두 레이아웃은 필드별 오프셋, 정렬, 크기를 제공합니다. 구조체 크기는 정렬 단위로 올림되어 있어 배열 스트라이드로 사용할 수 있습니다. `storage<array<T>>`는 요소 타입의 배열 바인딩이므로 `bindGroups`에 포함되지만 `storage`에는 항목이 없습니다. 요소의 std430 스트라이드나 다른 구조체의 레이아웃이 필요하면 선언에 `wgslLayout`을 호출합니다. [레이아웃과 리소스](/guide/authoring/layouts-and-resources/)의 구조체는 `wgslLayout(m.structs.find((s) => s.name === 'ShapeSegment')!, 'std430')`로 조회합니다. 버텍스 진입점에 `location` 매개변수가 없으면 `vertex`는 `undefined`이입니다.
+`uniforms`는 유니폼 블록의 std140 레이아웃이고, `storage`는 스토리지 버퍼의 std430 레이아웃입니다. 두 레이아웃은 필드별 오프셋, 정렬, 크기를 제공합니다. 구조체 크기는 정렬 단위로 올림되어 있어 배열 스트라이드로 사용할 수 있습니다. `storage<array<T>>`는 요소 타입의 배열 바인딩이므로 `bindGroups`에 포함되지만 `storage`에는 항목이 없습니다. 요소의 std430 스트라이드나 다른 구조체의 레이아웃이 필요하면 선언에 `wgslLayout`을 호출합니다. [레이아웃과 리소스](/guide/authoring/layouts-and-resources/)의 구조체는 `wgslLayout(m.structs.find((s) => s.name === 'ShapeSegment')!, 'std430')`로 조회합니다. 버텍스 진입점에 `location` 매개변수가 없으면 `vertex`는 `undefined`입니다.
 
 `packModule(m)`은 같은 정보를 평범한 JSON 매니페스트 하나로 모읍니다. 프로그램의 WGSL, 바이트
 레이아웃이 붙은 바인딩, 진입점, WebGL2 프로그램이 여기에 들어갑니다. 빌드가 이 매니페스트를
@@ -171,6 +171,6 @@ reach.bindings // Set { 'u' }, the binding names that stage reads
 reach.fns // the call-graph closure from those entries, the entries included
 ```
 
-`owner`는 리소스 할당 주체를 나타냅니다. 모듈이 바인딩을 선언하고 호스트가 리플렉션에 따라 할당하는 경우는 `'module'`이입니다. `"use typeshade"` 파일의 바인딩은 모두 이에 해당합니다. `resourceKind`는 생성할 리소스 종류입니다. 텍스처 항목의 `textureDim`과 `textureElem`은 뷰 생성에 사용하며, 선언 방법은 [레이아웃과 리소스](/guide/authoring/layouts-and-resources/)에서 설명합니다. 바인드 그룹 레이아웃의 `sampleType`은 깊이 텍스처가 `'depth'`, 정수 텍스처가 `'uint'` 또는 `'sint'`이입니다. `f32` 텍스처를 샘플러와 함께 읽으면 `'float'`이고, 텍셀·크기·개수만 조회하면 `'unfilterable-float'`이입니다. `r32float` 같은 32비트 실수 텍스처에는 후자가 필요합니다. `stages`는 바인딩을 사용하는 스테이지 목록입니다. WebGPU에서는 바인드 그룹 레이아웃의 가시성 마스크로, WebGL2에서는 스테이지별 유니폼 블록 바인딩 포인트와 텍스처 유닛 할당에 사용합니다.
+`owner`는 리소스 할당 주체를 나타냅니다. 모듈이 바인딩을 선언하고 호스트가 리플렉션에 따라 할당하는 경우는 `'module'`입니다. `"use typeshade"` 파일의 바인딩은 모두 이에 해당합니다. `resourceKind`는 생성할 리소스 종류입니다. 텍스처 항목의 `textureDim`과 `textureElem`은 뷰 생성에 사용하며, 선언 방법은 [레이아웃과 리소스](/guide/authoring/layouts-and-resources/)에서 설명합니다. 바인드 그룹 레이아웃의 `sampleType`은 깊이 텍스처가 `'depth'`, 정수 텍스처가 `'uint'` 또는 `'sint'`입니다. `f32` 텍스처를 샘플러와 함께 읽으면 `'float'`이고, 텍셀·크기·개수만 조회하면 `'unfilterable-float'`입니다. `r32float` 같은 32비트 실수 텍스처에는 후자가 필요합니다. `stages`는 바인딩을 사용하는 스테이지 목록입니다. WebGPU에서는 바인드 그룹 레이아웃의 가시성 마스크로, WebGL2에서는 스테이지별 유니폼 블록 바인딩 포인트와 텍스처 유닛 할당에 사용합니다.
 
 바인드 그룹에는 직접 선언한 바인딩과 하향 변환에서 추가한 바인딩이 모두 포함됩니다. [fp64](/guide/authoring/fp64/) 하향 변환은 에뮬레이션 헬퍼가 가드 텍스처를 읽는 모듈에 `_fp64` 텍스처 바인딩을 추가합니다. 이는 해당 페이지에서 설명하는 가드 텍스처입니다. 리플렉션을 사용하는 호스트는 생성 경위를 구별하지 않고 다른 바인딩과 같은 방식으로 연결합니다. 리플렉션이 실제 실행 프로그램과 일치하려면 생성 옵션의 `fp64Flavor`를 `reflect`에도 동일하게 전달해야 합니다.

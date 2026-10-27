@@ -1,4 +1,6 @@
 /* The document column */
+@import '@typeshade/site-ui/code-highlight.css';
+
 .doc {
   padding-block: 8px 24px;
   font-size: var(--text-prose);

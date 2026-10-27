@@ -1,0 +1,11 @@
+{
+  "sourceRevision": "e40c878809370719faef7dac3e34b80a92c4ce3d",
+  "overrides": {
+    "sfm-quickstart.md": {
+      "sha256": "56c7b170a54bd7e798bf644d7e3a02216b21098fe7cc3793940e1efe633b576d"
+    },
+    "gpu-sfm.md": {
+      "sha256": "8c693e4863cd77ae6731ee5638e4fea24c046317ac2449c7110bb1bf2dd9ebf8"
+    }
+  }
+}

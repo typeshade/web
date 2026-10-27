@@ -20,6 +20,7 @@ import path from 'node:path';
 import { compile } from '../../vendor/shader-dsl/src/index.ts';
 import type { ModuleDecl } from '../../vendor/shader-dsl/src/core/ir/nodes.ts';
 import { shortBlurb } from './blurb.ts';
+import { shadeTileCopy } from './example-copy.ts';
 
 const EXT = '.shade.ts';
 const examplesDir = path.resolve(process.cwd(), 'vendor/shader-dsl/examples');
@@ -344,7 +345,9 @@ export function shadeTitles(): Record<string, string> {
 /** The English description of every one, shortened to its first clause the way the registry
  *  table's are. */
 export function shadeDescriptions(): Record<string, string> {
-  return Object.fromEntries(shadeExampleList.map((e) => [e.id, shortBlurb(e.blurb)]));
+  return Object.fromEntries(
+    shadeExampleList.map((e) => [e.id, shadeTileCopy(e.id, shortBlurb(e.blurb))]),
+  );
 }
 
 /** One locale's words for the corpus, checked against the registry, so an example added

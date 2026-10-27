@@ -2,7 +2,7 @@
   "slug": "samplercomparisont",
   "source": "04e8c0a775a099b3527e60352e73e376697057bd84eedc0e6a9fbd564c5e164a",
   "texts": {
-    "summary": "textureSampleCompare가 받는 비교 샘플러이입니다. 이 샘플러는 기준값을 텍셀과 비교하고, 텍셀 값 자체 대신 필터 범위(footprint) 중 통과한 비율을 반환합니다.",
+    "summary": "textureSampleCompare가 받는 비교 샘플러입니다. 이 샘플러는 기준값을 텍셀과 비교하고, 텍셀 값 자체 대신 필터 범위(footprint) 중 통과한 비율을 반환합니다.",
     "description": "[`samplerT`](/api/samplert/)와는 어느 쪽으로도 바꿔 쓸 수 없습니다."
   }
 }

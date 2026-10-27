@@ -6,6 +6,7 @@ import "../../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 import CodeBlock from "../../../components/CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
 const code = `const device = await nn.device({ device: "auto" });
 const x = device.tensor([1, 2, 3, 4], { shape: [2, 2] });
 const y = x.relu().softmax();
@@ -41,23 +42,23 @@ await device.dispose();`;
         <CodeBlock title="생성, 실행, 해제" file="device.ts" code={code} />
         <ul class="api-list">
           <li>
-            <code>device(options?)</code>
+            <InlineTypeScript code="device(options?)" />
             <span>auto, cpu, webgpu, webgl2 중 선택하여 Device를 엽니다.</span>
           </li>
           <li>
-            <code>Device.tensor(values, &#123; shape &#125;)</code>
+            <InlineTypeScript code="Device.tensor(values, { shape })" />
             <span>Shape를 검사한 입력 Tensor를 생성합니다.</span>
           </li>
           <li>
-            <code>Tensor.data()</code>
+            <InlineTypeScript code="Tensor.data()" />
             <span>요청 그래프를 실행하고 호스트 값으로 반환합니다.</span>
           </li>
           <li>
-            <code>Tensor.disposeGraph(preserve?)</code>
+            <InlineTypeScript code="Tensor.disposeGraph(preserve?)" />
             <span>지정한 Tensor를 보존하면서 그래프 값을 해제합니다.</span>
           </li>
           <li>
-            <code>Device.dispose()</code>
+            <InlineTypeScript code="Device.dispose()" />
             <span>대기 중 작업을 기다린 뒤 런타임 자원을 정리합니다.</span>
           </li>
         </ul>
@@ -68,7 +69,7 @@ await device.dispose();`;
           <div>
             <h3>선형 대수</h3>
             <p>
-              <code>matmul(other, options?)</code>
+              <InlineTypeScript code="matmul(other, options?)" />
               <br />
               전치 옵션이 있는 rank-2 행렬 곱입니다.
             </p>
@@ -93,7 +94,7 @@ await device.dispose();`;
             <h3>Loss와 기울기</h3>
             <p>
               <code>softmaxCrossEntropyWithLogits</code>,{" "}
-              <code>backward()</code>와 일부 Tensor 그래프 미분 규칙입니다.
+              <InlineTypeScript code="backward()" />와 일부 Tensor 그래프 미분 규칙입니다.
             </p>
           </div>
         </div>
@@ -116,12 +117,14 @@ await device.dispose();`;
           <li>
             <code>optim.SGD</code>, <code>optim.Adam</code>
             <span>
-              Device 계층에 따라 CPU 배열 또는 GPU 커널로 파라미터를 갱신합니다.
+              장치에서 기울기를 계산하고 파라미터를 계획 하나로 갱신합니다.
+              <code>alsoRead</code>를 사용하면 같은 계획에서 추가 Tensor 값을
+              읽을 수 있습니다.
             </span>
           </li>
           <li>
             <code>CrossEntropyLoss</code>
-            <span>MNIST 경로에서 logits와 정수 클래스 레이블을 받습니다.</span>
+            <span>MNIST 예제에서 logits와 정수 클래스 레이블을 받습니다.</span>
           </li>
         </ul>
         <p class="fine-print">

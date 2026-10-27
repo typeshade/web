@@ -6,6 +6,6 @@
     "description": "[`recommendFp64Flavor`](/api/recommendfp64flavor/)와 [`isAppleGpu`](/api/isapplegpu/)가 읽어 디바이스에 필요한 df64 구현 방식을 고르는 식별 정보입니다. Metal을 사용하는 Apple GPU에서는 `'integer'`, 그 밖에는 `'float'`를 고릅니다. Apple 셰이더 컴파일러에서 구분이 필요한 이유는 `Fp64Flavor`에 설명되어 있습니다. 이 순수 선택 함수는 GPU를 직접 조회하지 않습니다. 호출자가 WebGPU 어댑터의 `info`, WebGL2의 `UNMASKED_RENDERER_WEBGL` 문자열, `navigator.userAgent` 등 가진 정보를 모아 전달합니다. 모든 필드는 선택 사항입니다. Apple을 가리키는 신호는 하나만 있어도 `'integer'`를 고르기에 충분합니다. 신호를 하나도 넘기지 않으면 `'float'`를 고릅니다. 신호를 수집하지 않은 Apple 디바이스에서는 적절하지 않은 구현 방식이 선택될 수 있습니다. 이 경우에도 df64의 컴파일과 실행은 가능합니다. 다만 셰이더 컴파일러가 float 방식이 의존하는 오차항의 결합 순서를 바꾸면 확장 정밀도가 일반 f32 수준으로 무너집니다.",
     "members.adapterInfo": "`GPUAdapter.info`(또는 {vendor, architecture} 모양을 가진 임의의 객체)입니다. Apple은 vendor를 'apple'로 보고한다(architecture는 'apple' 또는 'metal-3' 같은 값입니다).",
     "members.rendererString": "WebGL의 `UNMASKED_RENDERER_WEBGL`(또는 RENDERER) 문자열입니다. Apple 장치의 문자열은 'ANGLE (Apple, ANGLE Metal Renderer: Apple M1, Unspecified Version)' 또는 'Apple GPU'와 같은 모양입니다.",
-    "members.userAgent": "`navigator.userAgent`이입니다. GPU 문자열이 가려져 있을 때 쓰는 대체 값이다(iOS Safari는 항상 그 아래에서 Metal을 씁니다)."
+    "members.userAgent": "`navigator.userAgent`입니다. GPU 문자열이 가려져 있을 때 쓰는 대체 값입니다(iOS Safari는 항상 그 아래에서 Metal을 씁니다)."
   }
 }

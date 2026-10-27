@@ -6,6 +6,7 @@ import "../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import CodeBlock from "../../components/CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
 const code = `const input = device.tensor(values, { shape: [batch, features] });
 const logits = input.matmul(weights).add(bias);
 const output = logits.relu();
@@ -18,7 +19,7 @@ const result = await output.data();`;
   locale="en"
   active="execution"
   title="TypeNN execution model"
-  description="How a Tensor graph runs as TypeShade kernel functions in one fuse scope per data() call."
+  description="How a Tensor graph runs its TypeShade kernel functions when you call data()."
 >
   <ReadingSurface class="nn-docs">
     <article class="docs-article">
@@ -33,28 +34,32 @@ const result = await output.data();`;
         <Fragment slot="eyebrow">Guides</Fragment>
         <Fragment slot="title">Execution model</Fragment>
         <Fragment slot="description">
-          TypeNN owns the Tensor graph and its meaning. TypeShade owns kernel
-          compilation and program execution.
+          TypeNN builds and schedules Tensor graphs. TypeShade compiles their
+          kernel functions and runs them on the selected backend.
         </Fragment>
       </PageHeading>
       <section class="doc-section">
         <h2>Tensor calls build a deferred graph</h2>
         <p>
-          Operations such as <code>matmul()</code>, <code>add()</code>, and{" "}
-          <code>relu()</code> do not compute. Each one records a node that holds
+          Operations such as <InlineTypeScript code="matmul()" />,{" "}
+          <InlineTypeScript code="add()" />, and <InlineTypeScript
+            code="relu()"
+          /> do not compute values immediately. Each one records a node that holds
           a TypeShade kernel function, the input Tensors, the scalars the kernel
           takes by value, and the gradient rule.
         </p>
-        \1 title="A small Tensor graph" file="model.ts" code={code} />
+        <CodeBlock title="A small Tensor graph" file="model.ts" code={code} />
       </section>
       <section class="doc-section">
-        <h2>Each data() call runs one fuse scope</h2>
+        <h2>How data() computes a Tensor result</h2>
         <p>
-          When <code>data()</code> is requested, TypeNN collects the nodes under
-          the Tensor that have no array yet, makes one resident array for each,
-          and uploads each leaf. It then calls TypeShade <code>fuse</code> with
-          a body that calls each node's kernel function in graph order, and
-          reads the Tensor back once.
+          When you call <InlineTypeScript code="data()" /> for a Tensor without
+          a computed array, TypeNN collects the graph nodes needed to produce
+          it. It creates an output array for each node and uploads the leaf
+          arrays. TypeNN then calls TypeShade <InlineTypeScript code="fuse()" />
+          once, running each node's kernel in graph order. The compiler groups
+          compatible calls into dispatches, and TypeNN reads the requested
+          Tensor once.
         </p>
         <div class="execution-lanes">
           <div>
@@ -64,7 +69,7 @@ const result = await output.data();`;
           <div>
             <span class="lane-label">TypeShade</span>
             <p>
-              fuse scope plan · dispatches · backend tiers · runtime resources
+              compiler dispatch plan · backend tiers · runtime resources
             </p>
           </div>
         </div>
@@ -103,8 +108,8 @@ const result = await output.data();`;
           </div>
         </div>
         <p class="fine-print">
-          One active TypeNN Device is supported per JavaScript context because
-          TypeShade call-layer configuration is process-global.
+          TypeShade uses one call-layer configuration for the whole process,
+          so each JavaScript context supports one active TypeNN Device.
         </p>
       </section>
       <section class="doc-section">
@@ -112,9 +117,10 @@ const result = await output.data();`;
         <p>
           The compiler puts consecutive kernel calls in one dispatch when
           TypeShade's fusion rules hold. On WebGPU,{" "}
-          <code>a.add(b).mul(c).relu()</code> runs as one dispatch. A reduction,
-          a read at another index, or too many storage buffers starts a new
-          dispatch. After a read, <code>device.lastReport</code> shows the tier,
+          <InlineTypeScript code="a.add(b).mul(c).relu()" /> runs as one dispatch. A reduction
+          with a different output count, a read at another index, or too many
+          storage buffers starts a new dispatch. After a read,
+          <code>device.lastReport</code> shows the tier,
           the dispatches, the submissions, and the groups of calls. On the CPU
           tier the report has no dispatches and one group for each call.
         </p>

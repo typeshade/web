@@ -6,15 +6,15 @@ export const copy = {
     overview: 'Overview',
     docs: 'Documentation',
     playground: 'Playground',
-    tagline: 'Computer vision, powered by TypeShade.',
+    tagline: 'Computer vision in TypeScript, running on TypeShade.',
     intro:
-      'Reusable computer vision in TypeScript, with computation on the GPU. Start with geometric vision and sparse reconstruction, within a broader foundation for images, correspondence, motion and 3D.',
+      'TypeCV is a TypeScript library for computer vision with GPU acceleration. Use it for geometric vision and sparse 3D reconstruction.',
     start: 'Read the guide',
     try: 'Run in your browser',
     eyebrow: 'TypeScript → TypeShade → WebGPU',
-    hero: 'A clearer view.\nFrom code to geometry.',
+    hero: 'Build computer vision tools\nwith TypeShade and TypeScript.',
     caption:
-      'One resident pair verification plan. Original correspondence indices and a relative-pose summary return to the host.',
+      'Verify an image pair in one GPU execution plan. Read back the original correspondence indices and a relative-pose summary.',
     current: 'What runs today',
     currentText:
       'The current implementation concentrates on geometry and sparse 3D. Operators are reusable independently of an SfM graph.',
@@ -41,9 +41,9 @@ export const copy = {
         'bundleAdjustGpu',
       ],
     ],
-    scope: 'CV is the scope. SfM is a subset.',
+    scope: 'A computer vision library, with SfM in active development.',
     scopeText:
-      'Image processing, native feature extraction and matching, optical flow, dense depth and learned-vision integration are planned. The roadmap distinguishes available operators from future work.',
+      'Single-scale TypeShade GPU FAST/BRIEF extraction and matching are available experimentally. Image processing, optical flow, dense depth and learned-vision integration remain planned. The roadmap distinguishes current APIs from future work.',
     roadmap: 'Explore the roadmap',
     evidence: 'Inspect the evidence',
     evidenceText:
@@ -54,7 +54,7 @@ export const copy = {
       'TypeCV is early and has no published npm package. Build the library locally, then import the compiled entry points. The root entry is the independent CPU reference; the GPU entry uses TypeShade.',
     footer: 'Computer vision in TypeScript. Built on TypeShade.',
     englishDocs: 'Project documentation is currently written in English.',
-    demoTitle: 'Test a pair. Inspect the result.',
+    demoTitle: 'Verify image correspondences',
     demoIntro:
       'Generate a calibrated synthetic scene, introduce pixel noise and mismatches, then run the actual compiled TypeCV operator. All input and computation stay in your browser.',
     backend: 'Execution',
@@ -82,15 +82,15 @@ export const copy = {
     overview: '소개',
     docs: '문서',
     playground: '플레이그라운드',
-    tagline: 'TypeShade로 실행하는 컴퓨터 비전.',
+    tagline: 'TypeShade로 GPU 연산을 수행하는 TypeScript 컴퓨터 비전 라이브러리.',
     intro:
-      'TypeScript로 작성하고 GPU에서 계산하는 컴퓨터 비전 라이브러리입니다. 이미지, 대응점, 모션, 3D를 위한 공통 기반 위에서 기하 비전과 희소 복원부터 구현하고 있습니다.',
+      'TypeCV는 GPU 가속을 지원하는 TypeScript 컴퓨터 비전 라이브러리입니다. 기하 비전과 희소 3D 복원에 사용할 수 있습니다.',
     start: '가이드 읽기',
     try: '브라우저에서 실행',
     eyebrow: 'TypeScript → TypeShade → WebGPU',
-    hero: '코드에서 기하로.\n더 선명한 시야.',
+    hero: 'TypeScript와 TypeShade로\n컴퓨터 비전 도구를 만드세요.',
     caption:
-      '이미지 쌍 검증을 하나의 GPU 실행 계획으로 연결합니다. 원본 대응점 인덱스와 상대 자세 요약을 반환합니다.',
+      'GPU 실행 계획 하나로 이미지 쌍을 검증합니다. 원본 대응점 인덱스와 상대 자세 요약을 읽어옵니다.',
     current: '지금 실행할 수 있는 연산',
     currentText:
       '현재는 기하 비전과 희소 3D에 집중합니다. 각 연산은 SfM 그래프와 독립적으로 사용할 수 있습니다.',
@@ -117,9 +117,9 @@ export const copy = {
         'bundleAdjustGpu',
       ],
     ],
-    scope: '컴퓨터 비전 전체를 향해. SfM은 그 일부입니다.',
+    scope: 'SfM을 개발하고 있는 컴퓨터 비전 라이브러리입니다.',
     scopeText:
-      '이미지 처리, 자체 특징 추출·매칭, 광류, 밀집 깊이와 학습 기반 비전 연동은 계획 단계입니다. 로드맵에서 구현된 연산과 앞으로의 작업을 구분합니다.',
+      '단일 배율 TypeShade GPU FAST/BRIEF 특징 추출과 매칭을 실험적으로 사용할 수 있습니다. 이미지 처리, 광류, 밀집 깊이와 학습 기반 비전 연동은 향후 구현할 계획입니다. 로드맵에서 현재 API와 앞으로의 작업을 구분합니다.',
     roadmap: '로드맵 보기',
     evidence: '측정 결과를 직접 확인하세요',
     evidenceText:
@@ -130,7 +130,7 @@ export const copy = {
       'TypeCV는 초기 개발 단계이며 npm에 배포되지 않았습니다. 로컬에서 라이브러리를 빌드한 뒤 컴파일된 진입점을 가져오세요. 기본 진입점은 독립적인 CPU 참조 구현이며 GPU 진입점은 TypeShade를 사용합니다.',
     footer: 'TypeScript로 구현하는 컴퓨터 비전. TypeShade 기반.',
     englishDocs: '프로젝트 상세 문서는 현재 영문으로 제공됩니다.',
-    demoTitle: '대응점을 검증하고 결과를 확인하세요.',
+    demoTitle: '이미지 대응점 검증',
     demoIntro:
       '보정된 합성 장면에 픽셀 노이즈와 잘못된 대응점을 추가한 뒤, 실제 컴파일된 TypeCV 연산을 실행합니다. 입력과 계산은 모두 브라우저에 머뭅니다.',
     backend: '실행 환경',

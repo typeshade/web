@@ -4,7 +4,7 @@
   "texts": {
     "summary": "대상 하나에 맞춰 호출을 표기합니다.",
     "description": "`name`에 [`INTRINSICS`](/api/intrinsics/) 항목이 있으면, 그 항목의 `target`용 표기를 `args`에 적용한 결과를 반환합니다. 그렇지 않으면 인자를 `, `로 이어 붙인 `name(args)`를 반환합니다. 이 방식은 이식 가능한 내장 함수와 사용자 정의 함수 호출을 똑같이 다룹니다.",
-    "parameters.target": "표기할 대상입니다. `'wgsl'` 또는 `'glsl'`이입니다.",
+    "parameters.target": "표기할 대상입니다. `'wgsl'` 또는 `'glsl'`입니다.",
     "parameters.name": "내장 함수 id 또는 함수 이름입니다.",
     "parameters.args": "이미 소스 텍스트로 렌더링된 인자 식입니다.",
     "returns": "`target`용 호출을 소스 텍스트로 나타낸 값입니다."

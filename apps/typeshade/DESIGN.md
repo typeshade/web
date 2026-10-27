@@ -171,26 +171,18 @@ enforces the parts that can be checked mechanically and runs at the start of eve
 
 ## Voice
 
-- Say what the tool does. The front page states what; a linked page explains how or why.
-- Include quantities when they help explain a capability or limitation. Do not require a
-  number at a particular position in a paragraph.
-- Short sentences. One idea per sentence. Plain verbs: "emits", "runs", "checks".
-- Numbers come from the build (`src/lib/examples.ts`). A number that is not measured is not on the page.
-- Do not praise the page or the tool. Words like "honest", "measured" and "proven" go. <!-- ok -->
-- Do not write "X, not Y", "X, never Y", or "rather than". State X. <!-- ok -->
-- No em dashes. Use a comma, a colon or a new sentence.
-- No all-caps emphasis in prose or comments.
-- No lists of three for rhythm. Use the number of items there are.
-- Headings are short nouns in sentence case: Quick start, Motivation, Checks. A heading is
-  never a slogan and never a full sentence.
-- Write the factual explanation before choosing its heading or layout. Name the input,
-  result and relevant support conditions; avoid counting them for a paired slogan.
-- Home headings name the language or section content. The intro accepts a complete title
-  and lets it wrap; copy does not have to fit a pair of display lines.
-- Review each locale as a standalone page. Remove repeated claims and link prompts that
-  add no information. Copy checks verify consistency and known patterns; an editor still
-  needs to judge clarity, accuracy and tone in context.
-- Comments in code say why in one or two lines. They do not cite design documents.
+[Website content](../../docs/content-style.md) governs writing and translation. English is the
+source. Draft it using the owner's Blend2D, React, Vue, MapLibre and Mapbox references, then
+translate it into Korean with the same meaning and tone.
+
+Introduce the product and what developers can do with it. Use task headings and direct
+instructions where useful. Keep explanations connected and tied to examples. A heading can
+be a noun, question or action; it does not have to fit a fixed sentence pattern or display
+line count. Keep technical limitations and measured claims accurate. Numbers that describe
+the compiler come from `src/lib/examples.ts`.
+
+The copy and style scripts check specific patterns and consistency. Editorial review still
+judges each passage in context. Comments in code explain implementation decisions briefly.
 
 ## The system
 
@@ -735,8 +727,9 @@ group to the footer. Documentation carries 20 links and runs them down two
 columns 32px apart, and the three groups spread to the shell's two edges: 120px between one
 group and the next at a 768 viewport and 396px from 1440 up in English, 148px and 424px in
 Korean, with 64px as the floor. The space that grows is the space between groups, so the wider
-gap tells a reader where a group ends. Headings are single nouns or short noun phrases: Motivation, Verification, Quick
-start.
+gap tells a reader where a group ends. Navigation labels name destinations. Page and section
+headings follow the shared content guide: use a topic, task or reader question that fits the
+content, without imposing a noun-only pattern.
 
 ## Versions
 
@@ -1089,13 +1082,11 @@ reaches both the packed uniform bytes and the rendered frame.
 
 ## Korean prose
 
-`.claude/skills/readable-korean/SKILL.md` governs Korean wording and register. Use neutral,
-Wikipedia-like explanations with familiar terms and clear sentences. Published explanatory
-prose uses neutral polite endings such as `~입니다` and `~합니다`. Headings name their content with ordinary labels such as
-활용, 예제 and 주의사항. Keep established English names or technical explanations when
-English improves recognition or precision. Preserve technical meaning and give the reader
-adequate context. Include quantities when they explain the subject; Korean explanatory prose
-has no mandatory position for a number. Update existing copy when it is part of the task.
+Translate the reviewed English according to [Website content](../../docs/content-style.md).
+Keep its explanation, tone, examples and calls to action. Use natural Korean word order and
+polite endings; retain established API and technical names. The local
+`.claude/skills/readable-korean/SKILL.md` provides translation guidance. Do not independently
+rewrite the Korean into an encyclopedic or promotional voice.
 
 ## Languages
 

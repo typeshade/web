@@ -10,6 +10,13 @@ and Bun 1.4.3 are used by CI. Each website builds and deploys independently.
 | `apps/typecv`    | cv.typeshade.dev | library and documentation pinned at `sources/typecv`  |
 | `packages/ui`    | shared           | `@typeshade/site-ui`, linked with `workspace:*`       |
 
+## Content and agent handoff
+
+[AGENTS.md](AGENTS.md) records the owner's cross-site instructions.
+[Content style](docs/content-style.md) defines the English-first writing and Korean translation
+workflow. [Content review](docs/content-review.md) tracks the current all-site audit and its
+verification. Read these before changing page or UI text.
+
 ## Development
 
 ```sh

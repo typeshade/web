@@ -5,12 +5,17 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { authoringSections, type AuthoringSection } from './authoring.ts';
 import { RETIRED_GUIDE_SECTIONS } from './retired-guide-sections.mjs';
+import { editorialSourceText } from './editorial-source.ts';
 
 export const GUIDE_FILE = 'vendor/shader-dsl/AUTHORING.md';
 
-export const guideSections: readonly AuthoringSection[] = authoringSections(
+const guideSource = editorialSourceText(
   readFileSync(path.resolve(process.cwd(), GUIDE_FILE), 'utf8'),
+  '`worst` names the parameter, the point and the components where the two part.',
+  '`worst` names the parameter, the point and the components where the results differ.',
+  'AUTHORING.md gradCheck description',
 );
+export const guideSections: readonly AuthoringSection[] = authoringSections(guideSource);
 
 /** The id of every section with a page of its own, in the file's order. The overview is the
  *  text in front of the first heading, and it is the guide's own page. */

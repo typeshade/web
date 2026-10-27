@@ -2,7 +2,7 @@
   "slug": "logop",
   "source": "1da417a712c1101a2cef9f41dec6c1fb09f9e8c7bf3feef670423eba09bcc509",
   "texts": {
-    "summary": "Expr.logical의 연산자 태그입니다. 단락 평가하는 불리언 연산자 &&와 ||이입니다.",
-    "description": "`Expr.logical`의 연산자 태그입니다. 단락 평가를 하는 불리언 연산자 `&&`와 `||`이입니다. 두 피연산자와 결과는 모두 `bool`이입니다. `binop`과 따로 `Expr.op`로 두는 이유는, WGSL과 GLSL에서 `&&`와 `||`가 단락 평가로 동작하기 때문입니다. 일반 이항 연산자에는 이런 단락 평가가 없습니다."
+    "summary": "Expr.logical의 연산자 태그입니다. 단락 평가하는 불리언 연산자 &&와 ||입니다.",
+    "description": "`Expr.logical`의 연산자 태그입니다. 단락 평가를 하는 불리언 연산자 `&&`와 `||`입니다. 두 피연산자와 결과는 모두 `bool`입니다. `binop`과 따로 `Expr.op`로 두는 이유는, WGSL과 GLSL에서 `&&`와 `||`가 단락 평가로 동작하기 때문입니다. 일반 이항 연산자에는 이런 단락 평가가 없습니다."
   }
 }

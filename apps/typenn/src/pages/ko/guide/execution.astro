@@ -6,6 +6,7 @@ import "../../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 import CodeBlock from "../../../components/CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
 const code = `const input = device.tensor(values, { shape: [batch, features] });
 const logits = input.matmul(weights).add(bias);
 const output = logits.relu();
@@ -33,27 +34,30 @@ const result = await output.data();`;
         <Fragment slot="eyebrow">가이드</Fragment>
         <Fragment slot="title">실행 모델</Fragment>
         <Fragment slot="description">
-          TypeNN은 Tensor 그래프와 의미를 소유합니다. TypeShade는 커널 컴파일과
-          프로그램 실행을 맡습니다.
+          TypeNN은 Tensor 그래프를 만들고 실행 순서를 정합니다. TypeShade는
+          그래프의 커널 함수를 컴파일해 선택한 백엔드에서 실행합니다.
         </Fragment>
       </PageHeading>
       <section class="doc-section">
         <h2>Tensor 호출은 지연 그래프를 만듭니다</h2>
         <p>
-          <code>matmul()</code>, <code>add()</code>, <code>relu()</code> 같은
-          연산은 값을 계산하지 않습니다. 각 연산은 TypeShade 커널 함수, 입력
+          <InlineTypeScript code="matmul()" />, <InlineTypeScript code="add()" />,
+          <InlineTypeScript code="relu()" /> 같은 연산은 값을 즉시 계산하지
+          않습니다. 각 연산은 TypeShade 커널 함수, 입력
           Tensor, 값으로 넘기는 스칼라, 기울기 규칙을 담은 노드를 기록합니다.
         </p>
         <CodeBlock title="간단한 Tensor 그래프" file="model.ts" code={code} />
       </section>
       <section class="doc-section">
-        <h2>data() 호출마다 fuse 범위 하나가 실행됩니다</h2>
+        <h2>data()가 Tensor 결과를 계산하는 방식</h2>
         <p>
-          <code>data()</code>를 호출하면 TypeNN은 Tensor 아래에서 아직 배열이
-          없는 노드를 모아 노드마다 Resident 배열을 만들고 잎 노드를
-          업로드합니다. 그다음 노드의 커널 함수를 그래프 순서로 호출하는
-          본문으로 TypeShade <code>fuse</code>를 호출하고, Tensor를 한 번만
-          읽어옵니다.
+          계산된 배열이 없는 Tensor에 <InlineTypeScript code="data()" />를
+          호출하면 TypeNN은 결과에 필요한 그래프 노드를 모읍니다. 각 노드의 출력
+          배열을 만들고 잎 배열을 업로드합니다. 그런 다음 TypeShade{" "}
+          <InlineTypeScript code="fuse()" />를 한 번 호출해 그 안에서 노드 커널을
+          그래프 순서대로 실행합니다.
+          컴파일러는 함께 묶을 수 있는 호출을 디스패치로 묶고, TypeNN은 요청한
+          Tensor를 한 번 읽어옵니다.
         </p>
         <div class="execution-lanes">
           <div>
@@ -62,7 +66,7 @@ const result = await output.data();`;
           </div>
           <div>
             <span class="lane-label">TypeShade</span>
-            <p>fuse 범위 계획 · 디스패치 · Backend 계층 · Runtime 자원</p>
+            <p>컴파일러 디스패치 계획 · 디스패치 · Backend 계층 · Runtime 자원</p>
           </div>
         </div>
       </section>
@@ -100,8 +104,8 @@ const result = await output.data();`;
           </div>
         </div>
         <p class="fine-print">
-          TypeShade Call-layer 설정이 프로세스 전역이어서 JavaScript
-          컨텍스트마다 TypeNN Device 하나만 활성화할 수 있습니다.
+          TypeShade는 프로세스 전체에 call-layer 설정 하나를 사용하므로 JavaScript
+          컨텍스트마다 활성 TypeNN Device 하나만 사용할 수 있습니다.
         </p>
       </section>
       <section class="doc-section">
@@ -109,9 +113,10 @@ const result = await output.data();`;
         <p>
           TypeShade의 퓨전 규칙이 성립하면 컴파일러가 연속한 커널 호출을
           디스패치 하나에 담습니다. WebGPU에서{" "}
-          <code>a.add(b).mul(c).relu()</code>는 디스패치 하나로 실행됩니다.
-          리덕션, 다른 인덱스 읽기, 저장소 버퍼 한도 초과가 있으면 새 디스패치가
-          시작됩니다. 읽은 뒤 <code>device.lastReport</code>에서 계층, 디스패치,
+          <InlineTypeScript code="a.add(b).mul(c).relu()" />는 디스패치 하나로 실행됩니다.
+          출력 개수가 다른 리덕션, 다른 인덱스 읽기, 저장소 버퍼 한도 초과가
+          있으면 새 디스패치가 시작됩니다. 읽은 뒤
+          <code>device.lastReport</code>에서 계층, 디스패치,
           제출, 호출 그룹을 볼 수 있습니다. CPU 계층의 보고서에는 디스패치가
           없고 호출마다 그룹이 하나씩 있습니다.
         </p>

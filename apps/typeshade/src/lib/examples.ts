@@ -5,6 +5,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { examples as registry } from '../../vendor/shader-dsl/examples/index.ts';
 import { shortBlurb } from './blurb.ts';
+import { twinTileCopy } from './example-copy.ts';
 import { builtinCounts } from './builtin-table.ts';
 import { languageCounts } from './language-reference.ts';
 import { errorCodeCounts } from './error-codes.ts';
@@ -168,7 +169,9 @@ function countShadeBothTargets(): number {
  *  no longer shows. */
 export function twinBlurbs(): Record<string, string> {
   return Object.fromEntries(
-    shadeExampleList.filter((e) => e.twinOf).map((e) => [e.id, shortBlurb(originalOf(e.id).blurb)]),
+    shadeExampleList
+      .filter((e) => e.twinOf)
+      .map((e) => [e.id, twinTileCopy(e.id, shortBlurb(originalOf(e.id).blurb))]),
   );
 }
 

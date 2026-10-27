@@ -3,7 +3,7 @@
   "source": "9ecec9955210504b50f0ae6622009b2bbf17c2e4cf81aaeb5b269a30749ffe42",
   "texts": {
     "summary": "rt.sampler()가 만드는 샘플러의 옵션입니다.",
-    "members.filter": "확대, 축소, 그리고 밉 레벨 사이를 고르는 방식입니다. 생략하면 `'linear'`이입니다.",
+    "members.filter": "확대, 축소, 그리고 밉 레벨 사이를 고르는 방식입니다. 생략하면 `'linear'`입니다.",
     "members.address": "가장자리 바깥의 값을 읽는 방식이며, 모든 축에 적용됩니다. 생략하면 `'clamp'`(가장자리로 고정)입니다.",
     "members.compare": "비교 샘플러를 위한 설정입니다. 그림자 패스가 기록한 깊이 텍스처에 쓰이며, 이 샘플러가 수행할 비교를 지정합니다."
   }

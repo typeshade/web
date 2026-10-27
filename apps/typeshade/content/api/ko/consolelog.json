@@ -3,7 +3,7 @@
   "source": "292dc5f64eb7b89c17f6c49d8317b8fb119bb7dbe78c3f6bd7ac63ebe437b6e2",
   "texts": {
     "summary": "콘솔 버퍼가 바인딩된 위치와, 그 안의 항목 하나하나가 뜻하는 내용입니다.",
-    "description": "일반 데이터라서 워커가 그대로 보낼 수 있습니다. `compile(src, { console: 'gpu' })`로 컴파일했을 때의 `CompileResult.console`이입니다.",
+    "description": "일반 데이터라서 워커가 그대로 보낼 수 있습니다. `compile(src, { console: 'gpu' })`로 컴파일했을 때의 `CompileResult.console`입니다.",
     "members.sites": "기록된 호출마다 하나씩 있습니다. 항목의 첫 워드는 이 배열 안에서 그 호출이 놓인 인덱스입니다."
   }
 }

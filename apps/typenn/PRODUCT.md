@@ -45,7 +45,7 @@ an install command that is not ready.
 - `Module`, `Sequential`, `Linear`, `Flatten`, `ReLU`, `Dropout`, `CrossEntropyLoss`, `Adam`, and
   `SGD` cover the current example path.
 - Every operation is a TypeShade kernel function and every `data()` runs as one `fuse` scope.
-  Optimizers (SGD, Adam) update host arrays on every tier. Explicit `Tensor.data()` calls are host reads.
+  SGD and Adam update parameters on the device in one plan on every tier. Explicit `Tensor.data()` calls are host reads.
 - Tensor graph reverse-mode differentiation supports selected operations. TypeShade
   `shadeGrad`/`shadeGradCheck` are a distinct pure-function differentiation API.
 - One active TypeNN Device is supported per JavaScript context due to TypeShade's global call-layer

@@ -8,6 +8,7 @@ import "../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import CodeBlock from "../../components/CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
 const code = `import * as nn from "typenn";
 
 const device = await nn.device({ device: "auto" });
@@ -46,8 +47,8 @@ await device.dispose();`;
         <h2>Project status</h2>
         <p>
           TypeNN is pre-release. The npm package metadata still describes a
-          placeholder package, so use the repository source and examples as the
-          reference while the release path is prepared.
+          placeholder package. Check the repository source and examples for
+          current usage until the package is ready for release.
         </p>
         <p>
           <TextLink href="https://github.com/typeshade/typenn">
@@ -58,10 +59,10 @@ await device.dispose();`;
       <section class="doc-section" id="first-operation">
         <h2>Run your first operation</h2>
         <p>
-          <code>device()</code> selects WebGPU when available and falls back to
+          <InlineTypeScript code="device()" /> selects WebGPU when available and falls back to
           the TypeShade CPU tier. You can request <code>"cpu"</code>,{" "}
-          <code>"webgpu"</code>, or <code>"webgl2"</code> explicitly. WebGL2 is
-          a constrained path.
+          <code>"webgpu"</code>, or <code>"webgl2"</code> explicitly. With
+          WebGL2, TypeNN uses the CPU tier for calls it cannot run.
         </p>
         <CodeBlock
           title="MatMul followed by ReLU"
@@ -73,14 +74,14 @@ await device.dispose();`;
         <h2>Understand when work runs</h2>
         <p>
           Tensor methods construct a deferred graph. They do not immediately
-          read values back to JavaScript. Calling <code>data()</code> executes
+          read values back to JavaScript. Calling <InlineTypeScript code="data()" /> executes
           the reachable graph and returns a <code>Float32Array</code> to the
           host.
         </p>
         <div class="note">
           <strong>Keep the graph alive until execution finishes.</strong>
           <span>
-            After you consume the result, call <code>disposeGraph()</code> to
+            After you consume the result, call <InlineTypeScript code="disposeGraph()" /> to
             release intermediate tensors. Dispose the Device when its work is
             finished.
           </span>
@@ -93,8 +94,8 @@ await device.dispose();`;
             <span>
               <strong>Execution model</strong>
               <small>
-                Follow a Tensor graph through kernel functions and one fuse
-                scope.
+                See which kernels run for a Tensor when you call{" "}
+                <InlineTypeScript code="data()" />.
               </small>
             </span>
             <b>→</b>
@@ -102,7 +103,7 @@ await device.dispose();`;
           <LinkItem href="/guide/training/">
             <span>
               <strong>Train a model</strong>
-              <small>Build the Module and optimizer path.</small>
+              <small>Define a Module and update its parameters with an optimizer.</small>
             </span>
             <b>→</b>
           </LinkItem>

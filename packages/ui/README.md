@@ -17,6 +17,8 @@ React or Ant Design; these are optional peers supplied by interactive apps.
 - `styles/tooltip.css`: positioning and visibility for the DOM tooltip controller.
 - `react/controls.tsx`: Button, IconButton, Link, Field, Input, TextArea, NumberInput,
   Select and Checkbox. Numeric and choice interaction is backed by Ant Design.
+- `code/highlight`: build-time TypeScript tokenization for inline expressions and fenced
+  examples, with shared light/dark colors in `code-highlight.css`.
 
 Use Tailwind CSS v4 with the Vite plugin. Import the shared integration in each
 app's main stylesheet; it registers the package sources that automatic app
@@ -69,6 +71,7 @@ action, `loading` for an in-progress action, and `type="submit"` explicitly for 
 Use an anchor or Astro LinkButton for navigation. Button defaults to `type="button"`.
 
 Run `pnpm dev:ui` to inspect the workbench at `http://localhost:4324/`.
+Run `pnpm test:code` to verify code text preservation, escaping and syntax selection.
 Open `/patterns/` for tabs, dialogs, native forms, disclosure menus and tooltips.
 Run `pnpm build:ui && pnpm test:controls && pnpm test:patterns` for browser/axe checks. The workbench has
 no production deployment. The [UI audit](../../docs/ui-audit.md) records migration

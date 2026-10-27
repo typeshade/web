@@ -25,6 +25,7 @@ import type {
   ApiTargetSupport,
 } from './api-types.ts';
 import { plain } from './authoring.ts';
+import { editorialSourceText } from './editorial-source.ts';
 import { guideSections } from './guide.ts';
 import { slugify } from './slug.ts';
 
@@ -1071,13 +1072,106 @@ function build(): Built {
   const seeTagLinksByEntry: { readonly entry: ApiEntry; readonly links: readonly ApiLink[] }[] = [];
   for (const symbol of symbols) {
     const extracted = extract({ ...symbol, checker, root, tables, slugOf });
-    entries.push(extracted.entry);
+    const entry = editorializeEntry(extracted.entry);
+    entries.push(entry);
     unresolved.push(...extracted.unresolved);
-    seeTagLinksByEntry.push({ entry: extracted.entry, links: extracted.seeTagLinks });
+    seeTagLinksByEntry.push({ entry, links: extracted.seeTagLinks });
   }
   assertCategories(entries);
   symmetrizeSeeTags(entries, seeTagLinksByEntry);
   return { entries, unresolved };
+}
+
+/** Small, provenance-backed display corrections for defects in the pinned compiler's prose.
+ *  Keep these exact-match and local to the reference; source hashes are computed afterward. */
+function editorializeEntry(entry: ApiEntry): ApiEntry {
+  if (entry.slug === 'pack') {
+    const emit = entry.members.find((member) => member.name === 'emit');
+    if (!emit) throw new Error('[editorial] Pack: expected the emit member');
+    return {
+      ...entry,
+      members: entry.members.map((member) =>
+        member.name !== 'emit'
+          ? member
+          : {
+              ...member,
+              description: editorialSourceText(
+                member.description,
+                "One the build did not give is absent and stands\nfor its default (`'O2'`, `'full'` and `'float'`), and a manifest built with none has no `emit`.",
+                "Each option the build did not provide is absent and uses its default (`'O2'`, `'full'` and `'float'`), and a manifest built with none has no `emit`.",
+                'Pack.members.emit',
+              ),
+            },
+      ),
+    };
+  }
+  if (entry.slug === 'diagnosticdirective') {
+    return {
+      ...entry,
+      summary: editorialSourceText(
+        entry.summary,
+        'One WGSL diagnostic; directive.',
+        'A WGSL `diagnostic(severity, rule);` directive.',
+        'DiagnosticDirective summary',
+      ),
+    };
+  }
+  if (entry.slug === 'fp64guard') {
+    const from = 'No compiler treats a texel as a\ncompile-time constant.';
+    const to = 'The emitted shader reads `_fp64` from a bound texture instead of embedding its texel value as a compile-time constant.';
+    return {
+      ...entry,
+      description: editorialSourceText(entry.description, from, to, 'fp64Guard description'),
+    };
+  }
+  if (entry.slug === 'log') {
+    return {
+      ...entry,
+      description: editorialSourceText(
+        entry.description,
+        'so floor the argument with [`max`](/api/max/) when it can reach zero.',
+        'so set a lower bound with [`max`](/api/max/) when the argument can reach zero.',
+        'log description',
+      ),
+    };
+  }
+  if (entry.slug === 'createruntime') {
+    return {
+      ...entry,
+      summary: editorialSourceText(
+        entry.summary,
+        "Make a runtime: on the host's device or WebGL2 context, or on the first tier of prefer the environment has, a WebGPU device with the features and limits the programs and limits need, or a WebGL2 context of its own.",
+        "Creates a runtime on the host's device or WebGL2 context, or on the first available tier in `prefer`: a WebGPU device meeting the programs' feature requirements and the limits requested by the programs and `limits` option, or a new WebGL2 context.",
+        'createRuntime summary',
+      ),
+    };
+  }
+  if (entry.slug === 'frame') {
+    const submit = entry.members.find((member) => member.name === 'submit');
+    if (!submit) throw new Error('[editorial] Frame: expected the submit member');
+    return {
+      ...entry,
+      members: entry.members.map((member) =>
+        member.name !== 'submit'
+          ? member
+          : {
+              ...member,
+              description: editorialSourceText(
+                editorialSourceText(
+                  member.description,
+                  "It resolves once the queue has run the frame and the console lines of its\nentries are delivered, printed or handed to the runtime's sink, to what their buffers held:\n",
+                  "It resolves with the result below once the queue has run the frame and the console output from its\nentries has been delivered, printed or handed to the runtime's sink:\n",
+                  'Frame.members.submit',
+                ),
+                '`lines` the\n`console.*` calls it kept',
+                '`lines` the number of\n`console.*` calls it kept',
+                'Frame.members.submit lines count',
+              ),
+            },
+      ),
+    };
+  }
+  return entry;
 }
 
 /** `@see` is written by hand on one side of a pair, so a page it names does not automatically

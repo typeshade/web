@@ -2,9 +2,9 @@
   "slug": "textureoptions",
   "source": "004b5d079cc61b1f1ba5e8a557bd9c462ea65a36e63fb0e6790c9047e9cadbef",
   "texts": {
-    "summary": "rt.texture()가 만드는 텍스처의 옵션입니다. format은 디바이스가 렌더링 대상으로 쓰거나 샘플링할 수 있는 GPUTextureFormat 중 어떤 것이든 된다: rgba8unorm, rgba16float, depth24plus, r32float.",
-    "members.size": "`[width, height]`이입니다. 배열 텍스처나 3D 텍스처이면 `[width, height, layers]`이입니다.",
-    "members.dimension": "`'2d'` (기본값) 또는 `'3d'`이입니다. 텍스처 하나가 렌더링 대상과 샘플링 텍스처를 동시에 겸합니다.\n샘플 수가 1인 텍스처는 복사 원본과 복사 대상으로 모두 쓸 수 있습니다.",
+    "summary": "rt.texture()가 만드는 텍스처의 옵션입니다. format에는 디바이스가 렌더링 대상으로 쓰거나 샘플링할 수 있는 GPUTextureFormat을 지정합니다. 예를 들면 rgba8unorm, rgba16float, depth24plus, r32float입니다.",
+    "members.size": "`[width, height]`입니다. 배열 텍스처나 3D 텍스처이면 `[width, height, layers]`입니다.",
+    "members.dimension": "`'2d'` (기본값) 또는 `'3d'`입니다. 텍스처 하나가 렌더링 대상과 샘플링 텍스처를 동시에 겸합니다.\n샘플 수가 1인 텍스처는 복사 원본과 복사 대상으로 모두 쓸 수 있습니다.",
     "members.sampleCount": "멀티샘플 렌더링 대상이면 4입니다. 그 밖의 경우에는 기본값인 1입니다.",
     "members.storage": "진입점이 쓰는 스토리지 텍스처이면 `STORAGE_BINDING`을 추가합니다."
   }

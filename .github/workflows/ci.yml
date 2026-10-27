@@ -22,6 +22,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:styles
+      - run: pnpm test:code
       - run: pnpm check:ui
       - run: pnpm build:ui
       - run: pnpm exec playwright install --with-deps chromium
@@ -107,7 +108,7 @@ jobs:
           bun scripts/check-reference-notes.ts --dist
           bun run check:benchmark-catalog
           bun run check:regression-catalog
-          bun test scripts/playground-diagnostics.test.ts scripts/playground-host-default.test.ts scripts/compiler-authoring.test.ts scripts/compute-runtime.test.ts scripts/render-runtime.test.ts scripts/benchmarks.test.ts scripts/reference-notes.test.ts
+          bun test scripts/playground-diagnostics.test.ts scripts/playground-host-default.test.ts scripts/compiler-authoring.test.ts scripts/compute-runtime.test.ts scripts/render-runtime.test.ts scripts/benchmarks.test.ts scripts/reference-notes.test.ts scripts/editorial-source.test.ts
           bun run qa:seo
           bun run qa:worker-routes
           bun run qa:openseo

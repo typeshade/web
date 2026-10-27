@@ -9,7 +9,7 @@ type View = {
 };
 type SceneData = { views: View[]; landmarks: { xyz: Float64Array }[] };
 
-export default function SfmViewer({ reconstruction }: { reconstruction: SceneData }) {
+export default function SfmViewer({ reconstruction, label }: { reconstruction: SceneData; label: string }) {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const parent = host.current;
@@ -152,7 +152,7 @@ export default function SfmViewer({ reconstruction }: { reconstruction: SceneDat
       className="viewer"
       ref={host}
       role="img"
-      aria-label="Sparse 3D reconstruction with camera positions"
+      aria-label={label}
     >
       <span className="viewer-error" />
     </div>

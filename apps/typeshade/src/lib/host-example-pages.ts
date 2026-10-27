@@ -11,6 +11,7 @@
 // (examples/hosts/_order.ts). The words around them are `examples.host` in every dictionary.
 import { hostExamples } from '../../vendor/shader-dsl/examples/hosts/index.ts';
 import { shortBlurb } from './blurb.ts';
+import { hostPageCopy, hostTileCopy } from './example-copy.ts';
 import { shadeExampleIds } from './shade-examples.ts';
 
 /** The tiers a host example can list, in the order a call tries them. */
@@ -34,8 +35,6 @@ export interface HostExamplePage {
 // Some compiler titles open with the group's name ("Host: draw into a canvas"). The site
 // shows them under the heading Host examples, so the name comes off and the rest is the title.
 const TITLE_PREFIX = 'Host: ';
-// The compiler cites its own proposals ("(change 0058)"), which have no page on the site.
-const CHANGE_REFERENCE = /\s*\(change \d{4}\)/g;
 const NAMES_FORMER_HOST = /x-?gis/i;
 
 function check(): void {
@@ -71,15 +70,15 @@ export function hostTitles(): Record<string, string> {
 
 /** The English line under each tile: the compiler's blurb, shortened to its first clause. */
 export function hostDescriptions(): Record<string, string> {
-  return Object.fromEntries(hostExamples.map((h) => [h.id, shortBlurb(h.blurb)]));
+  return Object.fromEntries(
+    hostExamples.map((h) => [h.id, hostTileCopy(h.id, shortBlurb(h.blurb))]),
+  );
 }
 
 /** The English paragraph each page opens with: the compiler's whole blurb, less the citations
  *  of its own proposals. */
 export function hostBlurbs(): Record<string, string> {
-  return Object.fromEntries(
-    hostExamples.map((h) => [h.id, h.blurb.replace(CHANGE_REFERENCE, '').trim()]),
-  );
+  return Object.fromEntries(hostExamples.map((h) => [h.id, hostPageCopy(h.id, h.blurb)]));
 }
 
 /** One locale's words for the host examples, checked against the list, so a host example added

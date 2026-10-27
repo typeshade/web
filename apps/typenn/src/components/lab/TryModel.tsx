@@ -10,6 +10,7 @@ import { MIRROR_BASE } from "../../lab/datasets";
 import { formatTest } from "../../lab/format";
 import { bagOf, encode, wordIndex } from "../../lab/text";
 import { predict } from "../../lab/train";
+import { datasetClasses, datasetTitle } from "../../lab/copy";
 import type { Locale, Session, Words } from "../../lab/types";
 
 export function TryModel({
@@ -28,7 +29,8 @@ export function TryModel({
   return (
     <div className="lab-try">
       <p className="lab-note" data-testid="try-model">
-        <strong>{words.modelUsed}:</strong> {data.info.title} ·{" "}
+        <strong>{words.modelUsed}:</strong>{" "}
+        {datasetTitle(data.info.id, data.info.title, locale)} ·{" "}
         {words.presetName[spec.preset]} · {words.testMetric}:{" "}
         {formatTest(result.test, spec.preset === "regression", locale)} ·{" "}
         {words.trainedAgo.replace(
@@ -37,10 +39,10 @@ export function TryModel({
         )}
       </p>
       {task === "image-classification" && (
-        <ImageTry session={session} words={words} />
+        <ImageTry session={session} words={words} locale={locale} />
       )}
       {task === "text-classification" && (
-        <TextTry session={session} words={words} />
+        <TextTry session={session} words={words} locale={locale} />
       )}
       {task === "regression" && (
         <RegressionTry session={session} words={words} locale={locale} />
@@ -49,7 +51,7 @@ export function TryModel({
   );
 }
 
-function ImageTry({ session, words }: { session: Session; words: Words }) {
+function ImageTry({ session, words, locale }: { session: Session; words: Words; locale: Locale }) {
   const { data, model, device, spec } = session;
   const [h, w, c] = spec.inputShape as [number, number, number];
   const drawable = data.info.id === "mnist" || data.info.id === "fashion_mnist";
@@ -58,7 +60,7 @@ function ImageTry({ session, words }: { session: Session; words: Words }) {
   const [truth, setTruth] = useState<number | null>(null);
   const [top, setTop] = useState<{ label: string; p: number }[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const classes = data.manifest.classes ?? [];
+  const classes = datasetClasses(data.info.id, data.manifest.classes ?? [], locale);
 
   useEffect(() => {
     const el = canvas.current;
@@ -189,7 +191,7 @@ function ImageTry({ session, words }: { session: Session; words: Words }) {
   );
 }
 
-function TextTry({ session, words }: { session: Session; words: Words }) {
+function TextTry({ session, words, locale }: { session: Session; words: Words; locale: Locale }) {
   const { data, model, device, spec } = session;
   const [review, setReview] = useState("");
   const [rows, setRows] = useState<{ label: string; p: number }[] | null>(null);
@@ -197,7 +199,7 @@ function TextTry({ session, words }: { session: Session; words: Words }) {
   const vocab = useRef<{ index: Map<string, number>; list: string[] } | null>(
     null,
   );
-  const classes = data.manifest.classes ?? [];
+  const classes = datasetClasses(data.info.id, data.manifest.classes ?? [], locale);
 
   async function classify() {
     try {

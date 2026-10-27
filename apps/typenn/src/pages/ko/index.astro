@@ -10,6 +10,7 @@ import HomeSurface from "@typeshade/site-ui/astro/HomeSurface";
 import LinkButton from "@typeshade/site-ui/astro/LinkButton";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import CodeBlock from "../../components/CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
 
 const quickStart = `import * as nn from "typenn";
 
@@ -36,14 +37,12 @@ await device.dispose();`;
         <div class="home-copy">
           <Eyebrow>TypeScript 신경망 프레임워크</Eyebrow>
           <h1>
-            그래프는 TypeScript로.
-            <br />
-            <span>실행은 컴파일러로.</span>
+            TypeScript로 신경망을 만드세요.
           </h1>
           <p class="lead">
-            TypeNN은 Tensor와 Module 연산을 지연 그래프로 구성합니다.
-            TypeShade는 커널을 컴파일하고 CPU와 지원되는 GPU 백엔드에서
-            실행합니다.
+            Tensor 연산과 Module 클래스로 모델을 정의합니다. TypeNN은 연산을
+            지연 그래프에 기록하고, TypeShade는 커널을 컴파일해 CPU와 지원되는
+            GPU 백엔드에서 실행합니다.
           </p>
           <div class="action-row">
             <LinkButton variant="primary" size="default" href="/ko/playground/">
@@ -72,8 +71,8 @@ await device.dispose();`;
       <HomeSection aria-labelledby="path-title">
         <div class="section-heading-row">
           <div>
-            <Eyebrow>TypeScript에서 실행까지</Eyebrow>
-            <h2 id="path-title">세 계층이 실행 경로를 나눠 맡습니다.</h2>
+            <Eyebrow>실행</Eyebrow>
+            <h2 id="path-title">TypeNN은 Tensor 연산을 어떻게 실행할까요?</h2>
           </div>
           <TextLink href="/ko/guide/execution/">
             실행 방식 보기 <span aria-hidden="true">↗</span>
@@ -84,25 +83,28 @@ await device.dispose();`;
             <span class="path-index">01</span>
             <h3>정의</h3>
             <p>
-              Tensor 호출이 Shape와 연산을 표현합니다. TypeNN은 그래프 노드를
-              기록합니다.
+              Tensor 호출로 Shape와 연산을 정의합니다. TypeNN은 각 호출을 그래프
+              노드로 기록합니다.
             </p>
-            <code>tensor.matmul(weight).relu()</code>
+            <InlineTypeScript code="tensor.matmul(weight).relu()" />
           </article>
           <article>
             <span class="path-index">02</span>
-            <h3>연결</h3>
+            <h3>커널 함수 호출</h3>
             <p>
-              노드마다 TypeShade 커널 함수가 있고, TypeNN이 Resident 배열에 대해
-              호출합니다.
+              노드마다 TypeShade 커널 함수가 있습니다. <InlineTypeScript
+                code="data()"
+              />를 호출하면 TypeNN이 해당 노드의 입력·출력 배열로 함수를
+              실행합니다.
             </p>
-            <code>Tensor graph → kernel functions</code>
+            <code>TypeShade 커널</code>
           </article>
           <article>
             <span class="path-index">03</span>
-            <h3>실행</h3>
+            <h3>그래프 실행</h3>
             <p>
-              fuse 범위 하나가 선택된 실행 계층에서 필요한 커널을 실행합니다.
+              필요한 경우 <InlineTypeScript code="data()" />가 선택한 계층에서
+              결과에 필요한 커널을 실행합니다.
             </p>
             <code>CPU · WebGPU · WebGL2*</code>
           </article>
@@ -115,13 +117,11 @@ await device.dispose();`;
 
       <HomeSection layout="split" aria-labelledby="learn-title">
         <div class="learning-copy">
-          <Eyebrow>TypeNN 살펴보기</Eyebrow>
-          <h2 id="learn-title">
-            연산을 직접 실행하고 시스템의 내부를 따라가세요.
-          </h2>
+          <Eyebrow>TypeNN 사용해 보기</Eyebrow>
+          <h2 id="learn-title">브라우저에서 TypeNN 사용하기</h2>
           <p>
-            브라우저에서 행렬 연산을 실행한 뒤 실행 그래프, 자동 미분, 모델 학습
-            가이드를 확인하세요.
+            브라우저에서 행렬 연산을 실행하고, 가이드에서 그래프 실행, 자동 미분,
+            모델 학습을 알아보세요.
           </p>
         </div>
         <LinkList class="learning-links">
@@ -135,21 +135,21 @@ await device.dispose();`;
           <LinkItem href="/ko/guide/training/">
             <span>
               <strong>모델 학습</strong>
-              <small>문서화된 MNIST MLP 경로를 따라갑니다.</small>
+              <small>MLP를 학습해 MNIST 숫자를 분류하세요.</small>
             </span>
             <b aria-hidden="true">↗</b>
           </LinkItem>
           <LinkItem href="/ko/api/">
             <span>
               <strong>API 참조</strong>
-              <small>현재 Tensor와 Module API를 찾아봅니다.</small>
+              <small>현재 Tensor와 Module API를 찾아보세요.</small>
             </span>
             <b aria-hidden="true">↗</b>
           </LinkItem>
           <LinkItem href="/ko/examples/">
             <span>
               <strong>예제</strong>
-              <small>전체 소스 예제와 구현 범위를 확인합니다.</small>
+              <small>전체 소스 예제와 현재 구현 한계를 확인하세요.</small>
             </span>
             <b aria-hidden="true">↗</b>
           </LinkItem>
@@ -160,11 +160,12 @@ await device.dispose();`;
         <div>
           <Eyebrow>현재 구현 상태</Eyebrow>
           <h2 id="status-title">
-            모든 연산이 커널 함수입니다. 학습은 아직 최적화 전입니다.
+            학습과 실행
           </h2>
           <p>
-            <code>data()</code> 호출마다 TypeShade fuse 범위 하나가 실행되고,{" "}
-            <code>device.lastReport</code>가 그 계획을 보여 줍니다. SGD와 Adam은
+            <InlineTypeScript code="data()" />가 새 결과를 계산할 때 필요한
+            커널을 실행합니다. 계획이 실행된 뒤 <code>device.lastReport</code>에서
+            실행 계층과 디스패치 목록을 확인할 수 있습니다. SGD와 Adam은
             파라미터를 장치에서 갱신합니다. 타일 MatMul은 앞으로의 과제입니다.
           </p>
         </div>

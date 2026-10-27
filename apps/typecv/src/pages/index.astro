@@ -10,7 +10,7 @@ import LinkButton from "@typeshade/site-ui/astro/LinkButton";
 import SiteLayout from "../layouts/SiteLayout.astro";
 import { Code } from "astro/components";
 const intro =
-  "Reusable computer vision in TypeScript, with computation on the GPU. Start with geometric vision and sparse reconstruction within a broader foundation for images, correspondence, motion and 3D.";
+  "TypeCV is a TypeScript library for computer vision with GPU acceleration. Use it for geometric vision and sparse 3D reconstruction.";
 const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\nconst device = await ShadeDevice.open();\nconst result = await verifyImagePairGpu(device, first, second, matches);\nawait device.dispose();`;
 ---
 
@@ -26,9 +26,9 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
         <div class="home-copy">
           <Eyebrow>TYPECV / COMPUTER VISION</Eyebrow>
           <h1>
-            A clearer view.
+            Build computer vision tools
             <br />
-            From code to geometry.
+            with TypeShade and TypeScript.
           </h1>
           <p class="lead">{intro}</p>
           <div class="action-row">
@@ -39,7 +39,7 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
               Read the guide
             </LinkButton>
           </div>
-          <p class="home-note">TypeScript → TypeShade → WebGPU</p>
+          <p class="home-note">TypeScript library · TypeShade GPU operators</p>
         </div>
         <div class="home-code">
           <div class="code-frame">
@@ -57,8 +57,8 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
             </div>
           </div>
           <p class="home-note">
-            Resident correspondence verification. Geometry runs in a TypeShade
-            WebGPU plan.
+            This example verifies image correspondences with a TypeShade WebGPU
+            operator.
           </p>
         </div>
       </HomeHero>
@@ -66,7 +66,10 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
         <div class="section-intro">
           <Eyebrow>01 / OPERATORS</Eyebrow>
           <h2>Computer vision foundations</h2>
-          <p>Current operators are reusable independently of an SfM graph.</p>
+          <p>
+            Use pair verification, pose estimation, triangulation and bundle
+            adjustment independently or as part of sparse reconstruction.
+          </p>
         </div>
         <StepGrid>
           <a href="/docs/gpu-initialization/">
@@ -89,11 +92,13 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
       <HomeSection layout="split">
         <div>
           <Eyebrow>02 / SCOPE</Eyebrow>
-          <h2>CV is the scope. SfM is a subset.</h2>
+          <h2>Build on the current geometry APIs</h2>
           <p>
-            TypeCV is a growing computer vision library. The current focus is
-            geometric vision and sparse 3D, with an experimental TypeShade GPU
-            FAST/BRIEF feature frontend and matching operator.
+            TypeCV currently provides CPU reference APIs and TypeShade GPU
+            operators for geometric vision and sparse 3D reconstruction. GPU
+            FAST/BRIEF feature extraction and matching are available
+            experimentally in the SfM lab. Image processing, optical flow and
+            learned-vision integration remain planned.
           </p>
           <TextLink href="/docs/gpu-features/">
             Read about GPU features →
@@ -111,11 +116,11 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
         </div>
       </HomeSection>
       <HomeSection layout="action">
-        <h2>Try your own footage</h2>
+        <h2>Run a reconstruction on local video</h2>
         <p>
-          Choose a local video, extract frames in the browser, then run
-          TypeShade GPU feature matching and incremental SfM. Video stays on
-          your device.
+          Choose a local video or prepared frame bundle. The browser samples up
+          to eight frames, then runs experimental TypeShade GPU feature matching
+          and incremental SfM. The video stays in your browser.
         </p>
         <LinkButton variant="primary" size="default" href="/lab/">
           Open the SfM lab ↗

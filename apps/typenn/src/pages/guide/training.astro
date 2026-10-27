@@ -6,6 +6,7 @@ import "../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import CodeBlock from "../../components/CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
 const code = `const model = new SimpleMLP().to(device);
 const parameters = model.parameters();
 const criterion = new nn.CrossEntropyLoss();
@@ -104,23 +105,26 @@ const modelCode = `export class SimpleMLP extends nn.Module {
         />
       </section>
       <section class="doc-section">
-        <h2>What happens on GPU</h2>
+        <h2>What happens in a training step</h2>
         <p>
           On every tier, the forward and backward operations run as TypeShade
-          kernel functions, each <code>data()</code> call as one fuse scope.{" "}
-          <code>optimizer.step()</code> computes the gradients and updates the
-          parameters, and the Adam moments, in one plan on the device. It reads
+          kernel functions. When a requested Tensor has no computed array,
+          <InlineTypeScript code="data()" /> runs the kernels needed to produce
+          it. <InlineTypeScript code="optimizer.step()" /> computes the
+          gradients and updates parameters and Adam moments in one device plan.
+          It reads
           no gradient back and uploads no parameter. A layer's{" "}
           <code>weight</code> and <code>bias</code> arrays are host copies:{" "}
-          <code>await model.sync()</code> refreshes them, and a{" "}
-          <code>parameter.data()</code> read does for one parameter. On
+          <InlineTypeScript code="await model.sync()" /> refreshes them, and
+          <InlineTypeScript code="parameter.data()" /> reads one parameter. On
           SwiftShader the device update is not faster than the host loop it
           replaced.
         </p>
         <div class="note">
           <strong>Explicit reads remain reads.</strong>
           <span>
-            Calling <code>loss.data()</code> or <code>parameter.data()</code>{" "}
+            Calling <InlineTypeScript code="loss.data()" /> or{" "}
+            <InlineTypeScript code="parameter.data()" />
             requests a host result. The sample loop above reads back only the
             loss each step.
           </span>
@@ -129,7 +133,7 @@ const modelCode = `export class SimpleMLP extends nn.Module {
       <section class="doc-section">
         <h2>Dispose each batch graph</h2>
         <p>
-          <code>disposeGraph(model.parameters())</code> releases temporary
+          <InlineTypeScript code="disposeGraph(model.parameters())" /> releases temporary
           tensors while retaining model parameters. Keep the Device alive for
           the training session and dispose it after the final batch and any
           pending work finish.
@@ -141,12 +145,12 @@ const modelCode = `export class SimpleMLP extends nn.Module {
         </p>
       </section>
       <section class="doc-section">
-        <h2>Current scope</h2>
+        <h2>Operations covered by this example</h2>
         <p>
-          Tensor autograd covers selected operations. The current Module
-          training example is the authoritative scope; this guide does not imply
-          support for arbitrary user-defined kernels or all Tensor graph
-          derivatives.
+          Tensor graph autograd computes gradients for selected operations.
+          This guide follows the MNIST Module example; it does not claim support
+          for arbitrary user-defined kernels or gradients for every Tensor
+          operation.
         </p>
         <nav class="doc-pagination">
           <a href="/guide/execution/">

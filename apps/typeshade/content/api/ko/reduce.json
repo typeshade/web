@@ -8,7 +8,7 @@
     "parameters.loopInit": "카운터의 초기 값입니다.",
     "parameters.cond": "계속 반복할지 판단하는 조건입니다. 카운터를 받습니다.",
     "parameters.body": "누산기와 카운터를 받고, 다음 누산기를 반환합니다.",
-    "parameters.step": "반복마다 더하는 증가량입니다. 기본값은 `+1`이입니다.",
+    "parameters.step": "반복마다 더하는 증가량입니다. 기본값은 `+1`입니다.",
     "returns": "루프가 끝난 뒤 누산기를 읽는 노드입니다."
   }
 }

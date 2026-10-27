@@ -3,7 +3,7 @@
   "source": "e3b9a4af00367580d34dcba16587e0751d6334382089e0cb283dcdea672466d2",
   "texts": {
     "summary": "semanticDiff의 옵션입니다.",
-    "members.ignore": "무시할 축입니다. 기본값은 `['names', 'declOrder']`이입니다. 식별자 철자와 선언 순서까지 비교하려면 `[]`를 넘깁니다.",
+    "members.ignore": "무시할 축입니다. 기본값은 `['names', 'declOrder']`입니다. 식별자 철자와 선언 순서까지 비교하려면 `[]`를 넘깁니다.",
     "members.transforms": "`b`에 의도적으로 적용한 것으로 선언된 플러그인입니다. 프로덕션 생성 호출이 쓰는 것과 같은 플러그인 배열을 넘깁니다. 예를 들어 `[inline(), ...obfuscate()]`와 같이 넘깁니다. 각 플러그인의 `transformIR`을 순서대로 `a`에 적용합니다. 적용된 변환이 설명하는 diff 줄은 모두 네 분류에서 빠집니다. 그 줄은 [`ClassifiedSemanticDiff.explained`](/api/classifiedsemanticdiff/)로 옮겨지며, 그 플러그인에 귀속됩니다. 선언된 변환이 설명하지 않는 차이는 분류에 남습니다. 따라서 변환을 선언해도 그 변환과 무관한 회귀는 비교 결과에 남습니다. 텍스트 단계 플러그인(`minify`, `aliasTypes`, `prune`)은 이 비교 결과에 영향을 주지 않습니다. 이 비교는 생성된 텍스트를 보지 않기 때문입니다."
   }
 }

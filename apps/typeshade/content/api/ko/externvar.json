@@ -6,7 +6,7 @@
     "description": "호스트 prelude는 뷰 행렬이나 프레임 시간 같은 값을, 모듈이 선언하지 않은 전역 값으로 셰이더에 넘길 수 있습니다. `externVar`는 이런 값을 추상적으로 선언합니다. 두 백엔드 모두에서 아무것도 생성하지 않습니다. 대신 참조 주변의 모든 것을 제공합니다. 각 사용 위치의 타입 검사, `mangle`을 거쳐도 유지되는 이름, 그리고 `reflect().requires`(프래그먼트에서는 `requires`)의 항목입니다. 이 항목으로 호스트는 모듈의 기대치를 프렐류드가 제공하는 값과 비교할 수 있습니다.\n\n`spelling`은 논리 이름을 각 타깃의 이름에 대응시킵니다. 다른 호스트가 같은 값을 다르게 노출하면, 예를 들어 GLSL 프렐류드 전역 대신 WGSL 구조체 멤버나 바인딩된 유니폼으로 노출하면, 변경은 spelling 맵 안에만 머뭅니다.",
     "parameters.name": "논리 심볼 이름이며, 두 타깃 모두에서 기본 spelling입니다.",
     "parameters.type": "셰이더 타입입니다. 읽을 때마다 이 타입으로 검사합니다.",
-    "parameters.opts": "타깃별 `spelling`과 권고 성격의 `stage`이입니다.",
+    "parameters.opts": "타깃별 `spelling`과 권고 성격의 `stage`입니다.",
     "returns": "[`ExternVarHandle`](/api/externvarhandle/)을 반환합니다. `.node`로 값을 읽고, `.decl`은 `module({ externs })`에 넘깁니다."
   }
 }

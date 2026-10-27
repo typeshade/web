@@ -1,4 +1,5 @@
 @import "@typeshade/site-ui/product-sidebar.css";
+@import "@typeshade/site-ui/code-highlight.css";
 
 :where(.cv-docs) .doc-layout {
   display: grid;
@@ -50,6 +51,20 @@
   border-radius: 7px;
   background: var(--ui-code-bg);
   color: #d6e4ff;
+}
+:where(.cv-docs) .doc-article pre.ts-code-block {
+  background: #ffffff;
+  color: #24292e;
+}
+html[data-theme="dark"] :where(.cv-docs) .doc-article pre.ts-code-block {
+  background: #24292e;
+  color: #e1e4e8;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) :where(.cv-docs) .doc-article pre.ts-code-block {
+    background: #24292e;
+    color: #e1e4e8;
+  }
 }
 @media (max-width: 800px) {
   :where(.cv-docs) .doc-layout {

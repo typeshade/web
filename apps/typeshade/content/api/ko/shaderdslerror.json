@@ -3,6 +3,6 @@
   "source": "71e38c031133b837996f5b52b6a0107e03390862275da89baea387d911afabf5",
   "texts": {
     "summary": "TypeShadeError의 이전 이름입니다. 설계 문서와 0.1.0 이전 소스를 사용하는 코드와의 호환성을 위해 유지합니다.",
-    "description": "[`TypeShadeError`](/api/typeshadeerror/)의 예전 이름입니다. 설계 문서와 0.1.0 이전 소스를 따라 쓴 코드가 계속 해석되도록 남겨 두었습니다. 하위 클래스가 아니라 같은 클래스이므로 `instanceof`는 어느 방향으로든 똑같이 동작합니다. 보존할 수 없는 것은 `error.name`이입니다. 이 값은 모든 인스턴스에서 `TypeShadeError`로 읽히므로, 그 문자열을 비교하는 코드는 새 이름을 써야 합니다."
+    "description": "[`TypeShadeError`](/api/typeshadeerror/)의 예전 이름입니다. 설계 문서와 0.1.0 이전 소스를 따라 쓴 코드가 계속 해석되도록 남겨 두었습니다. 하위 클래스가 아니라 같은 클래스이므로 `instanceof`는 어느 방향으로든 똑같이 동작합니다. 보존할 수 없는 것은 `error.name`입니다. 이 값은 모든 인스턴스에서 `TypeShadeError`로 읽히므로, 그 문자열을 비교하는 코드는 새 이름을 써야 합니다."
   }
 }

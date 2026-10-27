@@ -36,6 +36,7 @@ import { CODES, diagnose } from '../../vendor/shader-dsl/src/dev.ts';
 import { emitModule } from '../../vendor/shader-dsl/src/core/backends/wgsl.ts';
 import { emitGlslStages } from '../../vendor/shader-dsl/src/core/backends/glsl.ts';
 import { referenceProse } from './api.ts';
+import { editorialSourceText } from './editorial-source.ts';
 
 const ROOT = 'vendor/shader-dsl';
 const TS_FILE = 'src/compiler/ts/codes.ts';
@@ -497,10 +498,20 @@ function printable(code: RawCode): RawCode {
   // examples already print it (src/scripts/live-shader-compile.ts).
   const prose = (text: string): string =>
     referenceProse(text).replace(/\bshader-dsl\b/g, 'typeshade');
+  // The registry's old source-file fragment has no target. Keep the compiler's diagnostic
+  // intact; the documentation hint links to the corresponding published guide instead.
+  const hint = code.code === 'SD0030'
+    ? editorialSourceText(
+        code.hint ?? '',
+        'AUTHORING.md#capabilities--extensions',
+        '[Capabilities and extensions](authoringCapabilities)',
+        'SD0030 documentation hint',
+      )
+    : code.hint;
   return {
     ...code,
     docs: code.docs.map(prose).filter((p) => p.length > 0),
-    hint: code.hint ? prose(code.hint) : '',
+    hint: hint ? prose(hint) : '',
   };
 }
 

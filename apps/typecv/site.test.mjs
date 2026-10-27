@@ -1,14 +1,123 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, access, mkdir } from 'node:fs/promises';
+import { readFile, access, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { createServer } from 'node:http';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { Marked, Renderer } from 'marked';
+import { prepareMarkedHighlights } from '@typeshade/site-ui/code/highlight';
+import {
+  assertReviewedSourceRevision,
+  selectDocumentationFile,
+  typecvSourceUrl,
+} from './scripts/doc-overrides.mjs';
 
 const directory = path.resolve(import.meta.dirname, 'dist');
 const version = JSON.parse(await readFile(path.join(directory, 'version.json'), 'utf8'));
 const fileFor = (pathname) =>
   path.join(directory, pathname.endsWith('/') ? pathname + 'index.html' : pathname);
+
+test('all generated pages render selectable TypeScript code with real tokens', async () => {
+  const source = '`const x: number = 2`\n\n```ts\nconst y = 3\n```\n';
+  const preparer = new Marked({ gfm: true, async: true });
+  const { tokens, highlighted } = await prepareMarkedHighlights(preparer, source);
+  const renderer = new Renderer();
+  renderer.codespan = ({ text }) => highlighted.get(`inline:${text}`) ?? `<code>${text}</code>`;
+  renderer.code = ({ text, lang }) =>
+    highlighted.get(`block:${lang}:${text}`) ?? `<pre><code>${text}</code></pre>`;
+  const html = new Marked({ gfm: true, renderer }).parser(tokens);
+  assert.match(html, /class="ts-inline-code"/);
+  assert.match(html, /class="ts-code-block"/);
+  assert.doesNotMatch(html, /\[object Promise\]/);
+  const snippets = [...html.matchAll(/<code[^>]*>([\s\S]*?)<\/code>/g)].map(([, code]) =>
+    code.replace(/<[^>]*>/g, '').replaceAll('&lt;', '<').replaceAll('&gt;', '>'),
+  );
+  assert.deepEqual(snippets, ['const x: number = 2', 'const y = 3']);
+});
+
+test('all generated pages check documentation override guards and source URLs', async () => {
+  const app = path.dirname(directory);
+  const docsRoot = path.resolve(app, '../../sources/typecv/docs');
+  const overridesRoot = path.join(app, 'docs-overrides');
+  const manifest = JSON.parse(
+    await readFile(path.join(overridesRoot, 'manifest.json'), 'utf8'),
+  );
+
+  for (const relativePath of Object.keys(manifest.overrides)) {
+    const selected = await selectDocumentationFile(
+      path.join(docsRoot, relativePath),
+      path.join(overridesRoot, relativePath),
+      relativePath,
+      manifest,
+    );
+    assert.deepEqual(selected, {
+      file: path.join(overridesRoot, relativePath),
+      edited: true,
+    });
+  }
+
+  const revision = manifest.sourceRevision;
+  assert.doesNotThrow(() => assertReviewedSourceRevision(revision, manifest));
+  assert.throws(
+    () => assertReviewedSourceRevision(`${revision}-changed`, manifest),
+    /source revision changed from reviewed/,
+  );
+  assert.equal(
+    typecvSourceUrl('../README.md', revision),
+    `https://github.com/typeshade/typecv/blob/${revision}/README.md`,
+  );
+  assert.equal(
+    typecvSourceUrl('experiments/gpu/pyramid-software.json', revision),
+    `https://github.com/typeshade/typecv/blob/${revision}/docs/experiments/gpu/pyramid-software.json`,
+  );
+  const documentationIndex = await readFile(fileFor('/docs/'), 'utf8');
+  assert.ok(
+    documentationIndex.includes(`href="${typecvSourceUrl('../README.md', revision)}"`),
+  );
+  const editedPage = await readFile(fileFor('/docs/sfm-quickstart/'), 'utf8');
+  assert.ok(editedPage.includes('This page is an edited website copy.'));
+  assert.ok(
+    editedPage.includes(`href="${typecvSourceUrl('sfm-quickstart.md', revision)}"`),
+  );
+  const highlightedDocs = await readFile(fileFor('/docs/gpu-sfm/'), 'utf8');
+  assert.match(highlightedDocs, /class="ts-inline-code"/);
+  assert.match(highlightedDocs, /class="ts-code-block"/);
+  assert.doesNotMatch(highlightedDocs, /\[object Promise\]/);
+
+  const temporary = await mkdtemp(path.join(tmpdir(), 'typecv-doc-override-'));
+  try {
+    const sourcePath = path.join(temporary, 'source.md');
+    const overridePath = path.join(temporary, 'override.md');
+    await writeFile(sourcePath, '# Updated upstream source');
+    await writeFile(overridePath, '# Website copy');
+    await assert.rejects(
+      selectDocumentationFile(sourcePath, overridePath, 'source.md', {
+        overrides: { 'source.md': { sha256: '0'.repeat(64) } },
+      }),
+      /source changed/,
+    );
+
+    const missingOverride = path.join(temporary, 'missing.md');
+    assert.deepEqual(
+      await selectDocumentationFile(sourcePath, missingOverride, 'source.md', {
+        overrides: {},
+      }),
+      { file: sourcePath, edited: false },
+    );
+
+    const directoryOverride = path.join(temporary, 'directory-override');
+    await mkdir(directoryOverride);
+    await assert.rejects(
+      selectDocumentationFile(sourcePath, directoryOverride, 'source.md', {
+        overrides: {},
+      }),
+      (error) => error.code === 'EISDIR',
+    );
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
+});
 
 test('all generated pages link to real pages, anchors, local runtimes and records', async () => {
   const failures = [];

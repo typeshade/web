@@ -1,6 +1,6 @@
 ---
 id: the-cpu-oracle
-source: 0372e09c40db5f814d6f24b2dabed45d06952db7468ea2419fd552a7fe2aeeda
+source: 8e4c544eb1f49d9fb5803aad52dd4bfd888ef03f899c7e80473c117324a95cde
 sourceLine: 1396
 rules: 8.22 Ca5h_etdlFvIPBA1NRya7g-bBPugGzboprLldGAJYDc=, 7.2 onO98E-yRQ3RftA44lVmgPmSW7ZkCd7rYrJGgFS8EI4=, 3.9 3B2rlXJXA0GupXGpH-mhQpicZan-WehN8Xf4nhFST6Q=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 8.25 XZRD1So9e-OFRi9VePXRjyCfT2_T_xaPFWQw_Uy0ZrM=, 7.6 kyzs2Ws4Mk2xUgP_v9ZM_z6jm_3zIWP2-BekxmeHpC8=, 12.7 J74H031gQ4FNHTZrIegdYr02_KKNMFFkgQLHhsuICeM=
 ---
@@ -181,7 +181,7 @@ compileModule(d.module).fns[d.name](0.5, 2) // → cos(1) * 0.5 * 2 + sin(1) = 1
 미분 규칙이 없는 구성 요소에 매개변수가 도달하면 `SD0118`로 거부하고 진단에 요소 이름을 표시합니다. 텍스처 샘플, 미분 내장 함수, 매개변수가 전달되는 구조체가 그 예입니다. 매개변수가 도달하지 않는 요소는 이 거부 조건에 해당하지 않습니다. 유도할 수 없는 미분을 영으로 대체하지 않습니다. 생성된 함수는 오라클에서 중앙 유한 차분과 비교해 검사합니다. 직접 작성한 함수도 같은 방법으로 검사할 수 있습니다.
 
 `grad(m, fn, wrt, { mode: 'reverse' })`는 `wrt`에 적은 모든 이름에 대해 한 번에 미분한다(변경
-제안 0056). 새 함수의 기본 이름은 `<fn>_vjp`이다. 이 함수는 같은 인수 뒤에 결과 타입의 시드
+제안 0056). 새 함수의 기본 이름은 `<fn>_vjp`입니다. 이 함수는 같은 인수 뒤에 결과 타입의 시드
 `dy`를 하나 더 받고, 이름마다 필드가 하나씩 있는 구조체를 반환합니다. 각 필드는 벡터-야코비안 곱
 `dy · d fn / d name`입니다. 호출 한 번으로 기울기 전체를 얻으므로, 손실 함수처럼 매개변수는 많고
 결과는 작을 때 이 모드를 씁니다. CPU에서 이 구조체는 객체이며, `d.adjoints`가 매개변수마다 그
@@ -334,7 +334,7 @@ const y = await out.read()
 본문 안의 진입점 호출(`@compute`)도 기록됩니다. 이 호출은 본문이 만든 순서대로 혼자 디스패치
 하나로 실행됩니다. 어떤 커널 호출도 이 호출에 합쳐지지 않고, 이 호출도 다른 그룹에 합쳐지지
 않습니다. 크기가 없는 스토리지 배열에는 `resident(...)` 값을 넘기며, 그 자리에 호스트 배열을 넘기면
-`TypeError`이입니다.
+`TypeError`입니다.
 
 호출이 바로 앞 호출과 떨어져 자기 디스패치로 실행되는 경우는 다음과 같습니다. 이웃을 읽는 경우
 (`t[i - 1]`, `t[i ^ 1]`), 다른 인덱스에 쓰는 경우(`out[2 * i]`), 앞 호출이 읽는 것을 쓰는 경우,
@@ -455,5 +455,5 @@ WGSL은 포인터를 받아 `swap(&x, &y)`로 부르고 본문에서 `*a = *b`�
 `@out` 매개변수를 쓰기 전에 읽으면 `TS8075`가 됩니다. 한정자는 파일이나 네임스페이스에 선언한
 함수에만 붙일 수 있고, 메서드와 진입점, 지역 함수는 값을 받습니다. 다만 한정자가 붙은 함수 안의
 지역 함수는 바깥의 다른 변수처럼 그 매개변수를 읽고 쓸 수 있습니다. `@in`은 없습니다. 한정자를 붙이지 않은
-매개변수가 곧 GLSL의 `in`이입니다. 모든 규칙과 거부되는 경우는 `docs/use-typeshade-surface.md`
+매개변수가 곧 GLSL의 `in`입니다. 모든 규칙과 거부되는 경우는 `docs/use-typeshade-surface.md`
 §70에 있습니다.

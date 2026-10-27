@@ -5,7 +5,7 @@
     "summary": "작성된 모듈을 모든 생성 경로가 기대는 구조 규칙에 비추어 검사하고, 하나라도 어기면 ValidationError를 던집니다.",
     "description": "[`emitModule`](/api/emitmodule/), [`emitGlslModule`](/api/emitglslmodule/), [`compileModule`](/api/compilemodule/)은 모듈을 대상에 맞게 다시 쓰기 전에 이 검사부터 실행합니다. 그래서 구조가 잘못된 모듈은 그 코드를 작성한 줄에서 보고되고, 잘못된 WGSL이나 GLSL이 되어 드라이버까지 가지 않습니다. 생성하지 않고 검사 결과만 필요할 때 직접 호출합니다.\n\n오류 하나가 모든 실패를 보고합니다. `validate`는 심각도가 error인 진단을 모두 모으고, 던지는 오류의 `err.diagnostics`에 전부 담습니다. 메시지는 같은 목록을 텍스트로 보여 줍니다. 각 진단에는 `code`(`SD0107`과 관련 코드), 진단을 낸 `ruleId`, 문제가 발견된 `fn`이 있고, `setSourceTracing`이 켜져 있으면 노드를 작성한 `file:line:col`도 있습니다.\n\n검사하는 핵심 규칙은 이렇습니다. 구조체나 함수 이름의 중복, 바인딩 충돌, 값을 반환하지 않고 끝나는 함수 경로, 한 표현식 안에 섞인 스칼라 타입, 가리키는 함수와 인자 개수나 인자 타입이 맞지 않는 호출, 프래그먼트 진입점 밖에서 읽은 프래그먼트 전용 내장 값, 두 백엔드 모두에서 생성할 수 없는 portable 커널, 같은 함수 안의 다른 지역 변수를 가리는 지역 변수입니다. 이 규칙은 [`composeModule`](/api/composemodule/)로 조립한 모듈과 일부러 조기 반환하는 컴퓨트 커널을 포함해 모든 모듈에 적용됩니다. 스타일 규칙은 린트에만 있으며, 그 규칙은 `lintModule`이나 `diagnose`로 실행합니다.",
     "parameters.m": "어떤 패스도 노드를 다시 쓰기 전, 만든 그대로의 작성된 모듈입니다.",
-    "exceptions.@link ValidationError": "심각도가 error인 진단을 모두 담고, 코드는 `SD0020`이입니다.",
+    "exceptions.@link ValidationError": "심각도가 error인 진단을 모두 담고, 코드는 `SD0020`입니다.",
     "exceptions.ValidationError": "작성된 모듈을 모든 생성 경로가 기대는 구조 규칙에 비추어 검사하고, 하나라도 어기면 ValidationError를 던집니다. emitModule, emitGlslModule, compileModule은 모듈을 대상에 맞게 다시 쓰기 전에 이 검사부터 실행합니다. 그래서 구조가 잘못된 모듈은 그 코드를 작성한 줄에서 보고되고, 잘못된 WGSL이나 GLSL이 되어 드라이버까지 가지 않습니다."
   }
 }

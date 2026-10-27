@@ -10,7 +10,7 @@ import LinkButton from "@typeshade/site-ui/astro/LinkButton";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import { Code } from "astro/components";
 const intro =
-  "TypeScript로 작성하고 TypeShade GPU에서 계산하는 컴퓨터 비전 라이브러리입니다. 이미지, 대응점, 모션, 3D를 위한 공통 기반에서 기하 비전과 희소 복원부터 구현하고 있습니다.";
+  "TypeCV는 GPU 가속을 지원하는 TypeScript 컴퓨터 비전 라이브러리입니다. 기하 비전과 희소 3D 복원에 사용할 수 있습니다.";
 const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\nconst device = await ShadeDevice.open();\nconst result = await verifyImagePairGpu(device, first, second, matches);\nawait device.dispose();`;
 ---
 
@@ -26,8 +26,8 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
         <div class="home-copy">
           <Eyebrow>TYPECV / COMPUTER VISION</Eyebrow>
           <h1>
-            코드에서 기하로.
-            <br />더 선명한 시야.
+            TypeScript와 TypeShade로
+            <br />컴퓨터 비전 도구를 만드세요.
           </h1>
           <p class="lead">{intro}</p>
           <div class="action-row">
@@ -38,7 +38,7 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
               가이드 읽기
             </LinkButton>
           </div>
-          <p class="home-note">TypeScript → TypeShade → WebGPU</p>
+          <p class="home-note">TypeScript 라이브러리 · TypeShade GPU 연산</p>
         </div>
         <div class="home-code">
           <div class="code-frame">
@@ -59,9 +59,12 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
       </HomeHero>
       <HomeSection>
         <div class="section-intro">
-          <Eyebrow>01 / OPERATORS</Eyebrow>
+          <Eyebrow>01 / 연산</Eyebrow>
           <h2>컴퓨터 비전 기반 연산</h2>
-          <p>각 연산은 SfM 그래프와 독립적으로 사용할 수 있습니다.</p>
+          <p>
+            이미지 쌍 검증, 자세 추정, 삼각측량과 번들 조정을 단독으로
+            사용하거나 희소 복원 과정에 조합할 수 있습니다.
+          </p>
         </div>
         <StepGrid>
           <a href="/ko/docs/gpu-initialization/">
@@ -83,12 +86,13 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
       </HomeSection>
       <HomeSection layout="split">
         <div>
-          <Eyebrow>02 / SCOPE</Eyebrow>
-          <h2>컴퓨터 비전 전체를 향해. SfM은 그 일부입니다.</h2>
+          <Eyebrow>02 / 개발 범위</Eyebrow>
+          <h2>현재 제공하는 기하 비전 API</h2>
           <p>
-            TypeCV는 확장 중인 컴퓨터 비전 라이브러리입니다. 현재 기하 비전과
-            희소 3D에 집중하며 TypeShade GPU FAST/BRIEF 특징 검출·매칭 연산을
-            실험적으로 제공합니다.
+            TypeCV는 현재 기하 비전과 희소 3D 복원을 위한 CPU 참조 API와
+            TypeShade GPU 연산을 제공합니다. GPU FAST/BRIEF 특징 추출과 매칭은
+            SfM 실험실에서 실험적으로 사용할 수 있습니다. 이미지 처리, 광류와
+            학습 기반 비전 연동은 향후 구현할 계획입니다.
           </p>
           <TextLink href="/ko/docs/gpu-features/">
             GPU 특징 연산 설명 →
@@ -104,10 +108,11 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
         </div>
       </HomeSection>
       <HomeSection layout="action">
-        <h2>직접 촬영한 영상을 실행해 보세요</h2>
+        <h2>로컬 영상으로 복원을 실행하세요</h2>
         <p>
-          로컬 영상을 선택해 브라우저에서 프레임을 추출하고 TypeShade GPU 특징
-          매칭과 증분 SfM을 실행합니다. 영상은 기기 밖으로 전송되지 않습니다.
+          로컬 영상이나 준비된 프레임 묶음을 선택하세요. 브라우저에서 최대
+          8개 프레임을 추출한 뒤 실험적인 TypeShade GPU 특징 매칭과 증분 SfM을
+          실행합니다. 영상은 브라우저 밖으로 전송되지 않습니다.
         </p>
         <LinkButton variant="primary" size="default" href="/ko/lab/">
           SfM 실험실 열기 ↗

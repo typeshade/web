@@ -28,7 +28,7 @@ export function k(@builtin("global_invocation_id") gid: vec3u) {
 기능 이름은 고정되어 있고 타깃과 독립적이므로, 소스에 `EXT_*`나 `OVR_*` 같은 확장 문자열을 직접 적지 않습니다. 기능 게이트(capability gate)는 생성기가 모듈을 처리하기 전에 각 id를 검사합니다. 기능을 표현할 수 없는 백엔드는 해당 기능 이름을 포함한 `UnsupportedFeatureError`(`SD0030`)를 던집니다. 이 실패 방식은 드라이버가 거부할 소스를 생성하는 대신 컴파일 단계에서 실패하는 fail closed 방식입니다.
 
 소스에서 쓸 표기가 없는 기능이 넷 있습니다. `floatRenderTarget`, `float32Blend`,
-`float32Filterable`, `multiview`이다. 앞의 셋은 호스트가 켜며 셰이더에는 토큰 하나도 더하지
+`float32Filterable`, `multiview`입니다. 앞의 셋은 호스트가 켜며 셰이더에는 토큰 하나도 더하지
 않고, 넷째는 GLSL `#extension`입니다. 이런 기능이 필요한 호스트는 컴파일된 모듈의 `enables`에
 적습니다.
 

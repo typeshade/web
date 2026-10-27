@@ -3,6 +3,6 @@
   "source": "accaec350a4a30feaa284f969342d1b0ce2261cc39dec8bff20fe4ec58a8fff4",
   "texts": {
     "summary": "createDevice()가 디바이스를 여는 방식입니다.",
-    "description": "`prefer`, `device`, `runtime`은 TypeScript 타입과 런타임에서 모두 상호 배타적이다(변경 0085). 추가 옵션은 `DeviceOptions & { label?: string }`처럼 교차 타입으로 결합합니다. 인터페이스는 이 유니언 타입을 확장할 수 없습니다."
+    "description": "`prefer`, `device`, `runtime`은 TypeScript 타입과 런타임에서 모두 상호 배타적입니다(변경 0085). 추가 옵션은 `DeviceOptions & { label?: string }`처럼 교차 타입으로 결합합니다. 인터페이스는 이 유니언 타입을 확장할 수 없습니다."
   }
 }

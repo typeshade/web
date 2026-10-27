@@ -96,7 +96,7 @@ const sections: Record<string, { title: string; description: string }> = {
 const apiCategories: Record<string, { name: string; summary: string }> = {
   authoring: {
     name: '작성',
-    summary: '셰이더의 모듈, 함수, 변수, 제어 흐름을 선언하고 조립하는 IR 빌더 함수입니다.',
+    summary: '셰이더를 작성할 때 쓰는 빌더 API입니다. 모듈, 함수, 변수와 제어 흐름을 다룹니다.',
   },
   builtins: {
     name: '내장 함수',
@@ -110,12 +110,12 @@ const apiCategories: Record<string, { name: string; summary: string }> = {
   types: {
     name: '타입',
     summary:
-      '작성 API에 타입을 붙이는 타입 키와 타입 기술자입니다. 셰이더 값의 형태가 여기서 정해집니다.',
+      '작성 API가 사용하는 타입 키와 타입 기술자입니다. 타입 검사와 값 생성에 쓰이는 정의를 다룹니다.',
   },
   ir: {
     name: 'IR',
     summary:
-      '모든 백엔드가 읽는 중간 표현입니다. 노드와 문장과 선언이 들어 있고, 출력은 모두 여기서 나옵니다.',
+      '모든 백엔드가 읽는 중간 표현입니다. 노드, 문장과 선언을 담아 컴파일 결과를 구성합니다.',
   },
   layout: {
     name: '레이아웃',
@@ -149,7 +149,7 @@ const apiCategories: Record<string, { name: string; summary: string }> = {
   diagnostics: {
     name: '진단',
     summary:
-      '코드가 붙은 오류 클래스와, 출력이 나가기 전에 거치는 검증 단계입니다. 실수는 여기서 걸립니다.',
+      '코드가 붙은 오류 클래스와 WGSL·GLSL 출력 전에 입력을 검사하는 검증 단계를 설명합니다.',
   },
   'emulated-f64': {
     name: 'f64 에뮬레이션',
@@ -162,7 +162,7 @@ const apiCategories: Record<string, { name: string; summary: string }> = {
   backends: {
     name: '백엔드',
     summary:
-      '백엔드가 지켜야 하는 계약과 기능 모델, 그리고 대상마다 내장 함수를 어떤 이름으로 낼지 정하는 레지스트리이입니다.',
+      '백엔드가 지켜야 하는 계약과 기능 모델, 대상마다 내장 함수를 어떤 이름으로 출력할지 정하는 레지스트리입니다.',
   },
   tooling: {
     name: '도구',
@@ -185,8 +185,8 @@ export const ko: Copy = {
   },
 
   meta: {
-    title: 'TypeShade: WebGPU와 WebGL2를 위한 TypeScript 셰이더 언어',
-    description: `TypeShade는 TypeScript 문법으로 셰이더를 작성하는 언어입니다. WebGPU용 WGSL과 WebGL2용 ${glsl}으로 컴파일합니다.`,
+    title: 'TypeShade | 웹을 위한 셰이더 언어',
+    description: `TypeScript 문법으로 셰이더를 작성하세요. TypeShade는 WebGPU용 WGSL과 WebGL2용 ${glsl}으로 컴파일하며, GPU 타입과 편집기 지원, Vite 연동을 제공합니다.`,
     ogAlt: 'TypeShade: WebGPU와 WebGL2를 위한 하나의 셰이더 소스. 렌더링된 metaballs 셰이더.',
   },
 
@@ -362,10 +362,10 @@ export const ko: Copy = {
       // 구간이 좁아져 단어 중간에서 잘리는 사례가 늘었습니다(SEO 리뷰, onpage, 설명 절단). 번역이
       // 있는 export는 content/api/ko/의 한국어 요약이 뒤에 붙습니다.
       pageDescription: (name: string, kind: string, category: string, summary: string) =>
-        `${name}, ${category} 분류 ${kind}이입니다. ${summary}`,
+        `${name}, TypeShade API의 ${category} 분류에 속하는 ${kind}입니다. ${summary}`,
       kindLine: (kind: string, category: string) => `${kind}, ${category} 분류`,
       note: `시그니처, 설명, 예제는 커밋 ${facts.pinnedCommit}의 컴파일러 소스에서 그대로 가져온 영어 원문입니다.`,
-      translatedNote: `설명은 커밋 ${facts.pinnedCommit}의 컴파일러 소스에 있는 JSDoc을 한국어로 옮긴 것입니다. 시그니처와 예제 코드는 소스에 적힌 그대로입니다.`,
+      translatedNote: `설명은 커밋 ${facts.pinnedCommit}의 검토된 컴파일러 문서를 번역한 것입니다. 시그니처와 예제 코드는 원문을 따르며, 필요한 경우 설명에 편집상 수정이 반영됩니다.`,
       syntax: '구문',
       parameters: '매개변수',
       returnValue: '반환값',
@@ -383,7 +383,7 @@ export const ko: Copy = {
       inGuide: '관련 가이드',
       seeAlso: '함께 보기',
       languageNote:
-        '이 export는 IR 노드를 반환합니다. `"use typeshade"` 파일은 내장 함수 자체를 부른다:',
+        '이 export는 IR 노드를 반환합니다. `"use typeshade"` 파일에서는 내장 함수 자체를 부릅니다:',
       source: '소스',
       optional: '선택 사항',
       readonly: '읽기 전용',
@@ -506,7 +506,7 @@ export const ko: Copy = {
       title: 'TypeShade 언어 참조: "use typeshade" 파일이 쓰는 이름 전체 목록',
       description: `\`"use typeshade"\` 파일에서 쓸 수 있는 이름 ${facts.languageEntries}개를 모았다. 타입과 어트리뷰트, 내장 값, 함수, 상수, \`Math\` 멤버가 여기 들어 있다.`,
       h1: '언어 참조',
-      intro: `\`"use typeshade"\`로 시작하는 파일이 쓰는 언어이다. 이름 ${facts.languageEntries}개를 커밋 ${facts.pinnedCommit}의 컴파일러 언어 서비스에서 그대로 읽어 왔습니다. 편집기가 호버 설명을 낼 때 보는 표와 같은 표입니다.`,
+      intro: `\`"use typeshade"\`로 시작하는 파일을 위한 언어 참조입니다. 커밋 ${facts.pinnedCommit}의 컴파일러 언어 서비스에서 이름 ${facts.languageEntries}개를 가져왔으며, 편집기가 호버 정보를 표시할 때 쓰는 표와 같습니다.`,
       audience:
         '셰이더를 쓰는 사람을 위한 참조입니다. 호스트 애플리케이션과 [`fn()`](apiFn) 빌더가 부르는 쪽은 [컴파일러 API 참조](api)에 있습니다.',
       reference: '참조',
@@ -522,10 +522,10 @@ export const ko: Copy = {
       helpersP:
         '시그니처에는 앰비언트 파일이 스스로 쓰려고 선언한 타입이 나올 수 있습니다. 아래가 그 선언입니다.',
       swizzlesP: (n: number) =>
-        `\`…\` 줄은 나머지 멤버 ${n}개를 줄인 자리이며, 이 멤버는 모두 스위즐이다. 스위즐은 성분을 두 개에서 네 개까지 골라 새 벡터로 읽고, 원소 타입은 원래 벡터와 같다. 순서는 자유롭고 같은 성분을 거듭 골라도 되지만, 글자는 \`xyzw\`와 \`rgba\` 가운데 한쪽에서만 가져온다.`,
+        `\`…\` 줄은 생략된 멤버 ${n}개를 나타내며, 모두 스위즐입니다. 스위즐은 성분을 두 개에서 네 개까지 골라 원래 벡터와 같은 원소 타입의 새 벡터로 읽습니다. 성분 순서는 자유롭고 같은 성분을 반복해도 되지만, 글자는 \`xyzw\`나 \`rgba\` 한쪽에서만 골라야 합니다.`,
       readingP: `항목 하나에는 편집기가 그 이름으로 읽어 들이는 선언과, 컴파일러가 쓴 설명 한 문장이 들어갑니다. 내장 함수라면 두 백엔드가 각각 내보내는 WGSL과 ${glsl} 코드도 함께 보여 줍니다. 같은 호출의 네 칸 비교표는 [내장 함수 표](languageBuiltins)에 있습니다.`,
       sourceP:
-        '이 페이지의 항목은 모두 고정된 커밋의 컴파일러에서 읽어 왔고, 사이트에서 별도로 작성한 항목은 없습니다.',
+        '이름, 선언과 설명은 고정된 커밋의 컴파일러 언어 서비스에서 가져옵니다. 내장 함수의 출력 표기와 스테이지 규칙은 컴파일러 코드에서 읽습니다. 항목의 묶음과 이 페이지의 보충 설명은 사이트에서 작성했습니다.',
       entries: (n: number) => `이름 ${n}개`,
       signature: '시그니처',
       emits: '출력',
@@ -577,7 +577,7 @@ export const ko: Copy = {
           );
         },
         description: (name: string, kind: string, summary: string) =>
-          `${name}, TypeShade 언어 참조의 ${kind}이입니다. ${summary}`,
+          `${name} (${kind}), TypeShade 언어 참조 항목입니다. ${summary}`,
         targetsLead: (name: string, targets: { readonly wgsl: string; readonly glsl: string }) =>
           targets.wgsl === targets.glsl
             ? `TypeShade에서 ${name} 호출은 WGSL과 ${glsl} 모두에서 ${targets.wgsl} 형태로 컴파일됩니다.`
@@ -644,7 +644,7 @@ export const ko: Copy = {
         constant: {
           name: '상수',
           summary: '컴파일할 때 값으로 박히는 리터럴과 `discard`입니다.',
-          description: `선언 없이 바로 읽는 이름 ${facts.languageConstants}개이다. 컴파일 시점에 값으로 박히는 수학 리터럴과, 프래그먼트를 버리는 \`discard\`가 여기 든다.`,
+          description: `선언 없이 바로 읽는 이름 ${facts.languageConstants}개입니다. 컴파일 시점에 값으로 들어가는 수학 리터럴과 프래그먼트를 버리는 \`discard\`가 여기 포함됩니다.`,
         },
         math: {
           name: 'Math 멤버',
@@ -672,7 +672,7 @@ export const ko: Copy = {
       description: `TypeShade 컴파일러가 내는 프런트엔드 코드 ${facts.errorCodesTs}개와 코어 코드 ${facts.errorCodesSd}개입니다. 코드마다 뜻을 싣고, 프로그램으로 낼 수 있는 코드는 그 프로그램과 고친 모습도 보여 줍니다.`,
       summary: '진단에 붙는 코드와 그 뜻, 고치는 법입니다.',
       h1: '오류 코드',
-      intro: `컴파일러가 진단에 붙이는 코드를 모두 모았습니다. 커밋 ${facts.pinnedCommit}의 레지스트리 두 곳에서 읽어 왔다. \`"use typeshade"\` 프런트엔드의 코드가 ${facts.errorCodesTs}개, 그 아래 코어 IR 계층의 코드가 ${facts.errorCodesSd}개입니다.`,
+      intro: `컴파일러가 진단에 붙이는 코드를 모두 모았습니다. 커밋 ${facts.pinnedCommit}의 레지스트리 두 곳에서 읽었습니다. \`"use typeshade"\` 프런트엔드의 코드는 ${facts.errorCodesTs}개이고, 그 아래 코어 IR 계층의 코드는 ${facts.errorCodesSd}개입니다.`,
       verified: (n: number) =>
         `${n}개 페이지에는 코드를 내는 프로그램과 그 프로그램을 고친 모습이 함께 실려 있습니다. 둘 다 빌드할 때 고정된 컴파일러로 컴파일하므로, 프로그램이 더는 그 코드를 내지 않거나 고친 프로그램에 진단이 남으면 빌드가 멈춥니다. 예제 태그가 붙은 행이 그런 페이지입니다.`,
       note: '레지스트리 설명과 컴파일러 메시지는 컴파일러 원문이라 한국어 페이지에서도 영어로 둡니다.',
@@ -775,7 +775,7 @@ export const ko: Copy = {
         LOOP_BOUND:
           '컴파일러가 종료를 증명할 수 없는 `for` 루프입니다. 카운터를 경계와 비교하지 않거나, 본문이 경계를 씁니다.',
         LOOP_INFINITE:
-          '끝나지 않는 것이 확실한 루프입니다. `break`나 `return`이 없는데 조건이 `true`인 `while`, 또는 카운터를 경계에서 멀어지게 하는 증가입니다. 조건은 그대로 썼든 상수만으로 계산했든 같습니다.',
+          '끝나지 않는 것이 확실한 루프입니다. `break`나 `return`이 없는데 조건이 `true`인 `while`, 또는 카운터를 경계에서 멀어지게 하는 증입니다. 조건은 그대로 썼든 상수만으로 계산했든 같습니다.',
         LOOP_INDUCTION:
           '`for` 루프의 카운터가 `i32`나 `u32` 타입의 `let` 하나가 아니거나, 갱신이 상수만큼 움직이지 않습니다.',
         BREAK_OUTSIDE: '감싸는 루프나 `switch`가 없는 곳에 `break`를 썼습니다.',
@@ -793,7 +793,7 @@ export const ko: Copy = {
       summary:
         '언어가 담을 수 있는 것과 언어가 바뀌는 방식을 정한 규칙을 한 페이지에 하나씩 싣습니다.',
       h1: '설계 규칙',
-      intro: `컴파일러 설계 문서 \`docs/language-design.md\`의 규칙을 모두 모았다. 커밋 ${facts.pinnedCommit}의 추적 트리에서 읽어 왔다. 규칙은 \`"use typeshade"\` 파일을 쓰는 사람이나 컴파일러 자신을 제약한다. 규칙 하나에는 요구 사항 하나와 그 이유, 출처, 컴파일러가 규칙을 적용하는 곳이 들어 있다.`,
+      intro: `컴파일러 설계 문서 \`docs/language-design.md\`의 규칙을 모두 모았습니다. 커밋 ${facts.pinnedCommit}의 추적 트리에서 가져왔습니다. 각 규칙은 \`"use typeshade"\` 파일을 작성할 때나 컴파일러 내부에서 지켜야 할 요구 사항을 설명하고, 그 이유와 출처, 컴파일러가 규칙을 적용하는 위치를 밝힙니다.`,
       verifiedP: '추적 트리에 기록된 규칙별 검증 방식입니다.',
       note: '규칙 본문과 그 아래 항목은 설계 문서에 적힌 컴파일러 원문이라 한국어 페이지에서도 영어로 둡니다.',
       rulesCount: (n: number) => `규칙 ${n}개`,
@@ -862,7 +862,7 @@ export const ko: Copy = {
         },
         groups: {
           test: `규칙 ${facts.rulesTest}개입니다. 테스트나 게이트 스크립트, CI 워크플로가 규칙을 하나씩 가리킵니다. 목록에 오른 파일이 규칙을 더는 가리키지 않으면 컴파일러의 추적 검사가 실패합니다.`,
-          code: `규칙 ${facts.rulesCode}개이다. 구현이 \`Implements:\` 태그로 규칙을 가리키지만, 아직 확인하는 테스트는 없다. 테스트로 메워야 할 빈틈이다. 가이드 페이지가 이 규칙을 언급하면 그 옆에 이 사실을 표시한다.`,
+          code: `규칙 ${facts.rulesCode}개입니다. 구현이 \`Implements:\` 태그로 규칙을 가리키지만 아직 확인하는 테스트는 없습니다. 테스트로 보완해야 합니다. 가이드 페이지가 이 규칙을 언급하면 그 옆에 이 사실을 표시합니다.`,
           pending: `규칙 ${facts.rulesPending}개입니다. 설계 문서 부록 B에 아직 적용하지 않은 규칙으로 올라 있고, 확인하는 파일은 없습니다. 가이드 페이지가 이 규칙을 언급하면 그 옆에 이 사실을 표시합니다.`,
           review: `규칙 ${facts.rulesReview}개입니다. 규칙마다 리뷰가 지킨다고 적혀 있고, 확인하는 파일은 없습니다.`,
         },
@@ -927,8 +927,8 @@ export const ko: Copy = {
     description: `브라우저에서 "use typeshade" 파일을 작성해 WGSL과 ${glsl}으로 컴파일합니다. WebGPU나 WebGL2에서 실행하고 진단과 리플렉션도 확인할 수 있습니다.`,
     h1: 'Playground',
     intro:
-      '브라우저에서 셰이더를 편집하고 실행할 수 있습니다. 컴파일된 코드와 오류 메시지도 확인할 수 있습니다.',
-    help: 'Monaco 편집기에서 셰이더 코드를 작성합니다.',
+      '브라우저에서 TypeShade를 사용해 보세요. 예제를 선택하거나 직접 셰이더를 작성한 뒤, 생성된 코드와 렌더링 결과를 확인할 수 있습니다.',
+    help: 'Monaco 편집기에서 셰이더를 편집하세요.',
     run: '컴파일',
     reset: '예제 복원',
     editor: 'TypeShade 소스',
@@ -1288,59 +1288,59 @@ export const ko: Copy = {
 
   front: {
     searchTitle: 'TypeShade',
-    hero: 'TypeScript로 작성하는 셰이더',
-    lede: `TypeShade는 TypeScript 문법을 사용하는 셰이더 언어입니다. 작성한 코드를 WebGPU용 WGSL과 WebGL2용 ${glsl}으로 컴파일합니다.`,
-    playground: 'Playground 열기',
+    hero: '웹을 위한 셰이더 언어',
+    lede: `TypeShade를 사용하면 TypeScript 문법으로 셰이더를 작성할 수 있습니다. 코드를 WebGPU용 WGSL 또는 WebGL2용 ${glsl}으로 컴파일하고 애플리케이션에서 사용하세요.`,
+    playground: '온라인에서 실행',
     quickStart: '시작하기',
-    why: '언어 소개',
-    source: '작성 언어',
+    why: '왜 TypeShade인가요?',
+    source: '소스 언어',
     language: {
-      h: '언어 기능',
-      p: '변수와 함수는 TypeScript 문법으로 작성합니다. GPU에 필요한 타입과 리소스 선언, 셰이더 단계별 규칙은 TypeShade가 정의합니다.',
-      more: '언어 가이드',
+      h: 'TypeScript로 셰이더 작성하기',
+      p: '함수, 클래스, 모듈로 셰이더를 구성하세요. TypeShade는 GPU 데이터와 셰이더 단계를 다루는 데 필요한 타입과 선언을 추가합니다.',
+      more: '언어 배우기',
       rows: [
         {
-          title: '타입과 레이아웃',
+          title: 'GPU 타입',
           code: 'f32, vec3, mat4',
-          body: '스칼라, 벡터, 행렬 타입을 제공합니다. 클래스와 타입 별칭으로 셰이더에서 사용할 데이터 구조를 정의합니다.',
+          body: '스칼라, 벡터, 행렬 값을 사용하세요. 클래스와 타입 별칭으로 구조화된 데이터를 정의할 수 있습니다.',
         },
         {
-          title: '리소스와 진입점',
+          title: '셰이더 단계',
           code: '@vertex / @fragment / @compute',
-          body: 'uniform과 storage로 GPU 리소스를 선언합니다. 함수에 데코레이터를 붙여 버텍스, 프래그먼트, 컴퓨트 진입점을 지정합니다.',
+          body: '데코레이터로 버텍스, 프래그먼트, 컴퓨트 진입점을 선언하세요. uniform과 storage 선언으로 애플리케이션의 데이터에 접근할 수 있습니다.',
         },
         {
-          title: '애플리케이션 연동',
+          title: 'Vite 연동',
           code: 'import { fs } from "./scene.shade.ts"',
-          body: 'Vite 플러그인을 사용하면 애플리케이션에서 셰이더 파일을 import하고 함수를 호출할 수 있습니다. 컴퓨트·프래그먼트 진입점 실행에 필요한 GPU 설정은 런타임이 처리합니다.',
+          body: '애플리케이션에서 셰이더 파일을 import하고 export된 함수를 호출하세요. 컴퓨트와 프래그먼트 진입점에 필요한 디바이스와 파이프라인은 런타임이 설정합니다.',
         },
       ],
     },
     targets: {
-      h: '컴파일 결과',
-      p: '아래 예제에서 TypeShade 소스와 컴파일된 WGSL, GLSL 코드를 확인할 수 있습니다.',
-      summary: '소스, WGSL, GLSL 비교하기',
-      count: `저장소의 예제 ${facts.shadeExamples}개 중 ${facts.shadeRenderable}개는 WGSL과 GLSL을 모두 생성합니다. 나머지는 WGSL만 생성합니다.`,
+      h: 'WGSL과 GLSL로 컴파일하기',
+      p: '생성된 코드를 자체 WebGPU 또는 WebGL2 렌더러에서 사용하세요. 아래에서 소스와 컴파일 결과를 비교할 수 있습니다. 지원하는 기능은 타깃에 따라 다릅니다.',
+      summary: '소스와 컴파일 결과 보기',
       source: 'hello.shade.ts',
       wgsl: 'WGSL',
       glsl: `${glsl} 프래그먼트`,
     },
     oracle: {
-      h: '컴파일러 검증',
-      p: '컴파일러 테스트는 CPU 계산 결과를 검사합니다. 생성된 WGSL은 Tint로, GLSL은 WebGL2로 컴파일해 확인합니다.',
-      more: '검증 문서',
-      caption: '같은 그라디언트 셰이더를 빌드 시점에 캡처한 결과입니다.',
+      h: '컴파일러 테스트',
+      p: 'TypeShade는 CPU에서 셰이더 계산을 테스트하고, 생성된 WGSL을 Tint로 컴파일하며, GLSL을 WebGL2에서 컴파일하고 링크합니다.',
+      more: 'TypeShade 테스트 방법',
+      caption:
+        '같은 그라디언트 셰이더를 WebGPU와 WebGL2로 렌더링한 결과입니다. 이미지는 사이트를 빌드할 때 캡처했습니다.',
     },
     gallery: {
-      h: '예제',
-      p: '각 예제에는 소스 코드와 Playground 실행 링크가 있습니다.',
-      all: '예제 목록',
+      h: '셰이더 예제 살펴보기',
+      p: '예제를 열어 소스를 확인하고, 코드를 편집하고, Playground에서 실행해 보세요.',
+      all: '예제 둘러보기',
     },
     install: {
-      h: '설치',
-      p: '현재는 npm으로 Git 저장소의 소스를 설치합니다. 설치 후 설정과 실행 방법은 빠른 시작 문서에 있습니다.',
+      h: 'TypeShade 시작하기',
+      p: 'npm으로 Git에서 TypeShade를 설치한 뒤, 빠른 시작을 따라 첫 셰이더를 컴파일하고 실행해 보세요.',
       note: `${facts.nextVersion} 버전은 아직 npm에 배포하지 않았습니다.`,
-      more: '빠른 시작',
+      more: '빠른 시작 읽기',
     },
   },
   quickStart: {
@@ -1357,7 +1357,7 @@ export const ko: Copy = {
         '`uniform<T>`와 `storage<T>`로 GPU 리소스를 선언합니다.',
       ],
       hostP0:
-        '애플리케이션에서 셰이더를 사용하는 방법은 아래와 같습니다. 컴파일된 코드를 직접 WebGPU나 WebGL2에 전달하거나, Vite로 셰이더 파일을 import해 함수를 호출할 수 있습니다. 컴파일된 프로그램을 런타임에 불러오는 방법은 [WebGPU와 WebGL2](conceptsWebgpu)에서 설명합니다.',
+        '애플리케이션에서 컴파일된 코드를 WebGPU나 WebGL2에 전달하거나, Vite로 셰이더를 import하고 함수를 호출할 수 있습니다. 컴파일된 프로그램을 런타임에 불러오는 방법은 [WebGPU와 WebGL2](conceptsWebgpu)를 참고하세요.',
       compileH: '파일 컴파일하기',
       hostWgslLabel: 'WebGPU에 WGSL 전달하기',
       hostP1:
@@ -1378,8 +1378,8 @@ export const ko: Copy = {
         '호스트 코드에서 이 페이지 위쪽의 `hello.shade.ts`를 가져와 `fs`를 호출하면 캔버스가 빨간색으로 채워집니다. 버텍스 진입점은 아직 호스트에서 직접 호출할 수 없어 `vs`의 타입은 `never`로 선언됩니다.',
       drawLabel: '호스트 파일에서 hello.shade.ts 그리기, app.ts',
       untilP:
-        '실행 방식별로 애플리케이션과 런타임이 담당하는 작업은 [WebGPU와 WebGL2](conceptsWebgpu)에 정리되어 있습니다.',
-      nextLearnP: '언어 가이드에서 타입, 함수, 제어 흐름과 GPU 리소스 사용법을 설명합니다.',
+        '각 방식에서 애플리케이션과 런타임이 담당하는 작업은 [WebGPU와 WebGL2](conceptsWebgpu)를 참고하세요.',
+      nextLearnP: '언어 가이드에서 타입, 함수, 제어 흐름, GPU 리소스를 이어서 배워보세요.',
       nextLinks: [
         { linkKey: 'languageTypes', label: 'Types: 타입과 GPU struct' },
         { linkKey: 'languageFunctions', label: 'Functions: helper와 entry point' },
@@ -1398,13 +1398,13 @@ export const ko: Copy = {
     h1: 'Quick Start',
     runLabel: '컴파일러 실행 명령',
     installH: '설치',
-    p0: '셰이더 파일의 첫 문장에 `"use typeshade"`를 추가합니다. 아래 예제는 클래스로 함수의 반환 타입을 정의하고, 데코레이터로 버텍스와 프래그먼트 함수를 지정합니다.',
-    p1: `아래 코드를 \`${quickStartFile.shader.name}\`로 저장합니다. 유니폼과 버텍스·프래그먼트 함수를 포함한 ${quickStartFile.shader.lines}줄의 셰이더입니다. 이어서 ${quickStartFile.host.lines}줄의 호스트 코드를 작성합니다. 이 코드는 [\`compile()\`](apiCompile)로 셰이더를 컴파일하고 WGSL을 출력합니다.`,
-    p2: '실행하면 두 단계의 WGSL이 함께 출력됩니다. 프래그먼트 진입점은 여기 있습니다.',
+    p0: '셰이더 파일을 만들고 첫 문장에 `"use typeshade"`를 추가하세요. 아래 예제는 반환 타입에 클래스를 사용하고, 데코레이터로 버텍스와 프래그먼트 진입점을 정의합니다.',
+    p1: `다음 셰이더를 \`${quickStartFile.shader.name}\`로 저장하세요. 유니폼과 버텍스·프래그먼트 함수를 정의하는 코드입니다. 이어서 아래의 호스트 파일을 만들어 [\`compile()\`](apiCompile)을 호출하고 생성된 WGSL을 출력하세요.`,
+    p2: '명령을 실행하면 두 셰이더 단계가 컴파일됩니다. 프래그먼트 진입점은 다음과 같습니다.',
     p3: `같은 함수의 ${glsl} 코드와 [\`reflect()\`](apiReflect)로 확인한 유니폼 레이아웃은 [예제 페이지](examples)에 있습니다. 문법과 사용법은 [언어 가이드](guide)에서 설명합니다.`,
     live: {
       h: '라이브 예제',
-      p: '이 예제는 `sin`으로 줄무늬를 만들고 `time` 값에 따라 움직입니다. 코드를 수정하면 다시 컴파일해 캔버스에 표시합니다.',
+      p: '이 셰이더는 `sin`으로 줄무늬를 그리고 `time`으로 움직입니다. 코드를 바꾸거나 컨트롤을 조절하면서 결과가 어떻게 달라지는지 확인해 보세요.',
       title: '사인 줄무늬',
       caption: '두 색 사이를 오가며 캔버스를 가로지르는 사인파.',
       anchor:
@@ -1425,45 +1425,45 @@ export const ko: Copy = {
   },
   motivation: {
     use: {
-      title: 'TypeShade 소개: 문법과 실행 방식',
+      title: '소개 | TypeShade',
       description:
-        'TypeShade의 기본 문법, use typeshade 지시문, TypeScript와의 차이, 컴파일된 셰이더를 실행하는 방법을 설명합니다.',
-      h1: 'TypeShade 소개',
+        'TypeShade가 TypeScript 문법으로 GPU 타입, 셰이더 함수, 리소스를 정의하고 WebGPU와 WebGL2용으로 컴파일하는 방법을 알아보세요.',
+      h1: '소개',
       sections: [
         [
-          'TypeShade란',
-          'TypeShade는 TypeScript 문법으로 셰이더를 작성하는 언어이자 컴파일러입니다. GPU에서 사용하는 타입과 연산을 정의하며, 작성한 코드를 WGSL이나 GLSL로 변환합니다.',
+          'TypeShade란 무엇인가요?',
+          'TypeShade는 WebGPU와 WebGL2를 위한 셰이더 언어이자 컴파일러입니다. TypeScript 문법으로 셰이더 함수, GPU 데이터 타입, 리소스를 정의합니다. 생성된 WGSL이나 GLSL을 기존 렌더러에서 사용하거나, TypeShade 런타임으로 셰이더를 실행할 수 있습니다.',
           'typeshade는-무엇을-바꾸나요',
         ],
         [
-          '`use typeshade` 지시문',
-          '셰이더 파일은 `"use typeshade"`로 시작합니다. 컴파일러는 이 지시문이 있는 파일에 TypeShade의 타입 검사와 컴파일 규칙을 적용합니다.',
+          '셰이더 작성하기',
+          '셰이더 파일을 `"use typeshade"`로 시작하세요. 이 지시문은 컴파일러가 TypeShade의 셰이더 타입과 컴파일 규칙을 적용하도록 합니다. 이 파일에 함수와 리소스를 정의하고, 필요에 따라 다른 셰이더 모듈을 import하세요.',
           'use-typeshade-는-언어-경계입니다',
         ],
         [
-          '지원하는 TypeScript 문법',
-          '함수, 타입 주석, import와 export, 조건문과 반복문을 사용할 수 있습니다. 다만 일반 TypeScript 프로그램에서 사용하는 기능을 모두 지원하지는 않습니다. GPU 코드로 변환할 수 없는 구문은 컴파일 오류로 표시합니다.',
+          'TypeScript 문법 사용하기',
+          'TypeScript를 알고 있다면 익숙한 함수 선언, 타입 주석, import, 조건문, 반복문을 사용할 수 있습니다. TypeShade는 셰이더 코드로 컴파일할 수 있는 구문을 지원합니다. 일부 TypeScript와 JavaScript 기능은 셰이더에서 사용할 수 없습니다.',
           'typescript에서-무엇이-그대로-익숙한가요',
         ],
         [
-          'GPU 타입과 실행 규칙',
-          'TypeShade는 GPU용 숫자, 벡터, 행렬 타입과 리소스 선언을 제공합니다. `function`으로 선언한 함수와 `if` 조건문도 셰이더로 컴파일되므로, 사용하는 리소스와 연산이 실행 대상에서 지원되어야 합니다.',
+          'GPU 데이터 다루기',
+          'TypeShade의 숫자, 벡터, 행렬 타입으로 GPU 데이터를 표현하세요. 리소스를 선언하면 애플리케이션이 제공하는 버퍼와 텍스처에 접근할 수 있습니다. `function` 선언과 `if` 문을 포함한 셰이더 코드는 타깃 GPU 언어의 규칙을 따라야 합니다.',
           'typescript와-typeshade의-차이는-어디에-있나요',
         ],
         [
-          '컴파일과 실행',
-          '컴파일러는 WebGPU용 WGSL과 WebGL2용 GLSL ES 3.00을 생성합니다. 지원되는 기능은 출력 언어에 따라 다릅니다. 애플리케이션은 생성된 코드를 직접 WebGPU나 WebGL2에 전달하거나, `typeshade/runtime`으로 컴파일된 프로그램을 실행할 수 있습니다.',
+          '셰이더 실행하기',
+          '셰이더를 WebGPU용 WGSL 또는 WebGL2용 GLSL ES 3.00으로 컴파일하세요. 사용할 수 있는 기능은 타깃에 따라 다릅니다. 생성된 코드를 자체 렌더러에 전달하거나, `typeshade/runtime`으로 컴파일된 프로그램을 불러올 수 있습니다.',
           '컴파일-결과는-무엇인가요',
         ],
         [
-          '관련 문서',
-          '빠른 시작은 설치부터 `"use typeshade"` 파일 작성과 실행까지 설명합니다. 언어 가이드는 문법과 GPU 실행 규칙을, 검증 문서는 컴파일러 테스트를 다룹니다. 함수별 사용법은 API 참조에 있습니다.',
+          '시작하기',
+          '빠른 시작을 따라 TypeShade를 설치하고 `"use typeshade"` 파일을 실행해 보세요. 언어 가이드에서 문법을 배우거나, API 참조에서 개별 함수를 찾아볼 수 있습니다. 검증 페이지에서는 컴파일러를 테스트하는 방법을 설명합니다.',
           '어디서부터-배우면-되나요',
         ],
       ],
-      familiarH: 'TypeScript와의 차이',
+      familiarH: 'TypeScript와 TypeShade',
       familiarP:
-        '문법이 같더라도 셰이더에서는 타입과 실행 방식이 달라집니다. 주요 차이는 다음 표와 같습니다.',
+        'TypeShade는 TypeScript 문법을 사용하지만, 코드는 셰이더로 실행됩니다. 따라서 사용할 수 있는 타입과 함수, 모듈, 제어 흐름을 컴파일하는 방식이 달라집니다.',
       rows: [
         ['함수', '함수 선언과 호출', '데코레이터로 셰이더 진입점을 지정합니다.'],
         ['타입', '타입 주석과 추론', 'GPU용 스칼라, 벡터, 행렬 타입을 사용합니다.'],
@@ -1475,9 +1475,9 @@ export const ko: Copy = {
           '애플리케이션이 컴파일된 셰이더를 WebGPU나 WebGL2로 실행합니다.',
         ],
       ],
-      furtherH: 'TypeScript·JavaScript 참고 문서',
+      furtherH: 'TypeScript와 JavaScript 배우기',
       furtherP:
-        '타입 주석과 함수 선언은 TypeScript Handbook에, 표현식과 제어 흐름은 MDN JavaScript Guide에 설명되어 있습니다.',
+        'TypeScript나 JavaScript가 처음인가요? TypeScript Handbook은 타입과 함수를 다룹니다. MDN JavaScript Guide는 표현식, 제어 흐름, 모듈을 설명합니다.',
       further: [
         [
           'TypeScript Handbook — Everyday Types',
@@ -1497,37 +1497,37 @@ export const ko: Copy = {
       ],
       columns: ['개념', 'TypeScript', 'TypeShade'],
     },
-    title: 'TypeShade를 사용하는 이유와 도입 시 고려사항',
+    title: '왜 TypeShade인가요? | TypeShade',
     description:
-      'TypeShade에서 사용할 수 있는 개발 도구, 셰이더 코드 재사용, 애플리케이션 연동 방법과 지원 범위를 설명합니다.',
+      'TypeScript 도구로 셰이더를 작성하고, WebGPU와 WebGL2용으로 컴파일하고, 애플리케이션에 연동하세요. 지원하는 기능과 현재의 제한 사항을 알아볼 수 있습니다.',
     h1: '왜 TypeShade인가',
     intro:
-      'TypeShade를 사용하면 TypeScript 문법으로 셰이더를 작성하고 WGSL과 GLSL로 컴파일할 수 있습니다. 프로젝트에 도입할 때 필요한 도구와 지원 범위는 아래와 같습니다.',
+      'TypeShade는 셰이더 개발에 TypeScript 문법과 도구를 제공합니다. 셰이더를 모듈로 구성하고, WebGPU와 WebGL2용으로 컴파일하고, 자체 렌더러나 TypeShade 런타임에서 사용할 수 있습니다.',
     sections: [
       {
         id: 'typescript-tooling',
-        h: 'TypeScript 개발 도구',
-        p: '함수, 클래스, 타입 주석, import로 셰이더 코드를 작성합니다. 파일은 `"use typeshade"`로 시작합니다. [편집기 확장](editor)은 자동 완성, 오류 표시, 코드 탐색을 지원합니다. 구문별 지원 여부와 컴파일 결과는 [TypeScript 대응표](languageFromTypescript)에 있습니다.',
+        h: 'TypeScript 도구 사용하기',
+        p: '`"use typeshade"`로 시작하는 파일에 셰이더 함수, 클래스, import를 작성하세요. [편집기 확장](editor)은 작업 중에 자동 완성, 진단, 코드 탐색을 제공합니다. 지원하는 문법과 생성되는 코드는 [TypeScript 대응표](languageFromTypescript)에서 확인할 수 있습니다.',
       },
       {
         id: 'shared-source',
-        h: '셰이더 소스 공유',
-        p: `WebGPU는 WGSL을, WebGL2는 ${glsl}을 사용합니다. TypeShade에서는 같은 셰이더 소스를 각 언어로 컴파일할 수 있습니다. 함수의 내용을 바꾸고 다시 컴파일하면 두 출력에 반영됩니다. 다만 각 언어에서 지원하는 기능은 다릅니다. 자세한 차이는 [타깃 가이드](conceptsWgsl)에 있습니다.`,
+        h: 'WebGPU와 WebGL2 지원',
+        p: `WebGPU는 WGSL을, WebGL2는 ${glsl}을 사용합니다. TypeShade는 셰이더 소스에서 두 코드를 생성하므로, 공통 함수를 수정하고 다시 컴파일하면 각 출력에 변경 사항이 반영됩니다. 일부 기능은 한 타깃에서만 사용할 수 있습니다. 자세한 내용은 [타깃 가이드](conceptsWgsl)를 참고하세요.`,
       },
       {
         id: 'host-integration',
-        h: '호스트 연동',
-        p: '자체 렌더러가 있는 애플리케이션은 컴파일된 셰이더 코드와 리소스의 타입·레이아웃 정보를 사용할 수 있습니다. Vite 플러그인으로 셰이더를 import해 함수를 호출하는 방법도 있습니다. 프로그램을 직접 불러와 실행하려면 `typeshade/runtime`을 사용합니다. 각 방식의 설정은 [WebGPU와 WebGL2 가이드](conceptsWebgpu)에 있습니다.',
+        h: '애플리케이션에 연동하기',
+        p: '생성된 셰이더 코드와 리소스 레이아웃 정보를 자체 렌더러에서 사용하세요. Vite에서는 셰이더 파일을 import하고 애플리케이션 코드에서 함수를 호출할 수도 있습니다. 컴파일된 프로그램을 직접 불러오려면 `typeshade/runtime`을 사용하세요. [WebGPU와 WebGL2 가이드](conceptsWebgpu)에서 각 방법을 설명합니다.',
       },
       {
         id: 'verification',
-        h: '검증 기준',
-        p: 'CPU 오라클은 셰이더 연산을 배정밀도로 계산하며, 테스트에서 비교할 기준값을 제공합니다. 컴파일러 테스트는 생성된 코드가 컴파일되는지, 저장된 예상 결과와 일치하는지도 확인합니다. GPU와 CPU의 부동소수점 계산 결과는 다를 수 있습니다. 구체적인 테스트와 한계는 [검증 문서](checks)에 있습니다.',
+        h: '셰이더 계산 테스트하기',
+        p: 'CPU 오라클은 셰이더 연산을 배정밀도로 계산하여 테스트의 기준값을 제공합니다. 다른 테스트는 생성된 코드를 컴파일하고 저장된 출력과 비교합니다. CPU와 GPU 실행의 부동소수점 결과는 다를 수 있습니다. 테스트와 그 한계는 [검증](checks)에서 확인할 수 있습니다.',
       },
       {
         id: 'constraints',
-        h: 'GPU 제약',
-        p: '일부 기능은 WGSL로만 컴파일할 수 있습니다. WebGL2에서 컴퓨트를 실행할 때도 변환할 수 있는 연산과 리소스에 제한이 있습니다. 필요한 기능이 지원되는지는 [언어 가이드](guide)와 [타깃 가이드](conceptsWgsl)에서 확인할 수 있습니다. 도입 시에는 기존 빌드에 TypeShade 컴파일 과정도 추가해야 합니다.',
+        h: '타깃 지원 확인하기',
+        p: '빌드에 TypeShade를 추가하기 전에 셰이더에 필요한 기능이 지원되는지 확인하세요. 일부 기능은 WGSL로만 컴파일되며, WebGL2 컴퓨트는 지원하는 연산과 리소스에 제한이 있습니다. [언어 가이드](guide)와 [타깃 가이드](conceptsWgsl)에서 이러한 제한을 설명합니다.',
       },
       {
         id: 'project-status',
@@ -1537,7 +1537,7 @@ export const ko: Copy = {
     ],
     nextH: '시작하기',
     nextP:
-      '[Playground](playground)에서 셰이더를 수정하고 출력을 확인할 수 있습니다. 프로젝트에 적용하는 방법은 [빠른 시작](quickStart)에, 완성된 프로그램은 [예제](examples)에 있습니다.',
+      '[Playground](playground)에서 [예제](examples)를 실행해 보거나, [빠른 시작](quickStart)을 따라 프로젝트를 설정하세요.',
   },
 
   benchmarks: {
@@ -1722,7 +1722,7 @@ export const ko: Copy = {
   checks: {
     title: 'TypeShade 검증: CPU 오라클, 컴파일 게이트, 골든 파일',
     description:
-      'TypeShade 컴파일러의 CPU 계산 테스트, WGSL·GLSL 컴파일 검사, 저장된 예상 출력과의 비교 방법을 설명합니다.',
+      'TypeShade가 셰이더 계산을 테스트하고, 생성된 WGSL과 GLSL을 검증하고, 컴파일 결과의 변경 사항을 확인하는 방법을 알아보세요.',
     h1: '검증 방식',
     ciH: '푸시마다 하는 검사',
     intro:
@@ -1734,7 +1734,7 @@ export const ko: Copy = {
     ],
     pairH: '두 백엔드에서 같은 패스',
     pairIntro:
-      '그라디언트 셰이더의 WebGPU와 WebGL2 렌더링 결과입니다. 이 화면은 결과를 눈으로 비교하기 위한 예제이며, 픽셀 일치를 판정하지는 않습니다.',
+      'WebGPU와 WebGL2로 렌더링한 그라디언트 셰이더를 비교해 보세요. 이 예제는 시각적으로 비교하기 위한 것이며, 픽셀의 일치를 테스트하지는 않습니다.',
     gpuFrame: {
       neutral: '컴파일된 WGSL로 빌드할 때 WebGPU에서 그렸습니다.',
       webgpu: '컴파일된 WGSL로 지금 WebGPU에서 그리고 있습니다.',
@@ -1749,7 +1749,7 @@ export const ko: Copy = {
     },
     authorTime: {
       h: '코드를 쓰는 동안',
-      p: '아래 예제는 유니폼에 없는 필드를 읽어 오류를 발생시킵니다. 편집기의 언어 서비스와 컴파일러가 같은 위치에서 같은 오류 코드를 반환하는지 확인합니다.',
+      p: '아래 예제는 유니폼 블록에 없는 필드를 읽으려고 합니다. 언어 서비스와 컴파일러는 같은 위치에서 같은 오류 코드를 표시합니다. 이 동작은 사이트를 빌드할 때 검사합니다.',
       caption: `${err.wrongLine}행에서 잘못 읽은 필드, 그 줄이 내는 진단, 그리고 읽으려던 블록에 대해 [\`reflect()\`](apiReflect)가 복원한 ${std} 레이아웃입니다. 필드 ${err.layout.fields.length}개에 ${err.layout.size}바이트이고, 첫 필드 뒤의 빈 공간은 정렬 때문에 생긴 자리입니다.`,
     },
   },
@@ -1762,7 +1762,7 @@ export const ko: Copy = {
     title: 'TypeScript와 WebGPU: TypeScript로 WebGPU 셰이더를 작성하는 방법',
     description: `TypeScript로 WebGPU 셰이더를 작성합니다. "use typeshade" 파일은 WGSL과 ${glsl}으로 컴파일됩니다. 타입, 함수, 모듈이 GPU에서 무엇이 되는지 설명합니다.`,
     h1: 'TypeScript로 쓰는 WebGPU 셰이더',
-    lead: `TypeShade를 쓰면 WebGPU 셰이더를 TypeScript로 작성할 수 있다. \`"use typeshade"\`로 표시한 파일은 WebGPU용 WGSL과 WebGL2용 ${glsl}으로 컴파일됩니다. 편집기는 같은 파일을 TypeScript로 읽습니다. 타입, 함수, 모듈은 셰이더의 값과 진입점, 컴파일 단위를 표현하며, WebGPU API는 호스트 애플리케이션에서 사용합니다.`,
+    lead: `TypeShade를 사용하면 WebGPU 셰이더를 TypeScript로 작성할 수 있습니다. \`"use typeshade"\`로 표시한 파일은 WebGPU용 WGSL과 WebGL2용 ${glsl}으로 컴파일됩니다. 편집기는 같은 파일을 TypeScript로 읽습니다. 타입, 함수, 모듈은 셰이더 값과 진입점, 컴파일 단위를 표현하며, WebGPU API는 호스트 애플리케이션에서 사용합니다.`,
     startH: 'TypeScript 파일에서 시작합니다',
     startP:
       '`"use typeshade"`는 파일을 TypeShade 소스로 표시합니다. 그 파일과 그 파일이 가져오는 TypeShade 파일은 한 프로그램으로 컴파일됩니다. 함수, 매개변수, 반환 타입, 객체, import와 export처럼 익숙한 TypeScript 형태는 그대로 이어집니다. 두 번째 블록은 고정된 컴파일러가 이 파일에서 만든 WGSL이며 페이지를 빌드하는 동안 생성됩니다.',
@@ -1982,7 +1982,7 @@ export const ko: Copy = {
         [
           '셰이더 언어',
           'WGSL입니다. 모듈 하나가 모든 스테이지를 담습니다.',
-          `${glsl}이입니다. 버텍스 셰이더와 프래그먼트 셰이더를 프로그램 하나로 링크합니다.`,
+          `${glsl}을 사용합니다. 버텍스 셰이더와 프래그먼트 셰이더를 프로그램 하나로 링크합니다.`,
         ],
         [
           '리소스 바인딩',
@@ -1992,7 +1992,7 @@ export const ko: Copy = {
         [
           '컴퓨트',
           '네이티브 `@compute` 스테이지입니다.',
-          `네이티브 컴퓨트 스테이지가 없다. TypeShade는 지원하는 \`@compute\` 진입점을 생성된 ${glsl} 패스로 실행하고 변환할 수 없는 진입점은 매니페스트에 남깁니다.`,
+          `네이티브 컴퓨트 스테이지는 없습니다. TypeShade는 지원하는 \`@compute\` 진입점을 생성된 ${glsl} 패스로 실행하고, 변환할 수 없는 진입점은 매니페스트에 기록합니다.`,
         ],
         [
           '정밀도',
@@ -2062,11 +2062,11 @@ export const ko: Copy = {
       reflectionNote:
         '셰이더에서 필드 이름을 바꾸면 다음 빌드에서 리플렉션이 따라 바뀌고, 리플렉션을 읽는 호스트 코드도 함께 따라옵니다.',
       runtimeH: '런타임',
-      runtimeP: `호스트가 컴파일하는 모듈은 브라우저에서 TypeShade의 어떤 코드도 필요로 하지 않는다. 컴파일러는 셰이더 텍스트가 만들어지는 곳에서 돌아간다. 빌드, 테스트, 그리고 [언어 서비스](languageService)를 거친 편집기가 그런 곳이다. 브라우저에 도달하는 것은 생성된 셰이더 소스와, 애플리케이션이 원래 쓰던 호스트 코드뿐이다. 호스트가 가져오는 모듈은 \`typeshade/runtime\`을 번들에 싣는다. 호출은 이 코드에서 실행되고, 컴파일러는 번들에 들어가지 않는다. Vite 플러그인이 번들을 만들 때 모듈을 컴파일하기 때문이다. 호출은 브라우저가 가진 첫 tier(호출이 실행되는 백엔드)에서 실행되며, 순서는 WebGPU, WebGL2, CPU이다. \`configure({ prefer })\`는 compute 진입점과 커널 함수가 시도할 tier의 순서를 정하고, \`Resident\`는 호출과 호출 사이에 배열을 GPU에 둔다. 프로그램 런타임에 프로그램을 불러오는 호스트도 같은 \`typeshade/runtime\`과 매니페스트만 싣고, 컴파일러는 싣지 않는다. TypeShade가 설치하는 런타임 의존성은 ${facts.runtimeDeps}개, \`compile()\`과 언어 서비스가 소스를 읽을 때 쓰는 TypeScript뿐이다.`,
+      runtimeP: `호스트가 모듈을 컴파일해 셰이더 코드를 전달하는 방식에서는 브라우저에 TypeShade 코드가 필요하지 않습니다. 컴파일러는 빌드, 테스트 또는 [언어 서비스](languageService)를 사용하는 편집기처럼 셰이더 텍스트를 만드는 곳에서 실행됩니다. 브라우저에는 생성된 셰이더 소스와 애플리케이션의 호스트 코드만 전달됩니다. Vite 플러그인으로 가져온 모듈은 호출을 실행할 \`typeshade/runtime\`을 번들에 포함하지만 컴파일러는 포함하지 않습니다. 플러그인이 번들을 만들 때 모듈을 컴파일하기 때문입니다. 호출은 브라우저에서 사용할 수 있는 첫 실행 경로(WebGPU, WebGL2, CPU 순서)에서 실행됩니다. \`configure({ prefer })\`는 컴퓨트 진입점과 커널 함수가 시도할 순서를 정하며, \`Resident\`는 호출 사이에 배열을 GPU에 둡니다. 프로그램 런타임에 프로그램을 불러오는 경우에도 번들에는 \`typeshade/runtime\`과 매니페스트만 포함하고 컴파일러는 포함하지 않습니다. TypeShade는 런타임 의존성으로 TypeScript ${facts.runtimeDeps}개를 설치합니다. \`compile()\`과 언어 서비스가 소스를 읽을 때 사용합니다.`,
       runtimeOwnerP:
         '호스트는 `typeshade/runtime`의 `createDevice()`로 호출의 소유자를 따로 열 수도 있다(규칙 11.8). 소유자는 `prefer`에서 처음 열리는 tier나 호스트가 이미 가진 `GPUDevice`, 또는 프로그램 런타임의 디바이스(`createDevice({ runtime })`) 위에 열립니다. `device.array()`는 그 호출이 받는 `Resident` 배열을 만들고, `device.fuse()`는 호출 체인을 그 디바이스에서 계획 하나로 실행합니다. 일반 호출은 배열과 텍스처의 유일한 소유자를 선택합니다. 소유자가 있는 리소스가 없으면 기본 소유자를 씁니다. 여러 소유자가 섞이면 실행 전에 거부하며, 소유권과 수명 검사는 유지됩니다. 디바이스를 정하는 `prefer`, `device`, `runtime` 옵션은 함께 지정할 수 없습니다. 소유자는 에뮬레이션 배정밀도의 플레이버(`createDevice({ fp64Flavor })`)와, 긴 커널의 청크 하나가 쓸 수 있는 시간(`createDevice({ timeBudgetMs })`)도 정합니다. `fp64Flavor`를 생략하면 실제 디바이스나 컨텍스트에서 자동으로 선택하며, 명시적인 재정의도 지원합니다. `configure()`, `resident()`, `fuse()`는 이전처럼 기본 소유자를 다룹니다.',
       runtimeInfoP:
-        '`buildInfo`는 패키지 버전과, 확인할 수 있을 때만 정확한 소스 리비전을 제공합니다. 수정되었거나 빌드 결과가 오래되었거나 리비전이 기록되지 않은 빌드는 `revision: null`이입니다. `device.info`와 `runtime.info`는 실제로 열린 디바이스나 컨텍스트의 고정된 기록입니다. 직렬화할 수 있으며, 디바이스를 잃거나 해제한 뒤에도 읽을 수 있습니다. WebGPU 식별 정보에는 출처가 표시되고, 기능과 한도는 활성화된 디바이스의 값입니다. 알 수 없는 식별 정보는 그대로 남깁니다. WebGL 문자열은 실제 컨텍스트에서 읽습니다. 이 정보는 개별 호출의 실행 tier를 나타내거나 보고서를 전송하지 않습니다. 런타임 빌드, 프로그램을 만든 컴파일러, 벤치마크 워크로드의 출처는 각각 기록합니다.',
+        '`buildInfo`는 패키지 버전과, 확인할 수 있을 때만 정확한 소스 리비전을 제공합니다. 수정되었거나 빌드 결과가 오래되었거나 리비전이 기록되지 않은 빌드는 `revision: null`입니다. `device.info`와 `runtime.info`는 실제로 열린 디바이스나 컨텍스트의 고정된 기록입니다. 직렬화할 수 있으며, 디바이스를 잃거나 해제한 뒤에도 읽을 수 있습니다. WebGPU 식별 정보에는 출처가 표시되고, 기능과 한도는 활성화된 디바이스의 값입니다. 알 수 없는 식별 정보는 그대로 남깁니다. WebGL 문자열은 실제 컨텍스트에서 읽습니다. 이 정보는 개별 호출의 실행 tier를 나타내거나 보고서를 전송하지 않습니다. 런타임 빌드, 프로그램을 만든 컴파일러, 벤치마크 워크로드의 출처는 각각 기록합니다.',
       webgl2H: 'WebGL2에서 달라지는 것',
       webgl2P: '같은 소스가 WebGL2용으로도 컴파일되고, 호스트 쪽 모습은 달라집니다.',
       webgl2Items: [
@@ -2103,7 +2103,7 @@ export const ko: Copy = {
       glslVertexLabel: `생성된 ${glsl} 버텍스 셰이더`,
       glslFragmentLabel: `생성된 ${glsl} 프래그먼트 셰이더`,
       diffH: '타깃이 갈라지는 지점',
-      diffP: `차이마다 그 차이를 다루는 가이드 페이지의 이름을 붙였습니다. 두 언어가 어긋나는 곳에서는 WGSL이 구성 요소의 뜻을 정하고, ${facts.glslTarget}은 컴파일러가 코드를 써 내는 대상일 뿐이다(규칙 1.2).`,
+      diffP: `각 차이에는 관련 가이드 페이지를 연결했습니다. 두 언어가 다르게 동작하는 경우 WGSL이 구성 요소의 의미를 정하고, ${facts.glslTarget}은 컴파일러가 출력을 생성하는 대상입니다(규칙 1.2).`,
       diffColumns: ['달라지는 것', 'WGSL', `${glsl}`],
       diffRows: [
         [
@@ -2146,7 +2146,7 @@ export const ko: Copy = {
       colWgsl: 'WGSL',
       colSource: 'TypeShade',
       convertH: '기존 셰이더 옮기기',
-      convertP: `\`compile()\`이 읽는 소스는 TypeScript로 쓴 \`"use typeshade"\` 파일 한 종류뿐이다. 컴파일러에는 GLSL이나 WGSL을 읽는 프런트엔드가 없다. 그래서 두 언어 가운데 하나로 쓴 셰이더는 TypeScript로 한 번 다시 쓴다. 그러면 컴파일러가 그 파일 하나에서 WGSL과 ${glsl}을 만듭니다.`,
+      convertP: `\`compile()\`은 TypeScript로 작성한 \`"use typeshade"\` 파일만 읽습니다. 컴파일러에는 GLSL이나 WGSL을 읽는 프런트엔드가 없으므로, 이 언어로 작성한 셰이더는 TypeScript로 다시 작성해야 합니다. 그러면 컴파일러가 하나의 파일에서 WGSL과 ${glsl}을 생성합니다.`,
       convertItems: [
         `GLSL에서: [GLSL 셰이더 옮기기](internalsGlslShader)는 유니폼 블록, \`#ifdef\`, \`#include\`, \`#extension\`처럼 셰이더 전체에 걸린 것을 다룬다. [${glsl}을 TypeShade로](languageFromGlsl)에는 타입, 유니폼, builtin 변수, 함수가 있습니다.`,
         'WGSL에서: [WGSL을 TypeShade로](languageFromWgsl)에서 WGSL 구성 요소마다 TypeShade 표기를 찾습니다.',
@@ -2215,7 +2215,7 @@ export const ko: Copy = {
     documentsP2:
       '위치는 줄과 문자의 쌍이며 둘 다 영에서 시작하고, 문자는 UTF-16 코드 단위로 셉니다. 범위는 끝을 포함하지 않는 반개구간입니다. LSP가 쓰는 규약 그대로이므로 언어 서버는 필드를 그대로 넘기면 됩니다. Monaco는 하나부터 세기 때문에 Playground의 어댑터가 자기 쪽에서 하나를 더하고, 돌아올 때 다시 뺍니다. 두 좌표계가 만나는 곳은 그 어댑터 하나뿐입니다.',
     documentsP3:
-      '문서는 상대 경로로 다른 셰이더 파일을 가져올 수 있고, 패키지의 파일은 패키지 이름으로 가져옵니다. 패키지는 Node가 찾는 방식대로 `node_modules`에서 찾는다(규칙 3.9). 서비스는 그 가져오기를 `compile()`이 따르는 규칙대로, 또는 넘겨준 `resolveImport`로 문서의 `uri`에 대해 해석합니다. 열지 않은 파일은 `readDocument`로 읽으며, 이 함수는 파일의 텍스트를 돌려주고 그런 파일이 없으면 `undefined`를 돌려줍니다. 각 패키지의 `package.json`도 이 함수에 요청합니다. `compile()`도 같은 두 옵션을 받으므로 편집기와 컴파일러는 한 프로그램을 읽고, 둘 다 따라갈 수 없는 가져오기는 양쪽에서 `TS8072`가 됩니다.',
+      '문서는 상대 경로로 다른 셰이더 파일을 가져올 수 있고, 패키지 파일은 패키지 이름으로 가져옵니다. Node가 찾는 방식대로 `node_modules`에서 패키지를 찾습니다(규칙 3.9). 서비스는 `compile()`과 같은 규칙을 따르거나 전달된 `resolveImport`를 사용해 문서의 `uri`를 기준으로 가져오기를 해석합니다. 열지 않은 파일은 `readDocument`로 읽습니다. 이 함수는 파일의 텍스트를 돌려주고, 파일이 없으면 `undefined`를 돌려줍니다. 각 패키지의 `package.json`도 이 함수에 요청합니다. `compile()`도 같은 두 옵션을 받으므로 편집기와 컴파일러가 한 프로그램을 읽습니다. 두 쪽 모두 해결할 수 없는 가져오기는 `TS8072`가 됩니다.',
     packagingH: '패키지 구성',
     packagingP:
       '이 서비스는 `typescript` 위에서 돌아가며, 패키지는 이것을 필수 피어 의존성으로 둡니다. `compile()`이 `"use typeshade"` 파일을 TypeScript 파서로 읽기 때문에 기본 진입점에도 필요합니다. 그래서 컴파일러만 가져오는 프로그램도 TypeScript를 함께 설치하고, `typeshade/language-service`는 같은 패키지를 그대로 씁니다.',
@@ -2276,36 +2276,36 @@ export const ko: Copy = {
   examples: {
     path: {
       h: '예제로 배우는 순서',
-      p: '각 단계는 Language Guide의 한 개념을 실제 shader 작성으로 연결합니다.',
+      p: '각 단계에서 언어 가이드의 개념을 익히고 셰이더 작성에 적용합니다.',
       steps: [
         {
           title: '1. 첫 shader',
-          text: '"use typeshade" 파일의 기본 형태와 shader entry를 먼저 익힙니다.',
-          label: 'Quick start',
+          text: '"use typeshade" 파일의 기본 형태와 셰이더 진입점을 익힙니다.',
+          label: '빠른 시작',
           linkKey: 'quickStart',
         },
         {
           title: '2. 값과 타입',
-          text: 'TypeScript의 type/class가 GPU value layout으로 어떻게 내려가는지 봅니다.',
-          label: 'Types',
+          text: 'TypeScript 타입 별칭과 클래스가 GPU 값의 배치로 어떻게 변환되는지 살펴봅니다.',
+          label: '타입',
           linkKey: 'languageTypes',
         },
         {
           title: '3. 계산을 함수로',
-          text: 'helper function과 stage entry를 조합해 실제 shader 계산을 구성합니다.',
-          label: 'Functions',
+          text: '헬퍼 함수와 스테이지 진입점을 조합해 셰이더 계산을 구성합니다.',
+          label: '함수',
           linkKey: 'languageFunctions',
         },
         {
           title: '4. GPU 데이터',
-          text: 'vector, matrix, array와 host-owned resource를 연결합니다.',
-          label: 'Resources',
+          text: '벡터, 행렬, 배열을 호스트가 제공하는 셰이더 리소스에 연결합니다.',
+          label: '리소스',
           linkKey: 'languageResources',
         },
         {
           title: '5. 실제 예제',
-          text: '저장소의 예제를 읽으며 여러 개념을 하나의 shader로 조합합니다.',
-          label: 'Source examples',
+          text: '저장소의 예제를 읽으며 여러 개념을 완성된 셰이더로 조합합니다.',
+          label: '소스 예제',
           linkKey: 'examplesDir',
         },
       ],
@@ -2322,7 +2322,7 @@ export const ko: Copy = {
     },
     shade: {
       h: 'TypeScript 소스로 쓴 예제',
-      p: `예제는 \`"use typeshade"\`로 시작하는 셰이더 파일이며, \`compile()\`로 컴파일합니다. 사용하는 언어 기능에 따라 분류했습니다. ${facts.shadeRenderable}개는 ${glsl}도 생성하며, 나머지는 WGSL만 생성합니다. 렌더링을 지원하는 예제에는 미리보기가 있습니다.`,
+      p: `언어 기능별로 분류된 예제를 살펴보세요. 각 셰이더는 \`"use typeshade"\`로 시작하며 \`compile()\`로 컴파일됩니다. 예제를 열면 소스와 생성된 코드를 볼 수 있습니다. ${facts.shadeRenderable}개 예제는 WGSL과 함께 ${glsl}도 지원하며, 나머지는 WGSL만 생성합니다. 렌더링 가능한 예제에는 미리보기가 있습니다.`,
       groups: {
         cartographic: '지도',
         screen: '화면 공간',
@@ -2450,18 +2450,17 @@ export const ko: Copy = {
           '`mat4`와 `vec3`를 담은 `Camera` 클래스를 `uniform<Camera>` 뒤에 두고, 평범한 헬퍼 함수가 읽습니다.',
         'textured-quad':
           '전체 화면 삼각형이 `sampler`를 거쳐 `texture_2d<f32>`를 샘플링하고, `override<f32>` 특수화 상수 두 개로 색을 입힙니다.',
-        'array-length':
-          '런타임 크기 스토리지 배열을 도는 커널이라면 반드시 필요한 경계 검사입니다.',
+        'array-length': '런타임 크기의 스토리지 배열을 처리하는 커널에 필요한 경계 검사입니다.',
         'storage-texture':
           '컴퓨트 진입점이 텍셀 좌표로 직접 쓰는 이미지입니다. 샘플러도 필터링도 없습니다.',
         'shadow-compare':
           '`sampler_comparison`을 거쳐 깊이 텍스처를 `textureSampleCompare`와 `textureSampleCompareLevel`로 읽습니다. 평범한 2D 그림자 맵과 캐스케이드 배열 양쪽에서 씁니다.',
         'cube-env':
-          '환경 맵은 방향으로 찾는 `texture_cube<f32>`, 컬러 그레이딩 표는 셰이딩한 색으로 색인하는 `texture_3d<f32>`이입니다. `textureSampleBias`와 `textureSampleGrad`를 쓰고, 점광원의 그림자는 광원에서 나가는 방향으로 비교하는 `texture_depth_cube`이입니다.',
+          '환경 맵은 방향으로 찾는 `texture_cube<f32>`, 컬러 그레이딩 표는 셰이딩한 색으로 색인하는 `texture_3d<f32>`입니다. `textureSampleBias`와 `textureSampleGrad`를 쓰고, 점광원의 그림자는 광원에서 나가는 방향으로 비교하는 `texture_depth_cube`입니다.',
         'cube-array-gather':
-          '색상 램프는 `texture_1d<f32>`, 환경 맵 둘은 레이어로 고르는 `texture_cube_array<f32>`이입니다. `textureGatherCompare`로 퍼센티지 클로저 필터를 손으로 짜고, `textureGather`로 텍셀 네 개에서 채널 하나를 모으며, 점광원의 그림자는 `texture_depth_cube_array`이입니다.',
+          '색상 램프는 `texture_1d<f32>`, 환경 맵 둘은 레이어로 고르는 `texture_cube_array<f32>`입니다. `textureGatherCompare`로 퍼센티지 클로저 필터를 손으로 짜고, `textureGather`로 텍셀 네 개에서 채널 하나를 모으며, 점광원의 그림자는 `texture_depth_cube_array`입니다.',
         'msaa-resolve':
-          'MSAA 렌더 타깃을 `texture_multisampled_2d<f32>`로 두고 `textureLoad(t, coords, sampleIndex)`로 샘플을 하나씩 읽어 `textureNumSamples`만큼 평균을 구합니다. 깊이 어태치먼트는 `texture_depth_multisampled_2d`이입니다.',
+          'MSAA 렌더 타깃을 `texture_multisampled_2d<f32>`로 두고 `textureLoad(t, coords, sampleIndex)`로 샘플을 하나씩 읽어 `textureNumSamples`만큼 평균을 구합니다. 깊이 어태치먼트는 `texture_depth_multisampled_2d`입니다.',
         'module-const':
           '컴파일러가 허용하는 모든 스칼라 타입으로 모듈 범위 상수를 하나씩 선언합니다.',
         'palette-const':
@@ -2470,8 +2469,9 @@ export const ko: Copy = {
           '전체 화면 삼각형의 꼭짓점은 `array<f32, 3>` 목록 두 개에서 오고, 색은 `array<i32, 3>`으로 가중한 `array<vec3, 3>` 구간값에서 옵니다.',
         'convert-grid':
           '전체 화면 삼각형의 꼭짓점은 `vec2(vec2u(...))`에서 오고, 색은 `f32`에서 `u32`로 갔다가 다시 `f32`로 돌아오는 왕복에서 옵니다.',
-        'normal-matrix': '`matCxR`는 모두 타입입니다.',
-        'fp64-lane-stripes': '소스로 쓴 `f64` 인터페이스입니다.',
+        'normal-matrix': '법선 행렬에 `mat3`를 쓰고, 행렬 자르기와 전치, 곱셈을 보여 줍니다.',
+        'fp64-lane-stripes':
+          '큰 월드 좌표에서 에뮬레이션 `f64`와 `f32` 정밀도를 비교하는 셰이더입니다.',
         'bitfield-bands':
           '전체 화면 삼각형의 색을 `switch`로 고릅니다. 띠 번호는 `&=`, `|=`, `<<=`, `>>=`, `^=`로 만들고, `let x: f32`는 값을 넣기 전에 먼저 선언하며, varying은 `{ pos, uv }` 축약형으로 돌려줍니다.',
         'block-scope':
@@ -2486,9 +2486,9 @@ export const ko: Copy = {
           '`reflect`, `refract`, `faceForward`가 범프에 빛을 주고, `transpose`와 `determinant`가 호스트 행렬을 읽으며, 비트 내장 함수(`firstLeadingBit`, `reverseBits`, `countOneBits`, `extractBits`, `insertBits`)가 화면에 띠를 만듭니다. 띠가 시작하는 자리는 `fwidthCoarse`가 표시합니다.',
         'bool-select': '벡터 둘을 비교하면 결과는 불 벡터입니다.',
         'ray-class':
-          '생성자와 메서드 하나, 정적 함수 하나를 둔 `class Ray`, 그리고 `hit(ray)` 메서드가 광선을 따라간 거리를 돌려주는 `class Sphere`이입니다.',
+          '생성자와 메서드 하나, 정적 함수 하나를 둔 `class Ray`, 그리고 `hit(ray)` 메서드가 광선을 따라간 거리를 돌려주는 `class Sphere`입니다.',
         'capsule-corp-namek-class':
-          '드래곤볼 Z의 캡슐 코퍼레이션 우주선을 나메크에 놓은 장면입니다. 우주선, 착륙 장치, 나무, 지형, 글자, 재질, 셀 셰이딩과 카메라를 공유 SDF 장면을 중심으로 TypeShade 클래스로 구성합니다.',
+          '드래곤볼 Z에 나오는 캡슐 코퍼레이션의 우주선을 TypeShade 클래스로 구성한 장면입니다.',
         'orbit-inout':
           '`class Body`의 `step`, `turn`, `advance`가 `this`에 값을 넣으므로, 각 메서드는 자기 객체를 참조로 받습니다.',
         'particle-step':
@@ -2500,50 +2500,49 @@ export const ko: Copy = {
         'generic-helpers':
           '제네릭 헬퍼 셋입니다. 파일이 부를 때 쓴 인자 타입 조합마다 한 번씩 컴파일됩니다.',
         'generic-class':
-          'f32와 vec3에 쓴 `class Slot<T>`이다. 모듈에는 `Slot_f32`와 `Slot_vec3`가 서로 다른 구조체로 들어가고, 저마다 생성자와 모든 메서드의 복사본을 따로 갖습니다.',
+          '`class Slot<T>`를 f32와 vec3에 사용합니다. 모듈에는 `Slot_f32`와 `Slot_vec3`가 서로 다른 구조체로 생성되며, 각 구조체에 생성자와 모든 메서드가 따로 생성됩니다.',
         'tuple-and-brand':
-          '튜플은 타입이 길이를 정해 둔 목록이고 `array<T, N>`이 바로 그것이므로, `[f32, f32]`는 곧 `array<f32, 2>`이입니다.',
-        'class-syntax': 'TypeScript 클래스를 쓰는 방식 그대로 작성한 `class Ring`이입니다.',
+          '튜플은 타입이 길이를 정해 둔 목록이고 `array<T, N>`이 바로 그것이므로, `[f32, f32]`는 곧 `array<f32, 2>`입니다.',
+        'class-syntax': 'TypeScript 클래스를 쓰는 방식 그대로 작성한 `class Ring`입니다.',
         'rng-method':
           '`next()`가 생성기의 상태를 앞으로 옮기고 뽑은 값을 돌려주는 `class Rng`입니다.',
         'class-builder':
-          '모든 `return`이 `return this`인 메서드는 자기 객체를 돌려주므로 `a.at(p).tinted(c)`는 호출을 차례로 `a`에서 실행하고, `new Disc().at(p).sized(r)`는 `new`가 만든 값을 임시 변수에 담는다(규칙 8.10).',
+          '`return this`를 반환하는 메서드로 같은 객체의 빌더 체인을 이어 가며, `new`로 시작한 체인은 결과를 임시 변수에 담습니다.',
         'class-parts':
-          '`ring.advance(dt)`는 자신이 담은 `Mover`의 `step`을 불러 고리를 옮깁니다. 그래서 `step`이 어느 클래스의 것이든 `advance`는 자기 객체를 바꾸고 참조로 받는다(규칙 8.10).',
+          '`ring.advance(dt)`는 자신이 담은 `Mover`의 `step`을 부르며, 변경되는 객체를 참조로 전달합니다.',
         'rt-renderer-class':
           '추상 SDF 도형 클래스와 상속으로 만든 3D 레이 트레이서입니다. 구체, 상자, 토러스, 평면을 구면 추적으로 렌더링합니다.',
         'imported-noise': '다른 셰이더 파일의 `fbm`으로 구름을 그립니다.',
-        'separable-blur': '두 패스로 나눈 블러이입니다.',
+        'separable-blur': '두 패스로 나눈 블러입니다.',
         'feedback-trail': '궤적을 남기는 점입니다.',
         closures:
           '`ring`은 TypeScript 클로저처럼 프래그먼트 진입점의 `p`와 `width`를 읽고 그 `glow`에 더합니다.',
         'higher-order':
-          '`cover`와 `around4`는 거리 필드를 함수 `f: Field`로 받고, 제네릭 함수가 타입 인자 조합마다 한 번 컴파일되듯 호출이 넘기는 함수마다 한 번씩 컴파일된다(규칙 8.18).',
+          '`cover`와 `around4`는 거리 필드 함수를 인자로 받고, 호출에서 넘긴 함수마다 별도 코드로 컴파일됩니다.',
         'inferred-returns':
-          '반환 타입을 적은 함수가 하나도 없고, TypeScript가 추론하듯 저마다 본문이 돌려주는 것을 돌려준다(규칙 8.19).',
+          '함수마다 반환 타입을 생략하고, TypeShade가 본문에서 반환하는 값으로 타입을 추론합니다.',
         'array-methods':
-          '`array<Light, 3>`에 든 조명 세 개를 TypeScript 작성자가 먼저 떠올리는 배열 메서드로 비춥니다. 호출마다 배열 타입과 넘긴 함수에 맞춘 카운트 루프가 만들어진다(규칙 8.18, 언어 문서 §63).',
+          '`array<Light, 3>`의 조명 세 개를 TypeScript 개발자가 흔히 쓰는 배열 메서드로 셰이딩합니다.',
         'loops-over-data':
           '데이터를 다루는 프로그램이 쓰는 세 가지 루프를 Tint와 실제 WebGL2 컨텍스트로 확인합니다.',
         'path-tracer': '평범한 TypeScript로 쓴 작은 경로 추적기입니다.',
-        'workgroup-tile-2d': '`@compute([8, 8])`는 WGSL의 `@workgroup_size(8, 8)`이입니다.',
-        'loop-kernel': '로드맵에 나오는 지형 예제입니다.',
+        'workgroup-tile-2d': '`@compute([8, 8])`는 WGSL의 `@workgroup_size(8, 8)`입니다.',
+        'loop-kernel': '런타임 크기의 출력 배열에서 각 원소를 처리하는 지형 커널입니다.',
         'loop-reduction': '배열을 도는 루프로 합, 평균과 분산, 히스토그램을 구합니다.',
         'loop-struct-array': '파티클 한 걸음을 `array<Particle>`을 도는 루프로 씁니다.',
         'loop-on-cpu':
           '반복이 서로 독립인지 보는 증명이 거부하는 루프를 규칙마다(R1부터 R6까지) 하나씩 둡니다.',
         'kernel-array-methods':
-          '`sumOfSquares`, `scale`, `firstAbove`는 TypeScript 개발자가 먼저 쓰는 `Array.prototype`의 메서드로 배열을 줄이고, 쓰고, 찾는다(변경 0079).',
+          '`sumOfSquares`, `scale`, `firstAbove`는 배열 메서드로 커널 데이터를 줄이고, 쓰고, 검색합니다.',
         'kernel-image-invert':
-          '`invert`는 `texture_2d<f32>`를 읽고 `texture_storage_2d`에 저장하므로 커널 함수이다(규칙 8.22, 변경 0077).',
-        'kernel-push':
-          '`strong`은 문턱값보다 큰 원소의 인덱스를 `out.push(i)`로 덧붙인다(변경 0078).',
+          '`invert`는 커널 반복문에서 `texture_2d<f32>`를 읽고 결과를 `texture_storage_2d`에 씁니다.',
+        'kernel-push': '`strong`은 `out.push(i)`로 문턱값보다 큰 각 원소의 인덱스를 덧붙입니다.',
         'kernel-set-unique':
-          '`labels`는 영이 아닌 픽셀의 라벨을 `seen.add(...)`로 `Set<u32>`에 넣고(변경 0080), `latest`는 키마다 마지막에 넣은 값을 `Map<u32, f32>`에 둡니다.',
+          '`labels`는 영이 아닌 픽셀의 라벨을 `Set<u32>`에 모으고, `latest`는 `Map<u32, f32>`에서 키마다 마지막 값을 유지합니다.',
         'private-state':
-          '최상위의 평범한 `let seed: u32`는 WGSL의 `var<private>`이입니다. 인보케이션마다 복사본이 하나씩 있고, 그 인보케이션의 모든 함수가 함께 씁니다.',
+          '최상위의 평범한 `let seed: u32`는 WGSL의 `var<private>`입니다. 인보케이션마다 복사본이 하나씩 있고, 그 인보케이션의 모든 함수가 함께 씁니다.',
         'workgroup-scratch':
-          '`let tile: workgroup<array<f32, 64>>`는 WGSL의 `var<workgroup>`이입니다. 워크그룹마다 복사본이 하나씩 있어 그 안의 인보케이션들이 함께 쓰며, 여기서는 인보케이션이 한 칸씩 차지하는 스크래치로 씁니다. 원자적 값의 워크그룹 배열과 인보케이션별 카운터도 함께 둡니다.',
+          '`let tile: workgroup<array<f32, 64>>`는 WGSL의 `var<workgroup>`입니다. 워크그룹마다 복사본이 하나씩 있어 그 안의 인보케이션들이 함께 쓰며, 여기서는 인보케이션이 한 칸씩 차지하는 스크래치로 씁니다. 원자적 값의 워크그룹 배열과 인보케이션별 카운터도 함께 둡니다.',
         'workgroup-reduce':
           '인보케이션 64개가 값 64개를 워크그룹 메모리로 하나에 모읍니다. `workgroupBarrier()`가 라운드 순서를 잡습니다.',
         'atomic-histogram':
@@ -2551,7 +2550,7 @@ export const ko: Copy = {
         'gpu-console':
           '컴퓨트 커널 안에서 `console.log("i =", gid.x, p)`를 부릅니다. 문자열 리터럴은 라벨이 되고, 크기가 정해진 값은 무엇이든 인자로 넘길 수 있습니다.',
         'compute-reduction-twin':
-          '@workgroup_size가 붙은 컴퓨트 커널이입니다. 입력 스토리지 버퍼의 한 구간을 reduce()로 접어 출력 원소 하나로 만듭니다.',
+          '@workgroup_size가 붙은 컴퓨트 커널입니다. 입력 스토리지 버퍼의 한 구간을 reduce()로 접어 출력 원소 하나로 만듭니다.',
         'workgroup-override':
           '`override<u32>` 하나가 컴퓨트 진입점의 워크그룹 크기와 공유 스크래치 배열의 바깥쪽 길이를 정합니다.',
         'hillshade-twin': '음영 기복.',
@@ -2564,7 +2563,7 @@ export const ko: Copy = {
         'starfield-twin': '텍스처 없이 그린 밤하늘.',
         'kaleidoscope-twin': '극좌표로 접는 거울 반사.',
         'gradient-twin': '섞는 비율을 조절할 수 있는 세로 방향 두 색 그러데이션.',
-        'voronoi-twin': '움직이는 셀룰러 노이즈.',
+        'voronoi-twin': '움직이는 보로노이 패턴입니다.',
         'fp64-deep-zoom-twin': '에뮬레이션 배정밀도(f32 두 개로 만든 df64).',
         'fp64-checker-plane-twin': '월드 평면 위의 1단위 체커보드.',
         'fp64-loran-twin': 'LORAN 방식의 해도 격자.',
@@ -2583,19 +2582,18 @@ export const ko: Copy = {
         'id-pick': 'WGSL 방식의 진입점 입출력입니다.',
         'clip-planes':
           '`@builtin("clip_distances")`로 사용자 클립 평면 네 개를 둡니다. 래스터라이저가 래스터화하기 전에 읽는 버텍스 출력입니다.',
-        'uniform-array': '`array<f32, 4>`를 담은 `uniform`이입니다.',
+        'uniform-array': '`array<f32, 4>`를 담은 `uniform`입니다.',
         'sample-branch': 'WGSL은 `textureSample`을 균일한 제어 흐름에서만 부르게 합니다.',
-        'integer-math':
-          '레지스트리가 이식 가능하다고 했지만 실제로는 그렇지 않았던 내장 함수 둘입니다.',
-        'packing-bitcast': 'WGSL에는 있지만 이 언어에 없던 이식 가능한 내장 함수들입니다.',
+        'integer-math': 'GLSL ES 3.00에 해당 입력 타입의 오버로드가 없는 정수 `abs`와 `dot`입니다.',
+        'packing-bitcast': 'TypeShade 셰이더에서 쓰는 패킹, 비트캐스트, 생성자 연산 예제입니다.',
         'packed-bytes':
           '`u32` 하나를 바이트 네 개로 읽거나 네 개를 다시 써 넣는 내장 함수 여덟 개입니다.',
-        'compute-sync': 'WGSL에는 있지만 이 언어에 없던 동기화 내장 함수 세 개입니다.',
+        'compute-sync': '비교 후 교환, 워크그룹 균일 로드, 텍스처 배리어를 보여 주는 예제입니다.',
       },
     },
     host: {
       h: '호스트 예제',
-      p: '예제마다 파일이 두 개입니다. 하나는 `"use typeshade"` 모듈이고, 다른 하나는 애플리케이션이 쓰는 방식 그대로 그 모듈을 실행하는 `host.ts`이입니다. 호스트는 Vite 플러그인으로 모듈을 가져와 모듈이 내보내는 것을 부릅니다. 페이지마다 두 파일과, 호스트가 실행되는 tier를 보여 줍니다.',
+      p: '예제마다 파일이 두 개입니다. 하나는 `"use typeshade"` 모듈이고, 다른 하나는 애플리케이션이 쓰는 방식 그대로 그 모듈을 실행하는 `host.ts`입니다. 호스트는 Vite 플러그인으로 모듈을 가져와 모듈이 내보내는 것을 부릅니다. 페이지마다 두 파일과, 호스트가 실행되는 tier를 보여 줍니다.',
       cover: '모듈과 그 모듈을 실행하는 호스트, 두 파일입니다.',
       titles: {
         'host-draw': '캔버스에 그리기',
@@ -2621,23 +2619,23 @@ export const ko: Copy = {
         'loop-fuse':
           '커널 함수 다섯 개와, `typeshade/fuse`의 `fuse()` 안에서 이를 부르는 호스트입니다.',
         'string-keys-record':
-          '채널 이름은 u32 id가 되고 Record는 id 순서의 배열이 된다(변경 0081).',
+          '정해진 채널 이름의 집합은 `u32` id가 되고, `Record`는 id 순서의 배열이 됩니다.',
         'host-set-unique':
-          'JavaScript의 `Set`과 `Map`을 받는 커널 함수 네 개와, 이를 부르는 호스트이다(변경 0080).',
+          'JavaScript의 `Set`과 `Map`을 받는 커널 함수 네 개와 이를 호출하는 호스트입니다.',
       },
       blurbs: {
         'host-draw':
-          '전체 화면 `@fragment` 진입점과 이를 그리는 호스트입니다. 호스트는 `fs`를 가져와 프레임마다 `fs(canvas, { frame })`를 한 번 부르고, 유니폼에 시간을 넣습니다. 그리는 것은 전체 화면 삼각형 하나입니다. WebGPU가 먼저이고, 없으면 WebGL2, 그다음은 CPU tier입니다. 호스트 코드에는 파이프라인도 버퍼도 바인드 그룹도 없다(규칙 8.24).',
+          '전체 화면 `@fragment` 진입점과 이를 그리는 호스트입니다. 호스트는 `fs`를 가져와 프레임마다 `fs(canvas, { frame })`를 한 번 부르고 유니폼에 시간을 넣습니다. 셰이더는 전체 화면 삼각형 하나를 그립니다. WebGPU를 먼저 시도하고, 사용할 수 없으면 WebGL2, 그다음 CPU tier를 사용합니다. 호스트 코드에는 파이프라인, 버퍼, 바인드 그룹이 없습니다.',
         'host-compute':
-          '`@compute` 진입점과 이를 실행하는 호스트입니다. `run()`은 선언한 기본값을 쓰고, `runSpecialized()`는 직접 호출과 `device.fuse()` 안의 호출에 `{ constants }`를 넘깁니다. `WIDTH`는 워크그룹 크기를, `GAIN`은 출력 배율을 정합니다. 호스트는 선택한 폭으로 그룹 개수를 계산하고, 계획의 배열을 Resident로 유지한 뒤 결과와 디스패치 리포트를 돌려준다(규칙 8.24). 상수를 선택한 디바이스 계획에서는 WebGPU와 CPU tier가 워크그룹당 32개 인보케이션을 사용하며, WebGL2는 기본값 64를 유지하면서 `GAIN`을 선택합니다.',
+          '`@compute` 진입점과 이를 실행하는 호스트입니다. `run()`은 선언한 기본값을 쓰고, `runSpecialized()`는 직접 호출과 `device.fuse()` 안의 호출에 `{ constants }`를 넘깁니다. `WIDTH`는 워크그룹 크기를, `GAIN`은 출력 배율을 정합니다. 호스트는 선택한 폭으로 그룹 개수를 계산하고, 계획의 배열을 Resident로 유지한 뒤 결과와 디스패치 리포트를 돌려준다. 상수를 선택한 디바이스 계획에서는 WebGPU와 CPU tier가 워크그룹당 32개 인보케이션을 사용하며, WebGL2는 기본값 64를 유지하면서 `GAIN`을 선택합니다.',
         'host-kernel':
-          '커널 함수 두 개와 이를 부르는 호스트입니다. `exposure`는 `array<f32>`를 돌고, `peak`는 그 배열을 하나의 값으로 줄입니다. 호스트는 `Float32Array`를 넘겨 `await exposure(1.5, pixels)`를 부르고, 숫자 하나를 얻으려고 `await peak(pixels)`를 부릅니다. 컴파일러가 반복이 서로 독립이라고 증명한 루프는 GPU에서 반복마다 인보케이션 하나로 실행되고, 배열은 제자리에서 바뀌어 돌아온다(규칙 8.22).',
+          '커널 함수 두 개와 이를 부르는 호스트입니다. `exposure`는 `array<f32>`를 돌고, `peak`는 그 배열을 하나의 값으로 줄입니다. 호스트는 `Float32Array`를 넘겨 `await exposure(1.5, pixels)`를 부르고, 숫자 하나를 얻으려고 `await peak(pixels)`를 부릅니다. 컴파일러가 반복이 서로 독립이라고 증명한 루프는 GPU에서 반복마다 인보케이션 하나로 실행되고, 배열은 제자리에서 바뀌어 돌아온다.',
         'host-resident':
-          '커널 함수 세 개와, 이를 `resident()` 배열 위에서 이어 부르는 호스트입니다. `decay`와 `accumulate` 호출은 큐에 들어가기만 합니다. 배열은 장치의 버퍼에 그대로 남고, 다음 호출이 같은 버퍼를 바인딩합니다. 호스트는 `sum`을 기다릴 때 한 번만 기다리고, `read()`로 배열을 한 번만 읽어 온다(규칙 11.8).',
+          '커널 함수 세 개와, 이를 `resident()` 배열 위에서 이어 부르는 호스트입니다. `decay`와 `accumulate` 호출은 큐에 들어가기만 합니다. 배열은 장치의 버퍼에 그대로 남고, 다음 호출이 같은 버퍼를 바인딩합니다. 호스트는 `sum`을 기다릴 때 한 번만 기다리고, `read()`로 배열을 한 번만 읽어 온다.',
         'host-helper':
-          '프래그먼트 진입점이 GPU에서 그리고 호스트가 CPU에서 부르는 지형 함수 `height`입니다. 호스트는 `fs(canvas, { view })`로 지형을 그린 뒤, 커서 아래의 높이를 얻으려고 `height([u, v])`를 부릅니다. 결과는 평범한 숫자이고, 같은 코드를 `f32` 정밀도로 계산한 값입니다. 캔버스는 읽지 않는다(언어 문서 §64).',
+          '프래그먼트 진입점이 GPU에서 그리고 호스트가 CPU에서 부르는 지형 함수 `height`입니다. 호스트는 `fs(canvas, { view })`로 지형을 그린 뒤, 커서 아래의 높이를 얻으려고 `height([u, v])`를 부릅니다. 결과는 평범한 숫자이고, 같은 코드를 `f32` 정밀도로 계산한 값입니다. 캔버스는 읽지 않는다.',
         'host-program':
-          '버텍스 진입점과 프래그먼트 진입점, 그리고 엔진처럼 이를 실행하는 호스트입니다. 모듈의 기본 내보내기가 매니페스트입니다. 호스트는 프로그램 런타임에서 `rt.load()`로 매니페스트를 불러오고, 렌더 파이프라인을 만들어 프레임마다 텍스처에 전체 화면 삼각형을 그립니다. 유니폼은 이름으로 바인딩합니다. 마지막으로 텍스처를 읽어 온다(규칙 11.10, 11.11).',
+          '버텍스 진입점과 프래그먼트 진입점, 그리고 엔진처럼 이를 실행하는 호스트입니다. 모듈의 기본 내보내기가 매니페스트입니다. 호스트는 프로그램 런타임에서 `rt.load()`로 매니페스트를 불러오고, 렌더 파이프라인을 만들어 프레임마다 텍스처에 전체 화면 삼각형을 그립니다. 유니폼은 이름으로 바인딩합니다. 마지막으로 텍스처를 읽어 온다.',
         'loop-fuse':
           '커널 함수 다섯 개와, `typeshade/fuse`의 `fuse()` 안에서 이를 부르는 호스트입니다. `add`, `mul`, `relu` 호출은 저마다 바로 앞 호출이 같은 인덱스에 쓴 값을 읽습니다. 그래서 WebGPU에서는 스코프가 이 호출들을 디스패치 하나로 실행하고, 리포트에도 그렇게 적힙니다. `pairsum`은 `t[i ^ 1]`을 읽는데, 이 원소는 다른 인보케이션이 씁니다. 그래서 이 호출을 가운데 둔 스코프는 디스패치 두 번으로 실행되고, 리포트가 그 줄을 짚어 줍니다. 리덕션 호출로 끝나는 스코프도 있습니다. `total`로 끝나는 스코프는 `add`와 `mul`을 그 루프의 프롤로그로 실행합니다. 그래서 세 호출이 리덕션과 함께 디스패치 하나가 됩니다.',
         'string-keys-record':
@@ -2724,14 +2722,14 @@ export const ko: Copy = {
     glsl: {
       h: `gradient 패스의 ${glsl} 출력`,
       p1: `gradient 패스 \`${hero.file}\`는 프래그먼트 단계로 이 ${glsl} \`main\`을 낸다.`,
-      p2: `모듈 전체는 WGSL로 ${hero.emit.wgslLines}줄이고, GLSL은 버텍스 단계 ${hero.emit.glslVertexLines}줄, 프래그먼트 단계 ${hero.emit.glslFragmentLines}줄이다. 유니폼 타입, 바이트 오프셋, 바인드 그룹 항목, 진입점 시그니처는 [\`reflect()\`](apiReflect)에서 나온다. reflect()는 같은 중간 표현을 읽지만 출력 경로에는 관여하지 않으므로, 호스트는 그 레이아웃대로 유니폼 버퍼를 채우면 된다. [검증 페이지](checks)에는 유니폼 블록의 복원된 레이아웃이 잘못 쓴 필드의 진단과 나란히 있다.`,
+      p2: `모듈 전체는 WGSL ${hero.emit.wgslLines}줄입니다. GLSL은 버텍스 단계 ${hero.emit.glslVertexLines}줄, 프래그먼트 단계 ${hero.emit.glslFragmentLines}줄입니다. 유니폼 타입, 바이트 오프셋, 바인드 그룹 항목, 진입점 시그니처는 [\`reflect()\`](apiReflect)에서 가져옵니다. 같은 중간 표현을 읽지만 출력 경로에는 관여하지 않으므로 호스트는 그 레이아웃에 따라 유니폼 버퍼를 채울 수 있습니다. [검증 페이지](checks)에서는 유니폼 블록의 복원 레이아웃과 잘못 쓴 필드의 진단을 함께 보여 줍니다.`,
     },
     f64: {
       h: '에뮬레이션 배정밀도',
       p1: `WGSL에도 ${glsl}에도 배정밀도 부동소수점은 없다. TypeShade는 f32 값 두 개를 합치지 않고 나란히 든 쌍으로 이를 에뮬레이션하고, 산술, 비교, 일부 내장 함수를 그 쌍에 대한 호출로 바꿔 낸다. 그 범위 밖의 연산은 출력할 때 코드가 붙은 오류로 실패한다. 쓰는 코드는 그대로이고 선언한 타입만 다르다. deep-zoom 예제에서 \`${facts.deepZoomOrigin.name}\` 필드는 소스에서 \`${facts.deepZoomOrigin.sourceType}\`로 선언되고 유니폼 블록에서는 \`${facts.deepZoomOrigin.layoutType}\` 자리를 차지하며, 호스트가 그 자리를 분리한 쌍으로 채운다.`,
       p2: 'f64 산술을 하는 모듈에는 가드 텍스처 바인딩도 주입되는데, 호스트는 이 텍스처를 흰색 텍셀 하나로 채워야 합니다. GPU 드라이버의 셰이더 컴파일러는 텍셀 읽기를 미리 계산해 버릴 수 없는데, 그 읽기가 없으면 오차 보정 항을 마음대로 최적화해 없앨 수 있기 때문입니다. 연산마다 f32의 몇 배가 들므로 이 타입은 값 하나하나에 대해 골라서 씁니다. 예제는 [fp64-deep-zoom-twin.shade.ts](deepZoom)입니다.',
       p3: "이 가드는 에뮬레이션의 `'float'` 플레이버에 속합니다. Apple GPU에는 `'integer'` 플레이버가 필요합니다. 이 플레이버는 같은 오차 항을 정수 연산으로 계산하고, 가드를 바인딩하지 않습니다. 기본값은 실제 디바이스나 컨텍스트에서 자동으로 선택하며, 사용 가능한 경우 사용자 에이전트 정보도 참고합니다. Apple이나 Metal 신호가 있으면 `'integer'`를, CPU이거나 GPU 신호를 알 수 없으면 `'float'`를 선택합니다. 신호를 알 수 없을 때의 선택이 확장 정밀도를 보장하지는 않습니다. `createDevice({ fp64Flavor })`나 `configure({ fp64Flavor })`로 선택을 재정의할 수 있습니다. `recommendFp64Flavor`는 이 선택 함수를 제공합니다.",
-      caption: `같은 월드 좌표를 두 번 그렸습니다. 왼쪽은 ${split[0]}, 오른쪽은 ${split[1]}이입니다. ${split[0]} 쪽은 줄무늬가 계단처럼 나오는데, 이 거리에서는 ${split[0]}의 ulp 하나가 줄무늬에 필요한 소수 부분보다 거칠기 때문입니다. 다른 쪽은 매끄럽게 나옵니다.`,
+      caption: `같은 월드 좌표를 두 번 그렸습니다. 왼쪽은 ${split[0]}, 오른쪽은 ${split[1]}입니다. ${split[0]} 쪽은 줄무늬가 계단처럼 나오는데, 이 거리에서는 ${split[0]}의 ulp 하나가 줄무늬에 필요한 소수 부분보다 거칠기 때문입니다. 다른 쪽은 매끄럽게 나옵니다.`,
       captionNone: '빌드할 때 렌더링한 화면입니다. 이 브라우저에는 WebGPU도 WebGL2도 없습니다.',
     },
   },
@@ -2756,7 +2754,7 @@ export const ko: Copy = {
         'TypeShade 문법과 GPU 실행 규칙을 예제로 설명하는 가이드입니다. 타입, 리소스, 함수, 셰이더 스테이지가 컴파일 결과에 미치는 영향도 함께 다룹니다.',
       h1: 'TypeShade 언어 가이드',
       intro:
-        'TypeShade는 TypeScript 문법으로 셰이더를 작성합니다. 이 가이드는 지원하는 문법과 GPU 실행 방식을 설명합니다.',
+        'TypeScript 문법으로 TypeShade 셰이더를 작성하는 방법을 알아보세요. 이 가이드는 직접 컴파일하고 실행할 수 있는 예제로 타입, 함수, 리소스, 셰이더 단계를 소개합니다.',
       boundaryH: '1. `use typeshade`란?',
       boundaryP:
         '`"use typeshade"`는 TypeShade 셰이더 파일을 나타내는 첫 지시문입니다. 컴파일러는 이 지시문으로 파일을 구분하고, GPU 타입과 리소스, 스테이지, builtin 규칙을 적용합니다.',
@@ -2910,7 +2908,7 @@ export const ko: Copy = {
         helperP:
           '스테이지 데코레이터가 없는 최상위 함수은 다른 셰이더 함수에서 호출할 수 있는 헬퍼입니다. 반복되는 계산을 이름 있는 함수로 분리하면 셰이더를 읽고 검증하기 쉬워집니다.',
         helperNote:
-          '헬퍼는 파이프라인 진입점가 아니므로 스테이지 데코레이터가 없습니다. 이 구조는 계산을 작은 단위로 나누고 진입점의 역할을 읽기 쉽게 만듭니다.',
+          '헬퍼는 파이프라인 진입점이 아니므로 스테이지 데코레이터가 없습니다. 이 구조는 계산을 작은 단위로 나누고 진입점의 역할을 읽기 쉽게 만듭니다.',
         call: '4. 함수 호출',
         callP:
           '함수 호출은 일반적인 TypeScript 호출과 같은 문법을 사용합니다. 호출 대상과 인수에는 TypeShade의 GPU 타입 규칙이 적용되며, 일반 JavaScript API를 호출할 수는 없습니다.',
@@ -2920,7 +2918,7 @@ export const ko: Copy = {
         entryP:
           '파이프라인이 실행을 시작하는 함수는 top-level `export function`에 스테이지 데코레이터를 붙여 선언합니다. `@compute`, `@vertex`, `@fragment`가 각각 GPU 실행 단계와 연결됩니다.',
         entryNote:
-          '`export`는 TypeScript 모듈 개념과 함께 진입점를 컴파일러가 발견할 수 있게 합니다. 스테이지 데코레이터는 그 내보낸 함수이 어느 파이프라인 스테이지인지 추가로 설명합니다.',
+          '`export`는 TypeScript 모듈 개념과 함께 진입점을 컴파일러가 발견할 수 있게 합니다. 스테이지 데코레이터는 그 내보낸 함수이 어느 파이프라인 스테이지인지 추가로 설명합니다.',
         builtin: '6. Builtin은 매개변수로 받습니다',
         builtinP:
           'GPU가 제공하는 스테이지 입력은 숨겨진 전역 변수가 아니라 함수 시그니처에 명시합니다. 이렇게 하면 함수의 입력이 코드만 읽어도 드러나고 헬퍼와 진입점의 경계도 분명해집니다.',
@@ -2930,7 +2928,7 @@ export const ko: Copy = {
           ['`gid: vec3u`', '그 입력의 TypeShade 타입과 지역 이름입니다.'],
           ['`gid.x`', '현재 인보케이션의 x 성분를 읽습니다.'],
         ],
-        compute: '7. Compute 진입점를 읽는 법',
+        compute: '7. Compute 진입점을 읽는 법',
         computeP:
           '`@compute([64, 1, 1])`는 워크그룹 크기를 선언하고, `gid`는 `global_invocation_id` builtin을 받는 매개변수입니다. `gid.x`를 통해 현재 인보케이션의 x 좌표를 읽습니다.',
         computeNote:
@@ -2949,13 +2947,13 @@ export const ko: Copy = {
         boundaryItems: [
           '임의의 JavaScript 런타임 API를 호출하지 않습니다.',
           '동적 객체 생성과 일반적인 런타임 부수 효과를 셰이더 계산으로 가정하지 않습니다.',
-          '진입점는 class method가 아니라 내보낸 최상위 함수입니다.',
+          '진입점은 class method가 아니라 내보낸 최상위 함수입니다.',
           'builtin은 암시적 전역 변수이 아니라 명시적인 매개변수입니다.',
           '매개변수와 반환 타입은 GPU 값의 의미에 맞아야 합니다.',
         ],
         example: '11. 작은 함수에서 실제 진입점까지',
         exampleP:
-          '아래 예제는 헬퍼가 계산을 담당하고 진입점가 builtin과 리소스를 연결하는 전형적인 구조입니다.',
+          '아래 예제는 헬퍼가 계산을 담당하고 진입점이 builtin과 리소스를 연결하는 전형적인 구조입니다.',
         exampleNote:
           '이 예제는 헬퍼와 진입점의 역할을 구분합니다. `addBias`는 재사용 가능한 계산이고, `paint`는 스테이지와 builtin을 선언하면서 실제 GPU 인보케이션과 리소스를 연결합니다.',
         next: '다음: Control flow',
@@ -3044,14 +3042,14 @@ export const ko: Copy = {
           '배열은 여러 GPU 값을 표현합니다. 길이가 고정된 배열과 같은 타입의 원소로 이루어진 튜플은 함수 안의 const, let 바인딩 패턴을 지원합니다. 일부 원소를 생략하거나 패턴을 중첩할 수 있으며, 각 바인딩은 값을 복사합니다. 런타임이나 특수화 상수에 따라 길이가 정해지는 배열은 이 패턴을 지원하지 않습니다. 리소스 원소 타입과 함께 쓰면 호스트가 제공하는 버퍼의 구조를 나타냅니다.',
         live: '6. 라이브 예제',
         liveP:
-          '아래 진입점은 줄마다 GPU 타입이 하나씩 나옵니다. 위치는 `vec2`, 거리와 반지름은 `f32`, 색은 `vec3`이입니다.',
+          '아래 진입점은 줄마다 GPU 타입이 하나씩 나옵니다. 위치는 `vec2`, 거리와 반지름은 `f32`, 색은 `vec3`입니다.',
         liveTitle: '원반',
         liveCaption: '원반 하나입니다. vec2가 자리를, f32가 크기를, vec3이 색을 정합니다.',
         liveAnchor:
           '`d`는 픽셀에서 원반 테두리까지의 거리입니다. 안쪽은 음수, 테두리 위는 0, 바깥쪽은 양수입니다. `edge`는 그 `f32` 하나를 마스크로 바꾸고, `mix`는 그 마스크를 읽어 색을 고릅니다.',
         liveExercises: [
           '`p` 줄의 `vec2(ratio, 1.)`을 `vec2(1., 1.)`로 바꿉니다. 원반이 늘어나 타원이 됩니다. `ratio`가 x 성분에만 곱해지고 있었고, 성분마다 다르게 다루는 것이 `vec2`로 할 수 있는 일입니다.',
-          '`return` 줄을 `return vec4(vec3(fract(d * 10.)), 1.)`로 바꿉니다. 나타나는 고리가 바로 `d`이입니다. `vec3`은 그 `f32` 하나를 색 채널 세 개에 그대로 펼칩니다.',
+          '`return` 줄을 `return vec4(vec3(fract(d * 10.)), 1.)`로 바꿉니다. 나타나는 고리가 바로 `d`입니다. `vec3`은 그 `f32` 하나를 색 채널 세 개에 그대로 펼칩니다.',
           '`length(p)`를 `max(abs(p.x), abs(p.y))`로 바꾸면 원반이 정사각형이 되고, `abs(p.x) + abs(p.y)`로 바꾸면 마름모가 됩니다. 원하는 모양을 재는 `f32`를 직접 작성합니다.',
         ],
         liveCenter: 'uv 공간 기준 위치',
@@ -3095,7 +3093,7 @@ export const ko: Copy = {
           'TypeScript 함수와 모듈 개념에서 출발해 compute, vertex, fragment 진입점와 명시적인 builtin 매개변수를 이해합니다.',
         h1: 'Shader stages: GPU 실행 지점을 명시하기',
         intro:
-          'TypeShade의 진입점는 class가 아니라 내보낸 최상위 함수입니다. 데코레이터가 함수의 셰이더 스테이지와 필요한 메타데이터를 표시합니다.',
+          'TypeShade의 진입점은 class가 아니라 내보낸 최상위 함수입니다. 데코레이터가 함수의 셰이더 스테이지와 필요한 메타데이터를 표시합니다.',
         mapping: '1. TypeScript 함수와 모듈에서 출발하기',
         mappingP:
           'TypeScript에서 `export function`은 모듈의 공개 함수입니다. TypeShade에서는 여기에 스테이지 데코레이터를 더하면 파이프라인 진입점라는 GPU 의미가 생깁니다. 데코레이터가 없는 함수는 재사용 가능한 헬퍼로 남습니다.',
@@ -3106,10 +3104,10 @@ export const ko: Copy = {
           '일반 TypeScript에서 크기를 고른 뒤 `program.compute()`의 이름 있는 상수로 넘깁니다. 디스패치 수는 `pipeline.workgroupShape`에서 계산합니다. 가져온 진입점은 `entry(bindings, groups, { constants: { WG_SIZE: selected } })`로 부르며, `device.fuse()` 안에서도 같습니다. 선택한 크기에 맞춰 `groups`를 계산하고, 마지막 그룹에서 입력을 벗어난 인보케이션은 셰이더에서 걸러냅니다. WebGL2는 기본 워크그룹 모양을 사용해야 합니다. [host-compute 예제](exampleHostCompute)에 전체 호스트와 셰이더가 있습니다.',
         graphics: '3. Vertex와 fragment',
         graphicsP:
-          '`@vertex`와 `@fragment`는 그래픽스 파이프라인의 진입점를 표현합니다. 입력과 출력은 TypeShade 값 타입과 명시적인 builtin 매개변수로 선언합니다. 스테이지마다 무엇을 건네받고 무엇을 돌려주는지는 [셰이더 파이프라인](conceptsPipeline)이 설명합니다.',
+          '`@vertex`와 `@fragment`는 그래픽스 파이프라인의 진입점을 표현합니다. 입력과 출력은 TypeShade 값 타입과 명시적인 builtin 매개변수로 선언합니다. 스테이지마다 무엇을 건네받고 무엇을 돌려주는지는 [셰이더 파이프라인](conceptsPipeline)이 설명합니다.',
         helper: '4. Helper function',
         helperP:
-          '데코레이터가 없는 함수는 진입점가 아니라 헬퍼이입니다. 진입점를 class method로 만들거나 `this`를 파이프라인 객체로 취급하지 않습니다.',
+          '데코레이터가 없는 함수는 진입점이 아니라 헬퍼입니다. 진입점을 class method로 만들거나 `this`를 파이프라인 객체로 취급하지 않습니다.',
         next: '다음: 알고리즘',
       },
       algorithms: {
@@ -3123,7 +3121,7 @@ export const ko: Copy = {
         hostP:
           '호스트 코드는 다른 패키지처럼 이 하위 경로를 가져오고, 각 함수를 `Resident` 배열 위에서 부릅니다. 따로 부를 수도 있고 `fuse` 본문 안에서 부를 수도 있습니다. 각 함수는 출력의 모든 원소를 쓰므로, 디바이스 풀에서 받은 배열을 따로 초기화할 필요가 없습니다. 예외는 `histogram` 하나입니다. 이 함수는 받은 칸에 개수를 더하므로, 호출하는 쪽이 칸을 먼저 초기화합니다.',
         functions: '2. 함수 목록',
-        functionsP: '행에 따로 적지 않은 배열 매개변수는 `array<f32>`이입니다.',
+        functionsP: '행에 따로 적지 않은 배열 매개변수는 `array<f32>`입니다.',
         functionsColumns: ['묶음', '함수', '하는 일'],
         functionsRows: [
           [
@@ -3217,7 +3215,7 @@ export const ko: Copy = {
           ],
           [
             '`fillWords(out: array<u32>, seed: u32)`',
-            '커널 함수입니다. 원소 `i`는 `hash32(seed ^ i)`이입니다.',
+            '커널 함수입니다. 원소 `i`는 `hash32(seed ^ i)`입니다.',
           ],
           [
             '`generator(seed: u32): () => number`',
@@ -3356,10 +3354,10 @@ export const ko: Copy = {
             name: '모듈 `let`',
             p: '모듈 변수입니다. 호출마다 하나씩 생깁니다. [private-state](shadePrivateState)',
           },
-          varRefused: { name: '`var`', p: '호출별 변수는 `let`, 모듈 상수는 `const`이입니다.' },
+          varRefused: { name: '`var`', p: '호출별 변수는 `let`, 모듈 상수는 `const`입니다.' },
           enumRow: {
             name: '`enum`',
-            p: '멤버마다 모듈 상수가 하나씩 생깁니다. 이름은 `Enum_Member`, 타입은 `i32`이입니다.',
+            p: '멤버마다 모듈 상수가 하나씩 생깁니다. 이름은 `Enum_Member`, 타입은 `i32`입니다.',
           },
           constEnum: {
             name: '`const enum`',
@@ -3520,15 +3518,15 @@ export const ko: Copy = {
           },
           breakRow: {
             name: '`break`',
-            p: '`break`이입니다. 횟수가 정해진 루프를 일찍 빠져나오는 방법입니다. [julia-twin](shadeJuliaTwin)',
+            p: '`break`입니다. 횟수가 정해진 루프를 일찍 빠져나오는 방법입니다. [julia-twin](shadeJuliaTwin)',
           },
           continueRow: {
             name: '`continue`',
-            p: '`continue`이입니다. 루프가 감싸지 않은 `switch` 안에서는 거절합니다.',
+            p: '`continue`입니다. 루프가 감싸지 않은 `switch` 안에서는 거절합니다.',
           },
           discardRow: {
             name: '`discard`',
-            p: '`discard`이입니다. 프래그먼트 진입점이나 그 진입점이 부르는 함수에 씁니다. [cutout](shadeCutout)',
+            p: '`discard`입니다. 프래그먼트 진입점이나 그 진입점이 부르는 함수에 씁니다. [cutout](shadeCutout)',
           },
           destructuring: {
             name: '구조 분해',
@@ -3552,7 +3550,7 @@ export const ko: Copy = {
           },
           brand: {
             name: '브랜드 타입',
-            p: '브랜드는 지워지고 매개변수는 `f32`이입니다. [tuple-and-brand](shadeTupleAndBrand)',
+            p: '브랜드는 지워지고 매개변수는 `f32`입니다. [tuple-and-brand](shadeTupleAndBrand)',
           },
           typeClaims: {
             name: '타입 주장',
@@ -3576,10 +3574,10 @@ export const ko: Copy = {
             p: '문자열 리터럴은 [키 타입](languageStringKeys)이 필요한 자리에서 허용됩니다. 값 집합이 열린 `string`은 계속 거부됩니다.',
           },
           numberType: { name: '`number`', p: 'GPU의 수에는 너비가 있습니다.' },
-          booleanType: { name: '`boolean`', p: '셰이더 표기는 `bool`이입니다.' },
+          booleanType: { name: '`boolean`', p: '셰이더 표기는 `bool`입니다.' },
           integerLiteral: {
             name: '정수 리터럴',
-            p: '정수로 적은 지역 초기값은 선언된 비제네릭 함수, 생성자나 메서드의 인자 자리에서 요구하는 `i32` 또는 `u32`를 따를 수 있습니다. 타입이 명시된 초기화와 단순 대입도 지역 변수에 의존하지 않고 타입이 정해져 있으면 양쪽 방향으로 같은 요구를 전달합니다. 서로 다른 구체 타입이 요구되면 `TS8003`을 보고하므로 타입 표기나 캐스트로 정합니다. 정수 타입을 요구하는 사용처가 없으면 타입 표기 없는 지역 변수는 `f32`이입니다. 실수로 적은 초기값, 모듈 상수와 루프 유도 변수는 기존 규칙을 따릅니다.',
+            p: '정수로 적은 지역 초기값은 선언된 비제네릭 함수, 생성자나 메서드의 인자 자리에서 요구하는 `i32` 또는 `u32`를 따를 수 있습니다. 타입이 명시된 초기화와 단순 대입도 지역 변수에 의존하지 않고 타입이 정해져 있으면 양쪽 방향으로 같은 요구를 전달합니다. 서로 다른 구체 타입이 요구되면 `TS8003`을 보고하므로 타입 표기나 캐스트로 정합니다. 정수 타입을 요구하는 사용처가 없으면 타입 표기 없는 지역 변수는 `f32`입니다. 실수로 적은 초기값, 모듈 상수와 루프 유도 변수는 기존 규칙을 따릅니다.',
           },
           increment: { name: '증감 연산자', p: '값이 한 걸음 옮겨 간 결과를 대입합니다.' },
           f64Scalar: {
@@ -3619,7 +3617,7 @@ export const ko: Copy = {
         description:
           'WGSL 작성 인터페이스를 구성 요소별로 훑고 각각의 TypeShade 표기를 보여 줍니다. 스칼라, 벡터, 텍스처, 주소 공간, 스테이지 속성, 문을 다룹니다.',
         h1: 'WGSL을 TypeShade로',
-        intro: `이미 WGSL을 쓰는 사람이 이 사이트에서 찾는 것은 하나이다. 눈앞에 있는 구성 요소를 TypeShade로 어떻게 적느냐이다. 이 페이지는 그 방향으로 읽힌다. 왼쪽에 WGSL 형태, 오른쪽에 \`"use typeshade"\` 파일에 적을 코드, 그리고 둘이 맞아떨어지지 않는 자리에는 설명을 단다. [WGSL과 ${glsl} 비교](conceptsWgsl)에서는 셰이더 하나를 두 타깃으로 컴파일하고 서로 다른 곳을 짚습니다.`,
+        intro: `WGSL을 쓰는 개발자는 이 페이지에서 각 구성 요소를 TypeShade로 표기하는 방법을 찾을 수 있습니다. 왼쪽 열에는 WGSL 형태를, 오른쪽 열에는 \`"use typeshade"\` 파일에 쓸 코드를 둡니다. 둘의 동작이 다른 부분에는 설명을 덧붙입니다. [WGSL과 ${glsl} 비교](conceptsWgsl)에서는 셰이더 하나를 두 타깃으로 컴파일해 차이를 보여 줍니다.`,
         readingH: '표 읽는 법',
         readingP: `오른쪽 칸은 커밋 ${facts.pinnedCommit}의 컴파일러가 실제로 받아들이는 소스이고, 왼쪽 칸은 그 컴파일러가 같은 소스에 대해 생성한 WGSL입니다. 두 칸 모두 이 페이지를 빌드할 때 측정합니다. 컴파일러가 더 이상 그렇게 쓰지 않게 되면 다음 고정 시점에 바뀐 행으로 여기에 도착합니다.`,
         colWgsl: 'WGSL',
@@ -3669,7 +3667,7 @@ export const ko: Copy = {
           '텍스처와 샘플러는 주소 공간 래퍼 없이 그냥 적습니다. 핸들은 어느 주소 공간에도 놓이지 않기 때문입니다. 샘플링 텍스처는 `f32`나 `i32`나 `u32`를 받고, 그 요소 타입이 WGSL 표기와 적용 가능한 읽기 방식을 함께 결정합니다. 스토리지 텍스처는 포맷과 접근 모드를 문자열 리터럴 타입으로 받으므로 이 컴파일러보다 `tsc`가 먼저 검사합니다.',
         resourcesH: '리소스와 주소 공간',
         resourcesP:
-          '리소스는 `declare`로 적습니다. 다른 쪽이 제공하는 값을 가리키는 TypeScript의 표현이 그것입니다. 주소 공간과 접근 모드는 타입 주석의 래퍼 타입이 나타냅니다. 셰이더가 쓰는 `storage` 바인딩은 `storage<T, "read_write">`이고, 리소스는 모두 `const`이입니다.',
+          '리소스는 `declare`로 적습니다. 다른 쪽이 제공하는 값을 가리키는 TypeScript의 표현이 그것입니다. 주소 공간과 접근 모드는 타입 주석의 래퍼 타입이 나타냅니다. 셰이더가 쓰는 `storage` 바인딩은 `storage<T, "read_write">`이고, 리소스는 모두 `const`입니다.',
         slotsP:
           '`@group`이나 `@binding`은 적지 않습니다. 슬롯 번호는 파일 안 `declare`의 등장 순서이고, 위의 WGSL이 그 결과입니다. 텍스처와 샘플러도 같은 방식으로 다음 슬롯을 가져갑니다.',
         stagesH: '진입점과 속성',
@@ -3680,7 +3678,7 @@ export const ko: Copy = {
         returnsP:
           '버텍스 진입점은 반드시 위치를 만들어 내야 합니다. 반환 타입이 `vec4`이면 그 자체가 position builtin을 답니다. 구조체를 반환하면 위치는 필드 하나가 나르고, 프로그램이 원하는 만큼 `@location` varying을 덧붙입니다. position 필드가 없는 구조체 반환, `void` 반환, `vec4`가 아닌 단일 타입은 각각 거부되며 어떤 필드나 타입을 적어야 하는지 함께 알려 줍니다.',
         builtinValuesH: 'builtin 값',
-        builtinValuesP: `\`@builtin(...)\`의 이름 목록은 WGSL의 것이고 ${facts.wgslBuiltinIds}개를 문자열로 그대로 넘긴다. 그래서 WGSL 속성은 같은 이름에서 따옴표만 뺀 모양이다. 매개변수 타입이 이 이름들만 담은 닫힌 유니온이라, 오타는 작성자가 적은 줄에서 \`tsc\` 오류가 된다. WGSL은 id 하나를 빼고 모두 타입을 고정하므로, 타입 칸이 곧 이 속성이 말해야 하는 타입이다.`,
+        builtinValuesP: `\`@builtin(...)\` 이름 ${facts.wgslBuiltinIds}개는 WGSL에서 온 것으로, 문자열 그대로 전달됩니다. 따라서 WGSL 속성에는 같은 이름을 따옴표 없이 씁니다. 매개변수 타입은 이 이름만 허용하는 유니온이므로 오타가 있으면 작성한 줄에서 \`tsc\` 오류가 납니다. WGSL은 한 id를 제외한 모든 타입을 정하므로 타입 열에는 해당 속성에 필요한 타입이 표시됩니다.`,
         clipDistancesP: '타입이 고정되지 않은 유일한 id입니다. 배열 길이는 작성자가 정합니다.',
         absentH: 'WGSL에 없는 이름',
         absentP:
@@ -3703,7 +3701,7 @@ export const ko: Copy = {
           'stages.fragment':
             '프래그먼트 진입점은 아무것도 반환하지 않아도 됩니다. 스토리지 바인딩에만 쓰는 프로그램이 그런 모양입니다.',
           'stages.compute':
-            '목록이 워크그룹 크기입니다. 목록 없는 `@compute`는 `[64, 1, 1]`이입니다.',
+            '목록은 워크그룹 크기입니다. 목록이 없는 `@compute`는 `[64, 1, 1]`을 사용합니다.',
           'stages.location': 'location은 진입점 매개변수와 클래스 필드와 반환 자리에 붙습니다.',
           'stages.vertexBare':
             '반환 타입이 `vec4`이면 그 자체가 position builtin을 답니다. 그래서 가장 작은 버텍스 셰이더에는 구조체도 매개변수도 필요 없습니다.',
@@ -3712,7 +3710,7 @@ export const ko: Copy = {
           'stages.fragmentReturn':
             '프래그먼트가 단일 값을 반환하면 너비와 상관없이 location 0을 가져갑니다. 그래서 `f32`, `vec2`, `vec3`, `vec4`가 모두 드로 버퍼 포맷이 됩니다. 구조체 반환은 렌더 타깃이 여럿일 때 쓰는 형태입니다.',
           'statements.let':
-            'WGSL의 `let`은 그대로 있는 값이고, TypeScript에서 그 뜻을 말하는 것이 `const`이입니다.',
+            'WGSL의 `let`은 값이 바뀌지 않는 선언입니다. TypeScript에서는 `const`가 같은 역할을 합니다.',
           'statements.var':
             'WGSL의 `var`는 바뀌는 지역 변수입니다. 초기값 없는 `let b: f32`가 그것을 선언하고 값은 나중 대입에 맡깁니다. 대입하지 않은 경로에서 읽으면 거부되며(`TS8075`, 규칙 7.6), 모든 타깃이 이 지역 변수를 영에서 시작합니다.',
           'statements.for':
@@ -3738,7 +3736,7 @@ export const ko: Copy = {
         h1: `${glsl}을 TypeShade로`,
         intro: `WebGL2용 셰이더는 ${glsl}로 씁니다. 그 대부분에는 두 타깃에 같은 프로그램을 생성하는 TypeShade 표기가 있습니다. 각 구성 요소의 TypeShade 표기와 WebGPU 전용 여부, 두 타깃 모두에서 거부하는 문법을 함께 정리합니다. [WGSL과 ${glsl} 비교](conceptsWgsl)에서는 셰이더 하나를 두 타깃으로 컴파일하고 서로 다른 곳을 짚습니다.`,
         readingH: '표 읽는 법',
-        readingP: `오른쪽 칸은 커밋 ${facts.pinnedCommit}의 컴파일러가 실제로 받아들이는 소스이고, 왼쪽 칸은 그 컴파일러가 같은 소스에 대해 생성한 ${glsl}이입니다. GLSL에 형태가 없는 행에서는 없는 표기를 지어내는 대신 컴파일러가 직접 내는 문장을 그 칸에 싣습니다.`,
+        readingP: `오른쪽 칸은 커밋 ${facts.pinnedCommit}의 컴파일러가 실제로 받아들이는 소스이고, 왼쪽 칸은 같은 컴파일러가 생성한 ${glsl} 코드입니다. GLSL에 대응하는 형태가 없는 행에는 없는 표기를 만들어 넣지 않고 컴파일러가 내는 문장을 싣습니다.`,
         colGlsl: glsl,
         colSource: 'TypeShade',
         colNote: '설명',
@@ -3798,7 +3796,7 @@ export const ko: Copy = {
         varyingsP:
           '버텍스 스테이지에서 프래그먼트 스테이지로 넘어가는 값은 양쪽 모두에서 `@location(n)` 필드입니다. GLSL은 그 둘을 이름으로 잇고 WebGPU는 번호로 이으므로, 생성된 GLSL에서 맞아야 하는 것은 필드 이름입니다.',
         capabilitiesH: '확장과 기능',
-        capabilitiesP: `\`#extension\` 줄은 GPU 기능의 한쪽 절반이고, 호스트의 \`getExtension\` 호출이 나머지 절반이다. GLSL의 프로파일에는 행이 ${facts.glslCapabilities}개 있고 그중 하나만 소스에 지시문을 넣습니다. 행이 아예 없는 기능은 텍스트를 쓰기도 전에 GLSL에서 모듈을 차단합니다.`,
+        capabilitiesP: `\`#extension\` 지시문과 호스트의 \`getExtension\` 호출이 함께 GPU 확장을 사용 설정합니다. GLSL 프로파일에는 ${facts.glslCapabilities}개 항목이 있으며, 그중 하나는 소스에 지시문을 넣습니다. 항목이 없는 기능을 쓰면 GLSL 코드를 생성하기 전에 모듈을 거부합니다.`,
         enablesP:
           '`"use typeshade"` 파일에는 이 네 가지를 적을 방법이 없습니다. `"enable ..."`은 WGSL 확장 이름을 받는데 넷 중 어느 것도 WGSL 확장이 아니므로, 호스트가 필요한 기능을 컴파일된 모듈의 `enables`에 적는다: `{ ...compile(source).module, enables: [...] }`. 스토리지 바인딩, 컴퓨트 진입점, `@builtin("clip_distances")`처럼 모듈의 모양에서 따라오는 기능은 파일에서 도출되며, 그중 어느 것도 이 표에 행이 없습니다.',
         variablesH: 'builtin 변수',
@@ -3816,7 +3814,7 @@ export const ko: Copy = {
         restP:
           '컴파일러가 표기할 수 있는 내장 함수와 두 타깃에서 각각 생성하는 텍스트는 [내장 함수 표](languageBuiltins)에 있습니다.',
         edslH: '관련 페이지',
-        edslP: `이 페이지는 구성 요소를 하나씩 다룹니다. [GLSL 셰이더 옮기기](internalsGlslShader)는 ${glsl} 셰이더 전체에 걸린 것을 다룬다. 유니폼 블록, \`#ifdef\`, \`#include\`, \`#extension\`이 그 예이다. 그 페이지의 행마다 \`"use typeshade"\` 표기가 있다. [WGSL과 ${glsl} 비교](conceptsWgsl)는 셰이더 하나를 두 타깃으로 컴파일해 보여 주고, 이 페이지의 WGSL 쪽은 [WGSL을 TypeShade로](languageFromWgsl)입니다.`,
+        edslP: `이 페이지는 구성 요소를 하나씩 다룹니다. [GLSL 셰이더 옮기기](internalsGlslShader)에서는 ${glsl} 셰이더 전체에 포함된 유니폼 블록, \`#ifdef\`, \`#include\`, \`#extension\` 등을 다룹니다. 각 행에 \`"use typeshade"\` 표기가 있습니다. [WGSL과 ${glsl} 비교](conceptsWgsl)에서는 셰이더 하나를 두 타깃으로 컴파일해 비교합니다. 이 페이지의 WGSL 대응 내용은 [WGSL에서 TypeShade로](languageFromWgsl)에서 볼 수 있습니다.`,
         refusals: {
           'uniforms.precision': '적을 것이 없습니다.',
         },
@@ -3883,8 +3881,8 @@ export const ko: Copy = {
         h1: '내장 함수',
         intro: `내장 함수는 GPU 셰이더 언어가 제공하는 함수입니다. 호출은 컴파일러 안에서 공통 이름으로 표현하며, 각 백엔드가 타깃 언어의 표기로 변환합니다. 그래서 한 번 작성한 호출이 두 벌로 생성됩니다. 레지스트리에 담긴 이름은 ${facts.builtins}개입니다.`,
         readingH: '한 행을 읽는 법',
-        readingP: `첫째 칸은 호출이 달고 다니는 이름이며, 인자가 들어갈 자리마다 플레이스홀더를 하나씩 넣었습니다. 다음 두 칸은 WGSL 백엔드와 ${glsl} 백엔드가 그 호출에 대해 쓰는 코드로, 고정된 커밋의 컴파일러 표기표를 그대로 실행해 얻었습니다. 이 가운데 ${facts.portableBuiltins}개는 두 타깃에서 표기가 같고, ${facts.glslAbsentBuiltins}개는 ${glsl}에 형태가 아예 없어 그 칸에 컴파일러가 낸 메시지를 싣습니다. ${facts.mathAliasBuiltins}개는 \`Math.\` 이름으로도 부를 수 있으며, 수학과 캐스트 표의 마지막 칸이 그 이름을 보여 준다. [WGSL과 ${glsl} 비교](conceptsWgsl)에서는 셰이더 하나를 두 타깃으로 컴파일하고 서로 다른 곳을 짚습니다.`,
-        idsP: `이 이름 가운데 몇 개는 컴파일러가 고르는 것이라 손으로 적지 않는다. 레이어 텍스처 읽기, 깊이 비교, 스토리지 fetch, 부호 없는 좌표로 하는 텍셀 읽기는 저마다 자기 이름을 받는다. 그래야 호출의 인자 순서가 어떤 텍스처에 쓰였는지에 따라 달라지지 않는다. 부호 없는 값의 \`abs\`와 정수 \`dot\`도 따로 이름을 받는다. ${glsl}에는 둘 다 그 타입의 오버로드가 없기 때문입니다.`,
+        readingP: `첫째 칸은 호출이 달고 다니는 이름이며, 인자가 들어갈 자리마다 플레이스홀더를 하나씩 넣었습니다. 다음 두 칸은 WGSL 백엔드와 ${glsl} 백엔드가 그 호출에 대해 쓰는 코드로, 고정된 커밋의 컴파일러 표기표를 그대로 실행해 얻었습니다. 이 가운데 ${facts.portableBuiltins}개는 두 타깃에서 표기가 같고, ${facts.glslAbsentBuiltins}개는 ${glsl}에 형태가 아예 없어 그 칸에 컴파일러가 낸 메시지를 싣습니다. ${facts.mathAliasBuiltins}개는 \`Math.\` 이름으로도 부를 수 있으며, 수학과 캐스트 표의 마지막 칸에서 그 이름을 확인할 수 있습니다. [WGSL과 ${glsl} 비교](conceptsWgsl)에서는 셰이더 하나를 두 타깃으로 컴파일하고 서로 다른 곳을 짚습니다.`,
+        idsP: `이 이름 가운데 몇 개는 컴파일러가 선택하므로 직접 쓰지 않습니다. 레이어 텍스처 읽기, 깊이 비교, 스토리지 fetch, 부호 없는 좌표로 하는 텍셀 읽기는 각각 별도의 이름을 사용합니다. 그래야 호출의 인자 순서가 어떤 텍스처에 쓰였는지에 따라 달라지지 않습니다. 부호 없는 값의 \`abs\`와 정수 \`dot\`도 따로 이름을 받는다. ${glsl}에는 둘 다 그 타입의 오버로드가 없기 때문입니다.`,
         precedenceH: '파일이 직접 선언한 이름',
         precedenceP:
           '파일에 선언한 함수는 같은 이름의 내장 함수보다 우선합니다. 그런 이름은 내장 함수가 되기 전에는 작성자의 함수를 가리켰고, 기능을 더한다고 해서 이미 돌아가던 프로그램의 뜻이 바뀌면 안 되기 때문입니다.',
@@ -3910,7 +3908,7 @@ export const ko: Copy = {
         },
         bitsP: `${glsl}에는 비트 내장 함수가 하나도 없습니다. 그래서 위 칸은 GLSL 생성기가 정의하는 작은 함수를 부릅니다. 그 정의는 해당 타깃에 있는 시프트와 마스크, 비교만으로 쓰여 있습니다. 하나도 부르지 않는 모듈은 정의도 싣지 않습니다.`,
         helpersH: 'GLSL 헬퍼 함수',
-        helpersP: `스토리지 버퍼는 ${glsl}에 형태가 없어서, 스토리지를 읽는 코드는 데이터 텍스처를 읽는 코드로 바뀝니다. 아래가 그 읽기를 대신하는 함수들이며, 모듈이 부르는 함수의 정의는 GLSL 생성기가 함께 생성합니다.`,
+        helpersP: `스토리지 버퍼는 ${glsl}에 형태가 없어서, 스토리지를 읽는 코드는 데이터 텍스처를 읽는 코드로 바뀝니다. 아래가 그 읽기를 대신하는 함수들이며, 모듈에서 호출하는 함수의 정의는 GLSL 생성기가 함께 생성합니다.`,
         sourceP:
           '이 페이지의 모든 행은 고정된 커밋의 [표기 레지스트리](intrinsicRegistry)에서 읽어 온 것이고, 사이트에서 별도로 작성한 항목은 없습니다.',
       },

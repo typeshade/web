@@ -44,7 +44,7 @@ hardware details, generated compiler output, model results, or support guarantee
 - `/examples/` and `/ko/examples/`: MNIST MLP code, source repository, correctness tests, and
   implementation status.
 
-Every English route has a separately authored Korean counterpart with canonical and alternate
+Every English route has a Korean translation of its reviewed English source with canonical and alternate
 language links. Shared top navigation provides a short product-level route; a documentation
 sidebar and previous/next links support deeper reading. Mobile turns the sidebar into a
 horizontal navigation row.
@@ -73,8 +73,8 @@ horizontal navigation row.
 
 ## Content and accessibility
 
-- Write in plain sentences for TypeScript developers. English is the source route; Korean is
-  separately written, uses 합쇼체, and does not translate API identifiers.
+- Write in plain sentences for TypeScript developers. Follow [Website content](../../docs/content-style.md). English is the source; Korean
+  translates its meaning and tone, uses polite endings, and preserves API identifiers.
 - Explain the observable behavior before implementation detail. Link claims to code or project
   documentation.
 - The Playground accepts only numeric matrix values and fixed operations. It does not evaluate
