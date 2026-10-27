@@ -1337,92 +1337,60 @@ export const en = {
   },
 
   front: {
-    title: 'TypeShade, a shader language you write in TypeScript',
     searchTitle: 'TypeShade',
-    lede: `TypeShade is a language of its own, with TypeScript's syntax, types and editor. A file that starts with \`"use typeshade"\` emits WGSL for WebGPU and ${glsl} for WebGL2. ${facts.shadeRenderable} of the ${facts.shadeExamples} examples in the repository emit both from one file.`,
-    playground: 'Playground',
-    quickStart: 'Quick Start',
+    hero: { before: 'Shader code,', accent: 'in TypeScript.' },
+    lede: `A shader language with TypeScript syntax and editor support. One source emits WGSL for WebGPU and ${glsl} for WebGL2.`,
+    playground: 'Open Playground',
+    quickStart: 'Get started',
+    why: 'About the language',
+    source: 'Authoring language',
+    language: {
+      h: 'The language',
+      p: 'Types, resources and entry points expressed in TypeScript syntax. The compiler checks the GPU rules.',
+      more: 'Read the language guide',
+      rows: [
+        {
+          title: 'Types and layouts',
+          code: 'f32, vec3, mat4',
+          body: 'GPU types are built in. Classes and type aliases describe the values passed between shader stages.',
+        },
+        {
+          title: 'Resources and stages',
+          code: '@vertex / @fragment / @compute',
+          body: 'Declare uniform and storage bindings, then mark exported functions with the stage they run on.',
+        },
+        {
+          title: 'Host integration',
+          code: 'import { fs } from "./scene.shade.ts"',
+          body: 'The Vite plugin exposes shader exports to your application with typed bindings. The host owns the device and resources.',
+        },
+      ],
+    },
     targets: {
-      h: 'One file, two targets',
-      p: 'The compiler lowers `hello.shade.ts` to one intermediate representation and emits both targets from it. The file imports nothing, so it is the whole program; the pane beside it holds the WGSL and the GLSL ES 3.00 fragment a host hands to WebGPU or WebGL2, one tab each.',
+      h: 'Source and output',
+      p: 'One intermediate representation, two shader targets. Inspect the complete source and the code it produces.',
+      summary: 'Compare source, WGSL and GLSL',
+      count: `${facts.shadeRenderable} of ${facts.shadeExamples} repository examples emit both targets.`,
       source: 'hello.shade.ts',
       wgsl: 'WGSL',
       glsl: `${glsl} fragment`,
     },
+    oracle: {
+      h: 'Verification',
+      p: 'The CPU backend evaluates the same module in f64. The test suite checks compiler algebra, compiles WGSL with Tint and links GLSL with WebGL2.',
+      more: 'Explore the checks',
+      caption: 'Build-time captures of the same gradient shader.',
+    },
     gallery: {
       h: 'Examples',
-      p: `${facts.shadeExamples} examples ship with the compiler, from cartographic passes to compute kernels. Browse the collection or open an example below.`,
-      all: 'All examples',
-      /** What a canvas of one example says under it, by what drew the frame. The front page's
-       *  tiles are stills and carry none of this; the example's own page runs the shader. */
-      tile: (title: string) => ({
-        neutral: `${title}, drawn at build time.`,
-        webgpu: `${title}, running on WebGPU.`,
-        webgl2: `${title}, running on WebGL2.`,
-        none: `${title}, drawn at build time; this browser has no WebGPU or WebGL2.`,
-        reduced: `${title}, one frame, since this system asks for less motion.`,
-      }),
-    },
-    map: {
-      h: 'What carries over from TypeScript',
-      p: 'GPU code has three things: resources, value layouts and entry points. TypeShade gives each a place TypeScript already has, and keeps the rest of the language where it fits the GPU. The full rules are in the [language guide](guide).',
-      rows: [
-        [
-          '"use typeshade"',
-          'The directive is the language boundary',
-          "It is the first statement of the file, where a JavaScript directive goes. A file without it does not compile as a shader; with it, everything under it is checked as TypeShade and lowered to the compiler's intermediate representation.",
-        ],
-        [
-          'f32, vec3, mat4, sin(x)',
-          'GPU types and builtins are globals',
-          '`f32`, `vec3`, `mat4` and the builtins such as `sin` and `vec4(...)` need no import, and `Math.sin` and `Math.PI` are aliases of the same operations. The checker applies the shader rules to them in the editor, before any code is emitted.',
-        ],
-        [
-          'class VsIn { @location(0) uv: vec2 }',
-          'A type or a class is a value layout',
-          'Plain data is a `type` alias; a `class` carries per-field metadata such as `@location` and `@builtin`, and its fields lay out the struct both targets receive.',
-        ],
-        [
-          'new Circle(center, 0.3).coverage(p)',
-          'A class is a TypeScript class',
-          'Fields, a constructor and `new`, methods and static functions, `extends` with `super` and `abstract`, generic classes and functions, and the mixin pattern all compile. A method lowers to a function that takes the struct first, and a generic is compiled once per set of type arguments. The [gallery](examples) has a file for each of them.',
-        ],
-        [
-          'declare const u: uniform<Camera>',
-          'declare names a resource the host fills',
-          '`uniform<T>` reads a uniform block, and `storage<T, "read_write">` is a storage buffer the shader writes. There is no initializer: the host owns the slot, in the order the file declares them, and [`reflect()`](apiReflect) reports its layout.',
-        ],
-        [
-          '@fragment export function fs(v: VsOut): vec4',
-          'A decorated export is an entry point',
-          '`@vertex`, `@fragment` and `@compute([64, 1, 1])` name the stage; a function without one is a helper. Stage inputs are explicit parameters, a `@builtin("vertex_index")` or a `@location`. There is no hidden global.',
-        ],
-        [
-          'await scale({ k, xs, ys }, 4)',
-          'A host file imports the module and calls it',
-          "Through the `typeshade/vite` plugin, a host file imports a `.shade.ts` and calls what it exports. A helper runs on the CPU, a `@compute` entry runs on WebGPU or the WebGL2 compute tier where supported, and a full-screen `@fragment` entry draws into a canvas as `fs(canvas, bindings)`. The bindings object is typed from the module, so a binding the call leaves out is a type error on the host's line.",
-        ],
-      ],
-    },
-    oracle: {
-      h: 'Checked against the CPU',
-      p: "The same module runs on the CPU in f64, and [the test suite](checks) checks the compiler's algebra against it. Every emit is compiled on Tint and linked on WebGL2 on each push. Below, the gradient pass drawn by each backend from the same file.",
-      webgpu: {
-        neutral: 'The gradient pass, drawn at build time from the emitted WGSL.',
-        webgpu: 'The gradient pass, drawn by WebGPU from the emitted WGSL.',
-        webgl2: 'The gradient pass, drawn by WebGL2; this browser has no WebGPU.',
-        none: 'The gradient pass, drawn at build time; this browser has no WebGPU or WebGL2.',
-      },
-      webgl2: {
-        neutral: `The gradient pass, drawn at build time from the emitted ${glsl}.`,
-        webgpu: `The gradient pass, drawn by WebGL2 from the emitted ${glsl}.`,
-        webgl2: `The gradient pass, drawn by WebGL2 from the emitted ${glsl}.`,
-        none: 'The gradient pass, drawn at build time; this browser has no WebGL2.',
-      },
+      p: 'Open a shader, inspect its source and run it in the Playground.',
+      all: 'Browse all examples',
     },
     install: {
-      h: 'Install',
-      p: `Install the repository with npm through its Git URL. Import the package as \`typeshade\`; [Quick Start](quickStart) covers installation and the first shader. The ${facts.nextVersion} registry release is not published yet.`,
+      h: 'Start with TypeShade',
+      p: 'Install from the Git repository. The quick start walks through a shader and the host code that runs it.',
+      note: `The ${facts.nextVersion} registry release is not published yet.`,
+      more: 'Follow the quick start',
     },
   },
   quickStart: {
