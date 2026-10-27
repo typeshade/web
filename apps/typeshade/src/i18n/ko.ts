@@ -186,7 +186,7 @@ export const ko: Copy = {
 
   meta: {
     title: 'TypeShade: WebGPU와 WebGL2를 위한 TypeScript 셰이더 언어',
-    description: `파일 맨 위에 "use typeshade"를 쓰면 WebGPU용 WGSL과 WebGL2용 ${glsl}이 생성됩니다. 같은 소스를 CPU에서 f64로 실행해 출력을 대조할 수 있습니다.`,
+    description: `TypeShade는 TypeScript 문법으로 셰이더를 작성하는 언어입니다. WebGPU용 WGSL과 WebGL2용 ${glsl}으로 컴파일합니다.`,
     ogAlt: 'TypeShade: WebGPU와 WebGL2를 위한 하나의 셰이더 소스. 렌더링된 metaballs 셰이더.',
   },
 
@@ -927,8 +927,8 @@ export const ko: Copy = {
     description: `브라우저에서 "use typeshade" 파일을 작성해 WGSL과 ${glsl}으로 컴파일합니다. WebGPU나 WebGL2에서 실행하고 진단과 리플렉션도 확인할 수 있습니다.`,
     h1: 'Playground',
     intro:
-      'TypeShade TypeScript 파일을 작성하고 브라우저에서 컴파일한 뒤, 나온 WGSL과 진단을 확인하십시오.',
-    help: 'Monaco 편집기에서 TypeShade를 작성하고 여기서 컴파일합니다.',
+      '브라우저에서 셰이더를 편집하고 실행할 수 있습니다. 컴파일된 코드와 오류 메시지도 확인할 수 있습니다.',
+    help: 'Monaco 편집기에서 셰이더 코드를 작성합니다.',
     run: '컴파일',
     reset: '예제 복원',
     editor: 'TypeShade 소스',
@@ -945,7 +945,7 @@ export const ko: Copy = {
     loading: '편집기를 불러옵니다',
     clean: '진단 없음.',
     noOutput: 'WGSL 출력이 없습니다.',
-    directive: '파일 맨 위에 "use typeshade" 지시어를 쓰면 컴파일합니다.',
+    directive: '셰이더 파일의 첫 문장에 "use typeshade"를 추가합니다.',
     unavailable: '편집기를 불러오지 못했습니다. 연결을 확인하고 페이지를 새로 고치십시오.',
     starting: '언어 서비스를 시작합니다',
     serviceFailed: '언어 서비스가 멈췄습니다. 페이지를 새로 고치십시오.',
@@ -1288,46 +1288,46 @@ export const ko: Copy = {
 
   front: {
     searchTitle: 'TypeShade',
-    hero: 'TypeScript 문법의 셰이더 언어',
-    lede: `TypeShade는 TypeScript 문법으로 작성한 셰이더를 컴파일합니다. WebGPU용 WGSL과 WebGL2용 ${glsl}을 생성하며, TypeScript 편집기 도구를 사용할 수 있습니다.`,
+    hero: 'TypeScript로 작성하는 셰이더',
+    lede: `TypeShade는 TypeScript 문법을 사용하는 셰이더 언어입니다. 작성한 코드를 WebGPU용 WGSL과 WebGL2용 ${glsl}으로 컴파일합니다.`,
     playground: 'Playground 열기',
     quickStart: '시작하기',
     why: '언어 소개',
     source: '작성 언어',
     language: {
       h: '언어 기능',
-      p: '타입, 리소스, 엔트리 포인트를 TypeScript 문법으로 표현합니다. 컴파일러가 GPU 규칙을 검사합니다.',
+      p: '변수와 함수는 TypeScript 문법으로 작성합니다. GPU에 필요한 타입과 리소스 선언, 셰이더 단계별 규칙은 TypeShade가 정의합니다.',
       more: '언어 가이드',
       rows: [
         {
           title: '타입과 레이아웃',
           code: 'f32, vec3, mat4',
-          body: 'GPU 타입을 기본 제공합니다. 클래스와 타입 별칭으로 셰이더 단계 사이에 전달할 값의 구조를 정의합니다.',
+          body: '스칼라, 벡터, 행렬 타입을 제공합니다. 클래스와 타입 별칭으로 셰이더에서 사용할 데이터 구조를 정의합니다.',
         },
         {
-          title: '리소스와 단계',
+          title: '리소스와 진입점',
           code: '@vertex / @fragment / @compute',
-          body: 'uniform과 storage 바인딩을 선언하고, 내보내는 함수에 실행할 단계를 표시합니다.',
+          body: 'uniform과 storage로 GPU 리소스를 선언합니다. 함수에 데코레이터를 붙여 버텍스, 프래그먼트, 컴퓨트 진입점을 지정합니다.',
         },
         {
-          title: '호스트 연동',
+          title: '애플리케이션 연동',
           code: 'import { fs } from "./scene.shade.ts"',
-          body: 'Vite 플러그인으로 셰이더의 export를 타입이 있는 바인딩과 함께 가져옵니다. 호스트가 장치와 리소스를 관리합니다.',
+          body: 'Vite 플러그인을 사용하면 애플리케이션에서 셰이더 파일을 import하고 함수를 호출할 수 있습니다. 컴퓨트·프래그먼트 진입점 실행에 필요한 GPU 설정은 런타임이 처리합니다.',
         },
       ],
     },
     targets: {
       h: '컴파일 결과',
-      p: '.shade.ts 소스와 컴파일된 WGSL, GLSL 코드를 비교할 수 있습니다.',
+      p: '아래 예제에서 TypeShade 소스와 컴파일된 WGSL, GLSL 코드를 확인할 수 있습니다.',
       summary: '소스, WGSL, GLSL 비교하기',
-      count: `저장소 예제 ${facts.shadeExamples}개 중 ${facts.shadeRenderable}개가 두 타깃을 모두 생성합니다.`,
+      count: `저장소의 예제 ${facts.shadeExamples}개 중 ${facts.shadeRenderable}개는 WGSL과 GLSL을 모두 생성합니다. 나머지는 WGSL만 생성합니다.`,
       source: 'hello.shade.ts',
       wgsl: 'WGSL',
       glsl: `${glsl} 프래그먼트`,
     },
     oracle: {
       h: '컴파일러 검증',
-      p: 'CPU 백엔드가 같은 모듈을 f64로 평가합니다. 테스트는 컴파일러의 대수 연산을 검사하고, WGSL을 Tint로 컴파일하고 GLSL을 WebGL2로 링크합니다.',
+      p: '컴파일러 테스트는 CPU 계산 결과를 검사합니다. 생성된 WGSL은 Tint로, GLSL은 WebGL2로 컴파일해 확인합니다.',
       more: '검증 문서',
       caption: '같은 그라디언트 셰이더를 빌드 시점에 캡처한 결과입니다.',
     },
@@ -1338,8 +1338,8 @@ export const ko: Copy = {
     },
     install: {
       h: '설치',
-      p: 'Git 저장소에서 설치할 수 있습니다. 빠른 시작 문서는 셰이더 작성부터 호스트 코드에서 실행하는 방법까지 설명합니다.',
-      note: `${facts.nextVersion} 레지스트리 릴리스는 아직 게시되지 않았습니다.`,
+      p: '현재는 npm으로 Git 저장소의 소스를 설치합니다. 설치 후 설정과 실행 방법은 빠른 시작 문서에 있습니다.',
+      note: `${facts.nextVersion} 버전은 아직 npm에 배포하지 않았습니다.`,
       more: '빠른 시작',
     },
   },
@@ -1348,37 +1348,38 @@ export const ko: Copy = {
       hostH: '호스트 애플리케이션에 연결하기',
       boundaryH: 'TypeShade와 호스트의 경계',
       nextLearnH: '다음 학습',
-      p0: '`"use typeshade"`로 시작하는 파일은 셰이더 파일이며, 그 파일이 가져오는 셰이더 파일과 함께 한 프로그램으로 컴파일됩니다. 아래 예제가 TypeShade의 작성 인터페이스입니다.',
+      p0: '`"use typeshade"`로 시작하는 파일은 셰이더 소스입니다. 이 파일과 import한 셰이더 파일을 함께 컴파일합니다.',
       boundaryP:
-        'TypeShade 코드는 TypeScript처럼 작성하지만, `"use typeshade"`가 붙은 파일에서는 셰이더 언어 규칙이 적용됩니다. TypeScript의 타입과 문법으로 소스를 작성하며, GPU 타입, 리소스, 셰이더 스테이지에는 TypeShade의 언어 규칙이 적용됩니다.',
+        '셰이더 코드와 이를 실행하는 애플리케이션 코드는 별도 파일로 작성합니다. 셰이더 파일에는 `"use typeshade"`를 붙이며, GPU에서 사용할 타입과 리소스, 진입점을 정의합니다.',
       boundaryBullets: [
-        '`"use typeshade"`가 언어 경계를 선언합니다.',
-        'entry point의 GPU 입력은 `@builtin(...)` 같은 명시적인 매개변수로 표현합니다.',
-        '`uniform<T>`와 `storage<T>` 같은 리소스 타입은 GPU 리소스의 의미를 표현합니다.',
+        '`"use typeshade"`는 셰이더 파일을 표시합니다.',
+        'GPU가 진입점에 전달하는 값은 `@builtin(...)`이 붙은 매개변수로 받습니다.',
+        '`uniform<T>`와 `storage<T>`로 GPU 리소스를 선언합니다.',
       ],
       hostP0:
-        '호스트가 이 파일을 쓰는 방법은 세 가지입니다. 파일을 컴파일해 셰이더 소스를 자신의 WebGPU나 WebGL2 코드에 넘기거나, 파일을 가져와 그 파일이 내보내는 것을 부릅니다. 프레임을 직접 그리는 엔진이라면 세 번째 방법을 씁니다. 컴파일된 프로그램을 프로그램 런타임에 불러오는 방법이며, [WebGPU와 WebGL2](conceptsWebgpu)에서 설명합니다.',
+        '애플리케이션에서 셰이더를 사용하는 방법은 아래와 같습니다. 컴파일된 코드를 직접 WebGPU나 WebGL2에 전달하거나, Vite로 셰이더 파일을 import해 함수를 호출할 수 있습니다. 컴파일된 프로그램을 런타임에 불러오는 방법은 [WebGPU와 WebGL2](conceptsWebgpu)에서 설명합니다.',
       compileH: '파일 컴파일하기',
-      hostWgslLabel: '호스트가 WGSL을 소비하는 위치',
+      hostWgslLabel: 'WebGPU에 WGSL 전달하기',
       hostP1:
-        '지금 쓸 수 있는 방법입니다. 파일을 컴파일한 뒤, 호스트 애플리케이션이 생성된 WGSL 또는 GLSL ES 3.00 문자열을 WebGPU나 WebGL2에 넘깁니다.',
+        '셰이더 파일을 컴파일한 뒤, 생성된 WGSL 또는 GLSL ES 3.00 코드를 애플리케이션의 WebGPU나 WebGL2 코드에 전달합니다.',
       hostP2:
-        'TypeShade가 담당하는 것은 언어 의미와 셰이더 코드 생성입니다. device, pipeline, bind group, buffer, texture, command encoder 같은 GPU 런타임 객체의 생성과 수명 관리는 호스트가 담당합니다.',
+        '이 방식에서는 애플리케이션이 device, pipeline, bind group, buffer, texture, command encoder를 생성하고 관리합니다. TypeShade는 셰이더 코드를 생성합니다.',
       importH: '파일 가져오기',
-      importP: `Vite 플러그인은 Git에서 설치한 소스 패키지를 지원합니다. 호스트 파일이 \`.shade.ts\`를 가져와 그 파일이 내보내는 것을 부르면, 호출에 필요한 디바이스와 파이프라인은 TypeShade의 런타임이 만듭니다. 헬퍼는 CPU에서 실행됩니다. \`@compute\` 진입점은 \`await entry(bindings, workgroups)\`로 부릅니다. 지원하는 환경에서는 WebGPU나 WebGL2로 실행하고, 진입점이 쓴 값을 다시 읽어 옵니다. 전체 화면 \`@fragment\` 진입점은 \`entry(canvas, bindings)\`로 캔버스에 그리는데, WebGPU가 먼저이고 다음이 WebGL2, 마지막이 CPU입니다.`,
+      importP:
+        'Vite 플러그인을 설정하면 `.shade.ts` 파일을 import할 수 있습니다. export한 헬퍼 함수는 CPU에서 실행됩니다. `@compute` 진입점은 `await entry(bindings, workgroups)`로 호출하며, 지원되는 WebGPU 또는 WebGL2 환경에서 실행한 결과를 읽어 옵니다. 전체 화면 `@fragment` 진입점은 `entry(canvas, bindings)`로 호출합니다. WebGPU, WebGL2, CPU 순서로 사용 가능한 실행 방식을 선택하며, 필요한 디바이스와 파이프라인은 런타임이 생성합니다. 아래 설정은 Git에서 설치한 소스 패키지용입니다.',
       setupP:
         '설치 후에는 아래의 Vite 플러그인과 호스트 `tsconfig.json` 설정을 추가합니다. 스크립트는 Vite와 설치한 CLI를 `tsx`로 실행합니다. `prepare`는 `tsc`가 읽는 호스트 뷰를 만듭니다. `.gitignore`에 `*.shade.typeshade.ts`를 추가합니다.',
       viteLabel: 'Vite 플러그인, vite.config.ts',
-      tsconfigLabel: '호스트 tsconfig.json의 두 줄',
+      tsconfigLabel: '호스트 설정, tsconfig.json',
       packageLabel: '개발 스크립트, package.json',
       toolingLabel: 'Vite 개발 의존성',
       devLabel: '개발 서버 실행 명령',
       drawP:
-        '그러면 호스트 파일이 이 페이지 맨 위의 `hello.shade.ts`를 호출 하나로 그립니다. 버텍스 진입점은 아직 호스트 코드에서 부를 수 없어서 뷰가 `vs`를 `never`로 선언하고, `fs`는 캔버스 전체를 빨간색으로 채웁니다.',
+        '호스트 코드에서 이 페이지 위쪽의 `hello.shade.ts`를 가져와 `fs`를 호출하면 캔버스가 빨간색으로 채워집니다. 버텍스 진입점은 아직 호스트에서 직접 호출할 수 없어 `vs`의 타입은 `never`로 선언됩니다.',
       drawLabel: '호스트 파일에서 hello.shade.ts 그리기, app.ts',
-      untilP: `[WebGPU와 WebGL2](conceptsWebgpu)는 컴파일러, 호스트 호출, 프로그램 런타임의 소유권 경계를 설명합니다.`,
-      nextLearnP:
-        '언어 가이드는 TypeScript의 개념과 TypeShade의 GPU 실행 규칙을 연결해 설명합니다.',
+      untilP:
+        '실행 방식별로 애플리케이션과 런타임이 담당하는 작업은 [WebGPU와 WebGL2](conceptsWebgpu)에 정리되어 있습니다.',
+      nextLearnP: '언어 가이드에서 타입, 함수, 제어 흐름과 GPU 리소스 사용법을 설명합니다.',
       nextLinks: [
         { linkKey: 'languageTypes', label: 'Types: 타입과 GPU struct' },
         { linkKey: 'languageFunctions', label: 'Functions: helper와 entry point' },
@@ -1387,9 +1388,9 @@ export const ko: Copy = {
         { linkKey: 'languageResources', label: 'Resources: uniform과 storage' },
         { linkKey: 'languageStages', label: 'Shader stages: compute, vertex, fragment' },
       ],
-      nextLearnAllLink: '전체 Language Guide 보기',
+      nextLearnAllLink: '언어 가이드',
       nextEditorP:
-        '[VS Code 확장](editor)을 설치하면 입력하는 동안 진단과 파일이 컴파일되는 WGSL을 볼 수 있습니다.',
+        '[VS Code 확장](editor)을 설치하면 편집 중에 오류 메시지와 컴파일된 WGSL을 확인할 수 있습니다.',
     },
     title: 'TypeShade Quick Start: 설치와 첫 셰이더',
     description:
@@ -1397,13 +1398,13 @@ export const ko: Copy = {
     h1: 'Quick Start',
     runLabel: '컴파일러 실행 명령',
     installH: '설치',
-    p0: 'TypeScript 파일의 첫 문장에 `"use typeshade"`를 선언합니다. 이 지시어가 TypeShade 셰이더 언어로 넘어가는 경계를 만들며, 아래 예제는 class와 스테이지 데코레이터가 붙은 함수로 작성한 완전한 첫 셰이더입니다.',
-    p1: `호스트는 호출 하나로 파일을 컴파일합니다. 아래 gradient 패스를 \`${quickStartFile.shader.name}\`로 저장합니다. 유니폼 블록 하나와 버텍스 단계, 프래그먼트 단계가 든 ${quickStartFile.shader.lines}줄짜리 파일입니다. 그다음 [\`compile()\`](apiCompile)을 불러 WGSL을 출력하는 ${quickStartFile.host.lines}줄짜리 호스트 파일로 컴파일합니다.`,
+    p0: '셰이더 파일의 첫 문장에 `"use typeshade"`를 추가합니다. 아래 예제는 클래스로 함수의 반환 타입을 정의하고, 데코레이터로 버텍스와 프래그먼트 함수를 지정합니다.',
+    p1: `아래 코드를 \`${quickStartFile.shader.name}\`로 저장합니다. 유니폼과 버텍스·프래그먼트 함수를 포함한 ${quickStartFile.shader.lines}줄의 셰이더입니다. 이어서 ${quickStartFile.host.lines}줄의 호스트 코드를 작성합니다. 이 코드는 [\`compile()\`](apiCompile)로 셰이더를 컴파일하고 WGSL을 출력합니다.`,
     p2: '실행하면 두 단계의 WGSL이 함께 출력됩니다. 프래그먼트 진입점은 여기 있습니다.',
-    p3: `같은 함수의 ${glsl} 단계와, [\`reflect()\`](apiReflect)가 복원한 유니폼 레이아웃은 [예제 페이지](examples)에 있다. 나머지 API는 [작성 가이드](guide)를 보면 된다.`,
+    p3: `같은 함수의 ${glsl} 코드와 [\`reflect()\`](apiReflect)로 확인한 유니폼 레이아웃은 [예제 페이지](examples)에 있습니다. 문법과 사용법은 [언어 가이드](guide)에서 설명합니다.`,
     live: {
       h: '라이브 예제',
-      p: '`sin`이 x 좌표를 파동으로 바꾸고 `time`이 그 파동을 흘려보냅니다. 아래 파일이 그게 전부이고, 여기서 바로 돕니다. 한 줄을 고치면 다음 입력에 캔버스가 따라옵니다.',
+      p: '이 예제는 `sin`으로 줄무늬를 만들고 `time` 값에 따라 움직입니다. 코드를 수정하면 다시 컴파일해 캔버스에 표시합니다.',
       title: '사인 줄무늬',
       caption: '두 색 사이를 오가며 캔버스를 가로지르는 사인파.',
       anchor:
@@ -1424,53 +1425,59 @@ export const ko: Copy = {
   },
   motivation: {
     use: {
-      title: 'TypeShade란 무엇인가? TypeScript로 쓰는 셰이더 언어',
+      title: 'TypeShade 소개: 문법과 실행 방식',
       description:
-        'TypeScript의 개발 경험에서 출발해 셰이더 언어로 확장되는 TypeShade와 use typeshade의 의미를 설명합니다.',
-      h1: 'TypeScript에서 시작하는 셰이더 언어',
+        'TypeShade의 기본 문법, use typeshade 지시문, TypeScript와의 차이, 컴파일된 셰이더를 실행하는 방법을 설명합니다.',
+      h1: 'TypeShade 소개',
       sections: [
         [
-          'TypeShade는 무엇을 바꾸나요?',
-          'TypeShade는 TypeScript 코드를 GPU에서 그대로 실행하는 런타임이 아닙니다. TypeScript의 익숙한 문법과 개발 도구를 출발점으로 삼고, GPU 프로그램에 필요한 타입과 의미론을 가진 별도의 컴파일 언어로 해석합니다.',
+          'TypeShade란',
+          'TypeShade는 TypeScript 문법으로 셰이더를 작성하는 언어이자 컴파일러입니다. GPU에서 사용하는 타입과 연산을 정의하며, 작성한 코드를 WGSL이나 GLSL로 변환합니다.',
+          'typeshade는-무엇을-바꾸나요',
         ],
         [
-          '`use typeshade`는 언어 경계입니다',
-          '`"use typeshade"`는 파일 수준에서 TypeShade 프로그램임을 선언합니다. 이 한 줄을 기준으로 컴파일러는 일반 애플리케이션 코드와 다른 TypeShade 셰이더 의미론을 적용합니다. 셰이더 파일은 이 지시문으로 시작합니다.',
+          '`use typeshade` 지시문',
+          '셰이더 파일은 `"use typeshade"`로 시작합니다. 컴파일러는 이 지시문이 있는 파일에 TypeShade의 타입 검사와 컴파일 규칙을 적용합니다.',
+          'use-typeshade-는-언어-경계입니다',
         ],
         [
-          'TypeScript에서 무엇이 그대로 익숙한가요?',
-          '함수, 타입 주석, 모듈, 표현식과 제어 흐름처럼 이미 알고 있는 언어 개념이 TypeShade의 작성 경험을 구성합니다. 하지만 TypeScript의 모든 기능을 그대로 실행할 수 있다는 뜻은 아닙니다. TypeShade는 GPU 실행 모델에 맞지 않는 기능을 제한하고, 차이가 있는 곳을 정적 진단으로 드러냅니다.',
+          '지원하는 TypeScript 문법',
+          '함수, 타입 주석, import와 export, 조건문과 반복문을 사용할 수 있습니다. 다만 일반 TypeScript 프로그램에서 사용하는 기능을 모두 지원하지는 않습니다. GPU 코드로 변환할 수 없는 구문은 컴파일 오류로 표시합니다.',
+          'typescript에서-무엇이-그대로-익숙한가요',
         ],
         [
-          'TypeScript와 TypeShade의 차이는 어디에 있나요?',
-          'TypeScript가 일반 프로그램의 타입과 실행을 설명한다면 TypeShade는 GPU 프로그램의 값, 벡터와 행렬, 리소스, 엔트리 포인트, 타깃별 제약까지 설명합니다. 같은 `function`이나 `if`를 보더라도 최종 프로그램은 GPU의 실행 모델을 따라야 합니다.',
+          'GPU 타입과 실행 규칙',
+          'TypeShade는 GPU용 숫자, 벡터, 행렬 타입과 리소스 선언을 제공합니다. `function`으로 선언한 함수와 `if` 조건문도 셰이더로 컴파일되므로, 사용하는 리소스와 연산이 실행 대상에서 지원되어야 합니다.',
+          'typescript와-typeshade의-차이는-어디에-있나요',
         ],
         [
-          '컴파일 결과는 무엇인가요?',
-          'TypeShade 소스는 하나의 중간 표현으로 내려간 뒤 호스트가 사용할 셰이더 소스로 출력됩니다. 현재 WebGPU에는 WGSL을, WebGL2에는 GLSL ES 3.00을 생성합니다. 호스트는 이 소스를 직접 작성한 WebGPU나 WebGL2 코드에 넘기거나, 컴파일된 프로그램을 프로그램 런타임 `typeshade/runtime`에 불러와 실행합니다.',
+          '컴파일과 실행',
+          '컴파일러는 WebGPU용 WGSL과 WebGL2용 GLSL ES 3.00을 생성합니다. 지원되는 기능은 출력 언어에 따라 다릅니다. 애플리케이션은 생성된 코드를 직접 WebGPU나 WebGL2에 전달하거나, `typeshade/runtime`으로 컴파일된 프로그램을 실행할 수 있습니다.',
+          '컴파일-결과는-무엇인가요',
         ],
         [
-          '어디서부터 배우면 되나요?',
-          'Quick start는 `"use typeshade"` 파일을 만드는 방법을 설명합니다. Language guide는 타입, 값과 표현식, 함수, 제어 흐름, GPU 실행 규칙을 다룹니다. 컴파일러의 검증 방식과 API는 Verification과 API reference에서 설명합니다.',
+          '관련 문서',
+          '빠른 시작은 설치부터 `"use typeshade"` 파일 작성과 실행까지 설명합니다. 언어 가이드는 문법과 GPU 실행 규칙을, 검증 문서는 컴파일러 테스트를 다룹니다. 함수별 사용법은 API 참조에 있습니다.',
+          '어디서부터-배우면-되나요',
         ],
       ],
-      familiarH: 'TypeScript 지식이 출발점이 됩니다',
+      familiarH: 'TypeScript와의 차이',
       familiarP:
-        'TypeShade는 익숙한 언어 개념을 버리지 않습니다. 대신 GPU에서 의미가 달라지는 지점을 명확하게 구분합니다.',
+        '문법이 같더라도 셰이더에서는 타입과 실행 방식이 달라집니다. 주요 차이는 다음 표와 같습니다.',
       rows: [
-        ['함수', '함수 선언과 호출', '셰이더 함수와 엔트리 포인트 규칙이 추가됩니다.'],
-        ['타입', '타입 주석과 추론', 'GPU-native 타입과 벡터·행렬 타입이 추가됩니다.'],
+        ['함수', '함수 선언과 호출', '데코레이터로 셰이더 진입점을 지정합니다.'],
+        ['타입', '타입 주석과 추론', 'GPU용 스칼라, 벡터, 행렬 타입을 사용합니다.'],
+        ['모듈', 'import / export', '셰이더 파일과 import한 셰이더 파일을 함께 컴파일합니다.'],
+        ['제어 흐름', 'if / for 등의 문법', '실행 대상에서 지원하는 조건문과 반복문을 사용합니다.'],
         [
-          '모듈',
-          'import / export',
-          '셰이더 파일은 자신이 가져오는 셰이더 파일과 함께 한 프로그램으로 컴파일됩니다.',
+          '실행',
+          'JavaScript 런타임',
+          '애플리케이션이 컴파일된 셰이더를 WebGPU나 WebGL2로 실행합니다.',
         ],
-        ['제어 흐름', 'if / for 등의 문법', 'GPU 실행 모델과 타깃 제약을 만족해야 합니다.'],
-        ['실행', 'JavaScript 런타임', '컴파일 결과를 WebGPU/WebGL2 호스트가 실행합니다.'],
       ],
-      furtherH: 'TypeScript와 JavaScript를 함께 참고하세요',
+      furtherH: 'TypeScript·JavaScript 참고 문서',
       furtherP:
-        'TypeShade 문서는 언어의 차이를 설명하는 데 집중합니다. 익숙하지 않은 TypeScript 또는 JavaScript 개념은 원문 문서를 함께 보면 더 빠르게 배울 수 있습니다.',
+        '타입 주석과 함수 선언은 TypeScript Handbook에, 표현식과 제어 흐름은 MDN JavaScript Guide에 설명되어 있습니다.',
       further: [
         [
           'TypeScript Handbook — Everyday Types',
@@ -1488,39 +1495,39 @@ export const ko: Copy = {
           'JavaScript의 표현식, 제어 흐름, 함수와 모듈에 대한 언어 배경',
         ],
       ],
-      columns: ['개념', 'TypeScript에서 익숙한 부분', 'TypeShade에서 추가되는 의미'],
+      columns: ['개념', 'TypeScript', 'TypeShade'],
     },
     title: 'TypeShade를 사용하는 이유와 도입 시 고려사항',
     description:
-      'TypeShade는 TypeScript 문법과 편집 도구로 GPU 프로그램을 작성하는 언어입니다. 셰이더 소스 공유, 여러 타깃으로 컴파일, CPU 기준값을 이용한 검증과 도입 시 고려할 제약을 설명합니다.',
+      'TypeShade에서 사용할 수 있는 개발 도구, 셰이더 코드 재사용, 애플리케이션 연동 방법과 지원 범위를 설명합니다.',
     h1: '왜 TypeShade인가',
     intro:
-      'TypeShade는 타입이 있는 소스 파일로 셰이더 로직을 작성하고, 지원하는 GPU 타깃으로 컴파일하는 언어입니다. TypeScript 개발 도구, 셰이더 소스 공유, 출력 검증을 같은 개발 과정에 연결합니다.',
+      'TypeShade를 사용하면 TypeScript 문법으로 셰이더를 작성하고 WGSL과 GLSL로 컴파일할 수 있습니다. 프로젝트에 도입할 때 필요한 도구와 지원 범위는 아래와 같습니다.',
     sections: [
       {
         id: 'typescript-tooling',
         h: 'TypeScript 개발 도구',
-        p: '함수, 클래스, 타입 주석, import를 이용해 익숙한 방식으로 셰이더 코드를 구성합니다. 파일 첫머리의 `"use typeshade"`는 셰이더 타입과 실행 규칙을 적용하는 경계입니다. [편집기 확장](editor)은 자동 완성, 셰이더 진단, 코드 탐색을 제공합니다. [TypeScript 대응표](languageFromTypescript)는 지원하는 각 구문이 어떻게 컴파일되는지 설명합니다.',
+        p: '함수, 클래스, 타입 주석, import로 셰이더 코드를 작성합니다. 파일은 `"use typeshade"`로 시작합니다. [편집기 확장](editor)은 자동 완성, 오류 표시, 코드 탐색을 지원합니다. 구문별 지원 여부와 컴파일 결과는 [TypeScript 대응표](languageFromTypescript)에 있습니다.',
       },
       {
         id: 'shared-source',
         h: '셰이더 소스 공유',
-        p: `WebGPU는 WGSL을, WebGL2는 ${glsl}을 사용합니다. 구현을 따로 관리하면 변경할 때마다 각 언어에 반영해야 합니다. TypeShade는 셰이더 프로그램을 공통 중간 표현으로 변환하고, 여기서 지원하는 타깃 코드를 생성합니다. 헬퍼 함수를 수정하면 같은 컴파일 과정에서 각 타깃의 출력에 반영됩니다. [타깃 가이드](conceptsWgsl)는 타깃별 기능 차이를 설명합니다.`,
+        p: `WebGPU는 WGSL을, WebGL2는 ${glsl}을 사용합니다. TypeShade에서는 같은 셰이더 소스를 각 언어로 컴파일할 수 있습니다. 함수의 내용을 바꾸고 다시 컴파일하면 두 출력에 반영됩니다. 다만 각 언어에서 지원하는 기능은 다릅니다. 자세한 차이는 [타깃 가이드](conceptsWgsl)에 있습니다.`,
       },
       {
         id: 'host-integration',
         h: '호스트 연동',
-        p: '컴파일러는 호스트가 확인하고 사용할 수 있도록 셰이더 소스와 리플렉션 메타데이터를 제공합니다. 애플리케이션은 이 출력을 자체 렌더러에 연결할 수 있습니다. Vite 플러그인을 쓰면 셰이더 모듈을 import하고 `typeshade/runtime`으로 진입점을 호출할 수도 있습니다. [WebGPU와 WebGL2 가이드](conceptsWebgpu)는 연동 방식과 호스트가 제공하는 리소스를 설명합니다.',
+        p: '자체 렌더러가 있는 애플리케이션은 컴파일된 셰이더 코드와 리소스의 타입·레이아웃 정보를 사용할 수 있습니다. Vite 플러그인으로 셰이더를 import해 함수를 호출하는 방법도 있습니다. 프로그램을 직접 불러와 실행하려면 `typeshade/runtime`을 사용합니다. 각 방식의 설정은 [WebGPU와 WebGL2 가이드](conceptsWebgpu)에 있습니다.',
       },
       {
         id: 'verification',
         h: '검증 기준',
-        p: 'CPU 오라클은 같은 중간 표현을 배정밀도로 계산합니다. 이 결과는 GPU 출력을 확인하는 기준값으로 쓰입니다. 컴파일러 검사에는 타깃 코드 컴파일, 출력 스냅샷, 차등 테스트도 포함됩니다. 부동소수점 결과는 실행 타깃에 따라 달라질 수 있습니다. [검증 페이지](checks)는 각 검사의 범위를 설명합니다.',
+        p: 'CPU 오라클은 셰이더 연산을 배정밀도로 계산하며, 테스트에서 비교할 기준값을 제공합니다. 컴파일러 테스트는 생성된 코드가 컴파일되는지, 저장된 예상 결과와 일치하는지도 확인합니다. GPU와 CPU의 부동소수점 계산 결과는 다를 수 있습니다. 구체적인 테스트와 한계는 [검증 문서](checks)에 있습니다.',
       },
       {
         id: 'constraints',
         h: 'GPU 제약',
-        p: '셰이더는 리소스, 셰이더 단계, 타깃별 규칙을 따라야 합니다. 일부 구문은 WGSL만 생성하며, WebGL2의 컴퓨트 실행은 지원하는 변환 방식과 기능 범위로 제한됩니다. TypeShade를 도입하면 컴파일 단계와 언어 규칙이 추가됩니다. [언어 가이드](guide)와 [타깃 가이드](conceptsWgsl)는 이 제약을 설명합니다. 타깃이 하나이거나 특정 타깃의 기능이 필요한 프로젝트는 기존 WGSL이나 GLSL로 요구사항을 충족할 수도 있습니다.',
+        p: '일부 기능은 WGSL로만 컴파일할 수 있습니다. WebGL2에서 컴퓨트를 실행할 때도 변환할 수 있는 연산과 리소스에 제한이 있습니다. 필요한 기능이 지원되는지는 [언어 가이드](guide)와 [타깃 가이드](conceptsWgsl)에서 확인할 수 있습니다. 도입 시에는 기존 빌드에 TypeShade 컴파일 과정도 추가해야 합니다.',
       },
       {
         id: 'project-status',
@@ -1715,18 +1722,19 @@ export const ko: Copy = {
   checks: {
     title: 'TypeShade 검증: CPU 오라클, 컴파일 게이트, 골든 파일',
     description:
-      'TypeShade의 CI가 푸시마다 실행하는 것: f64 CPU 오라클, Tint와 실제 WebGL2 컨텍스트에서 실행되는 컴파일 게이트, 출력마다의 골든 파일.',
+      'TypeShade 컴파일러의 CPU 계산 테스트, WGSL·GLSL 컴파일 검사, 저장된 예상 출력과의 비교 방법을 설명합니다.',
     h1: '검증 방식',
     ciH: '푸시마다 하는 검사',
-    intro: '저장소의 CI는 푸시와 풀 리퀘스트마다 [CI 워크플로](ciGates)에서 다음을 실행합니다.',
+    intro:
+      '컴파일러 저장소의 [CI 워크플로](ciGates)에 정의된 주요 검사입니다. main 브랜치에 푸시할 때 실행하며, 문서만 수정한 풀 리퀘스트에서는 GPU 검사를 생략합니다.',
     items: [
-      `같은 모듈을 f64 산술로 실행되는 CPU 함수로도 컴파일합니다. 이것이 기준값을 내는 오라클입니다. 기본 모드에서는 동등 비교만 먼저 f32로 반올림해 GPU와 맞추고, 연산마다 반올림하는 f32 모드는 따로 켭니다. 테스트는 이 함수를 알려진 답과 맞춰 보고, 생성된 JavaScript라는 두 번째 CPU 백엔드와도 맞춰 봅니다. 둘은 비트 단위로 같아야 합니다. 오라클은 드라이버의 반올림에 대해서는 아무것도 말해 주지 않습니다. 이 저장소에서는 GPU 출력을 오라클과 맞춰 보지 않습니다. WGSL은 결과를 정해 두었는데 ${glsl}은 정하지 않은 곳에서는 오라클이 WGSL을 따른다(규칙 11.5). [src/core/oracle.ts](oracle)`,
-      `컴파일 게이트는 등록된 예제를 전부 출력합니다. WGSL은 헤드리스 Chromium 안의 Tint에 넘기고, 렌더링 가능한 예제의 ${glsl} 두 단계는 실제 WebGL2 컨텍스트에서 컴파일하고 링크합니다. 컴파일될 수 없는 셰이더도 각 컴파일러에 하나씩 넘깁니다. 어느 쪽이든 그것을 받아들이면 게이트는 실패하고, 예제에 대한 판정은 무효가 됩니다. [scripts/compile-gate.ts](compileGate)`,
-      '골든 파일에는 모든 예제의 출력 바이트가 들어 있어서, 백엔드가 조금이라도 바뀌면 리뷰에서 diff로 드러납니다. [emit-goldens.test.ts](goldens)',
+      `CPU 오라클은 셰이더 연산을 f64로 계산합니다. 기본 모드에서는 동등 비교 전에 값을 f32로 반올림하며, 매 연산에서 반올림하는 f32 모드도 있습니다. 테스트는 알려진 정답 및 별도의 JavaScript 백엔드와 결과를 비교합니다. f64 결과만으로 GPU 드라이버의 반올림 동작을 검증할 수는 없습니다. WGSL은 결과를 정의하지만 ${glsl}은 정의하지 않는 연산에서는 WGSL 규칙을 따릅니다(규칙 11.5). 구현은 [src/core/oracle.ts](oracle)에 있습니다.`,
+      `컴파일 검사는 등록된 예제에서 생성한 WGSL을 Chromium의 Tint에 전달합니다. 렌더링 가능한 예제의 ${glsl} 버텍스·프래그먼트 코드는 WebGL2에서 컴파일하고 링크합니다. 오류가 있는 셰이더도 함께 넣어 검사 도구가 실제로 오류를 감지하는지 확인합니다. 구현은 [scripts/compile-gate.ts](compileGate)에 있습니다.`,
+      '골든 파일은 비교 기준으로 저장한 컴파일 결과입니다. 새로 생성한 코드와 바이트 단위로 비교하므로, 출력이 바뀌면 테스트가 실패합니다. 의도한 변경은 결과 파일을 갱신하고 코드와 함께 검토합니다. [emit-goldens.test.ts](goldens)',
     ],
     pairH: '두 백엔드에서 같은 패스',
     pairIntro:
-      '첫 페이지의 gradient 패스를 백엔드마다 한 번씩 그렸습니다. 두 백엔드의 픽셀 비교는 아직 커밋되어 있지 않습니다.',
+      '그라디언트 셰이더의 WebGPU와 WebGL2 렌더링 결과입니다. 이 화면은 결과를 눈으로 비교하기 위한 예제이며, 픽셀 일치를 판정하지는 않습니다.',
     gpuFrame: {
       neutral: '컴파일된 WGSL로 빌드할 때 WebGPU에서 그렸습니다.',
       webgpu: '컴파일된 WGSL로 지금 WebGPU에서 그리고 있습니다.',
@@ -1741,7 +1749,7 @@ export const ko: Copy = {
     },
     authorTime: {
       h: '코드를 쓰는 동안',
-      p: '유니폼 블록은 한 번 선언하고, 필드를 읽는 곳마다 그 선언에 맞춰 타입 검사를 받습니다. 하나만 잘못 써도 문자열이 GPU에 닿기 전에 편집기가 알려 주고, 컴파일러도 같은 코드로 그 파일을 거부합니다.',
+      p: '아래 예제는 유니폼에 없는 필드를 읽어 오류를 발생시킵니다. 편집기의 언어 서비스와 컴파일러가 같은 위치에서 같은 오류 코드를 반환하는지 확인합니다.',
       caption: `${err.wrongLine}행에서 잘못 읽은 필드, 그 줄이 내는 진단, 그리고 읽으려던 블록에 대해 [\`reflect()\`](apiReflect)가 복원한 ${std} 레이아웃입니다. 필드 ${err.layout.fields.length}개에 ${err.layout.size}바이트이고, 첫 필드 뒤의 빈 공간은 정렬 때문에 생긴 자리입니다.`,
     },
   },
@@ -2314,7 +2322,7 @@ export const ko: Copy = {
     },
     shade: {
       h: 'TypeScript 소스로 쓴 예제',
-      p: `예제는 모두 \`"use typeshade"\`로 시작하는 TypeScript 파일이고, \`compile()\`이 파일의 바이트를 그대로 읽어 컴파일한다. 파일마다 언어의 한 부분을 보여 주므로 이 페이지에서도 언어 기능별로 분류한다. 이 가운데 ${facts.shadeRenderable}개는 ${glsl} 형태가 있고, 나머지는 WGSL만 생성합니다. 페이지가 그릴 수 있는 예제에는 그림이 붙습니다.`,
+      p: `예제는 \`"use typeshade"\`로 시작하는 셰이더 파일이며, \`compile()\`로 컴파일합니다. 사용하는 언어 기능에 따라 분류했습니다. ${facts.shadeRenderable}개는 ${glsl}도 생성하며, 나머지는 WGSL만 생성합니다. 렌더링을 지원하는 예제에는 미리보기가 있습니다.`,
       groups: {
         cartographic: '지도',
         screen: '화면 공간',
@@ -2748,7 +2756,7 @@ export const ko: Copy = {
         'TypeShade 문법과 GPU 실행 규칙을 예제로 설명하는 가이드입니다. 타입, 리소스, 함수, 셰이더 스테이지가 컴파일 결과에 미치는 영향도 함께 다룹니다.',
       h1: 'TypeShade 언어 가이드',
       intro:
-        'TypeShade 셰이더의 문법은 TypeScript와 같습니다. 이 가이드는 컴파일 규칙과 GPU 실행 방식을 설명합니다.',
+        'TypeShade는 TypeScript 문법으로 셰이더를 작성합니다. 이 가이드는 지원하는 문법과 GPU 실행 방식을 설명합니다.',
       boundaryH: '1. `use typeshade`란?',
       boundaryP:
         '`"use typeshade"`는 TypeShade 셰이더 파일을 나타내는 첫 지시문입니다. 컴파일러는 이 지시문으로 파일을 구분하고, GPU 타입과 리소스, 스테이지, builtin 규칙을 적용합니다.',
