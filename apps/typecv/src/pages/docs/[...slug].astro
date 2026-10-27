@@ -4,6 +4,7 @@ import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import "@typeshade/site-ui/code-highlight.css";
 import {
   prepareMarkedHighlights,
+  typescriptFenceLanguage,
 } from "@typeshade/site-ui/code/highlight";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import { Marked, Renderer } from "marked";
@@ -100,7 +101,7 @@ renderer.link = function ({ href, title, tokens }) {
 renderer.codespan = ({ text }) =>
   highlighted.get(`inline:${text}`) ?? `<code>${text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</code>`;
 renderer.code = ({ text, lang }) => {
-  if (/^(?:ts|typescript|tsx)$/.test((lang ?? "").trim().toLowerCase()))
+  if (typescriptFenceLanguage(lang))
     return highlighted.get(`block:${lang}:${text}`) ?? `<pre><code>${text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</code></pre>\n`;
   const safe = text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
   return `<pre><code${lang ? ` class="language-${lang.replaceAll('"', "&quot;")}"` : ""}>${safe}</code></pre>\n`;

@@ -1,31 +1,5 @@
 ---
-import Eyebrow from "@typeshade/site-ui/astro/Eyebrow";
-import "../../styles/lab-page.css";
-import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
-import SiteLayout from "../../layouts/SiteLayout.astro";
-import SfmLab from "../../components/SfmLab";
-const description =
-  "로컬 영상이나 준비된 프레임 묶음에서 프레임을 추출한 뒤 브라우저에서 실험적인 TypeShade GPU 특징 매칭과 증분 희소 복원을 실행합니다.";
+import LabPage from "../../components/LabPage.astro";
 ---
 
-<SiteLayout
-  locale="ko"
-  active="lab"
-  title="SfM 실험실"
-  description={description}
->
-  <ReadingSurface>
-    <div class="lab-main">
-      <header class="lab-header">
-        <Eyebrow>TYPECV / SFM LAB</Eyebrow>
-        <h1>영상에서 장면 복원하기</h1>
-        <p>
-          로컬 영상이나 준비된 프레임 묶음을 선택하세요. 최대 8개 프레임을
-          추출하고 가정한 초점거리를 사용해 실험적인 GPU 특징 매칭과 증분 희소
-          복원을 실행합니다. 결과는 영상 내용과 보정 가정에 따라 달라집니다.
-        </p>
-      </header>
-      <SfmLab client:load locale="ko" />
-    </div>
-  </ReadingSurface>
-</SiteLayout>
+<LabPage locale="ko" />

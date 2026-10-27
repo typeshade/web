@@ -1,0 +1,126 @@
+---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import LinkItem from "@typeshade/site-ui/astro/LinkItem";
+import LinkList from "@typeshade/site-ui/astro/LinkList";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
+import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import CodeBlock from "../CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
+import { firstOperation } from "../../content/code-examples";
+import { guideCopy, type GuideLocale } from "../../content/guide-copy";
+import "../../styles/docs.css";
+
+const { locale } = Astro.props as { locale: GuideLocale };
+const copy = guideCopy[locale];
+const isKo = locale === "ko";
+const base = isKo ? "/ko" : "";
+---
+
+<SiteLayout
+  locale={locale}
+  active="start"
+  title={copy.title}
+  description={copy.description}
+>
+  <ReadingSurface class="nn-docs">
+    <article class="docs-article">
+      <Breadcrumbs aria-label="Breadcrumb">
+        <a href={`${base}/`}>TypeNN</a>
+        <span>/</span>
+        <span>{copy.home}</span>
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">{copy.eyebrow}</Fragment>
+        <Fragment slot="title">{copy.heading}</Fragment>
+        <Fragment slot="description">{copy.intro}</Fragment>
+      </PageHeading>
+      <section class="doc-section" id="install">
+        <h2>{copy.statusTitle}</h2>
+        <p>{copy.status}</p>
+        <p>
+          <TextLink href="https://github.com/typeshade/typenn">
+            {copy.repository}
+          </TextLink>
+        </p>
+      </section>
+      <section class="doc-section" id="first-operation">
+        <h2>{copy.firstTitle}</h2>
+        <p>
+          <InlineTypeScript code="device()" />
+          {copy.firstText}
+          {isKo ? (
+            <>
+              <code>"cpu"</code>, <code>"webgpu"</code>, <code>"webgl2"</code>
+              {copy.firstTextEnd}
+            </>
+          ) : (
+            <>
+              <code>"cpu"</code>, <code>"webgpu"</code>, or{" "}
+              <code>"webgl2"</code>
+              {copy.firstTextEnd}
+            </>
+          )}
+        </p>
+        <CodeBlock
+          title={copy.firstCodeTitle}
+          file="first-operation.ts"
+          code={firstOperation}
+        />
+      </section>
+      <section class="doc-section" id="what-happens">
+        <h2>{copy.understandTitle}</h2>
+        <p>
+          {copy.understandBefore}
+          <InlineTypeScript code="data()" />
+          {copy.understandAfter}
+          <code>Float32Array</code>
+          {isKo ? "를 호스트로 반환합니다." : " to the host."}
+        </p>
+        <div class="note">
+          <strong>{copy.keepTitle}</strong>
+          <span>
+            {copy.keepTextBefore}
+            <InlineTypeScript code="disposeGraph()" />
+            {copy.keepTextAfter}
+          </span>
+        </div>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.nextTitle}</h2>
+        <LinkList class="next-links">
+          <LinkItem href={`${base}/guide/execution/`}>
+            <span>
+              <strong>{copy.execution}</strong>
+              <small>
+                {isKo && <InlineTypeScript code="data()" />}
+                {copy.executionLink}
+                {!isKo && (
+                  <>
+                    <InlineTypeScript code="data()" />.
+                  </>
+                )}
+              </small>
+            </span>
+            <b>→</b>
+          </LinkItem>
+          <LinkItem href={`${base}/guide/training/`}>
+            <span>
+              <strong>{copy.training}</strong>
+              <small>{copy.trainingLink}</small>
+            </span>
+            <b>→</b>
+          </LinkItem>
+          <LinkItem href={`${base}/playground/`}>
+            <span>
+              <strong>{copy.playground}</strong>
+              <small>{copy.playgroundLink}</small>
+            </span>
+            <b>→</b>
+          </LinkItem>
+        </LinkList>
+      </section>
+    </article>
+  </ReadingSurface>
+</SiteLayout>

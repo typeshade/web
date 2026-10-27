@@ -1,0 +1,136 @@
+---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
+import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import CodeBlock from "../CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
+import { mnistModel, trainingLoop } from "../../content/code-examples";
+import { trainingCopy, type GuideLocale } from "../../content/guide-copy";
+import "../../styles/docs.css";
+
+const { locale } = Astro.props as { locale: GuideLocale };
+const copy = trainingCopy[locale];
+const isKo = locale === "ko";
+const base = isKo ? "/ko" : "";
+---
+
+<SiteLayout
+  locale={locale}
+  active="training"
+  title={copy.title}
+  description={copy.description}
+>
+  <ReadingSurface class="nn-docs">
+    <article class="docs-article">
+      <Breadcrumbs aria-label="Breadcrumb">
+        <a href={`${base}/`}>TypeNN</a>
+        <span>/</span>
+        <a href={`${base}/guide/`}>{copy.breadcrumb}</a>
+        <span>/</span>
+        <span>{copy.current}</span>
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">{copy.eyebrow}</Fragment>
+        <Fragment slot="title">{copy.heading}</Fragment>
+        <Fragment slot="description">{copy.intro}</Fragment>
+      </PageHeading>
+      <section class="doc-section">
+        <h2>{copy.modelTitle}</h2>
+        <p>{copy.modelText}</p>
+        <CodeBlock
+          title={copy.modelCodeTitle}
+          file="examples/mnist/model.ts"
+          code={mnistModel}
+        />
+      </section>
+      <section class="doc-section">
+        <h2>{copy.loopTitle}</h2>
+        <p>{copy.loopText}</p>
+        <CodeBlock
+          title={copy.loopCodeTitle}
+          file="examples/mnist/train.ts"
+          code={trainingLoop}
+        />
+      </section>
+      <section class="doc-section">
+        <h2>{copy.stepTitle}</h2>
+        <p>
+          {copy.stepBefore}
+          <InlineTypeScript code="data()" />
+          {copy.stepMiddle}
+          <InlineTypeScript code="optimizer.step()" />
+          {copy.stepAfter}
+          {isKo ? (
+            <>
+              <code>weight</code>와 <code>bias</code>
+              {copy.stepTail}
+              <InlineTypeScript code="await model.sync()" />
+              {copy.stepEnd}
+              <InlineTypeScript code="parameter.data()" />
+              {copy.stepFinal}
+            </>
+          ) : (
+            <>
+              <code>weight</code> and <code>bias</code>
+              {copy.stepTail}
+              <InlineTypeScript code="await model.sync()" />
+              {copy.stepEnd}
+              <InlineTypeScript code="parameter.data()" />
+              {copy.stepFinal}
+            </>
+          )}
+        </p>
+        <div class="note">
+          <strong>{copy.noteTitle}</strong>
+          <span>
+            {isKo ? (
+              <>
+                <InlineTypeScript code="loss.data()" />
+                {copy.noteBefore}
+                <InlineTypeScript code="parameter.data()" />
+                {copy.noteMiddle}
+              </>
+            ) : (
+              <>
+                {copy.noteBefore}
+                <InlineTypeScript code="loss.data()" />
+                {copy.noteMiddle}
+                <InlineTypeScript code="parameter.data()" />
+              </>
+            )}
+            {copy.noteAfter}
+          </span>
+        </div>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.disposeTitle}</h2>
+        <p>
+          <InlineTypeScript code="disposeGraph(model.parameters())" />
+          {copy.disposeBefore}
+        </p>
+        <p>
+          <TextLink href="https://github.com/typeshade/typenn/tree/main/examples/mnist">
+            {copy.sourceLink}
+          </TextLink>
+        </p>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.coverageTitle}</h2>
+        <p>{copy.coverage}</p>
+        <nav class="doc-pagination">
+          <a href={`${base}/guide/execution/`}>
+            <small>{copy.previous}</small>
+            <strong>{copy.execution}</strong>
+          </a>
+          <a href={`${base}/api/`}>
+            <small>{copy.next}</small>
+            <strong>{copy.api}</strong>
+            <span>→</span>
+          </a>
+        </nav>
+      </section>
+    </article>
+  </ReadingSurface>
+</SiteLayout>

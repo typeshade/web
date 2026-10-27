@@ -1,0 +1,285 @@
+---
+import HomeHero from "@typeshade/site-ui/astro/HomeHero";
+import HomeSection from "@typeshade/site-ui/astro/HomeSection";
+import StepGrid from "@typeshade/site-ui/astro/StepGrid";
+import Eyebrow from "@typeshade/site-ui/astro/Eyebrow";
+import LinkItem from "@typeshade/site-ui/astro/LinkItem";
+import LinkList from "@typeshade/site-ui/astro/LinkList";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
+import HomeSurface from "@typeshade/site-ui/astro/HomeSurface";
+import LinkButton from "@typeshade/site-ui/astro/LinkButton";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import CodeBlock from "../CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
+import { homeQuickStart } from "../../content/code-examples";
+import type { Locale } from "../../content/locale";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const ko = locale === "ko";
+const copy = {
+  title: ko
+    ? "TypeNN — TypeScript 신경망 프레임워크"
+    : "TypeNN — Neural networks in TypeScript",
+  description: ko
+    ? "TypeScript Tensor 연산을 TypeShade 컴파일러와 런타임으로 실행하는 신경망 프레임워크입니다."
+    : "Write Tensor operations in TypeScript, run them through the TypeShade compiler and runtime, and try the framework in your browser.",
+  eyebrow: ko
+    ? "TypeScript 신경망 프레임워크"
+    : "A TypeScript neural network framework",
+  hero: ko
+    ? "TypeScript로 신경망을 만드세요."
+    : "Build neural networks in TypeScript.",
+  lead: ko
+    ? "Tensor 연산과 Module 클래스로 모델을 정의합니다. TypeNN은 연산을 지연 그래프에 기록하고, TypeShade는 커널을 컴파일해 CPU와 지원되는 GPU 백엔드에서 실행합니다."
+    : "Use Tensor operations and Module classes to define models. TypeNN records those operations in a deferred graph; TypeShade compiles and runs their kernels on CPU and supported GPU backends.",
+  playground: ko ? "Playground 실행" : "Try the playground",
+  guide: ko ? "가이드 읽기" : "Read the guide",
+  release: ko
+    ? "프리릴리스 · 현재 사용법은 저장소 소스와 예제를 기준으로 확인할 수 있습니다."
+    : "Pre-release · source and examples are the current usage reference.",
+  output: ko ? "예시 출력" : "Example output",
+  execution: ko ? "실행" : "Execution",
+  executionTitle: ko
+    ? "TypeNN은 Tensor 연산을 어떻게 실행할까요?"
+    : "How TypeNN executes Tensor operations",
+  executionLink: ko ? "실행 방식 보기" : "How execution works",
+  steps: ko
+    ? [
+        {
+          title: "정의",
+          before:
+            "Tensor 호출로 Shape와 연산을 정의합니다. TypeNN은 각 호출을 그래프 노드로 기록합니다.",
+        },
+        {
+          title: "커널 함수 호출",
+          before: "노드마다 TypeShade 커널 함수가 있습니다. ",
+          expression: "data()",
+          after:
+            "를 호출하면 TypeNN이 해당 노드의 입력·출력 배열로 함수를 실행합니다.",
+        },
+        {
+          title: "그래프 실행",
+          before: "필요한 경우 ",
+          expression: "data()",
+          after: "가 선택한 계층에서 결과에 필요한 커널을 실행합니다.",
+        },
+      ]
+    : [
+        {
+          title: "Define",
+          before:
+            "Tensor calls define shapes and operations. TypeNN records each call as a graph node.",
+        },
+        {
+          title: "Call kernel functions",
+          before: "Each node holds a TypeShade kernel function. When you call ",
+          expression: "data()",
+          after:
+            ", TypeNN runs the function with that node's input and output arrays.",
+        },
+        {
+          title: "Run the graph",
+          before: "When needed, ",
+          expression: "data()",
+          after:
+            " runs the kernels for the requested result on the selected tier.",
+        },
+      ],
+  finePrint: ko
+    ? "* WebGL2와 CPU 계층은 같은 커널 함수를 따로 실행합니다. elementwise 연쇄를 디스패치 하나로 퓨전하는 것은 WebGPU뿐입니다."
+    : "* WebGL2 and the CPU tier run the same kernel functions apart. Only WebGPU fuses an elementwise chain into one dispatch.",
+  learnEyebrow: ko ? "TypeNN 사용해 보기" : "Try TypeNN",
+  learnTitle: ko
+    ? "브라우저에서 TypeNN 사용하기"
+    : "Try TypeNN in your browser",
+  learnBody: ko
+    ? "브라우저에서 행렬 연산을 실행하고, 가이드에서 그래프 실행, 자동 미분, 모델 학습을 알아보세요."
+    : "Run matrix operations in the browser, then read the guides to learn about graph execution, automatic differentiation, and model training.",
+  cards: ko
+    ? [
+        {
+          title: "Playground",
+          description: "실제 TypeNN 연산을 브라우저에서 실행합니다.",
+          href: "/playground/",
+        },
+        {
+          title: "모델 학습",
+          description: "MLP를 학습해 MNIST 숫자를 분류하세요.",
+          href: "/guide/training/",
+        },
+        {
+          title: "API 참조",
+          description: "현재 Tensor와 Module API를 찾아보세요.",
+          href: "/api/",
+        },
+        {
+          title: "예제",
+          description: "전체 소스 예제와 현재 구현 한계를 확인하세요.",
+          href: "/examples/",
+        },
+      ]
+    : [
+        {
+          title: "Playground",
+          description: "Run real TypeNN operations in this browser.",
+          href: "/playground/",
+        },
+        {
+          title: "Train a model",
+          description: "Train an MLP to classify MNIST digits.",
+          href: "/guide/training/",
+        },
+        {
+          title: "API reference",
+          description: "Look up the current Tensor and Module APIs.",
+          href: "/api/",
+        },
+        {
+          title: "Examples",
+          description: "Read complete source examples and current limits.",
+          href: "/examples/",
+        },
+      ],
+  statusEyebrow: ko ? "현재 구현 상태" : "Current implementation",
+  statusTitle: ko ? "학습과 실행" : "Training and execution",
+  statusBeforeData: ko ? "" : "When ",
+  statusAfterData: ko
+    ? "가 새 결과를 계산할 때 필요한 커널을 실행합니다. 계획이 실행된 뒤 "
+    : " computes a new result, it runs the required kernels. After a plan runs, inspect ",
+  statusAfterReport: ko
+    ? "에서 실행 계층과 디스패치 목록을 확인할 수 있습니다. SGD와 Adam은 파라미터를 장치에서 갱신합니다. 타일 MatMul은 앞으로의 과제입니다."
+    : " for its execution tier and dispatches. SGD and Adam update parameters on the device; tiled MatMul remains future work.",
+  statusLink: ko ? "구현 상태 보기" : "Read implementation status",
+};
+const path = (p: string) => (locale === "ko" ? `/ko${p === "/" ? "/" : p}` : p);
+const stepIds = ["01", "02", "03"];
+---
+
+<SiteLayout
+  locale={locale}
+  active="home"
+  title={copy.title}
+  description={copy.description}
+>
+  <HomeSurface>
+    <div class="home-content">
+      <HomeHero>
+        <div class="home-copy">
+          <Eyebrow>{copy.eyebrow}</Eyebrow>
+          <h1>{copy.hero}</h1>
+          <p class="lead">{copy.lead}</p>
+          <div class="action-row">
+            <LinkButton
+              variant="primary"
+              size="default"
+              href={path("/playground/")}
+            >
+              {copy.playground + " "}
+              <span aria-hidden="true">→</span>
+            </LinkButton>
+            <LinkButton
+              variant="secondary"
+              size="default"
+              href={path("/guide/")}
+            >
+              {copy.guide}
+            </LinkButton>
+          </div>
+          <p class="release-note">{copy.release}</p>
+        </div>
+        <div class="home-code">
+          <CodeBlock
+            title="Tensor API"
+            file="example.ts"
+            code={homeQuickStart}
+          />
+          <div class="execution-result">
+            <span class="result-dot" aria-hidden="true"></span>
+            <span>Float32Array</span>
+            <code>[19, 22, 43, 50]</code>
+            <span class="result-label">{copy.output}</span>
+          </div>
+        </div>
+      </HomeHero>
+      <HomeSection aria-labelledby="path-title">
+        <div class="section-heading-row">
+          <div>
+            <Eyebrow>{copy.execution}</Eyebrow>
+            <h2 id="path-title">{copy.executionTitle}</h2>
+          </div>
+          <TextLink href={path("/guide/execution/")}>
+            {copy.executionLink + " "}
+            <span aria-hidden="true">↗</span>
+          </TextLink>
+        </div>
+        <StepGrid>
+          {copy.steps.map((step, i) => (
+            <article>
+              <span class="path-index">{stepIds[i]}</span>
+              <h3>{step.title}</h3>
+              <p>
+                {step.before}
+                {step.expression && <InlineTypeScript code={step.expression} />}
+                {step.after}
+              </p>
+              {i === 0 ? (
+                <InlineTypeScript code="tensor.matmul(weight).relu()" />
+              ) : (
+                <code>
+                  {i === 1
+                    ? ko
+                      ? "TypeShade 커널"
+                      : "TypeShade kernel"
+                    : "CPU · WebGPU · WebGL2*"}
+                </code>
+              )}
+            </article>
+          ))}
+        </StepGrid>
+        <p class="fine-print">{copy.finePrint}</p>
+      </HomeSection>
+      <HomeSection layout="split" aria-labelledby="learn-title">
+        <div class="learning-copy">
+          <Eyebrow>{copy.learnEyebrow}</Eyebrow>
+          <h2 id="learn-title">{copy.learnTitle}</h2>
+          <p>{copy.learnBody}</p>
+        </div>
+        <LinkList class="learning-links">
+          {copy.cards.map((card) => (
+            <LinkItem href={path(card.href)}>
+              <span>
+                <strong>{card.title}</strong>
+                <small>{card.description}</small>
+              </span>
+              <b aria-hidden="true">↗</b>
+            </LinkItem>
+          ))}
+        </LinkList>
+      </HomeSection>
+      <HomeSection layout="action" aria-labelledby="status-title">
+        <div>
+          <Eyebrow>{copy.statusEyebrow}</Eyebrow>
+          <h2 id="status-title">{copy.statusTitle}</h2>
+          <p>
+            {copy.statusBeforeData}
+            <InlineTypeScript code="data()" />
+            {copy.statusAfterData}
+            <code>device.lastReport</code>
+            {copy.statusAfterReport}
+          </p>
+        </div>
+        <LinkButton
+          variant="secondary"
+          size="default"
+          href="https://github.com/typeshade/typenn/blob/main/TODO.md"
+        >
+          {copy.statusLink + " "}
+          <span aria-hidden="true">↗</span>
+        </LinkButton>
+      </HomeSection>
+    </div>
+  </HomeSurface>
+</SiteLayout>

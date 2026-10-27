@@ -83,7 +83,10 @@ const routes = {
   typenn: {
     "/": [".ui-home", ".kg-panel", ".nn-docs"],
     "/guide/": [".nn-docs", ".kg-panel", ".ui-home"],
-    "/playground/": [".kg-panel", ".nn-docs", ".ui-home"],
+    "/playground/": [".kg-panel", ".nn-docs", ".ui-home", ".lab-cards"],
+    "/ko/playground/": [".kg-panel", ".nn-docs", ".ui-home", ".lab-cards"],
+    "/lab/": [".lab-cards", ".nn-docs", ".ui-home", ".matrix-editor"],
+    "/ko/lab/": [".lab-cards", ".nn-docs", ".ui-home", ".matrix-editor"],
   },
   typecv: {
     "/": [".ui-home", ".pair-canvases", ".sfm-inputs", ".cv-docs"],

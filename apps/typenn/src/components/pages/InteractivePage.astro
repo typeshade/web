@@ -1,0 +1,85 @@
+---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import type { Locale } from "../../content/locale";
+
+interface Props {
+  locale: Locale;
+  kind: "lab" | "playground";
+}
+const { locale, kind } = Astro.props;
+const ko = locale === "ko";
+const isLab = kind === "lab";
+const copy = {
+  lab: {
+    title: ko ? "TypeNN 실습" : "TypeNN Lab",
+    description: ko
+      ? "Keras 데이터셋 전체로 브라우저에서 TypeNN 모델을 학습합니다. MNIST, Fashion-MNIST, CIFAR, IMDB, Reuters, 캘리포니아 주택 가격을 지원합니다."
+      : "Train TypeNN models in your browser on full Keras datasets: MNIST, Fashion-MNIST, CIFAR, IMDB, Reuters and California housing.",
+    crumb: ko ? "실습" : "Lab",
+    eyebrow: ko ? "브라우저에서 학습" : "Train in your browser",
+    heading: ko ? "학습 실습실" : "Training lab",
+    intro: ko
+      ? "데이터셋을 고르고, 모델과 학습 설정을 정한 뒤 학습 데이터 전체로 학습하세요. 테스트 지표는 에포크가 끝날 때마다 테스트 데이터 전체로 계산합니다."
+      : "Pick a dataset, set a model and its training settings, then train on the full training split. The test metric is measured on the full test split after each epoch.",
+    label: ko ? "실행 대상:" : "What this runs:",
+    runtime: ko
+      ? "이 사이트에 포함된 TypeNN 빌드이며, 선택한 계층에서 실행합니다. 단계마다 배치 하나로 옵티마이저를 한 번 갱신합니다."
+      : "the TypeNN build shipped with this site, on the tier you select. Each step is one optimizer update over one batch.",
+    timing: ko
+      ? "이 페이지의 시간은 이 브라우저에서 잰 실제 경과 시간입니다. 소프트웨어 렌더러(SwiftShader) 결과는 물리 GPU 벤치마크가 아닙니다."
+      : "Times on this page are wall-clock times in this browser. A software renderer (SwiftShader) is not a physical GPU benchmark.",
+  },
+  playground: {
+    title: "TypeNN Playground",
+    description: ko
+      ? "2×2 행렬을 수정하고 실제 TypeNN 런타임에서 MatMul, Add, ReLU 연산을 실행합니다."
+      : "Edit two small matrices and execute MatMul, Add, or ReLU with the actual TypeNN runtime in your browser.",
+    crumb: "Playground",
+    eyebrow: ko ? "브라우저에서 TypeNN 실행" : "Run TypeNN in your browser",
+    heading: "Tensor Playground",
+    intro: ko
+      ? "행렬 값과 연산, 백엔드를 선택하고 사이트에 포함된 TypeNN 런타임으로 실행해 보세요."
+      : "Change the matrix values, choose an operation and backend, then run it through the TypeNN runtime bundled with this site.",
+    label: ko ? "실행 대상:" : "What this runs:",
+    runtime: ko
+      ? "사이트에 포함된 TypeNN 빌드와 TypeShade 런타임입니다. JavaScript로 다시 구현하거나 결과를 흉내 내지 않습니다."
+      : "the shipped TypeNN build and its TypeShade runtime. It is not a JavaScript reimplementation or a mock result.",
+    timing: ko
+      ? "예제는 작고, 런타임 시작 시 백엔드 준비가 포함됩니다. 시간을 성능 벤치마크로 표시하지 않습니다. 자동 모드는 WebGPU를 시도하고 CPU로 폴백합니다. WebGL2는 직접 선택해야 합니다."
+      : "The example is intentionally small. Runtime startup includes backend preparation; this page does not report its duration as a benchmark. Automatic mode tries WebGPU and falls back to CPU. WebGL2 must be selected explicitly.",
+  },
+}[kind];
+const home = ko ? "/ko/" : "/";
+---
+
+<SiteLayout
+  locale={locale}
+  active={kind}
+  title={copy.title}
+  description={copy.description}
+>
+  <ReadingSurface>
+    <article class:list={["playground-page", isLab && "lab-page"]}>
+      <Breadcrumbs aria-label="Breadcrumb">
+        <a href={home}>TypeNN</a>
+        <span>/</span>
+        <span>{copy.crumb}</span>
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">{copy.eyebrow}</Fragment>
+        <Fragment slot="title">{copy.heading}</Fragment>
+        <Fragment slot="description">{copy.intro}</Fragment>
+      </PageHeading>
+      <slot />
+      <div class="playground-disclosure">
+        <p>
+          <strong>{copy.label}</strong> {copy.runtime}
+        </p>
+        <p>{copy.timing}</p>
+      </div>
+    </article>
+  </ReadingSurface>
+</SiteLayout>

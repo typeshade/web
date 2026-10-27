@@ -10,6 +10,10 @@ The owner specifically requested Luna subagents. This all-site review and local 
 are complete. The coverage and existing language boundaries below distinguish this work
 from the earlier narrow TypeShade home/entry-page revisions.
 
+The subsequent template and rendering work is recorded in
+[maintenance-followup.md](maintenance-followup.md). Page layout and copy ownership is mapped
+in [page-templates.md](page-templates.md).
+
 ## Working state
 
 - Repository: `typeshade/web`.
@@ -61,6 +65,10 @@ TypeShade compiler-generated language-reference excerpts, diagnostic registry an
 also retain explicitly identified English source text; their surrounding site copy is translated.
 
 ## Validation
+
+The editorial revision `c62f78e` also passed all five jobs in GitHub Actions run
+[40454514084](https://github.com/typeshade/web/actions/runs/40454514084): controls, scope,
+TypeShade, TypeNN and TypeCV. Follow-up revision checks are recorded separately.
 
 - Shared UI: `pnpm check:ui`, `pnpm build:ui`, `pnpm test:controls`,
   `pnpm test:patterns` and `pnpm test:styles` passed on this working tree. Browser tests

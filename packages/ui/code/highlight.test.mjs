@@ -4,6 +4,8 @@ import {
   highlightTypeScriptBlock,
   highlightTypeScriptInline,
   isTypeScriptExpression,
+  prepareMarkedHighlights,
+  typescriptFenceLanguage,
 } from "./highlight.mjs";
 
 const textContent = (html) =>
@@ -63,4 +65,50 @@ test("inline and fenced output escape source while preserving selectable text an
   );
   assert.equal(textContent(block), source);
   assert.match(block, /--shiki-dark:/);
+  const trailingNewline = await highlightTypeScriptBlock("const end = true\n");
+  assert.equal(textContent(trailingNewline), "const end = true\n");
+});
+
+test("fence aliases and metadata select TS or TSX while unknown languages stay untouched", async () => {
+  assert.equal(typescriptFenceLanguage("ts"), "typescript");
+  assert.equal(typescriptFenceLanguage('ts title="example.ts"'), "typescript");
+  assert.equal(typescriptFenceLanguage("typescript {.sample}"), "typescript");
+  assert.equal(typescriptFenceLanguage("tsx title=Component.tsx"), "tsx");
+  assert.equal(typescriptFenceLanguage("typescriptreact"), "tsx");
+  assert.equal(typescriptFenceLanguage("wgsl"), undefined);
+  assert.equal(typescriptFenceLanguage(undefined), undefined);
+
+  const jsx = "const node = <Button disabled />\n";
+  const ts = await highlightTypeScriptBlock(jsx, "typescript");
+  const tsx = await highlightTypeScriptBlock(jsx, "tsx");
+  assert.notEqual(
+    ts.replace('class="language-typescript"', ""),
+    tsx.replace('class="language-tsx"', ""),
+    "TSX must produce different tokens, not just a different language class",
+  );
+  assert.match(tsx, /class="language-tsx"/);
+  assert.equal(textContent(tsx), jsx);
+
+  const tokens = [
+    { type: "code", lang: 'ts title="example.ts"', text: "const value = 1" },
+    { type: "code", lang: "tsx", text: jsx },
+    {
+      type: "code",
+      lang: "wgsl",
+      text: "@compute @workgroup_size(1) fn main() {}",
+    },
+  ];
+  const { highlighted } = await prepareMarkedHighlights(
+    { lexer: () => tokens },
+    "",
+  );
+  assert.match(
+    highlighted.get(`block:ts title="example.ts":const value = 1`),
+    /language-typescript/,
+  );
+  assert.match(highlighted.get(`block:tsx:${jsx}`), /language-tsx/);
+  assert.equal(
+    highlighted.has(`block:wgsl:@compute @workgroup_size(1) fn main() {}`),
+    false,
+  );
 });

@@ -1,0 +1,144 @@
+---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
+import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import CodeBlock from "../CodeBlock.astro";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
+import { executionExample } from "../../content/code-examples";
+import { executionCopy, type GuideLocale } from "../../content/guide-copy";
+import "../../styles/docs.css";
+
+const { locale } = Astro.props as { locale: GuideLocale };
+const copy = executionCopy[locale];
+const isKo = locale === "ko";
+const base = isKo ? "/ko" : "";
+const code = isKo
+  ? executionExample("여기에서 그래프 결과를 구체화합니다.")
+  : executionExample("This is the materialization boundary.");
+---
+
+<SiteLayout
+  locale={locale}
+  active="execution"
+  title={copy.title}
+  description={copy.description}
+>
+  <ReadingSurface class="nn-docs">
+    <article class="docs-article">
+      <Breadcrumbs aria-label="Breadcrumb">
+        <a href={`${base}/`}>TypeNN</a>
+        <span>/</span>
+        <a href={`${base}/guide/`}>{copy.breadcrumb}</a>
+        <span>/</span>
+        <span>{copy.current}</span>
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">{copy.eyebrow}</Fragment>
+        <Fragment slot="title">{copy.heading}</Fragment>
+        <Fragment slot="description">{copy.intro}</Fragment>
+      </PageHeading>
+      <section class="doc-section">
+        <h2>{copy.callsTitle}</h2>
+        <p>
+          {copy.callsBefore}
+          <InlineTypeScript code="matmul()" />
+          {copy.callsBetween}
+          <InlineTypeScript code="add()" />
+          {isKo ? copy.callsBetween : ", and "}
+          <InlineTypeScript code="relu()" />
+          {copy.callsAfter}
+        </p>
+        <CodeBlock title={copy.graphTitle} file="model.ts" code={code} />
+      </section>
+      <section class="doc-section">
+        <h2>{copy.dataTitle}</h2>
+        <p>
+          {copy.dataBefore}
+          <InlineTypeScript code="data()" />
+          {copy.dataMiddle}
+          <InlineTypeScript code="fuse()" />
+          {copy.dataAfter}
+        </p>
+        <div class="execution-lanes">
+          <div>
+            <span class="lane-label">{copy.laneOneLabel}</span>
+            <p>{copy.laneOne}</p>
+          </div>
+          <div>
+            <span class="lane-label">{copy.laneTwoLabel}</span>
+            <p>{copy.laneTwo}</p>
+          </div>
+        </div>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.backendsTitle}</h2>
+        <div class="backend-table" role="table" aria-label={copy.tableAria}>
+          <div class="table-row table-head" role="row">
+            <span role="columnheader">{copy.tier}</span>
+            <span role="columnheader">{copy.selection}</span>
+            <span role="columnheader">{copy.currentNote}</span>
+          </div>
+          <div class="table-row" role="row">
+            <strong role="cell">{copy.cpu}</strong>
+            <span role="cell">{copy.cpuSelect}</span>
+            <span role="cell">{copy.cpuNote}</span>
+          </div>
+          <div class="table-row" role="row">
+            <strong role="cell">{copy.gpu}</strong>
+            <span role="cell">{copy.gpuSelect}</span>
+            <span role="cell">{copy.gpuNote}</span>
+          </div>
+          <div class="table-row" role="row">
+            <strong role="cell">{copy.gl}</strong>
+            <span role="cell">{copy.glSelect}</span>
+            <span role="cell">{copy.glNote}</span>
+          </div>
+        </div>
+        <p class="fine-print">{copy.fine}</p>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.planTitle}</h2>
+        <p>
+          {copy.planBefore}
+          <InlineTypeScript code="a.add(b).mul(c).relu()" />
+          {copy.planMiddle}
+          <code>device.lastReport</code>
+          {copy.planAfter}
+        </p>
+        <p>
+          <TextLink href="https://github.com/typeshade/typenn#how-a-read-runs">
+            {copy.sourceLink}
+          </TextLink>
+        </p>
+        {isKo && (
+          <nav class="doc-pagination">
+            <a href={`${base}/guide/`}>
+              <small>{copy.previous}</small>
+              <strong>{copy.home}</strong>
+            </a>
+            <a href={`${base}/guide/training/`}>
+              <small>{copy.next}</small>
+              <strong>{copy.training}</strong>
+              <span>→</span>
+            </a>
+          </nav>
+        )}
+      </section>
+      {!isKo && (
+        <nav class="doc-pagination">
+          <a href={`${base}/guide/`}>
+            <small>{copy.previous}</small>
+            <strong>{copy.home}</strong>
+          </a>
+          <a href={`${base}/guide/training/`}>
+            <small>{copy.next}</small>
+            <strong>{copy.training}</strong>
+            <span>→</span>
+          </a>
+        </nav>
+      )}
+    </article>
+  </ReadingSurface>
+</SiteLayout>

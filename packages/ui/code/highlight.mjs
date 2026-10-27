@@ -51,57 +51,39 @@ export function isTypeScriptExpression(value) {
   );
 }
 
+const TYPESCRIPT_FENCE_LANGUAGES = new Map([
+  ["ts", "typescript"],
+  ["typescript", "typescript"],
+  ["tsx", "tsx"],
+  ["typescriptreact", "tsx"],
+]);
+
+/** Resolve a Markdown fence's language word, ignoring optional info-string metadata. */
+export function typescriptFenceLanguage(info) {
+  const firstWord = String(info ?? "")
+    .trim()
+    .split(/\s+/, 1)[0]
+    ?.toLowerCase();
+  return TYPESCRIPT_FENCE_LANGUAGES.get(firstWord);
+}
+
 /** Tokenize a short inline TypeScript expression with the site's light and dark palettes. */
 export async function highlightTypeScriptInline(value) {
   const text = String(value);
   if (!isTypeScriptExpression(text)) return undefined;
-  highlighter ??= createHighlighter({
-    themes: ["github-light", "github-dark"],
-    langs: ["typescript"],
-  });
-  const result = await (
-    await highlighter
-  ).codeToTokens(text, {
-    lang: "typescript",
-    themes: { light: "github-light", dark: "github-dark" },
-  });
-  const spans = result.tokens
-    .map((line) =>
-      line
-        .map((token) => {
-          const style = tokenColors(token.htmlStyle);
-          return `<span${style ? ` style="${escapeHtml(style)}"` : ""}>${escapeHtml(token.content)}</span>`;
-        })
-        .join(""),
-    )
-    .join("\n");
+  const spans = await highlightTokens(text, "typescript");
   return `<code class="ts-inline-code" data-language="typescript">${spans}</code>`;
 }
 
-/** Render a fenced TypeScript block using the same selectable, dual-theme tokens. */
-export async function highlightTypeScriptBlock(value) {
+/** Render a fenced TypeScript or TSX block using selectable, dual-theme tokens. */
+export async function highlightTypeScriptBlock(value, language = "typescript") {
+  if (language !== "typescript" && language !== "tsx")
+    throw new RangeError(
+      `Unsupported TypeScript highlighting language: ${language}`,
+    );
   const text = String(value);
-  highlighter ??= createHighlighter({
-    themes: ["github-light", "github-dark"],
-    langs: ["typescript"],
-  });
-  const result = await (
-    await highlighter
-  ).codeToTokens(text, {
-    lang: "typescript",
-    themes: { light: "github-light", dark: "github-dark" },
-  });
-  const lines = result.tokens
-    .map((line) =>
-      line
-        .map((token) => {
-          const style = tokenColors(token.htmlStyle);
-          return `<span${style ? ` style="${escapeHtml(style)}"` : ""}>${escapeHtml(token.content)}</span>`;
-        })
-        .join(""),
-    )
-    .join("\n");
-  return `<pre class="ts-code-block"><code class="language-typescript">${lines}</code></pre>`;
+  const lines = await highlightTokens(text, language);
+  return `<pre class="ts-code-block"><code class="language-${language}">${lines}</code></pre>`;
 }
 
 /** Precompute token HTML so synchronous Marked renderers can emit real HTML, never promises. */
@@ -118,19 +100,44 @@ export async function prepareMarkedHighlights(marked, markdown) {
     if (token.type === "codespan") {
       const html = await highlightTypeScriptInline(token.text);
       if (html) highlighted.set(`inline:${token.text}`, html);
-    } else if (
-      token.type === "code" &&
-      /^(?:ts|typescript|tsx)$/.test((token.lang ?? "").trim().toLowerCase())
-    ) {
+    } else if (token.type === "code" && typescriptFenceLanguage(token.lang)) {
+      const language = typescriptFenceLanguage(token.lang);
       highlighted.set(
         `block:${token.lang}:${token.text}`,
-        await highlightTypeScriptBlock(token.text),
+        await highlightTypeScriptBlock(token.text, language),
       );
     }
     for (const child of Object.values(token)) await collect(child);
   };
   await collect(tokens);
   return { tokens, highlighted };
+}
+
+function getHighlighter() {
+  highlighter ??= createHighlighter({
+    themes: ["github-light", "github-dark"],
+    langs: ["typescript", "tsx"],
+  });
+  return highlighter;
+}
+
+async function highlightTokens(text, language) {
+  const result = await (
+    await getHighlighter()
+  ).codeToTokens(text, {
+    lang: language,
+    themes: { light: "github-light", dark: "github-dark" },
+  });
+  return result.tokens
+    .map((line) =>
+      line
+        .map((token) => {
+          const style = tokenColors(token.htmlStyle);
+          return `<span${style ? ` style="${escapeHtml(style)}"` : ""}>${escapeHtml(token.content)}</span>`;
+        })
+        .join(""),
+    )
+    .join("\n");
 }
 
 function tokenColors(style = {}) {

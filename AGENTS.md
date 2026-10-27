@@ -33,6 +33,8 @@ patterns. Align conflicting local guidance with these instructions.
 
 ## Work and handoff
 
+- Read [docs/maintenance-followup.md](docs/maintenance-followup.md) for the active template
+  and rendering follow-up after the editorial review.
 - Read [docs/content-review.md](docs/content-review.md) for the active scope, assignments,
   completed review, validation and remaining work. Update it with concrete evidence. Do not
   claim all content was reviewed if a subset only received a pattern scan.

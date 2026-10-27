@@ -8,7 +8,5 @@ local writing advice. Preserve implementation facts and source provenance.
 
 ## Build entry point
 
-Use `pnpm --filter typecv-site build` from the workspace root. The current site is built
-by Astro; `scripts/prepare.mjs` prepares runtime assets and JSON evidence. The legacy
-`build.mjs` is not the production build and overwrites `dist` with the old templates.
-Do not run it to validate changes to the Astro site.
+Use `pnpm --filter typecv-site build` from the workspace root. The site is built by Astro;
+`scripts/prepare.mjs` prepares runtime assets and JSON evidence.

@@ -1,46 +1,8 @@
 ---
-import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
-import PageHeading from "@typeshade/site-ui/astro/PageHeading";
-import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+import InteractivePage from "../../components/pages/InteractivePage.astro";
 import Playground from "../../components/Playground";
 ---
 
-<SiteLayout
-  locale="en"
-  active="playground"
-  title="TypeNN Playground"
-  description="Edit two small matrices and execute MatMul, Add, or ReLU with the actual TypeNN runtime in your browser."
->
-  <ReadingSurface>
-    <article class="playground-page">
-      <Breadcrumbs aria-label="Breadcrumb">
-        <a href="/">TypeNN</a>
-        <span>/</span>
-        <span>Playground</span>
-      </Breadcrumbs>
-      <PageHeading>
-        <Fragment slot="eyebrow">Run TypeNN in your browser</Fragment>
-        <Fragment slot="title">Tensor Playground</Fragment>
-        <Fragment slot="description">
-          Change the matrix values, choose an operation and backend, then run it
-          through the TypeNN runtime bundled with this site.
-        </Fragment>
-      </PageHeading>
-      <Playground locale="en" client:load />
-      <div class="playground-disclosure">
-        <p>
-          <strong>What this runs:</strong> the shipped TypeNN build and its
-          TypeShade runtime. It is not a JavaScript reimplementation or a mock
-          result.
-        </p>
-        <p>
-          The example is intentionally small. Runtime startup includes backend
-          preparation; this page does not report its duration as a benchmark.
-          Automatic mode tries WebGPU and falls back to CPU. WebGL2 must be
-          selected explicitly.
-        </p>
-      </div>
-    </article>
-  </ReadingSurface>
-</SiteLayout>
+<InteractivePage locale="en" kind="playground">
+  <Playground locale="en" client:load />
+</InteractivePage>

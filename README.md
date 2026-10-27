@@ -42,6 +42,7 @@ app's prebuild hook after its source library has been built.
 Edit `packages/ui` and use its CSS, Astro or React subpath exports. No tarball
 copying or npm publishing is needed. The app-specific GPU, learning and editor
 logic stays in the app. See [UI architecture](packages/ui/README.md).
+For page structure and locale data, see [Editing site pages](docs/page-templates.md).
 
 Run `pnpm dev:ui` for the component workbench at http://localhost:4324/.
 `pnpm check:ui && pnpm build:ui && pnpm test:controls && pnpm test:patterns` verifies control states,

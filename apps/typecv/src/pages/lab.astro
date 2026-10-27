@@ -1,27 +1,5 @@
 ---
-import Eyebrow from "@typeshade/site-ui/astro/Eyebrow";
-import "../styles/lab-page.css";
-import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
-import SiteLayout from "../layouts/SiteLayout.astro";
-import SfmLab from "../components/SfmLab";
-const description =
-  "Sample frames from a local video or prepared frame bundle, then run experimental TypeShade GPU feature matching and incremental sparse reconstruction in your browser.";
+import LabPage from "../components/LabPage.astro";
 ---
 
-<SiteLayout locale="en" active="lab" title="SfM lab" description={description}>
-  <ReadingSurface>
-    <div class="lab-main">
-      <header class="lab-header">
-        <Eyebrow>TYPECV / SFM LAB</Eyebrow>
-        <h1>Reconstruct a scene from video</h1>
-        <p>
-          Choose a local video or prepared frame bundle. TypeCV samples up to
-          eight frames, uses an assumed focal length, and runs experimental GPU
-          feature matching and incremental sparse reconstruction. The result
-          depends on the footage and these calibration assumptions.
-        </p>
-      </header>
-      <SfmLab client:load locale="en" />
-    </div>
-  </ReadingSurface>
-</SiteLayout>
+<LabPage locale="en" />
