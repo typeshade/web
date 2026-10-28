@@ -3,4 +3,4 @@ import type { HTMLAttributes } from 'astro/types';
 type Props = HTMLAttributes<'a'> & { href: string; variant?: 'primary' | 'secondary'; size?: 'default' | 'large' };
 const { variant = 'secondary', size = 'default', class: className, ...attributes } = Astro.props;
 ---
-<a {...attributes} class:list={['button', `button-${variant}`, { 'button-lg': size === 'large' }, className]}><slot /></a>
+<a {...attributes} class:list={['ui-button', 'button', `button-${variant}`, { 'button-lg': size === 'large' }, className]} data-variant={variant} data-size={size}><slot /></a>

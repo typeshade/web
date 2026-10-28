@@ -289,9 +289,6 @@
 .playground-code .token.punctuation {
   color: #d6e4ff;
 }
-:root[data-theme="dark"] .button-quiet {
-  background: var(--panel);
-}
 :root[data-theme="dark"] .execution-result,
 :root[data-theme="dark"] .playground-workbench {
   background: var(--panel);

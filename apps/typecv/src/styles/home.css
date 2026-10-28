@@ -46,40 +46,6 @@
   gap: 10px;
   margin-top: 28px;
 }
-.button {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ui-space-3);
-  padding: 9px 15px;
-  border: 1px solid var(--line);
-  border-radius: var(--ui-radius-control);
-  font-size: 13px;
-  font-weight: 550;
-  transition:
-    background-color 0.16s ease,
-    color 0.16s ease,
-    border-color 0.16s ease;
-}
-.button-primary {
-  border-color: var(--ui-blue-6);
-  color: white;
-  background: var(--ui-blue-6);
-}
-.button-primary:hover {
-  border-color: var(--ui-blue-7);
-  color: white;
-  background: var(--ui-blue-7);
-}
-.button-quiet {
-  color: var(--ink);
-  background: var(--panel);
-}
-.button-quiet:hover {
-  border-color: color-mix(in srgb, var(--brand) 45%, var(--line));
-  color: var(--brand);
-}
 .release-note {
   margin: 20px 0 0;
   color: var(--muted);
@@ -112,7 +78,7 @@
 .code-file {
   overflow: hidden;
   color: var(--ui-white) 72;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
   font-weight: 400;
   text-overflow: ellipsis;
@@ -208,7 +174,7 @@
 }
 .path-index {
   color: var(--brand);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
 }
 .path-strip h3 {

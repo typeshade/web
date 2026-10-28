@@ -10,6 +10,30 @@ concurrency:
   group: web-checks-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check:ui
+      - run: pnpm build:ui
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:controls
+        env:
+          UI_SCREENSHOTS: artifacts/ui
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ui-workbench
+          path: |
+            apps/ui/dist
+            artifacts/ui
+          retention-days: 7
   scope:
     runs-on: ubuntu-latest
     outputs:

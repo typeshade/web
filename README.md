@@ -3,12 +3,12 @@
 Websites and shared UI for TypeShade, TypeNN and TypeCV. Node 24, pnpm 10.28.2
 and Bun 1.4.3 are used by CI. Each website builds and deploys independently.
 
-| Workspace | Domain | Source |
-| --- | --- | --- |
-| `apps/typeshade` | typeshade.dev | compiler pinned at `apps/typeshade/vendor/shader-dsl` |
-| `apps/typenn` | nn.typeshade.dev | library pinned at `sources/typenn` |
-| `apps/typecv` | cv.typeshade.dev | library and documentation pinned at `sources/typecv` |
-| `packages/ui` | shared | `@typeshade/site-ui`, linked with `workspace:*` |
+| Workspace        | Domain           | Source                                                |
+| ---------------- | ---------------- | ----------------------------------------------------- |
+| `apps/typeshade` | typeshade.dev    | compiler pinned at `apps/typeshade/vendor/shader-dsl` |
+| `apps/typenn`    | nn.typeshade.dev | library pinned at `sources/typenn`                    |
+| `apps/typecv`    | cv.typeshade.dev | library and documentation pinned at `sources/typecv`  |
+| `packages/ui`    | shared           | `@typeshade/site-ui`, linked with `workspace:*`       |
 
 ## Development
 
@@ -35,6 +35,12 @@ app's prebuild hook after its source library has been built.
 Edit `packages/ui` and use its CSS, Astro or React subpath exports. No tarball
 copying or npm publishing is needed. The app-specific GPU, learning and editor
 logic stays in the app. See [UI architecture](packages/ui/README.md).
+
+Run `pnpm dev:ui` for the component workbench at http://localhost:4324/.
+`pnpm check:ui && pnpm build:ui && pnpm test:controls` verifies control states,
+keyboard interactions and automated accessibility. CI checks the workbench on each
+PR and retains screenshots as an artifact. It has no production deployment.
+See [the UI audit and adoption plan](docs/ui-audit.md) for scope and remaining work.
 
 ## CI and deployment
 

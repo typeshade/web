@@ -1,36 +1,3 @@
-/* Buttons: Ant's default face and its primary face, 32px tall, 40px for the page's action. */
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ui-space-2);
-  block-size: 32px;
-  padding: 4px 15px;
-  border: 1px solid var(--color-line-2);
-  border-radius: var(--radius);
-  background: var(--color-ground);
-  color: var(--color-text-1);
-  box-shadow: var(--shadow-button);
-  font-family: inherit;
-  font-size: var(--text-ui);
-  line-height: var(--text-ui--line-height);
-  text-decoration: none;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    color var(--motion),
-    border-color var(--motion),
-    background-color var(--motion),
-    box-shadow var(--motion);
-}
-.button:hover {
-  color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-}
-.button:active {
-  color: var(--color-primary-active);
-  border-color: var(--color-primary-active);
-}
 .button-icon {
   inline-size: 12px;
   block-size: 12px;
@@ -39,29 +6,6 @@
 }
 .button:hover .button-icon {
   transform: translateX(2px);
-}
-.button-primary {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #fff;
-  box-shadow: var(--shadow-button-primary);
-}
-.button-primary:hover {
-  background: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-  color: #fff;
-}
-.button-primary:active {
-  background: var(--color-primary-active);
-  border-color: var(--color-primary-active);
-  color: #fff;
-}
-/* Ant's large control: 40px, 16px text. */
-.button-lg {
-  block-size: 40px;
-  padding: 7px 15px;
-  font-size: var(--text-h5);
-  border-radius: var(--radius-md);
 }
 /* Ant Alert, the info face: a 1px #91caff rule over the primary's own #e6f4ff wash, with the
    info-circle at the left. The two pre-release notes on the site use it. */

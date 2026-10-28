@@ -13,7 +13,10 @@
     "./astro/*": "./astro/*.astro",
     "./react": "./react/index.tsx",
     "./product-shell.css": "./styles/product-shell.css",
-    "./product-theme.css": "./styles/product-theme.css"
+    "./product-theme.css": "./styles/product-theme.css",
+    "./semantics.css": "./styles/semantics.css",
+    "./controls.css": "./styles/controls.css",
+    "./react/controls": "./react/controls.tsx"
   },
   "peerDependencies": {
     "astro": ">=6 <8",

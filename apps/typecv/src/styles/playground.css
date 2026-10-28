@@ -69,7 +69,7 @@
   height: 39px;
   color: var(--ink);
   background: var(--soft);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 13px;
 }
 .select-grid {
@@ -118,7 +118,7 @@
   border: 1px solid var(--line);
   border-radius: 20px;
   color: var(--muted);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
 }
 .backend-chip i {
@@ -149,7 +149,7 @@
 }
 .empty-mark {
   color: var(--brand);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 29px;
   font-weight: 400;
 }
@@ -161,7 +161,7 @@
   background: color-mix(in srgb, var(--brand) 20%, var(--line));
 }
 .loading-line::after {
-  content: '';
+  content: "";
   display: block;
   width: 40%;
   height: 100%;
@@ -196,7 +196,7 @@
   border-radius: 5px;
   background: var(--soft);
   color: var(--ink);
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 19px;
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -289,10 +289,7 @@
 .playground-code .token.punctuation {
   color: #d6e4ff;
 }
-:root[data-theme='dark'] .button-quiet {
-  background: var(--panel);
-}
-:root[data-theme='dark'] .execution-result,
-:root[data-theme='dark'] .playground-workbench {
+:root[data-theme="dark"] .execution-result,
+:root[data-theme="dark"] .playground-workbench {
   background: var(--panel);
 }

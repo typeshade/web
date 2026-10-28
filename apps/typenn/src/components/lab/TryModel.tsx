@@ -1,4 +1,4 @@
-import { Button, Input } from "antd";
+import { Button, Input, TextArea, Field } from "@typeshade/site-ui/react";
 import {
   useEffect,
   useRef,
@@ -173,7 +173,7 @@ function ImageTry({ session, words }: { session: Session; words: Words }) {
         <div className="lab-run-bar">
           {drawable && <Button onClick={clear}>{words.clear}</Button>}
           <Button onClick={randomTest}>{words.randomTest}</Button>
-          <Button type="primary" onClick={() => void classify()}>
+          <Button variant="primary" onClick={() => void classify()}>
             {words.classify}
           </Button>
         </div>
@@ -230,17 +230,16 @@ function TextTry({ session, words }: { session: Session; words: Words }) {
 
   return (
     <div className="lab-text-try">
-      <label className="lab-field lab-wide">
-        {words.reviewPlaceholder}
-        <Input.TextArea
+      <Field label={words.reviewPlaceholder}>
+        <TextArea
           rows={4}
           value={review}
           onChange={(e) => setReview(e.target.value)}
           placeholder={words.reviewPlaceholder}
         />
-      </label>
+      </Field>
       <div className="lab-run-bar">
-        <Button type="primary" onClick={() => void classify()}>
+        <Button variant="primary" onClick={() => void classify()}>
           {words.classify}
         </Button>
       </div>
@@ -305,8 +304,7 @@ function RegressionTry({
       <p className="lab-note">{words.features}</p>
       <div className="lab-features">
         {features.map((name, f) => (
-          <label key={name} className="lab-field">
-            {name}
+          <Field key={name} label={name}>
             <Input
               value={values[f]}
               onChange={(e) =>
@@ -314,12 +312,12 @@ function RegressionTry({
               }
               inputMode="decimal"
             />
-          </label>
+          </Field>
         ))}
       </div>
       <div className="lab-run-bar">
         <Button onClick={randomRow}>{words.randomRow}</Button>
-        <Button type="primary" onClick={() => void predictPrice()}>
+        <Button variant="primary" onClick={() => void predictPrice()}>
           {words.predictedPrice}
         </Button>
       </div>
