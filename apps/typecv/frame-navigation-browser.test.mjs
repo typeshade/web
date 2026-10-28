@@ -620,25 +620,38 @@ test('completed videos keep native playback, frame selection, images and camera 
     await page.waitForFunction(() => window.cameraDistance(61) < 1e-6);
     // Check the new controls in the production layout at a phone width.
     const assets = new URL('./dist/_astro/', import.meta.url);
-    const stylesheet = (await readdir(assets)).find(
-      (name) => name.startsWith('SiteLayout.') && name.endsWith('.css'),
+    const stylesheets = (await readdir(assets)).filter(
+      (name) =>
+        /^(?:SiteLayout|sfm-lab)\..+\.css$/.test(name),
     );
+    assert.ok(stylesheets.some((name) => name.startsWith('SiteLayout.')));
+    assert.ok(stylesheets.some((name) => name.startsWith('sfm-lab.')));
     await page.locator('style[data-harness]').evaluate((style) => style.remove());
     await page.locator('#app').evaluate((app) => {
       app.className = 'lab-main';
     });
-    await page.addStyleTag({ content: await readFile(new URL(stylesheet, assets), 'utf8') });
+    await page.addStyleTag({
+      content: await Promise.all(
+        stylesheets.map((name) => readFile(new URL(name, assets), 'utf8')),
+      ).then((contents) => contents.join('\n')),
+    });
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.waitForFunction(
       () =>
         getComputedStyle(document.querySelector('.sfm-live-grid')).gridTemplateColumns.split(' ')
           .length === 2,
     );
-    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+    await page.locator('.sfm-live-grid').scrollIntoViewIfNeeded();
     const desktop = await page.evaluate(async () => {
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       const stream = document.querySelector('.sfm-stream'),
         map = document.querySelector('.sfm-map');
+      const streamRect = stream.getBoundingClientRect();
+      const mapRect = map.getBoundingClientRect();
+      const streamHead = stream.querySelector('.sfm-map-head').getBoundingClientRect();
+      const mapHead = map.querySelector('.sfm-map-head').getBoundingClientRect();
+      const streamMedia = stream.querySelector('.sfm-media').getBoundingClientRect();
+      const mapMedia = map.querySelector('.sfm-media').getBoundingClientRect();
       const frame = stream.querySelector('.sfm-stage').getBoundingClientRect();
       const viewer = map.querySelector('.viewer').getBoundingClientRect();
       const video = stream.querySelector('video').getBoundingClientRect();
@@ -646,6 +659,12 @@ test('completed videos keep native playback, frame selection, images and camera 
       return {
         frameTop: frame.top,
         viewerTop: viewer.top,
+        streamTop: streamRect.top,
+        mapTop: mapRect.top,
+        streamHeadHeight: streamHead.height,
+        mapHeadHeight: mapHead.height,
+        streamMediaTop: streamMedia.top,
+        mapMediaTop: mapMedia.top,
         streamHeight: stream.getBoundingClientRect().height,
         mapHeight: map.getBoundingClientRect().height,
         scrollHeight: stream.scrollHeight,

@@ -116,6 +116,9 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:ui apps/${{ matrix.site }}/dist
       - if: matrix.site == 'typeshade'
+        name: Install the TypeShade test browser
+        run: pnpm --filter typeshade-site exec playwright install --with-deps chromium
+      - if: matrix.site == 'typeshade'
         run: pnpm --filter typeshade-site check:null-values
       - uses: actions/upload-artifact@v4
         with:
@@ -148,6 +151,9 @@ jobs:
           name: site-typecv
           path: apps/typecv/dist
       - run: pnpm exec playwright install --with-deps chromium
+      # Some migrated helpers use the pinned library's Playwright; app tests resolve their
+      # own locked version. Install both browser revisions instead of relying on a warm cache.
+      - run: pnpm --filter typecv-site exec playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Run migrated website tests
         working-directory: apps/typecv

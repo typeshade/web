@@ -26,6 +26,7 @@
     "@ant-design/cssinjs": "1.24.0"
   },
   "devDependencies": {
+    "@webgpu/types": "0.1.74",
     "@tailwindcss/vite": "4.3.3",
     "@types/prismjs": "1.26.6",
     "@types/react": "19.3.0",

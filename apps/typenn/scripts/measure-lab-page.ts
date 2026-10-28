@@ -1,3 +1,5 @@
+/// <reference types="@webgpu/types" />
+
 // Runs in the page of scripts/measure-lab.mjs: one training run of the Lab's train loop on a
 // synthetic dataset with the shape of a Lab dataset, on WebGPU. It counts the bytes the page
 // uploads to the GPU queue (queue.writeBuffer, and mappedAtCreation buffers) and times each step.
@@ -44,7 +46,9 @@ function countUploads(): void {
   ) {
     const [, , data, dataOffset, size] = args;
     const view = ArrayBuffer.isView(data) ? data : null;
-    const perElement = view ? view.BYTES_PER_ELEMENT : 1;
+    const perElement = view && "BYTES_PER_ELEMENT" in view
+      ? Number(view.BYTES_PER_ELEMENT)
+      : 1;
     const total = view
       ? view.byteLength / perElement
       : (data as ArrayBuffer).byteLength;
@@ -77,7 +81,7 @@ function syntheticDataset(
   preset: (typeof PRESETS)[keyof typeof PRESETS],
   id: string,
 ) {
-  const size = preset.shape.reduce((a, b) => a * b, 1);
+  const size = preset.shape.reduce<number>((a, b) => a * b, 1);
   const random = mulberry32(1);
   const split = (count: number) => {
     const x = new Uint8Array(count * size);
@@ -93,7 +97,7 @@ function syntheticDataset(
   });
   const splitRef = (count: number) => ({
     count,
-    x: field("uint8", preset.shape),
+    x: field("uint8", [...preset.shape]),
     y: field("uint8", []),
   });
   return {

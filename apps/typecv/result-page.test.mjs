@@ -134,9 +134,21 @@ test('the lab opens result files and a result card without a run', async () => {
 
     // View: the files download, and the viewer shows cameras, the dense cloud and the mesh switch.
     await page.getByRole('button', { name: 'View Demo demo' }).click();
-    await page.waitForFunction(
-      () => document.querySelector('.sfm-map .viewer')?.dataset.views === '2',
-    );
+    await page.locator('.lab-input-drawer').waitFor({ state: 'hidden' });
+    // Rendering pauses outside the viewport. The shared page header can put the viewer below
+    // the fold, so inspect the loaded scene after bringing its canvas into view.
+    await viewer.scrollIntoViewIfNeeded();
+    try {
+      await page.waitForFunction(
+        () => document.querySelector('.sfm-map .viewer')?.dataset.views === '2',
+      );
+    } catch (cause) {
+      const state = await page.evaluate(() => ({
+        status: document.querySelector('.lab-status')?.textContent,
+        viewer: { ...document.querySelector('.sfm-map .viewer')?.dataset },
+      }));
+      throw new Error(`Saved result did not open: ${JSON.stringify({ ...state, errors })}`, { cause });
+    }
     assert.equal(await viewer.getAttribute('data-views'), '2');
     await page.waitForFunction(
       () => document.querySelector('.sfm-map .viewer')?.dataset.cloud === 'dense',

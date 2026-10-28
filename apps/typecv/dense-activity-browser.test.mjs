@@ -498,6 +498,11 @@ test('the lab visualizes real fusion events, replaces temporary points and clear
     await stop.click();
     await run.waitFor();
     assert.match(await page.locator('.lab-status').textContent(), /Dense MVS cancelled/i);
+    // The viewer pauses drawing offscreen. Bring it back into view before asserting its retained map.
+    await page.locator('.sfm-map .viewer').scrollIntoViewIfNeeded();
+    await page.waitForFunction(
+      () => document.querySelector('.sfm-map .viewer')?.dataset.points === '3',
+    );
     assert.equal(await page.locator('.sfm-map .viewer').getAttribute('data-points'), '3');
     assert.equal(await page.evaluate(() => window.__denseWorker.cancelledDense), true);
     await page.waitForFunction(() =>

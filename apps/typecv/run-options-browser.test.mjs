@@ -104,7 +104,13 @@ const catalog = {
 };
 
 async function bundles() {
-  const common = { bundle: true, write: false, format: 'esm', logLevel: 'silent' };
+  const common = {
+    bundle: true,
+    write: false,
+    format: 'esm',
+    logLevel: 'silent',
+    loader: { '.css': 'empty' },
+  };
   const worker = (name, extra = {}) =>
     build({
       ...common,
@@ -139,7 +145,13 @@ async function serve() {
     [0, 3, 6].map((frame) => readFile(imageFixture('south-building', frame))),
   );
   const clip = await fixtureVideo(images, 320, 180);
-  const css = await readFile(new URL('./src/styles/global.css', import.meta.url), 'utf8');
+  const css = (
+    await Promise.all(
+      ['global.css', 'lab-page.css', 'sfm-lab.css'].map((name) =>
+        readFile(new URL(`./src/styles/${name}`, import.meta.url), 'utf8'),
+      ),
+    )
+  ).join('\n');
   const server = createServer((req, res) => {
     const path = new URL(req.url, 'http://localhost').pathname;
     if (Object.hasOwn(scripts, path))

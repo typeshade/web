@@ -135,7 +135,15 @@ replace those results. App-specific evidence and remaining browser checks are in
 [the TypeShade review](../apps/typeshade/docs/reviews/typeshade-upstream-migration.md).
 
 Workflow lint, frozen workspace install, 17 deployment/scope helper tests and shared code
-highlighting tests passed. Original dirty worktree file hashes and status were verified
+highlighting tests passed. The first migration CI run (`40655627199`, commit `cdb5eda`) passed
+shared controls, TypeCV build/UI checks and Python analysis. It exposed TypeNN measurement
+harness type errors and a missing TypeShade Playwright browser revision. The harness now has
+explicit WebGPU types and passes its type check and measurement smoke. CI installs each app
+test runner’s locked browser revision as well as the shared runner’s browser. Focused TypeCV regression reruns now pass for GPU preparation, camera/frame navigation,
+dense activity, run options, saved results and the public Playground. The lab stylesheet
+restores omitted input/command/progress controls, applies theme aliases to drawer portals,
+and excludes unrelated home/docs/global rules. Final shared UI and stylesheet ownership
+checks passed. The follow-up CI result must be checked before cutover. Original dirty worktree file hashes and status were verified
 unchanged on 2026-10-28. No production workflow was dispatched, no production credentials
 were changed and no repository was archived. A successful build or a prepared workflow is
 not a completed production migration.

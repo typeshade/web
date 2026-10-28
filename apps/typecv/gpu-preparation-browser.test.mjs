@@ -141,6 +141,7 @@ THREE.Scene.prototype.onAfterRender = function(renderer, scene, camera) {
         texture.addEventListener('dispose', () => window.disposedGraphTextures = (window.disposedGraphTextures ?? 0) + 1);
       }
       return {id:sprite.userData.id, texture:texture.uuid, version:texture.version,
+        u:(position.x + 1) / 2, v:(1 - position.y) / 2,
         x:rect.left + (position.x + 1) * rect.width / 2,
         y:rect.top + (1 - position.y) * rect.height / 2};
     }),
@@ -381,7 +382,30 @@ test("the Lab shows actual preparation, elapsed time, cancellation, errors and r
       await page.evaluate(() => {
         window.previousWorker = window.testWorker;
       });
-      await stop.click();
+      try {
+        await stop.click();
+      } catch (cause) {
+        const state = await page.evaluate(() => {
+          const button = document.querySelector(".lab-run-toggle");
+          const surface = document.querySelector(".mv-activity-surface");
+          const rect = button?.getBoundingClientRect();
+          const center = rect && {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+          };
+          return {
+            viewport: { width: innerWidth, height: innerHeight },
+            scrollY,
+            button: rect?.toJSON(),
+            surface: surface?.getBoundingClientRect().toJSON(),
+            centerHit: center && document.elementFromPoint(center.x, center.y)?.outerHTML.slice(0, 300),
+            grid: document.querySelector(".sfm-live-grid")?.getBoundingClientRect().toJSON(),
+          };
+        });
+        throw new Error(`Stop control was blocked by the graph surface: ${JSON.stringify(state)}`, {
+          cause,
+        });
+      }
       await preparation.waitFor({ state: "hidden" });
       assert.equal(
         await page.evaluate(() => window.previousWorker.terminated),
@@ -430,7 +454,9 @@ test("the Lab shows actual preparation, elapsed time, cancellation, errors and r
         const panel = page.getByTestId("multi-video-activity");
         assert.equal(await panel.getAttribute("data-mode"), "full");
         assert.equal(await panel.locator(".mv-activity-node").count(), 2);
-        await page.locator(".mv-activity-surface").scrollIntoViewIfNeeded();
+        await page
+          .locator(".sfm-map .viewer canvas")
+          .scrollIntoViewIfNeeded();
         // Prior cancelled runs also drew two nodes. Wait for a draw on this run's new surface
         // before capturing UUIDs; a stale snapshot would compare textures from different runs.
         try {
@@ -478,12 +504,28 @@ test("the Lab shows actual preparation, elapsed time, cancellation, errors and r
           const body = document.querySelector(".mv-activity-body");
           const current = document.querySelector(".mv-activity-surface");
           const widest = [...document.querySelectorAll("body *")]
-            .map((element) => ({
-              tag: element.tagName,
-              className:
-                typeof element.className === "string" ? element.className : "",
-              width: element.getBoundingClientRect().right,
-            }))
+            .map((element) => {
+              const rect = element.getBoundingClientRect();
+              return {
+                tag: element.tagName,
+                className:
+                  typeof element.className === "string" ? element.className : "",
+                src: element instanceof HTMLImageElement ? element.currentSrc : undefined,
+                parent:
+                  element.parentElement && {
+                    tag: element.parentElement.tagName,
+                    className:
+                      typeof element.parentElement.className === "string"
+                        ? element.parentElement.className
+                        : "",
+                    width: element.parentElement.getBoundingClientRect().width,
+                  },
+                left: rect.left,
+                right: rect.right,
+                width: rect.width,
+                display: getComputedStyle(element).display,
+              };
+            })
             .filter((element) => element.width > innerWidth)
             .sort((a, b) => b.width - a.width)
             .slice(0, 5);
@@ -677,7 +719,14 @@ test("the Lab shows actual preparation, elapsed time, cancellation, errors and r
         const secondNode = await page.evaluate(
           () => window.graphDrawing.nodes[1],
         );
-        await page.mouse.click(secondNode.x, secondNode.y);
+        const interactionSurface = page.locator(".mv-activity-surface");
+        await interactionSurface.scrollIntoViewIfNeeded();
+        const surfaceBox = await interactionSurface.boundingBox();
+        assert.ok(surfaceBox);
+        await page.mouse.click(
+          surfaceBox.x + secondNode.u * surfaceBox.width,
+          surfaceBox.y + secondNode.v * surfaceBox.height,
+        );
         await page.waitForFunction(
           () => document.querySelector(".mv-activity-selection")?.value === "b",
         );
@@ -701,7 +750,9 @@ test("the Lab shows actual preparation, elapsed time, cancellation, errors and r
             ),
           });
         await page.setViewportSize({ width: 1280, height: 900 });
-        await page.locator(".mv-activity-surface").scrollIntoViewIfNeeded();
+        await page
+          .locator(".sfm-map .viewer canvas")
+          .scrollIntoViewIfNeeded();
         assert.deepEqual(
           await page.evaluate(() =>
             window.graphDrawing.nodes.map((node) => node.texture),
@@ -816,7 +867,9 @@ test("the Lab shows actual preparation, elapsed time, cancellation, errors and r
         await panel
           .locator(".mv-activity-edge[data-state=verified]")
           .waitFor({ state: "attached" });
-        await page.locator(".mv-activity-surface").scrollIntoViewIfNeeded();
+        await page
+          .locator(".sfm-map .viewer canvas")
+          .scrollIntoViewIfNeeded();
         const surface = await page
           .locator(".mv-activity-surface")
           .boundingBox();
