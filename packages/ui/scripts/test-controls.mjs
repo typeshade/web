@@ -180,11 +180,14 @@ try {
       const input = document.querySelector(
         '.ui-select input[aria-expanded="true"]',
       );
+      const activeId = input?.getAttribute("aria-activedescendant");
       const active = document.querySelector(
-        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-active",
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option",
       );
       return (
-        input === document.activeElement && active?.textContent.trim() === "Adam"
+        input === document.activeElement &&
+        activeId === `${input?.getAttribute("aria-controls")}_0` &&
+        active?.textContent.trim() === "Adam"
       );
     },
   );
@@ -194,13 +197,14 @@ try {
       const input = document.querySelector(
         '.ui-select input[aria-expanded="true"]',
       );
-      const option = document.querySelector(
-        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-active",
+      const activeId = input?.getAttribute("aria-activedescendant");
+      const options = document.querySelectorAll(
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option",
       );
       return (
         input === document.activeElement &&
-        option?.classList.contains("ant-select-item-option-active") &&
-        option.textContent.trim() === "SGD"
+        activeId === `${input?.getAttribute("aria-controls")}_1` &&
+        options[1]?.textContent.trim() === "SGD"
       );
     },
   );
