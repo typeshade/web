@@ -1,0 +1,8 @@
+{
+  "slug": "madd",
+  "source": "e541454f6a5a1437d2ed43758a56304bf4990eb0e3dd3ce5c282545a5927ce13",
+  "texts": {
+    "summary": "곱셈 후 덧셈인 a*b + c를 계산합니다. a.mul(b).add(c) 체인으로 표현합니다.",
+    "description": "WGSL의 곱셈-덧셈 내장 함수를 생성하려면 [`fma`](/api/fma/)를 씁니다. 어느 형태도 단일 반올림을 보장하지 않습니다."
+  }
+}

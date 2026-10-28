@@ -1,0 +1,11 @@
+{
+  "slug": "step",
+  "source": "2fe310915c4407a3b0bfd0a98539c08fe28327222dd988723c3db1d0785f0aa5",
+  "texts": {
+    "summary": "step(edge, x): x가 edge보다 작은 곳은 0, 그 밖의 곳은 1이며 성분별로 계산합니다.",
+    "description": "결과의 키는 `x`로 정해집니다. WGSL은 `edge`와 `x`가 같은 타입이어야 한다고 요구합니다.",
+    "targets.wgsl": "`step(edge, x)`.",
+    "targets.glsl": "`step(edge, x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "slug": "pack2x16unorm",
+  "source": "2042a438a525f8844e5efbb9cc46189b658529d32c8dc0810600d6c539f989c8",
+  "texts": {
+    "summary": "vec2<f32>를 u32 하나로 패킹합니다. 두 성분은 16비트 unorm 값이며, 성분마다 ⌊0.5 + 65535·clamp(x, 0, 1)⌋이입니다. 성분 0은 하위 16비트에 들어갑니다.",
+    "description": "[`pack4x8unorm`](/api/pack4x8unorm/)의 8비트 채널보다 한 단계 높은 16비트 형식입니다. GLSL ES 3.00에서는 이름이 `packUnorm2x16`이입니다.",
+    "targets.wgsl": "`pack2x16unorm(v)`로 생성합니다.",
+    "targets.glsl": "`packUnorm2x16(v)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

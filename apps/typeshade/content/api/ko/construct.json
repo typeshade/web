@@ -1,0 +1,8 @@
+{
+  "slug": "construct",
+  "source": "954828ba5db329bfd251e96c5cf3b1e6cbf57aa2324a42521e140a15b4b54d48",
+  "texts": {
+    "summary": "저수준 TypeName(args) 생성자 호출입니다. vec2, vec3, vec2f64와 구조체의 .construct({...})가 모두 이 기본 요소 위에 만들어져 있습니다.",
+    "description": "일반 숫자 인자는 생성할 타입의 요소 스칼라로 승격됩니다. 이름이 정해진 헬퍼가 지원하지 않는 `ShaderType`에만 직접 호출합니다. 일반적인 작성에는 타입이 지정된 래퍼를 씁니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "emitfuncscsed",
+  "source": "6e0e6c97b0f8ded2061f2c0d8262046e2e00e4954bb13687ade7d16df98bfe95",
+  "texts": {
+    "summary": "emitFuncs의 별칭입니다.",
+    "targets.wgsl": "WebGPU용 WGSL을 생성합니다."
+  }
+}

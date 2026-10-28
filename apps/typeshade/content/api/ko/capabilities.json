@@ -1,0 +1,10 @@
+{
+  "slug": "capabilities",
+  "source": "7b56eb63f788bb652dad04d0bd11a0b38669664c90e8ad239cb5d452217b5184",
+  "texts": {
+    "summary": "백엔드가 지원하는 기능의 집합입니다. Capabilities.fromProfile로 백엔드의 capProfile에서 만듭니다.",
+    "description": "프로파일 키에 속한다는 것은 지원한다는 뜻입니다. 그래서 집합과 프로파일은 하나의 사실을 나타냅니다.\n\n모든 생성 전에 실행되는 기능 게이트가 이 집합을 씁니다. 게이트는 모듈이 필요로 하는 기능을 계산합니다. 저장 바인딩은 `storageBuffer`를, `@compute` 진입점은 `compute`를, 다중 샘플 텍스처 로드는 `msaaTextureLoad`를 필요로 합니다. 여기에 모듈이 `enables`에 적은 기능이 더해집니다. 게이트는 `covers(reqs)`를 호출합니다. 일치하지 않으면 `missing(reqs)`를 호출해, 대상이 생성할 수 없는 기능의 이름을 찾아냅니다. 그러면 [`UnsupportedFeatureError`](/api/unsupportedfeatureerror/)가 던져지고, 메시지는 \"backend 'glsl-es300' cannot emit this module: missing capabilities: compute\"로 나타나며, 모듈 전체를 문맥으로 담습니다. GLSL ES 3.00 `capProfile`에 `storageBuffer`, `compute`, `msaaTextureLoad`의 행이 없는 이유가 이것입니다. 게이트가 생성기보다 먼저 모듈을 거부하기 때문입니다.",
+    "members.fromProfile": "`capProfile`이 선언한 기능입니다. 프로파일의 키에서 읽습니다. 커버리지를 이 방식으로 만들어야 프로파일 멤버십과 기능 커버리지가 하나의 사실로 남습니다.",
+    "members.covers": "이 대상이 `reqs`가 필요로 하는 것을 모두 지원할 때만 true입니다."
+  }
+}

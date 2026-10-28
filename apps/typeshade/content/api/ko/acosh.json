@@ -1,0 +1,11 @@
+{
+  "slug": "acosh",
+  "source": "2d2ab50674c882712685917fdf91cbec21f01d4f9346612cc5d2515a0736f9aa",
+  "texts": {
+    "summary": "acosh(x): 역쌍곡코사인을 성분별로 구합니다.",
+    "description": "WGSL과 GLSL 명세에 따르면 `x < 1`은 정의되지 않습니다. 대부분의 드라이버에서는 NaN이 나옵니다. 정의역 안의 피연산자라도 반올림 때문에 1 아래로 내려갈 수 있습니다. 그럴 때는 [`asin`](/api/asin/)과 [`acos`](/api/acos/)의 경우처럼 `max(x, f32(1))`로 값을 1 이상으로 제한해야 합니다.",
+    "targets.wgsl": "`acosh(x)`.",
+    "targets.glsl": "`acosh(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

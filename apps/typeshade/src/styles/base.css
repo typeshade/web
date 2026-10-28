@@ -1,0 +1,93 @@
+/* Base */
+/* The page field is the container's own white, so the page reads as one surface from edge to
+   edge and the shell carries no band of grey beside it. The header and the footer keep their
+   hairline rules, and a card, a code frame and a dropdown keep their borders, which is what
+   sets each one apart on that field. */
+html {
+  background: var(--color-ground);
+  scrollbar-color: var(--color-line-2) transparent;
+}
+/* A column of header, document and footer, so a short page keeps its footer at the bottom
+   of the window instead of leaving it halfway up the screen. */
+body {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100vh;
+  background: var(--color-ground);
+  color: var(--color-text-1);
+  font-family: var(--font-sans);
+  font-size: var(--text-ui);
+  line-height: var(--text-ui--line-height);
+  -webkit-font-smoothing: antialiased;
+  caret-color: var(--color-accent);
+}
+body > main {
+  flex: 1;
+}
+::selection {
+  background: var(--color-selection);
+  color: var(--color-text-1);
+}
+:where(body *) {
+  min-inline-size: 0;
+}
+:where(img, canvas, svg, video) {
+  max-inline-size: 100%;
+  display: block;
+}
+:where([id]) {
+  scroll-margin-block-start: 24px;
+}
+/* Ant's focus ring: a 4px wash of the primary, plus the outline a keyboard reader needs on
+   any ground the wash disappears into. */
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  box-shadow: var(--ring);
+  border-radius: inherit;
+}
+:where(input, textarea, select):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+  box-shadow: var(--ring);
+}
+
+.wrap {
+  inline-size: var(--content);
+  margin-inline: auto;
+}
+/* The container every full-width page uses: the header's own measure, with the gutters. */
+.wide-in {
+  max-inline-size: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter-x);
+}
+/* Text that is only for a screen reader: a tile's caption, whose picture already has a name. */
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Skip link */
+.skip {
+  position: fixed;
+  inset-block-start: 8px;
+  inset-inline-start: 8px;
+  z-index: 60;
+  padding: 7px 15px;
+  background: var(--color-ground);
+  color: var(--color-text-1);
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-elevated);
+  text-decoration: none;
+  clip-path: inset(50%);
+}
+.skip:focus-visible {
+  clip-path: none;
+}

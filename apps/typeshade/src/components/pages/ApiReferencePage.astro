@@ -1,0 +1,335 @@
+---
+// One API reference page, laid out the way an MDN reference page is: the name, a one-sentence
+// summary, then Syntax, Parameters, Return value, Exceptions, Description, Examples, Targets
+// (the compatibility table), the members of an interface or class, In the guide, See also and
+// Source. A section with nothing to show is left out, and the outline lists the sections that
+// remain. The data is an ApiEntry (src/lib/api-types.ts), generated from the compiler at the
+// pinned commit; the words around it come from the dictionary (docs.api).
+import { Code } from 'astro-expressive-code/components';
+import Docs, { type Heading } from '../../layouts/Docs.astro';
+import ApiType from '../ApiType.astro';
+import LinkColumns from '../LinkColumns.astro';
+import Rich from '../Rich.astro';
+import type { ApiEntry, ApiEntryHtml, ApiTranslated } from '../../lib/api-types.ts';
+import { apiCategoryCopy, assertApiCategories, copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import { apiSiblings, isIrBuilder } from '../../lib/api-nav.ts';
+import { languageEntryPage } from '../../lib/language-reference.ts';
+import { errorCodePath } from '../../lib/error-codes.ts';
+import { facts } from '../../lib/examples.ts';
+import { links } from '../../lib/links.ts';
+import { META_MIN, fitDescription } from '../../lib/meta-description.ts';
+import { slugify } from '../../lib/slug.ts';
+
+interface Props {
+  locale: Locale;
+  /** The entry with its markdown fields rendered by the content loader (src/lib/api-loader.ts). */
+  entry: ApiEntry & { html: ApiEntryHtml; translations?: Record<string, ApiTranslated> };
+  /** The locale-neutral route of this page, for example '/api/clamp/'. */
+  path: string;
+}
+const { locale, entry, path } = Astro.props;
+// Markdown is rendered once, so its links name the English reference, error and rule pages; a
+// Korean page keeps the reader in Korean chrome by prefixing them.
+const localize = (s: string | undefined): string => (!s ? '' : locale === 'en' ? s : s.replace(/href="\/(api|reference\/errors|reference\/rules)\//g, `href="/${locale}/$1/`));
+// A locale with a current translation of this export (src/lib/api-translations.ts) reads the
+// summary, the description and every other JSDoc text in its own language; without one, stale
+// or never made, the page shows the compiler's English under the note that says so.
+const translated = entry.translations?.[locale];
+const raw = translated?.html ?? entry.html;
+const summary = translated?.summary ?? entry.summary;
+const html = {
+  summary: localize(raw.summary),
+  description: localize(raw.description),
+  parameters: raw.parameters.map(localize),
+  returns: localize(raw.returns),
+  exceptions: raw.exceptions.map(localize),
+  examples: raw.examples.map(localize),
+  targets: raw.targets.map(localize),
+  members: raw.members.map(localize),
+};
+assertApiCategories();
+const t = copyFor(locale);
+const a = t.docs.api;
+const category = apiCategoryCopy(locale, entry.category.slug);
+const callable = entry.kind === 'function' || entry.kind === 'constant';
+const heading = callable && entry.signatures.length > 0 ? `${entry.name}()` : entry.name;
+// A function of Builtins or Values imported from typeshade/core/ir alone is an IR builder for a
+// builtin of the language, and its title and description say so.
+const builder = entry.kind === 'function' && isIrBuilder(entry) && entry.modules.length === 1 && entry.modules[0] === 'typeshade/core/ir';
+const title = builder ? a.builderTitle(heading) : a.pageTitle(heading, a.kinds[entry.kind], category.name);
+// The meta description. A JSDoc summary of one short sentence is under the 70 characters the
+// SEO checks want, so the category's own sentence fills it out. A long one is cut at 160 on
+// an English page. A Korean page's description is a short Korean lead-in (docs.api.pageDescription)
+// in front of the summary, Korean where the export is translated and the JSDoc's English where
+// it is not; 140 leaves the tail enough room to find its own sentence or clause end instead of
+// falling to the word-boundary cut on almost every page, which a flat 100 did (the SEO review,
+// onpage, Korean description cutoff and mid-sentence cuts). The cut itself is in
+// src/lib/meta-description.ts, which the language reference's entry pages use too.
+const composed = builder ? a.builderDescription(entry.name, summary) : a.pageDescription(entry.name, a.kinds[entry.kind], category.name, summary);
+const filled = composed.length < META_MIN ? `${composed} ${category.summary}` : composed;
+const description = fitDescription(filled, localeSettings[locale].metaDescriptionMax);
+// The line a reader types before using any of this: one per specifier that exports the name,
+// the package's barrel first and then a subpath such as typeshade/runtime, which an application
+// that loads compiled programs imports alone. A type is imported as one.
+const typeOnly = entry.kind === 'interface' || entry.kind === 'type';
+const importLines = entry.modules.map((specifier) => `import ${typeOnly ? 'type ' : ''}{ ${entry.name} } from '${specifier}'`);
+// An IR builder for a builtin of the language names the builtin a shader file calls instead,
+// under the import line and first under See also.
+const languagePage = isIrBuilder(entry) ? languageEntryPage('function', entry.name) : undefined;
+const seeAlso = [...(languagePage ? [{ href: languagePage, label: `${entry.name}()` }] : []), ...entry.seeAlso];
+const sourceHref = `${facts.mirrorUrl}/blob/${facts.pinnedCommit}/${entry.source.file}#L${entry.source.line}`;
+// Previous and next walk this category alphabetically, then carry on into the next category,
+// the way the sidebar lists them. The pages of the reference are not in the sidebar's flat
+// list until their category is open, so the page hands the pager both ends itself.
+const siblings = apiSiblings(entry.slug);
+const page = (slug: string): string => localePath(locale, `/api/${slug}/`);
+const previous = siblings.previous
+  ? { label: siblings.previous.name, href: page(siblings.previous.slug) }
+  : { label: category.name, href: page(entry.category.slug) };
+const next = siblings.next
+  ? { label: siblings.next.name, href: page(siblings.next.slug) }
+  : siblings.nextCategory
+    ? { label: apiCategoryCopy(locale, siblings.nextCategory.category.slug).name, href: page(siblings.nextCategory.category.slug) }
+    : undefined;
+// What a search result calls the page: the name with its kind, so a hit reads abs (function).
+// Pagefind reads one key from one attribute, so the kind itself is recorded on the kind line.
+const meta = `title:${entry.name} (${a.kinds[entry.kind].toLowerCase()})`;
+
+const withHtml = entry.members.map((m, i) => ({ ...m, html: html.members[i] ?? '' }));
+const properties = withHtml.filter((m) => m.kind === 'property');
+const methods = withHtml.filter((m) => m.kind === 'method');
+const constructors = withHtml.filter((m) => m.kind === 'constructor');
+
+// The sections this page shows, in MDN's order; the outline follows the same list.
+const sections = [
+  { id: 'syntax', label: a.syntax, show: entry.signatures.length > 0 || entry.declaration.length > 0 },
+  { id: 'parameters', label: a.parameters, show: entry.parameters.length > 0 },
+  { id: 'return-value', label: a.returnValue, show: entry.returns !== null },
+  { id: 'exceptions', label: a.exceptions, show: entry.exceptions.length > 0 },
+  { id: 'description', label: a.descriptionHeading, show: entry.description.length > 0 },
+  { id: 'examples', label: a.examples, show: entry.examples.length > 0 },
+  { id: 'targets', label: a.targets, show: entry.targets.length > 0 },
+  { id: 'constructor', label: a.constructor, show: constructors.length > 0 },
+  { id: 'instance-properties', label: a.instanceProperties, show: properties.length > 0 },
+  { id: 'instance-methods', label: a.instanceMethods, show: methods.length > 0 },
+  { id: 'in-the-guide', label: a.inGuide, show: entry.guideSections.length > 0 },
+  { id: 'see-also', label: a.seeAlso, show: seeAlso.length > 0 },
+  { id: 'source', label: a.source, show: true },
+].filter((s) => s.show);
+// The first example is titled 'Example', later ones 'Example 2', 'Example 3'. The title is
+// built here from docs.api.example, since the ApiEntry data itself carries no locale.
+const exampleTitle = (i: number): string => (i === 0 ? a.example : `${a.example} ${i + 1}`);
+// The outline follows the page: each example sits under the Examples heading it belongs to.
+const headings: Heading[] = sections.flatMap((s) => [
+  { depth: 2, slug: s.id, text: s.label },
+  ...(s.id === 'examples' ? entry.examples.map((_, i) => ({ depth: 3, slug: `example-${slugify(exampleTitle(i))}`, text: exampleTitle(i) })) : []),
+]);
+// A guide section is named the way the sidebar names it, so a Korean page reads Korean here.
+const guideLabel = (link: { label: string; href: string }): string => {
+  const id = /\/guide\/internals\/([^/]+)\//.exec(link.href)?.[1];
+  if (!id) return t.docs.authoringGuide;
+  return t.guide.sections[id]?.title ?? link.label;
+};
+const supportLabel = (s: string) => a.support[s as keyof typeof a.support] ?? s;
+const targetLabel = (s: string) => a.targetNames[s as keyof typeof a.targetNames] ?? s;
+// A target's support state as an Ant tag: the primary's wash where the target has the name,
+// the red border where it does not, and the neutral tag for the rest.
+const tag = 'inline-block rounded-sm border px-[7px] text-label whitespace-nowrap';
+const supportTag: Record<string, string> = {
+  native: `${tag} border-(--color-primary-border) bg-(--color-primary-bg) text-accent`,
+  none: `${tag} border-diag bg-transparent text-diag`,
+};
+const supportClass = (s: string) => supportTag[s] ?? `${tag} border-line-2 bg-surface-1 text-text-2`;
+---
+
+<Docs
+  locale={locale}
+  path={path}
+  title={title}
+  description={description}
+  headings={headings}
+  editHref={sourceHref}
+  bodyLang={translated ? locale : 'en'}
+  noindex={entry.preview === true}
+  openCategory={entry.category.slug}
+  previous={previous}
+  next={next}
+  meta={meta}
+  breadcrumbs={[
+    { name: a.reference, href: links.api.href },
+    { name: category.name, href: `/api/${entry.category.slug}/` },
+    { name: heading, href: `/api/${entry.slug}/` },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  {entry.preview && <p class="rounded border border-diag px-3 py-2 text-(length:--text-ui) text-diag" lang={locale}>{a.previewNote}</p>}
+  <nav class="api-crumbs" aria-label={a.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, '/api/')}>{a.reference}</a>
+    <span aria-hidden="true">›</span>
+    <a href={localePath(locale, `/api/${entry.category.slug}/`)}>{category.name}</a>
+  </nav>
+  <h1><code>{heading}</code>{entry.deprecated && <span class="api-optional" lang={locale}>{a.deprecated}</span>}</h1>
+  <p class="api-kind" lang={locale} data-pagefind-meta={`${a.kindMeta}:${a.kinds[entry.kind]}`}>{a.kindLine(a.kinds[entry.kind], category.name)}</p>
+  <p class="api-summary">{summary}</p>
+  <p class="text-(length:--text-ui) text-text-2">{importLines.map((line, i) => <>{i > 0 && <br />}<code>{line}</code></>)}</p>
+  {languagePage && <p class="text-(length:--text-ui) text-text-2" lang={locale}><Rich text={a.languageNote} locale={locale} /> <a href={localePath(locale, languagePage)} lang="en"><code>{entry.name}()</code></a></p>}
+  <p class="guide-note" lang={locale}><Rich text={translated ? a.translatedNote : a.note} locale={locale} /></p>
+
+  {sections.some((s) => s.id === 'syntax') && (
+    <section>
+      <h2 id="syntax" lang={locale}>{a.syntax}</h2>
+      {entry.signatures.length > 0
+        ? <Code code={entry.signatures.map((s) => s.text).join('\n')} lang="ts" locale={locale} wrap />
+        : <Code code={entry.declaration} lang="ts" locale={locale} wrap />}
+    </section>
+  )}
+
+  {entry.parameters.length > 0 && (
+    <section>
+      <h2 id="parameters" lang={locale}>{a.parameters}</h2>
+      <dl class="api-list">
+        {entry.parameters.map((p, i) => (
+          <>
+            <dt><code>{p.name}</code>{p.optional && <span class="api-optional" lang={locale}>{a.optional}</span>} <ApiType locale={locale} text={p.type} self={entry.name} /></dt>
+            {html.parameters[i] && <dd><Fragment set:html={html.parameters[i]} /></dd>}
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
+
+  {entry.returns && (
+    <section>
+      <h2 id="return-value" lang={locale}>{a.returnValue}</h2>
+      <p><ApiType locale={locale} text={entry.returns.type} self={entry.name} /></p>
+      {html.returns && <Fragment set:html={html.returns} />}
+    </section>
+  )}
+
+  {entry.exceptions.length > 0 && (
+    <section>
+      <h2 id="exceptions" lang={locale}>{a.exceptions}</h2>
+      <dl class="api-list">
+        {entry.exceptions.map((e, i) => (
+          <>
+            <dt>{errorCodePath(e.name) ? <a href={localePath(locale, errorCodePath(e.name)!)}><code>{e.name}</code></a> : <code>{e.name}</code>}</dt>
+            <dd><Fragment set:html={html.exceptions[i]} /></dd>
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
+
+  {entry.description && (
+    <section>
+      <h2 id="description" lang={locale}>{a.descriptionHeading}</h2>
+      <Fragment set:html={html.description} />
+    </section>
+  )}
+
+  {entry.examples.length > 0 && (
+    <section>
+      <h2 id="examples" lang={locale}>{a.examples}</h2>
+      {entry.examples.map((e, i) => (
+        <section>
+          <h3 id={`example-${slugify(exampleTitle(i))}`}>{exampleTitle(i)}</h3>
+          {html.examples[i] && <Fragment set:html={html.examples[i]} />}
+          <Code code={e.code} lang={e.lang ?? 'ts'} locale={locale} />
+        </section>
+      ))}
+    </section>
+  )}
+
+  {entry.targets.length > 0 && (
+    <section>
+      <h2 id="targets" lang={locale}>{a.targets}</h2>
+      <table class="api-targets" data-own-stack>
+        <thead lang={locale}><tr><th>{a.target}</th><th>{a.supportHeading}</th><th>{a.notes}</th></tr></thead>
+        <tbody>
+          {entry.targets.map((s, i) => (
+            <tr>
+              <th scope="row">{targetLabel(s.target)}</th>
+              <td><span class={supportClass(s.support)} lang={locale}>{supportLabel(s.support)}</span></td>
+              <td>{html.targets[i] ? <Fragment set:html={html.targets[i]} /> : ''}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  )}
+
+  {constructors.length > 0 && (
+    <section>
+      <h2 id="constructor" lang={locale}>{a.constructor}</h2>
+      <dl class="api-list">
+        {constructors.map((m) => (
+          <>
+            <dt><code>{m.type}</code>{m.deprecated && <span class="api-optional" lang={locale}>{a.deprecated}</span>}</dt>
+            {m.html && <dd><Fragment set:html={m.html} /></dd>}
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
+
+  {properties.length > 0 && (
+    <section>
+      <h2 id="instance-properties" lang={locale}>{a.instanceProperties}</h2>
+      <dl class="api-list">
+        {properties.map((m) => (
+          <>
+            <dt><code>{m.name}</code>{m.optional && <span class="api-optional" lang={locale}>{a.optional}</span>}{m.readonly && <span class="api-optional" lang={locale}>{a.readonly}</span>}{m.deprecated && <span class="api-optional" lang={locale}>{a.deprecated}</span>} <ApiType locale={locale} text={m.type} self={entry.name} /></dt>
+            {m.html && <dd><Fragment set:html={m.html} /></dd>}
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
+
+  {methods.length > 0 && (
+    <section>
+      <h2 id="instance-methods" lang={locale}>{a.instanceMethods}</h2>
+      <dl class="api-list">
+        {methods.map((m) => (
+          <>
+            <dt><code>{m.name}</code>{m.deprecated && <span class="api-optional" lang={locale}>{a.deprecated}</span>} <ApiType locale={locale} text={m.type} self={entry.name} /></dt>
+            {m.html && <dd><Fragment set:html={m.html} /></dd>}
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
+
+  {entry.guideSections.length > 0 && (
+    <section lang={locale}>
+      <h2 id="in-the-guide">{a.inGuide}</h2>
+      <ul>{entry.guideSections.map((l) => <li><a href={localePath(locale, l.href)}>{guideLabel(l)}</a></li>)}</ul>
+    </section>
+  )}
+
+  {seeAlso.length > 0 && (
+    <section>
+      <h2 id="see-also" lang={locale}>{a.seeAlso}</h2>
+      <LinkColumns>{seeAlso.map((l) => <li><a href={localePath(locale, l.href)}><code>{l.label}</code></a></li>)}</LinkColumns>
+    </section>
+  )}
+
+  <section lang={locale}>
+    <h2 id="source">{a.source}</h2>
+    <p><a href={sourceHref}><code>{entry.source.file}</code>, {a.line(entry.source.line)}</a>, {a.atCommit(facts.pinnedCommit)}</p>
+  </section>
+</Docs>
+
+<style>
+  /* The targets table: the row's own header is the target's name, set like the head over it,
+     and these outrank the document's `.doc th` and `.doc p`. */
+  .api-targets th[scope='row'] { font-weight: 600; color: var(--color-text-1); white-space: nowrap; background: none }
+  .api-targets td :global(p) { margin-block-start: 0 }
+  /* On a phone the target name wraps instead of taking half the row: the notes need the width
+     more than "GLSL ES 3.00 (WebGL2)" needs one line. */
+  @media (max-width: 30rem) {
+    .api-targets th[scope='row'] { white-space: normal }
+    .api-targets thead th:first-child { width: 30% }
+    .api-targets thead th:nth-child(2) { width: 27% }
+  }
+</style>

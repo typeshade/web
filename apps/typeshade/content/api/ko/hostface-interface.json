@@ -1,0 +1,11 @@
+{
+  "slug": "hostface-interface",
+  "source": "0fe024d55c5b5cfd4669fe1683b9f35297b791c0df3aa4b136616eee0272be39",
+  "texts": {
+    "summary": "셰이더 모듈 하나의 호스트 인터페이스(host face)입니다.",
+    "members.diagnostics": "모듈 자체의 진단입니다. 그중 하나라도 오류이면 모듈은 컴파일되지 않고 `exports`, `view`, `code`가 없습니다. 이때 빌드는 이 진단을 내며 실패합니다.",
+    "members.view": "호스트 뷰의 텍스트입니다.",
+    "members.code": "생성 모듈의 JavaScript입니다.",
+    "members.files": "컴파일이 읽은 모든 파일로, 모듈 자신이 맨 앞에 옵니다. 번들러가 감시하는 목록이라서, 모듈이 가져오는 파일을 고치면 모듈이 다시 빌드됩니다."
+  }
+}

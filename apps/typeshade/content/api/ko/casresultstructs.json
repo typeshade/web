@@ -1,0 +1,8 @@
+{
+  "slug": "casresultstructs",
+  "source": "b8726bcf0b00f836bc3e32d26082e7f8c21d8feb8de0dc9c6bcabfb71054dff8",
+  "texts": {
+    "summary": "atomicCompareExchangeWeak가 돌려주는 구조체입니다. 호출 전에 위치가 담고 있던 내용과 교환이 일어났는지 여부를 담습니다.",
+    "description": "WGSL은 이 타입을 `__atomic_compare_exchange_result<T>`라고 부르지만, 이 이름을 적는 방법은 주지 않습니다. Tint에서 측정한 결과, 이 이름으로 선언한 변수는 \"invalid type for variable declaration\" 오류를 냅니다. 그래서 결과는 타입 추론으로 받고, 그 필드를 읽습니다.\n\n이 구조체는 중간 표현(IR)에서 타입으로 정의하며, 어떤 백엔드도 이를 선언하지 않습니다. WGSL의 구조체는 내장되어 있으므로, `struct`로 생성하면 내장 구조체를 가리게 됩니다. 생성된 코드도 이 타입의 이름을 쓰지 않으며, `let r = atomicCompareExchangeWeak(&x, a, b);`처럼 타입을 추론합니다. 그래서 이 두 선언은 모듈의 `structs` 항목이 아니라 상수로 둡니다."
+  }
+}

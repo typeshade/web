@@ -1,0 +1,11 @@
+{
+  "slug": "tof32",
+  "source": "826d13001dbdb12e73016f243f8f6db0a26afdffacf88bf488212d7dc72e6acc",
+  "texts": {
+    "summary": "f32로 변환합니다. f64 인자에 쓰면 정밀도를 잃는 명시적 축소이며, hi와 lo 두 절반을 더해 계산합니다. f64는 결코 암묵적으로 축소되지 않습니다.",
+    "description": "WGSL에서는 `f32(x)`를, GLSL에서는 `float(x)`를 생성합니다.",
+    "targets.wgsl": "`f32(x)`.",
+    "targets.glsl": "`float(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,83 @@
+---
+// Concepts: CPU and GPU, at /guide/concepts/cpu-and-gpu/. Each section gives a fact about
+// how the GPU runs a shader and then the TypeShade rule that follows from it. Copy lives in
+// `concepts.cpuAndGpu` (src/i18n/en.ts, src/i18n/ko.ts); the code samples are not copy, so
+// they stay here.
+import Docs from '../../layouts/Docs.astro';
+import { fitDescription } from '../../lib/meta-description.ts';
+import ConceptLesson from '../ConceptLesson.astro';
+import ConceptDoc from '../ConceptDoc.astro';
+import Rich from '../Rich.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import { copyFor, localeSettings, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { slugify } from '../../lib/slug.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = copyFor(locale).concepts.cpuAndGpu;
+const lesson = copyFor(locale).concepts.lessons.cpuAndGpu;
+const learningLabels = copyFor(locale).concepts.lessonLabels;
+const learningHeadings = [
+  { depth: 2, slug: 'learning-use', text: learningLabels.use },
+  { depth: 2, slug: 'learning-example', text: learningLabels.example },
+  { depth: 2, slug: 'learning-caveat', text: learningLabels.caveat },
+];
+if (c.title.length < 45 || c.title.length > 60) {
+  throw new Error(`[concepts] the CPU and GPU page has a ${c.title.length}-character title, outside the 45 to 60 the SEO checks want: ${c.title}`);
+}
+const headings = [...learningHeadings, ...[c.invocationH, c.memoryH, c.callsH, c.loopsH, c.typesH, c.tableH, c.furtherH].map((h) => ({ depth: 2, slug: slugify(h), text: h }))];
+---
+
+<Docs locale={locale} path={links.conceptsCpuGpu.href} title={c.title} description={fitDescription(`${lesson.meaning} ${lesson.use}`, localeSettings[locale].metaDescriptionMax)} headings={headings} editHref={editCopy(locale, 'concepts')} breadcrumbs={[{ name: copyFor(locale).docs.labels.sidebarGroups.concepts, href: links.concepts.href }, { name: c.h1, href: links.conceptsCpuGpu.href }]}>
+  <h1>{c.h1}</h1>
+  <p><Rich text={lesson.meaning} locale={locale} /></p>
+  <ConceptLesson locale={locale} lesson={lesson} topic="cpuAndGpu" />
+  <p>{c.lead}</p>
+
+  <section>
+    <h2 id={slugify(c.invocationH)}>{c.invocationH}</h2>
+    <p>{c.invocationP}</p>
+    <TypeShadeCode code={`@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  pixels[gid.x] = camera.pos.x\n}`} />
+    <p><Rich text={c.invocationRule} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.memoryH)}>{c.memoryH}</h2>
+    <p>{c.memoryP}</p>
+    <TypeShadeCode code={`class Camera {\n  view: mat4\n  pos: vec3\n}\n\ndeclare const camera: uniform<Camera>`} />
+    <p><Rich text={c.memoryRule} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.callsH)}>{c.callsH}</h2>
+    <p>{c.callsP}</p>
+    <p><Rich text={c.callsRule} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.loopsH)}>{c.loopsH}</h2>
+    <p>{c.loopsP}</p>
+    <TypeShadeCode code={`for (let i = 0; i < 4; i++) {\n  pixels[i] = pixels[i] + camera.pos.x\n}`} />
+    <p><Rich text={c.loopsRule} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.typesH)}>{c.typesH}</h2>
+    <p>{c.typesP}</p>
+    <TypeShadeCode code={`let value: f32 = 1\nlet index: u32 = 0\nlet direction: vec3 = vec3(0, 1, 0)`} />
+    <p><Rich text={c.typesRule} locale={locale} /></p>
+  </section>
+
+  <section>
+    <h2 id={slugify(c.tableH)}>{c.tableH}</h2>
+    <p>{c.tableP}</p>
+    <ConceptDoc locale={locale} rows={c.tableRows} columns={c.tableColumns} />
+  </section>
+
+  <section>
+    <h2 id={slugify(c.furtherH)}>{c.furtherH}</h2>
+    <ul>{c.furtherItems.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ul>
+    <p><Rich text={c.nextP} locale={locale} /></p>
+  </section>
+</Docs>

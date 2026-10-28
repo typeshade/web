@@ -1,0 +1,11 @@
+{
+  "slug": "degrees",
+  "source": "ebab7c4d039df4383d9cd37d6ce409d5f697390eac914ed20e2e2ae2f52a1031",
+  "texts": {
+    "summary": "degrees(rad): 라디안을 도로 바꿉니다. 성분별로 적용하며, 내장 함수와 같은 정확한 180/π를 씁니다. radians의 역함수입니다.",
+    "description": "`x.mul(RAD2DEG)`처럼 손으로 반올림한 상수를 곱하는 자리에 이 함수를 대신 씁니다.",
+    "targets.wgsl": "`degrees(x)`.",
+    "targets.glsl": "`degrees(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

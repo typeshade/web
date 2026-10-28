@@ -1,0 +1,12 @@
+{
+  "slug": "selectguardedarm",
+  "source": "0a39e857800928636a52d9be206f363006b9c01c308de914cb74e8b825a09e00",
+  "texts": {
+    "summary": "정의된 매크로 집합이 emitGuarded 소스에서 고르는 분기를 찾아냅니다.",
+    "description": "`emitGuarded`가 만드는 전처리기 체인의 모양만 이해합니다. 조건은 `&&`로 이어진 `defined(X)`와 `!defined(X)`로 만들어지고, `#if`, `#elif`, `#endif`는 0번 열에 놓여야 합니다. 테스트나 빌드 단계에서 이 함수를 써서, 호스트의 define이 고르는 분기가 [`VariantFamily.emit`](/api/variantfamily-interface/)의 독립 변형과 같은지 컴파일러를 돌리지 않고 확인합니다.",
+    "parameters.source": "[`VariantFamily.emitGuarded`](/api/variantfamily-interface/)의 출력입니다.",
+    "parameters.defined": "호스트가 정의하게 될 매크로 이름들입니다.",
+    "returns": "선택된 분기의 텍스트입니다. 맞는 분기가 없으면 `undefined`이입니다.",
+    "exceptions.Error": "`Error`는 `source`의 조건이 생성기가 만드는 체인의 형태가 아니면 발생합니다."
+  }
+}

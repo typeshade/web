@@ -1,0 +1,11 @@
+---
+import { getCollection } from 'astro:content';
+import { localePath } from '../../../../i18n/index.ts';
+
+export async function getStaticPaths() {
+  const guide = await getCollection('guide');
+  return guide.filter((entry) => entry.id !== 'overview').map((entry) => ({ params: { section: entry.id } }));
+}
+const { section } = Astro.params;
+return Astro.redirect(localePath('ko', `/guide/internals/${section}/`));
+---

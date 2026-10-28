@@ -1,0 +1,11 @@
+{
+  "slug": "fract",
+  "source": "50d2c748e77d3ade9b6897dbd23e1505b497594fcecd88d5ab972266b16a7b05",
+  "texts": {
+    "summary": "fract(x): 소수부이며, 성분별로 x − floor(x)입니다.",
+    "description": "도메인 반복(좌표를 `[0, 1)` 범위로 타일링하는 것)과, `fract(dot(p3, p3.yzx.add(33.33)))`처럼 해시 형태의 노이즈를 만드는 데 쓰는 기본 구성 요소입니다.",
+    "targets.wgsl": "`fract(x)`로 생성합니다. `f64` 피연산자에는 fp64 패스가 이를 `df64` 헬퍼로 다시 씁니다.",
+    "targets.glsl": "`fract(x)`로 생성합니다. `f64` 피연산자에는 fp64 패스가 이를 `df64` 헬퍼로 다시 씁니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

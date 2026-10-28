@@ -1,0 +1,468 @@
+---
+// One live example: the source a reader can edit, the canvas it draws on, and a control for
+// every uniform field the module declares. The shape is MDN's "Try it": the code, the result,
+// and the handles, with nothing between them.
+//
+// The build compiles the sample here (src/lib/live-shader-emit.ts) and inlines what the page
+// needs as JSON: the emitted WGSL and GLSL ES 3.00 stages, the reflected layout, and the
+// controls the reflection asks for. The compiler itself stays out of the page until the
+// reader's first edit, when src/scripts/live-shader.ts imports it as a chunk of its own.
+//
+// Putting one on a page: see "Live examples" in DESIGN.md.
+import { Code } from 'astro-expressive-code/components';
+import Rich from './Rich.astro';
+import { copyFor, localePath, type Locale } from '../i18n/index.ts';
+import { links } from '../lib/links.ts';
+import { cardClass, fileClass } from '../lib/live-card.ts';
+import { liveShader, livePayloadJson } from '../lib/live-shader-emit.ts';
+import type { ControlProps } from '../lib/live-shader-contract.ts';
+import type { StateStrings } from '../lib/shader-runtime.ts';
+
+interface Props {
+  locale: Locale;
+  /** Names the example. It is the id of its still image and of its inlined payload, so it is
+   *  unique across the site. */
+  id: string;
+  /** What the canvas is showing, for the accessible name. From the dictionaries. */
+  title: string;
+  /** The sample: a whole file, the way a Book of Shaders page shows a whole `.frag`. A sample
+   *  that declares no `@vertex` entry is compiled behind the fullscreen-triangle vertex half
+   *  (src/lib/live-shader-contract.ts) and takes `uv` as a `@location(0)` parameter; one that
+   *  declares both stages is compiled as written. Code is not copy, so it stays on the page
+   *  that uses it. */
+  code: string;
+  /** The line under the canvas. From the dictionaries. The runtime adds what drew the frame,
+   *  the way ShaderCanvas does, so the figure carries one line and not three. */
+  caption: string;
+  /** The name over the block. A file name is not copy, so it is written on the page and reads
+   *  the same in every language, the way the other code frames on the site name their file. */
+  file?: string;
+  files?: Readonly<Record<string, string>>;
+  /** One line saying what the reader is looking at, precise enough to check by eye. It is the
+   *  prose form of the "Expected output" comment an MDN interactive example carries. From the
+   *  dictionaries. */
+  anchor?: string;
+  /** What to try, one line each, with the controls or by editing a line. A live example a
+   *  reader does nothing with is a picture. From the dictionaries. */
+  exercises?: readonly string[];
+  /** Range, step, default and label for one uniform field each. A field the module does not
+   *  declare fails the build. */
+  controls?: ControlProps;
+  aspect?: '3/1' | '2/1' | '16/9' | '4/3' | '3/2' | '1/1';
+  /** Limit the result's visual size and place its controls directly below it. */
+  compact?: boolean;
+  /** Numeric plot bounds, shown on the result. */
+  plot?: { x: readonly [number, number]; y: readonly [number, number] };
+  /** `figure` is the column a guide page shows: code, then canvas, then controls. `hero` is
+   *  the front page's showcase card: a head bar with the file name and the two buttons, the
+   *  code pane beside the canvas, then the controls and the caption, with no emitted-output
+   *  disclosure (the front page prints that itself). */
+  variant?: 'figure' | 'hero';
+}
+
+const { locale, id, title, code, caption, file, files = {}, anchor, exercises = [], controls = {}, aspect = '2/1', compact = false, plot, variant = 'figure' } = Astro.props;
+const hero = variant === 'hero';
+const t = copyFor(locale);
+const l = t.live;
+const payload = liveShader(id, title, code, controls, { fileName: file, files });
+const graphLabel = t.docs.reference.demo.aria(title);
+const aria: StateStrings = plot ? {
+  webgpu: graphLabel, webgl2: graphLabel, none: graphLabel,
+  'still-webgpu': graphLabel, 'still-webgl2': graphLabel,
+} : t.canvas.aria(title);
+
+/** The caption, with what drew the frame appended. One line, the way the hero's is. */
+const captionFor = (backend: string): string => `${caption} ${backend}`;
+const captions: StateStrings = {
+  webgpu: captionFor(l.backend.webgpu),
+  webgl2: captionFor(l.backend.webgl2),
+  none: captionFor(l.backend.none),
+  'still-webgpu': captionFor(l.backend.webgpu),
+  'still-webgl2': captionFor(l.backend.webgl2),
+};
+
+// The words the browser half needs once it is running. It reads them off the element: the
+// module that holds the logic is bundled and takes no `define:vars`. Everything the page
+// renders itself stays out of here.
+const runtimeCopy = {
+  editorAria: l.editorAria,
+  loading: l.loading,
+  keptFrame: l.keptFrame,
+  noFrame: l.noFrame,
+  caption: captions,
+  aria,
+  lineAt: l.lineAt,
+  component: l.component,
+  errorsHref: localePath(locale, links.errors.href),
+};
+
+const payloadId = `live-payload-${id}`;
+const fields = payload.data.layout.fields;
+// The note under the controls names the reserved fields this sample declares, so it describes
+// the file above it. The names go in as code spans, which Rich renders.
+const reservedNote = l.reserved(payload.reserved.map((name) => `\`${name}\``).join(', '));
+---
+
+<figure
+  class:list={['figure', 'live', hero ? 'live-hero' : undefined, compact && !hero ? 'live-compact' : undefined]}
+  data-live-shader
+  data-live-id={id}
+  data-aspect={aspect}
+  data-live-plot={plot ? JSON.stringify(plot) : undefined}
+  data-payload={payloadId}
+  data-copy={JSON.stringify(runtimeCopy)}
+  data-live-state="idle"
+>
+  {/* The hero is one card: a head bar with the file name as the active tab and the two
+      buttons, a body holding the code pane and the picture, then the diagnostics, the
+      controls and the caption. The script finds every part by its data attribute, so the
+      wrappers change nothing for it. */}
+  {hero ? (
+    <div class={cardClass}>
+      <div class="live-card-head">
+        <span class={fileClass}>{file ?? l.file}</span>
+        <div class="live-bar">
+          <button type="button" data-live-edit aria-label={`${l.edit} ${file ?? l.file}`}>{l.edit}</button>
+          <button type="button" data-live-reset aria-label={`${l.reset} ${file ?? l.file}`}>{l.reset}</button>
+        </div>
+      </div>
+
+      <div class="live-card-body">
+        <div class="live-code" data-live-code>
+          <Code code={payload.source} lang="ts" title={file ?? l.file} locale={locale} />
+        </div>
+        <div class="figure-frame live-frame" style={`aspect-ratio: ${aspect}`}>
+          <img src={`/stills/${id}.webp`} alt={aria.none} loading="eager" fetchpriority="high" decoding="async" />
+          <canvas role="img" aria-label={aria.none} data-backend="none"></canvas>
+        </div>
+      </div>
+
+      <div class="live-diagnostics" data-live-diagnostics role="status" aria-live="polite"></div>
+      {/* The handles and the note naming the fields that have none are one group; the script
+          empties the panel on every rebuild, so the note sits beside it and not inside. */}
+      <div class="live-controls-group">
+        <div class="live-controls" data-live-controls hidden></div>
+        {payload.reserved.length > 0 && (
+          <p class="live-reserved">
+            <Rich text={reservedNote} locale={locale} />
+            {payload.reserved.includes('mouse') && <Fragment> <Rich text={l.mouseUnits} locale={locale} /></Fragment>}
+          </p>
+        )}
+      </div>
+      <figcaption class="figure-caption" data-live-caption>{caption}</figcaption>
+    </div>
+  ) : (
+    <Fragment>
+      {!compact && <div class="live-parts">
+        <div class="live-code" data-live-code>
+          <Code code={payload.source} lang="ts" title={file ?? l.file} locale={locale} />
+        </div>
+        <div class="live-bar">
+          <button type="button" data-live-edit aria-label={`${l.edit} ${file ?? l.file}`}>{l.edit}</button>
+          <button type="button" data-live-reset aria-label={`${l.reset} ${file ?? l.file}`}>{l.reset}</button>
+          {/* The file as it stands, opened in the Playground, which shows what its console
+              calls log and what the compiler emits for it. */}
+          <a data-live-playground href={localePath(locale, links.playground.href)} aria-label={`${l.playground} ${file ?? l.file}`}>{l.playground}</a>
+        </div>
+      </div>}
+
+      <div class="figure-frame live-frame" style={`aspect-ratio: ${aspect}`}>
+        <img src={`/stills/${id}.webp`} alt={aria.none} loading="lazy" decoding="async" />
+        <canvas role="img" aria-label={aria.none} data-backend="none"></canvas>
+        {plot && (
+          <div class="live-axes">
+            <span class="live-y-max"><code>y</code> = {plot.y[1]}</span>
+            <span class="live-y-min"><code>y</code> = {plot.y[0]}</span>
+            <span class="live-x-min"><code>x</code> = {plot.x[0]}</span>
+            <span class="live-x-max"><code>x</code> = {plot.x[1]}</span>
+          </div>
+        )}
+      </div>
+      {compact && <div class="live-controls" data-live-controls hidden></div>}
+      {compact && <div class="live-bar live-reset"><button type="button" data-live-reset aria-label={`${l.reset} ${file ?? l.file}`}>{l.reset}</button></div>}
+      <figcaption class="figure-caption" data-live-caption>{caption}</figcaption>
+
+      {plot && <p class="live-anchor">{payload.controls.some((control) => control.field === 'view3d') ? t.docs.reference.demo.interaction : t.docs.reference.demo.interaction2d}</p>}
+      {anchor && <p class="live-anchor"><Rich text={anchor} locale={locale} /></p>}
+
+      <div class="live-diagnostics" data-live-diagnostics role="status" aria-live="polite"></div>
+
+      {!compact && <div class="live-controls" data-live-controls hidden></div>}
+      {!compact && payload.reserved.length > 0 && (
+        <p class="live-reserved">
+          <Rich text={reservedNote} locale={locale} />
+          {payload.reserved.includes('mouse') && <Fragment> <Rich text={l.mouseUnits} locale={locale} /></Fragment>}
+        </p>
+      )}
+
+      {exercises.length > 0 && (
+        <div class="live-exercises">
+          <p>{plot ? t.docs.reference.demo.exercises : l.exercisesP}</p>
+          <ul>{exercises.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ul>
+        </div>
+      )}
+
+      {compact && (
+        <details class="live-parts">
+          <summary>{l.source}</summary>
+          <div class="live-bar">
+            <button type="button" data-live-edit aria-label={`${l.editCode} ${file ?? l.file}`}>{l.editCode}</button>
+            <a data-live-playground href={localePath(locale, links.playground.href)} aria-label={`${l.playground} ${file ?? l.file}`}>{l.playground}</a>
+          </div>
+          <div class="live-code" data-live-code>
+            <Code code={payload.source} lang="ts" title={file ?? l.file} locale={locale} />
+          </div>
+          {Object.entries(files).map(([name, source]) => (
+            <details class="live-output" data-live-module={name} data-pagefind-ignore>
+              <summary><code>{name}</code></summary>
+              <Code code="…" lang="ts" title={name} locale={locale} />
+              <noscript><pre tabindex="0" role="region" aria-label={name}><code>{source}</code></pre></noscript>
+            </details>
+          ))}
+          {payload.reserved.length > 0 && (
+            <p class="live-reserved">
+              <Rich text={reservedNote} locale={locale} />
+              {payload.reserved.includes('mouse') && <Fragment> <Rich text={l.mouseUnits} locale={locale} /></Fragment>}
+            </p>
+          )}
+        </details>
+      )}
+
+      <details class="live-output" data-live-output data-pagefind-ignore>
+        <summary>{l.output}</summary>
+        <div class="live-output-body">
+          <p class="live-reserved"><Rich text={l.outputNote} locale={locale} /></p>
+          <div data-live-emitted="wgsl"><Code code={plot ? "…" : payload.wgsl} lang="wgsl" title={l.wgsl} locale={locale} />{plot && <noscript><pre tabindex="0" role="region" aria-label={l.wgsl}><code>{payload.wgsl}</code></pre></noscript>}</div>
+          <div data-live-emitted="vertex"><Code code={plot ? "…" : payload.glsl.vertex} lang="glsl" title={l.glslVertex} locale={locale} />{plot && <noscript><pre tabindex="0" role="region" aria-label={l.glslVertex}><code>{payload.glsl.vertex}</code></pre></noscript>}</div>
+          <div data-live-emitted="fragment"><Code code={plot ? "…" : payload.glsl.fragment} lang="glsl" title={l.glslFragment} locale={locale} />{plot && <noscript><pre tabindex="0" role="region" aria-label={l.glslFragment}><code>{payload.glsl.fragment}</code></pre></noscript>}</div>
+          {fields.length > 0 && (
+            <table class="live-reflection">
+              <caption>{l.uniforms}</caption>
+              <thead><tr><th>{l.field}</th><th>{l.type}</th><th>{l.offset}</th></tr></thead>
+              <tbody>
+                {fields.map((f) => (
+                  <tr><td data-label={l.field}><code>{f.name}</code></td><td data-label={l.type}><code>{f.type}</code></td><td data-label={l.offset}><code>{f.offset}</code></td></tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </details>
+    </Fragment>
+  )}
+
+  <script type="application/json" id={payloadId} set:html={livePayloadJson(payload)} is:inline />
+</figure>
+
+<script>
+  import '../scripts/live-shader.ts'
+</script>
+
+<style>
+  [data-live-plot] canvas { cursor: grab }
+  [data-live-plot] canvas:active { cursor: grabbing }
+  .live-controls :global(.live-control-value) { white-space: nowrap; text-align: end; font-variant-numeric: tabular-nums; flex-shrink: 0 }
+
+  /* .figure already sets the column and its 10px gap (src/styles/global.css), so this adds
+     nothing but what the block's own parts need. */
+  .live-code { position: relative }
+  /* The figure's parts outside the hero: no box of their own, the figure's column is the box. */
+  .live-parts:not(details) { display: contents }
+  details.live-parts { border-block-start: 1px solid var(--color-line-1); padding-block-start: 10px }
+  details.live-parts summary { cursor: pointer; color: var(--color-text-2); font-size: var(--text-meta) }
+  details.live-parts .live-code { margin-block-start: 12px }
+  details.live-parts .live-bar { margin-block-start: 12px }
+  .live-axes { position: absolute; inset: 0; pointer-events: none; font: 400 var(--text-meta)/1.4 var(--font-mono) }
+  .live-axes span { position: absolute; padding: 1px 4px; border-radius: var(--radius-sm); background: var(--color-ground); color: var(--color-text-2) }
+  .live-y-max { inset-block-start: 6px; inset-inline-start: 6px }
+  .live-y-min { inset-block-end: 28px; inset-inline-start: 6px }
+  .live-x-min { inset-block-end: 6px; inset-inline-start: 6px }
+  .live-x-max { inset-block-end: 6px; inset-inline-end: 6px }
+  /* Edit and Reset: Ant's small default button, one rule for the hero card and the figure
+     column alike, so the two places cannot drift apart. */
+  .live-bar { display: flex; align-items: center; gap: 8px }
+  .live-bar button, .live-bar a {
+    display: inline-flex; align-items: center; block-size: 24px; padding: 0 8px;
+    border: 1px solid var(--color-line-2); border-radius: var(--radius-sm);
+    background: var(--color-ground); color: var(--color-text-1);
+    font-family: inherit; font-size: 0.75rem; line-height: 1.5; cursor: pointer;
+    text-decoration: none;
+    transition: color var(--motion), border-color var(--motion);
+  }
+  .live-bar button:hover, .live-bar a:hover { color: var(--color-primary-hover); border-color: var(--color-primary-hover) }
+  .live-bar button:active, .live-bar a:active { color: var(--color-primary-active); border-color: var(--color-primary-active) }
+  /* The canvas takes the pointer, which the reserved `mouse` field is filled from. Every
+     other figure on the site is a picture and lets the pointer through. */
+  .live-frame > canvas { pointer-events: auto }
+  /* A compact result leaves room around the picture and keeps its controls within reach.
+     The frame retains its aspect ratio, including when it shows the fallback image. */
+  .live-compact .live-frame, .live-compact .live-controls, .live-compact .live-reset {
+    inline-size: 90%; max-inline-size: 32rem; align-self: center;
+  }
+  .live-compact[data-aspect='1/1'] .live-frame,
+  .live-compact[data-aspect='1/1'] .live-controls,
+  .live-compact[data-aspect='1/1'] .live-reset { max-inline-size: 22rem }
+  .live-compact .live-reset { justify-content: flex-end }
+  .live-compact .live-controls :global(.live-control) { grid-template-columns: minmax(0, 1fr) }
+  .live-diagnostics:empty { display: none }
+  .live-reserved { margin: 0; color: var(--color-text-2); font-size: var(--text-meta) }
+  .live-output { margin-block-start: 6px; border-block-start: 1px solid var(--color-line-1); padding-block-start: 10px }
+  .live-output noscript pre { overflow-x: auto; white-space: pre }
+  .live-output summary { color: var(--color-text-2); font-size: var(--text-meta); cursor: pointer }
+  .live-output-body { display: flex; flex-direction: column; gap: 12px; margin-block-start: 12px }
+  .live-reflection { width: 100%; border-collapse: collapse; font-size: var(--text-meta) }
+  .live-reflection caption { margin-block-end: 6px; color: var(--color-text-2); text-align: left }
+  .live-reflection th, .live-reflection td { padding: 4px 8px 4px 0; text-align: left; border-block-end: 1px solid var(--color-line-1) }
+
+  /* The textarea and the control rows are built by src/scripts/live-shader.ts after the page
+     loads, so those nodes carry no scoping attribute and are addressed globally. */
+  .live-code :global(.live-input) {
+    position: absolute; inset: 0; z-index: 1; box-sizing: border-box; width: 100%;
+    margin: 0; border: 0; outline-offset: -2px; resize: none; overflow: auto;
+    background: transparent; color: transparent; caret-color: var(--color-accent);
+    -webkit-text-fill-color: transparent; white-space: pre; tab-size: 2;
+  }
+  .live-code :global(.live-input::selection) { background: color-mix(in srgb, var(--color-accent) 28%, transparent) }
+  .live-controls[hidden] { display: none }
+  .live-controls { display: flex; flex-direction: column; gap: 10px }
+  .live-controls :global(.live-control) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px }
+  .live-controls :global(.live-control-head) { display: flex; align-items: baseline; gap: 8px; font-size: var(--text-meta) }
+  .live-controls :global(.live-control-head code) { font-size: var(--text-meta) }
+  .live-controls :global(.live-control-label) { min-width: 0; color: var(--color-text-2) }
+  .live-controls :global(.live-control-value) { flex: 0 0 auto; color: var(--color-text-3); font: 400 var(--text-meta)/1.4 var(--font-mono) }
+  .live-controls :global(.live-control-inputs) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 24px }
+  .live-controls :global(.live-control-inputs input[type='range']) { flex: 1 1 140px; min-width: 0; accent-color: var(--color-accent) }
+  .live-controls :global(.live-control-inputs input[type='number']) {
+    width: 6rem; min-height: 24px; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm);
+    padding: 3px 6px; background: var(--color-ground); color: var(--color-text-1);
+    font: 400 var(--text-meta)/1.4 var(--font-mono);
+  }
+  /* 24px is the smallest target WCAG 2.2 takes; a checkbox draws smaller than its box. */
+  .live-controls :global(input[type='checkbox']) { width: 24px; height: 24px; accent-color: var(--color-accent) }
+  .live-controls :global(input[type='color']) {
+    width: 56px; height: 26px; padding: 0; border: 1px solid var(--color-line-2);
+    border-radius: var(--radius-sm); background: var(--color-ground);
+  }
+  .live-controls :global(.live-pad) {
+    position: relative; width: 100%; max-width: 160px; aspect-ratio: 1;
+    border: 1px solid var(--color-line-2); border-radius: var(--radius-sm);
+    background: var(--color-surface-1); touch-action: none; cursor: crosshair;
+  }
+  /* The pad is for a pointer; these two are the same numbers for a keyboard. */
+  .live-controls :global(.live-pad-axes) { display: flex; flex: 1 1 140px; flex-direction: column; gap: 6px; min-width: 0 }
+  .live-controls :global(.live-pad-axes input) { width: 100%; accent-color: var(--color-accent) }
+  .live-controls :global(.live-pad-dot) { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--color-accent) }
+  /* The compiler's own message is code and is set as code; the sentence the site adds is not. */
+  .live-diagnostics :global(.live-message) { color: var(--color-diag); font: 400 var(--text-meta)/1.55 var(--font-mono); white-space: pre-wrap }
+  .live-diagnostics :global(.live-jump) {
+    border: 0; padding: 0; margin-inline-end: 6px; background: none; color: inherit;
+    font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+  }
+  .live-diagnostics :global(.live-error-code) { color: inherit; text-decoration: underline; text-underline-offset: 2px }
+  .live-diagnostics :global(.live-note) { margin-block-start: 4px; color: var(--color-text-2); font-size: var(--text-meta) }
+
+  @media (min-width: 40rem) {
+    .live-controls :global(.live-control) { grid-template-columns: minmax(0, 16rem) minmax(0, 1fr); align-items: center; gap: 12px }
+  }
+
+  /* The showcase card: the file name as an active tab over the panes, the file on the left and
+     the picture it draws on the right, then the controls and the caption. .figure is a flex
+     column, so the hero's own rules carry the class pair to outrank it. The card's box and the
+     file tab are utilities in the markup (cardClass, fileClass). */
+  .figure.live-hero { display: block; gap: 0; margin: 0 }
+  .live-card-head {
+    display: flex; align-items: stretch; gap: 12px; block-size: 56px; padding-inline: 16px;
+    border-block-end: 1px solid var(--color-line-1);
+  }
+  .live-card-body { display: grid; grid-template-columns: minmax(0, 1fr) }
+  /* The code pane is a window over the block: its content is taken out of flow, so the picture
+     beside it sets the row's height and keeps its 4:3, and the pane scrolls inside. That box
+     is also what the editor's textarea is laid over (src/scripts/live-shader-editor.ts), whose
+     own padding is measured off the rendered lines, so the padding here stays untouched.
+     The pane's height rarely lands on a whole line, and the line the bottom edge crosses would
+     otherwise be cut through the middle of its glyphs; a 32px fade at the foot reads as more
+     code below and hands the cut to the mask. Expressive Code renders the frame, so the rules
+     that reach into it are :global(). */
+  .figure.live-hero .live-code {
+    position: relative; block-size: 260px; overflow-y: auto; background: var(--color-elevated);
+    scrollbar-width: thin; scrollbar-color: var(--color-line-2) transparent;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+  }
+  .figure.live-hero .live-code > :global(.expressive-code) { position: absolute; inset: 0; margin: 0 }
+  .figure.live-hero .live-code :global(.frame) { display: flex; flex-direction: column; block-size: 100%; box-shadow: none }
+  .figure.live-hero .live-code :global(.expressive-code) {
+    --ec-brdRad: 0; --ec-brdWd: 0; --ec-frm-shdCol: transparent;
+    --ec-frm-edTabBarBg: transparent; --ec-frm-edTabBarBrdBtmCol: transparent;
+  }
+  .figure.live-hero .live-code :global(.expressive-code .frame.has-title > .header) { display: none }
+  .figure.live-hero .live-code :global(.expressive-code pre) {
+    flex: 1; min-block-size: 0; overflow: auto; border: 0; border-radius: 0;
+    scrollbar-width: thin; scrollbar-color: var(--color-line-2) transparent; overscroll-behavior: contain;
+  }
+  .figure.live-hero .live-code :global(.expressive-code pre > code) { font-size: var(--text-code); line-height: 1.6 }
+  .figure.live-hero .live-frame {
+    order: -1; inline-size: 100%; border: 0; border-radius: 0;
+    border-block-end: 1px solid var(--color-line-1); background: var(--color-surface-2);
+  }
+  .figure.live-hero .live-diagnostics, .figure.live-hero figcaption { padding-inline: 16px }
+  .figure.live-hero .live-diagnostics { padding-block-start: 12px }
+  /* The handles and the note about the fields that have none read as one group: the note is
+     the group's last row, under the sliders it belongs to, not a second caption at the foot. */
+  .figure.live-hero .live-controls-group {
+    display: flex; flex-direction: column; gap: 4px; padding: 16px 16px 0;
+    border-block-start: 1px solid var(--color-line-1);
+  }
+  .figure.live-hero .live-controls { gap: 12px }
+  /* The note is the group's last row, so from 40rem it starts in the handles' own column: the
+     same 16rem label column and 12px gap the control rows are built on. */
+  .figure.live-hero .live-reserved { font-size: 0.75rem; line-height: 1.5; color: var(--color-text-2) }
+  .figure.live-hero figcaption { padding-block: 8px 16px; font-size: 0.75rem; line-height: 1.6667; color: var(--color-text-2) }
+  @media (min-width: 40rem) {
+    .figure.live-hero .live-reserved { padding-inline-start: calc(16rem + 12px) }
+  }
+  @media (min-width: 48rem) {
+    .live-card-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) }
+    .figure.live-hero .live-code { block-size: auto; border-inline-end: 1px solid var(--color-line-1) }
+    .figure.live-hero .live-frame { order: 0; border-block-end: 0 }
+  }
+
+  /* The uniform handles: Ant's primary on the slider, and a colour swatch at the height of an
+     Ant control. The rows are built by the runtime, so the selectors carry .figure.live to
+     outrank the control rules above. */
+  .figure.live .live-controls :global(input[type='range']) { accent-color: var(--color-primary) }
+  .figure.live .live-controls :global(input[type='color']) {
+    inline-size: 40px; block-size: 32px; padding: 2px; border: 1px solid var(--color-line-2);
+    border-radius: var(--radius); background: var(--color-elevated); cursor: pointer;
+  }
+  /* A vec2 control: the pad on the left, its two sliders beside it at the top, and the readout
+     under them, so the row is as tall as the pad and nothing wraps below it. */
+  .figure.live .live-controls :global(.live-control-inputs:has(.live-pad)) {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto 1fr;
+    align-items: start; column-gap: 12px; row-gap: 8px;
+  }
+  .figure.live .live-controls :global(.live-control-inputs:has(.live-pad) .live-pad) { grid-row: 1 / 3; inline-size: 120px; max-inline-size: none }
+  .figure.live .live-controls :global(.live-control-inputs:has(.live-pad) .live-pad-axes) { flex: none; gap: 12px; padding-block-start: 6px }
+  /* The slider rule above gives a range input a 140px flex basis, which in this column would be
+     its height; here the basis is its width. */
+  .figure.live .live-controls :global(.live-pad-axes input[type='range']) { flex: none; inline-size: 100% }
+  .figure.live .live-controls :global(.live-control-inputs:has(.live-pad) .live-control-value) { grid-column: 2; align-self: end }
+
+  /* What the reader should see, and what to try, under the same figure. The anchor line is one
+     sentence in the tertiary text, so the caption above it stays the louder of the two. The
+     exercises are an Ant List: no bullets, one row per thing to try, split by the rule every
+     other list on the site is split by. Both carry .figure.live to outrank the .doc defaults. */
+  .figure.live .live-anchor { margin: 0; font-size: var(--text-meta); line-height: var(--text-meta--line-height); color: var(--color-text-3) }
+  .figure.live .live-exercises { font-size: var(--text-ui); line-height: var(--text-ui--line-height) }
+  .figure.live .live-exercises > p { margin: 0 0 8px; color: var(--color-text-2) }
+  .figure.live .live-exercises ul { margin: 0; padding: 0; list-style: none; border-block-start: 1px solid var(--color-line-1) }
+  .figure.live .live-exercises li { margin: 0; padding-block: 12px; padding-inline: 0; border-block-end: 1px solid var(--color-line-1); color: var(--color-text-1) }
+  /* Ant's split list draws no rule after the last row, and here it would land 12px above the
+     emitted-output disclosure's own rule and read as two. */
+  .figure.live .live-exercises li:last-child { border-block-end: 0 }
+  /* The sentences under a figure in a document are running text, so they keep the text measure
+     while the frame and the code above them take the wide one (the caption is capped with every
+     figure's, in global.css). The front page's card lays its note out inside the card, at the
+     card's own width. */
+  .figure.live:not(.live-hero) :is(.live-anchor, .live-reserved, .live-exercises) { max-inline-size: var(--content) }
+</style>

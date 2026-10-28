@@ -1,0 +1,7 @@
+{
+  "slug": "overridehandle",
+  "source": "0661d6b62893d76283d497e49e1ee8a1caa0e8f333205ba8b1aa8fd87f75fc7b",
+  "texts": {
+    "summary": "파이프라인 특수화 상수에 대해 overrideConst가 돌려주는 한 쌍입니다. .node는 값을 읽으며, 최적화기에게 불투명하므로 어떤 식이나 분기 조건에서든 쓸 수 있습니다. .decl은 모듈에 들어갑니다."
+  }
+}

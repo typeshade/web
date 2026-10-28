@@ -1,0 +1,298 @@
+/* Interactive browser playground */
+.playground-page {
+  max-width: 1180px;
+}
+.playground-page .page-heading {
+  border: 0;
+  padding-bottom: 27px;
+}
+.playground-app {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+.playground-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-panel);
+  background: var(--panel);
+}
+.playground-controls,
+.playground-output {
+  min-width: 0;
+  padding: 22px;
+}
+.playground-controls {
+  border-right: 1px solid var(--line);
+}
+.control-heading,
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-4);
+  margin-bottom: 19px;
+}
+.control-heading h2,
+.output-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 550;
+}
+.control-heading .eyebrow,
+.output-header .eyebrow {
+  margin-bottom: 5px;
+}
+.matrix-editor {
+  min-width: 0;
+  padding: 0;
+  margin: 0 0 19px;
+  border: 0;
+}
+.matrix-editor legend {
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 550;
+}
+.matrix-editor .field-help {
+  display: block;
+  margin: 2px 0 7px;
+}
+.matrix-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-2);
+  max-width: 300px;
+}
+.matrix-input-grid .ant-input {
+  height: 39px;
+  color: var(--ink);
+  background: var(--soft);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+.select-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ui-space-3);
+  margin-top: 5px;
+}
+.field-label {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.field-label .ant-select {
+  width: 100%;
+  color: var(--ink);
+}
+.field-label .ant-select-selector {
+  min-height: 38px !important;
+  background: var(--soft) !important;
+}
+.run-button {
+  width: 100%;
+  margin-top: 20px;
+  font-weight: 550;
+}
+.field-help {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+.playground-controls > .field-help {
+  margin: 10px 0 0;
+}
+.output-header {
+  min-height: 42px;
+  align-items: start;
+}
+.backend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+}
+.backend-chip i {
+  width: 6px;
+  height: 6px;
+}
+.result-empty,
+.result-error,
+.matrix-result {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.result-empty {
+  padding: 20px;
+  border: 1px dashed var(--line);
+  border-radius: var(--ui-radius-control);
+  background: var(--soft);
+}
+.result-empty p {
+  max-width: 30ch;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.empty-mark {
+  color: var(--brand);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 29px;
+  font-weight: 400;
+}
+.loading-line {
+  width: min(160px, 55%);
+  height: 3px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--brand) 20%, var(--line));
+}
+.loading-line::after {
+  content: '';
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: var(--brand);
+  animation: loading-sweep 0.8s ease-in-out infinite alternate;
+}
+@keyframes loading-sweep {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(150%);
+  }
+}
+.matrix-result {
+  align-items: stretch;
+  text-align: left;
+}
+.result-caption {
+  color: var(--muted);
+  font-size: 10px;
+}
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-2);
+  margin: 10px 0 18px;
+}
+.result-grid output {
+  padding: 18px 10px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--soft);
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 19px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.result-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--success);
+  font-size: 11px;
+}
+.readback-note {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+.result-error {
+  min-height: 230px;
+  align-items: stretch;
+  gap: var(--ui-space-2);
+  padding: 17px;
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, var(--line));
+  border-radius: var(--ui-radius-control);
+  background: color-mix(in srgb, var(--danger) 4%, var(--panel));
+  text-align: left;
+}
+.result-error strong {
+  color: var(--danger);
+  font-size: 13px;
+}
+.result-error code {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 11px;
+}
+.result-error p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.playground-code pre {
+  max-height: 310px;
+  overflow: auto;
+  margin: 0;
+  padding: 17px 20px;
+  color: #d6e4ff;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.playground-code > .text-link {
+  margin: 0 16px 14px;
+  font-size: 11px;
+}
+.playground-disclosure {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  padding: 7px 2px 0;
+}
+.playground-disclosure p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.playground-disclosure strong {
+  color: var(--ink);
+  font-weight: 550;
+}
+.playground-code .token.comment {
+  color: #98a2b3;
+}
+.playground-code .token.keyword,
+.playground-code .token.atrule {
+  color: #ff7ab2;
+}
+.playground-code .token.string,
+.playground-code .token.attr-value {
+  color: #a5d6ff;
+}
+.playground-code .token.number,
+.playground-code .token.boolean {
+  color: #79c0ff;
+}
+.playground-code .token.function {
+  color: #d2a8ff;
+}
+.playground-code .token.operator,
+.playground-code .token.punctuation {
+  color: #d6e4ff;
+}
+:root[data-theme='dark'] .button-quiet {
+  background: var(--panel);
+}
+:root[data-theme='dark'] .execution-result,
+:root[data-theme='dark'] .playground-workbench {
+  background: var(--panel);
+}

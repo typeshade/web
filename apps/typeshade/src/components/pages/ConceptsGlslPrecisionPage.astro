@@ -1,0 +1,155 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import MappingTable from '../MappingTable.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editPrecisionGuide, links } from '../../lib/links.ts';
+import { precisionExample as sample, precisionCalculation } from '../../lib/glsl-precision-model.ts';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = copyFor(locale).concepts.glslPrecision;
+const fractionLabel = copyFor(locale).concepts.precisionFractionLabel;
+const headings = [
+  ['declaration', t.meaningH], ['defaults', t.defaultsH], ['tiers', t.tiersH],
+  ['rounding', t.modelH], ['browser', t.deviceH], ['practice', t.practicalH],
+  ['problems', t.troubleH], ['questions', t.faqH], ['typeshade', t.typeshadeH], ['sources', t.sourcesH],
+].map(([slug, text]) => ({ depth: 2, slug, text }));
+const coarse = precisionCalculation(sample.base, sample.increment, sample.coarseBits);
+const fine = precisionCalculation(sample.base, sample.increment, sample.fineBits);
+const labels = { idle: t.deviceIdle, ready: t.deviceReady, unavailable: t.deviceUnavailable, error: t.deviceError, unsupported: t.unsupported, vertex: t.vertex, fragment: t.fragment, result: t.modelResult };
+const declarations = `precision highp float;
+float exposure;
+vec3 position;
+mediump vec4 color;`;
+const fallback = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif`;
+const query = `const gl = canvas.getContext('webgl2');
+const format = gl?.getShaderPrecisionFormat(
+  gl.FRAGMENT_SHADER,
+  gl.HIGH_FLOAT,
+);
+if (format) {
+  console.log(format.rangeMin, format.rangeMax, format.precision);
+}`;
+---
+<Docs locale={locale} path={links.conceptsGlslPrecision.href} title={t.title} description={t.description} headings={headings} editHref={editPrecisionGuide(locale)} label={t.h1} meta={`title:${t.searchTitle}`} breadcrumbs={[
+  { name: copyFor(locale).docs.labels.sidebarGroups.concepts, href: links.concepts.href },
+  { name: t.h1, href: links.conceptsGlslPrecision.href },
+]}>
+  <h1><code>{t.h1}</code></h1>
+  <p><Rich text={t.lead} locale={locale} /></p>
+  <section>
+    <h2 id="declaration">{t.meaningH}</h2>
+    <dl class="precision-tokens">{t.tokens.map(([token, meaning]) => <div><dt><Rich text={token} locale={locale} /></dt><dd>{meaning}</dd></div>)}</dl>
+    <p><Rich text={t.scope} locale={locale} /></p>
+    <TypeShadeCode code={declarations} lang="glsl" title={t.declarationsLabel} />
+  </section>
+  <section>
+    <h2 id="defaults">{t.defaultsH}</h2>
+    <p>{t.defaultsP}</p>
+    <MappingTable locale={locale} caption={t.defaultsH} columns={t.defaultColumns} rows={t.defaultRows} />
+    <p>{t.supportP}</p>
+    <details class="precision-details">
+      <summary>{t.fallbackLabel}</summary>
+      <TypeShadeCode code={fallback} lang="glsl" title={t.fallbackLabel} />
+      <p>{t.fallbackP}</p>
+    </details>
+  </section>
+  <section>
+    <h2 id="tiers">{t.tiersH}</h2>
+    <p>{t.tiersP}</p>
+    <MappingTable locale={locale} caption={t.tiersH} columns={t.tierColumns} rows={t.tierRows} />
+    <p>{t.performanceP}</p>
+  </section>
+  <div data-precision-guide data-labels={JSON.stringify(labels)}>
+    <section>
+      <h2 id="rounding">{t.modelH}</h2>
+      <p>{t.modelP}</p>
+      <p><Rich text={t.modelSymbols} locale={locale} /></p>
+      <p class="guide-note">{t.modelNote}</p>
+      <fieldset disabled data-precision-controls class="precision-controls">
+        <label><span>{t.baseLabel}</span><select data-precision-base>{sample.bases.map(base => <option value={base} selected={base === sample.base}>{base}</option>)}</select></label>
+        <label><span>{t.incrementLabel} <output data-precision-increment-value>{sample.increment}</output></span><input data-precision-increment type="range" min={sample.incrementMin} max={sample.incrementMax} step={sample.incrementStep} value={sample.increment} /></label>
+      </fieldset>
+      <noscript><p class="guide-note">{t.noScript}</p></noscript>
+      <div class="precision-results" role="table" aria-label={t.modelH}>
+        <div class="precision-result-row precision-result-head" role="row"><span role="columnheader">{t.modelColumns[0]}</span><span role="columnheader">{t.modelColumns[1]}<small>{fractionLabel(sample.coarseBits)}</small></span><span role="columnheader">{t.modelColumns[2]}<small>{fractionLabel(sample.fineBits)}</small></span></div>
+        <div class="precision-result-row" role="row"><code role="cell">base + increment</code><code role="cell" data-precision-coarse-sum>{coarse.sum}</code><code role="cell" data-precision-fine-sum>{fine.sum}</code></div>
+        <div class="precision-result-row" role="row"><code role="cell">sum - base</code><code role="cell" data-precision-coarse-result>{coarse.recovered}</code><code role="cell" data-precision-fine-result>{fine.recovered}</code></div>
+      </div>
+      <p class="precision-summary" aria-live="polite" data-precision-summary>{t.modelResult}: {coarse.recovered} / {fine.recovered}</p>
+    </section>
+    <section>
+      <h2 id="browser">{t.deviceH}</h2>
+      <p>{t.deviceP}</p>
+      <div class="precision-probe-controls">
+        <label for="precision-context">{t.contextLabel}</label>
+        <select id="precision-context" data-precision-context><option value="webgl2">WebGL 2</option><option value="webgl">WebGL 1</option></select>
+        <button type="button" class="button" disabled data-precision-inspect>{t.inspect}</button>
+      </div>
+      <p class="guide-note" role="status" data-precision-status>{t.deviceIdle}</p>
+      <div class="precision-report" data-precision-report hidden role="region" aria-label={t.deviceH} tabindex="0">
+        <p class="precision-scroll-hint text-(length:--text-ui) text-text-2">{t.reportScroll}</p>
+        <table data-own-stack aria-label={t.deviceH}><thead><tr>{t.deviceColumns.map(label => <th scope="col">{label}</th>)}</tr></thead><tbody data-precision-report-body></tbody></table>
+      </div>
+      <p><Rich text={t.fieldsP} locale={locale} /></p>
+      <p>{t.queryP}</p>
+      <details class="precision-details"><summary>{t.queryLabel}</summary><TypeShadeCode code={query} lang="js" title={t.queryLabel} /></details>
+    </section>
+  </div>
+  <section>
+    <h2 id="practice">{t.practicalH}</h2>
+    <ul>{t.checks.map(text => <li>{text}</li>)}</ul>
+  </section>
+  <section>
+    <h2 id="problems">{t.troubleH}</h2>
+    <MappingTable locale={locale} caption={t.troubleH} columns={t.troubleColumns} rows={t.troubleRows} />
+  </section>
+  <section>
+    <h2 id="questions">{t.faqH}</h2>
+    {t.faq.map(([question, answer]) => <details class="precision-details"><summary>{question}</summary><p>{answer}</p></details>)}
+  </section>
+  <section>
+    <h2 id="typeshade">{t.typeshadeH}</h2>
+    <p><Rich text={t.typeshadeP} locale={locale} /></p>
+    <p><Rich text={t.typeshadeMore} locale={locale} /></p>
+  </section>
+  <section>
+    <h2 id="sources">{t.sourcesH}</h2>
+    <ul>{t.sources.map(text => <li><Rich text={text} locale={locale} /></li>)}</ul>
+  </section>
+</Docs>
+<script>
+  import '../../scripts/glsl-precision.ts';
+</script>
+<style>
+  .precision-details { margin-block-start: 16px; max-inline-size: var(--wide); border: 1px solid var(--color-line-2); border-radius: var(--radius); padding: 12px 16px }
+  .precision-details > summary { cursor: pointer; font-weight: 600 }
+  .precision-controls { display: grid; gap: 16px; max-inline-size: 352px; margin-block-start: 20px; padding: 16px; border: 1px solid var(--color-line-2); border-radius: var(--radius) }
+  .precision-controls label, .precision-controls label > span { display: block }
+  .precision-controls label > span { margin-block-end: 8px; font-size: var(--text-ui); color: var(--color-text-2) }
+  .precision-controls output { margin-inline-start: 8px; font-family: var(--font-mono) }
+  .precision-controls input { inline-size: 100% }
+  .precision-controls select, .precision-probe-controls select { min-block-size: 36px; padding: 4px 8px; border: 1px solid var(--color-line-2); border-radius: var(--radius); background: var(--color-ground); color: var(--color-text-1) }
+  .precision-results { max-inline-size: 520px; margin-block-start: 20px; font-size: var(--text-ui) }
+  .precision-result-row { display: grid; grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr)); gap: 12px; padding: 12px 0; border-block-end: 1px solid var(--color-line-2); overflow-wrap: anywhere }
+  .precision-result-head { font-weight: 600 }
+  .precision-result-head small { display: block; margin-block-start: 4px; font-size: 0.75rem; font-weight: 400; color: var(--color-text-2) }
+  .precision-summary { font-size: var(--text-ui); color: var(--color-text-2) }
+  .precision-probe-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-block-start: 20px; font-size: var(--text-ui) }
+  .precision-report { max-inline-size: var(--wide); overflow-x: auto }
+  .precision-report table { display: table; min-inline-size: 520px; inline-size: 100%; font-size: var(--text-ui) }
+  .precision-report thead { display: table-header-group }
+  .precision-report :global(tbody) { display: table-row-group }
+  .precision-report :global(tr) { display: table-row }
+  .precision-report th, .precision-report :global(td) { display: table-cell; padding: 10px; white-space: nowrap }
+  .precision-report :global(td::before) { display: none }
+  .precision-scroll-hint { margin-block-start: 12px }
+  .precision-tokens { max-inline-size: var(--content); margin-block-start: 16px }
+  .precision-tokens > div { display: grid; grid-template-columns: minmax(0, 6.5rem) minmax(0, 1fr); gap: 12px; padding-block: 12px; border-block-end: 1px solid var(--color-line-2) }
+  .precision-tokens dt { font-weight: 600 }
+</style>

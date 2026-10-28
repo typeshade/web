@@ -1,0 +1,7 @@
+{
+  "slug": "ifexpr",
+  "source": "68037d74d7cee3ef456c48e20f21946da29d87cd52da4fce62daee22c742f893",
+  "texts": {
+    "summary": "조건에 따라 두 값 중 하나를 고르는 디스패치이다: ifExpr(cond, () => a, () => b)."
+  }
+}

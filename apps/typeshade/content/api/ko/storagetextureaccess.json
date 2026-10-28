@@ -1,0 +1,8 @@
+{
+  "slug": "storagetextureaccess",
+  "source": "4a6de0c5c62620059c3a0fb87564fa2b4aefc2121d4348b797e02621a916a8af",
+  "texts": {
+    "summary": "셰이더가 스토리지 텍스처에 접근할 수 있는 방식입니다.",
+    "description": "WGSL은 이들을 `write`, `read`, `read_write`로 적습니다. WebGPU의 바인드 그룹 레이아웃은 같은 세 가지를 `write-only`, `read-only`, `read-write`로 적습니다. 이 표기를 WebGPU 표기로 바꾸는 함수가 [`storageTextureLayoutAccess`](/api/storagetexturelayoutaccess/)입니다."
+  }
+}

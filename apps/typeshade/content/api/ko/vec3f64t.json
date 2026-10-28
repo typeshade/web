@@ -1,0 +1,7 @@
+{
+  "slug": "vec3f64t",
+  "source": "63a76cd1cfa6cf7e440a8c54bb8d59a7918c255fa54d07cecfd847ea855a6e9b",
+  "texts": {
+    "summary": "3성분 에뮬레이션 배정밀도 벡터입니다. 생성되는 방식과, 일반 vec3fT 대신 에뮬레이션 배정밀도 계열을 골라야 하는 경우는 vec2f64T 항목을 참조합니다."
+  }
+}

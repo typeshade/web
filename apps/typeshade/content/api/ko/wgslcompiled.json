@@ -1,0 +1,8 @@
+{
+  "slug": "wgslcompiled",
+  "source": "767796f8a0f9f139ac49421685d78aa5ced21f0f05d4cf290e2f89f96ed66893",
+  "texts": {
+    "summary": "컴파일 결과를 보고할 수 있는 모듈입니다. GPUShaderModule이 이 인터페이스를 만족합니다.",
+    "description": "컴파일 결과를 보고할 수 있는 모듈입니다. `GPUShaderModule`이 이 인터페이스를 만족합니다.\n이 인터페이스는 [`WgslValidator`](/api/wgslvalidator/)와 별개의 인터페이스입니다. `getCompilationInfo()`가 디바이스가 돌려주는 모듈의 메서드이기 때문입니다."
+  }
+}

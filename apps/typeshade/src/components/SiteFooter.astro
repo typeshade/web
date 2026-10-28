@@ -1,0 +1,74 @@
+---
+// The site map in three columns, then the licence, the copyright and the commit the page
+// was built from.
+import Rich from './Rich.astro';
+import { facts } from '../lib/examples.ts';
+import { docsPages, links } from '../lib/links.ts';
+import { copyFor, localePath, locales, type Locale } from '../i18n/index.ts';
+import { githubNewIssue } from '../lib/issue-data.ts';
+
+interface Props {
+  locale: Locale;
+  path: string;
+  /** Per-locale override for the language switcher, already a real href (the 404 page). */
+  switchTarget?: Partial<Record<Locale, string>>;
+}
+const { locale, path, switchTarget } = Astro.props;
+const t = copyFor(locale);
+const columns = [
+  {
+    // The group with the links in it. It spans most of the site map's tracks and its list
+    // runs down them, so it never stands as one tall column beside the two short ones.
+    wide: true,
+    h: t.footer.docs,
+    items: [
+      ...docsPages(locale),
+      { label: t.docs.api.h1, href: localePath(locale, links.api.href) },
+      { label: t.footer.readme, href: links.docs.href },
+    ],
+  },
+  {
+    h: t.footer.project,
+    items: [
+      { label: t.nav.github, href: links.mirror.href },
+      { label: t.footer.newIssue, href: githubNewIssue('compiler'), report: 'compiler' },
+      { label: t.footer.releases, href: links.releases.href },
+      { label: t.footer.npm, href: links.npm.href },
+      { label: t.nav.llms, href: links.llms.href },
+      { label: t.benchmarks.h1, href: localePath(locale, links.benchmarks.href) },
+      // The products built on TypeShade close the group, one link each by name. The next one
+      // is a line here, a link in links.ts and its name in both dictionaries.
+      { label: t.footer.radiance, href: links.radiance.href },
+      { label: t.footer.typenn, href: links.typenn.href },
+    ],
+  },
+  {
+    h: t.footer.languages,
+    items: locales.map((l) => ({
+      label: copyFor(l).name,
+      href: switchTarget?.[l] ?? localePath(l, path),
+      locale: l,
+    })),
+  },
+];
+---
+
+<footer class="site-footer" data-pagefind-ignore>
+  <div class="site-map">
+    {columns.map((c) => (
+      <div class:list={['site-map-col', 'wide' in c && c.wide ? 'site-map-docs' : undefined]}>
+        <h2>{c.h}</h2>
+        <ul>
+          {c.items.map((i) => (
+            <li><a href={i.href} lang={'locale' in i ? i.locale : undefined} hreflang={'locale' in i ? i.locale : undefined} data-report={'report' in i ? i.report : undefined}>{i.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+  <div class="site-legal">
+    <p><Rich text={t.footer.license} locale={locale} /></p>
+    <p>{t.footer.copyright}</p>
+    <p>{t.footer.builtFrom} <a href={links.commit.href}>{facts.pinnedCommit}</a>.</p>
+  </div>
+</footer>

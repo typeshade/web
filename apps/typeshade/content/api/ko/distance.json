@@ -1,0 +1,11 @@
+{
+  "slug": "distance",
+  "source": "7912acfd88520fe7dca1be97a70f0a1a313330a91895a7a1523147bce0c15869",
+  "texts": {
+    "summary": "distance(a, b): |a − b|, 벡터를 스칼라로 바꿉니다. length(a.sub(b))를 내장 함수 형태로 쓴 것입니다.",
+    "description": "f32 벡터에는 f32를, 에뮬레이션된 배정밀도 벡터에는 f64를 돌려줍니다.",
+    "targets.wgsl": "`distance(a, b)`. 피연산자가 `f64`이면 fp64 패스가 이를 `df64` 헬퍼 호출로 바꿉니다.",
+    "targets.glsl": "`distance(a, b)`. 피연산자가 `f64`이면 fp64 패스가 이를 `df64` 헬퍼 호출로 바꿉니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "slug": "overridedecl",
+  "source": "e5b83092ee6def5719a22582953bb4f46626d59c8dbdf9e5a70d4b2538820171",
+  "texts": {
+    "summary": "파이프라인 특수화 상수입니다. overrideConst의 바탕이 되는 선언입니다.",
+    "description": "WGSL에서는 모듈 범위에 `override name: type = default;`를 생성합니다. 호스트는 `createRenderPipeline({ constants: { name } })`로 이를 특수화합니다. GLSL ES 3.00에서는 `#version` 줄 뒤에 `#define name default`를 생성합니다. 호스트는 `emitGlslModule(m, stage, { overrideValues })`로 다시 생성하여 이를 특수화합니다. 값은 파이프라인을 만들 때 정해집니다. 그래서 작성한 모듈 하나로 호스트가 필요한 만큼의 드라이버별 특수화 변형을 얻을 수 있으며, 드라이버는 상수 값 때문에 도달하지 않게 된 분기를 제거합니다. WGSL 스칼라 타입만 허용된다(`bool`, `i32`, `u32`, `f32`). 벡터, 행렬, 배열, 구조체 타입은 작성할 때 `SD0014`로 거부됩니다.",
+    "members.default": "`override` 선언이나 `#define`에 생성되는 기본 값입니다. 호스트가 이 상수에 아무 값도 주지 않을 때 파이프라인이 받는 값입니다."
+  }
+}

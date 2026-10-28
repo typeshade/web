@@ -1,0 +1,8 @@
+{
+  "slug": "vec2",
+  "source": "fbbadcae5bb0bc41efcb244213f207a445507e970c542b749b4313db30fc72e1",
+  "texts": {
+    "summary": "WGSL 방식의 vec2<f32> 생성자이다: vec2(x, y).",
+    "description": "일반 숫자 성분은 f32로 승격됩니다. 그래서 `vec2(pos.x, 0)`은 `f32()` 래퍼 없이 f32 0을 생성합니다.\n\n[`construct`](/api/construct/)는 이 함수와 그 밖의 모든 벡터 및 구조체 생성자가 기반으로 삼는, 타입 없는 기본 함수입니다."
+  }
+}

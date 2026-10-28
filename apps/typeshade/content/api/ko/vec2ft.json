@@ -1,0 +1,8 @@
+{
+  "slug": "vec2ft",
+  "source": "ed91673e836e6970f28e01fe1112ee9684b342d1625c37fcf58e8d8ae800eb69",
+  "texts": {
+    "summary": "기본 vec2<f32>입니다. DSL에서 가장 흔한 벡터 타입이며, 화면 좌표, UV 좌표, 2차원 위치에 쓰입니다. 예를 들어 uv: location(0, vec2fT) 프래그먼트 입력 필드나 resolution: vec2fT 유니폼이 이에 해당합니다.",
+    "description": "[`vec2`](/api/vec2/) 생성자로 값을 만듭니다. 값이 f32가 제공하는 것보다 더 높은 정밀도를 필요로 하면 대신 [`vec2f64T`](/api/vec2f64t/)를 씁니다."
+  }
+}

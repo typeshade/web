@@ -1,0 +1,8 @@
+{
+  "slug": "capprofile",
+  "source": "00ec986c9216e0844cc6528be19eff7cc34e4c3290e4d9682eb9949113637329",
+  "texts": {
+    "summary": "백엔드의 기능 표이자, 대상이 지원하는 기능을 정하는 단일 기준입니다.",
+    "description": "표에 행이 있으면 지원한다는 뜻입니다. 행이 있는 기능은 이 대상에서 생성할 수 있습니다. 행이 없는 기능은 생성할 때 그 이름을 담은 [`UnsupportedFeatureError`](/api/unsupportedfeatureerror/)를 던집니다. 나머지는 모두 같은 행에서 파생됩니다. 지원 범위는 키(`Capabilities.fromProfile`)에서 얻고, 소스 지시문 머리말은 각 행의 `directive`에서, 호스트 활성화 목록은 각 행의 `hostFeature`에서 만든다([`hostFeaturesFor`](/api/hostfeaturesfor/)). 따라서 이 셋이 서로 어긋날 수 없습니다."
+  }
+}

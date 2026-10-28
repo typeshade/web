@@ -1,0 +1,8 @@
+{
+  "slug": "emitstruct",
+  "source": "9b5a70f183265d503c226518c061e080c15a9e5c1f8301974453bb0b5c2c242c",
+  "texts": {
+    "summary": "StructDecl 하나를 WGSL 구조체 블록으로 생성합니다.",
+    "targets.wgsl": "WebGPU용 WGSL을 생성합니다."
+  }
+}

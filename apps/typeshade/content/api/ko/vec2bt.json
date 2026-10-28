@@ -1,0 +1,8 @@
+{
+  "slug": "vec2bt",
+  "source": "290d59f2a763e57e1fe8cb5ff7d67aaf90acad9748139866c00cdc6f638f6a32",
+  "texts": {
+    "summary": "vec2<bool>입니다. 두 vec2 값을 성분별로 비교했을 때 나오는 결과 타입입니다.",
+    "description": "`any`, `all`, 성분별 `select`가 이 타입을 받습니다. 호스트와 공유할 수 없습니다."
+  }
+}

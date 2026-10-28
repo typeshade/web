@@ -1,0 +1,44 @@
+---
+import SidebarTree from './SidebarTree.astro';
+import { navigationContext, sidebarNodes, containsPage } from '../lib/docs-navigation.ts';
+import { copyFor, type Locale } from '../i18n/index.ts';
+import type { SidebarGroup } from '../lib/links.ts';
+interface Props { locale: Locale; path: string; here: string; label: string; groups: readonly SidebarGroup[]; breadcrumbs?: readonly { name: string; href: string }[] }
+const { locale, path, here, label, groups, breadcrumbs } = Astro.props;
+const t = copyFor(locale).docs.navigation;
+const context = navigationContext(locale, path, label, groups, breadcrumbs);
+const trees = groups.map(group => ({ ...group, nodes: sidebarNodes(group.items) }));
+---
+<div class="sidebar-context docs-group" data-sidebar-context>
+  <p class="sidebar-caption">{t.location}</p>
+  <p class="sidebar-path">{context.parents.map((parent, index) => <>{index > 0 && <span aria-hidden="true">/</span>}<a href={parent.href}>{parent.label}</a></>)}</p>
+  <ul>
+    <li><a class:list={['sidebar-current', { 'sidebar-current-code': /^\/reference\/[^/]+\/[^/]+\/$/.test(path) }]} href={here} aria-current="page">{context.current.label}</a></li>
+  </ul>
+  {context.related.length > 0 && <>
+    <p class="sidebar-caption sidebar-related-title">{t.related}</p>
+    <ul>{context.related.map(item => <li><a class="sidebar-related" href={item.href}><code>{item.label}</code></a></li>)}</ul>
+  </>}
+</div>
+<p class="sidebar-caption sidebar-browse-title">{t.browse}</p>
+<div class="sidebar-sections">
+  {trees.map(group => <section class="docs-group sidebar-section" data-sidebar-section>
+    <p class:list={['docs-group-title', { 'sidebar-section-current': group.nodes.some(node => containsPage(node, here)) }]}>{group.title}</p>
+    <SidebarTree nodes={group.nodes} here={here} overview={t.overview} />
+  </section>)}
+</div>
+<style>
+  .sidebar-caption { padding-inline: 12px; font-size: 0.75rem; color: var(--color-text-3); line-height: 1.5 }
+  .sidebar-context ul { margin-block-start: 6px }
+  .sidebar-context a { min-block-size: 36px; padding: 7px 12px; overflow-wrap: anywhere }
+  .sidebar-path { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin-block-start: 8px; padding-inline: 12px; color: var(--color-text-3) }
+  .sidebar-context .sidebar-path a { display: inline; min-block-size: 0; padding: 0; font-size: 0.8125rem }
+  .sidebar-current { margin-block-start: 6px }
+  .sidebar-current-code, .sidebar-related code { font-family: var(--font-mono); font-size: var(--text-code) }
+  .sidebar-related-title { margin-block-start: 16px }
+  .sidebar-browse-title { margin-block-start: 24px; padding-block-start: 16px; border-block-start: 1px solid var(--color-line-2) }
+  .sidebar-sections { margin-block-start: 8px }
+  .sidebar-section { margin-block-start: 2px }
+  .sidebar-section > .docs-group-title { margin: 0; padding: 10px 12px 4px; font-size: var(--text-ui); color: var(--color-text-2) }
+  .sidebar-section > .sidebar-section-current { color: var(--color-text-1); font-weight: 600 }
+</style>

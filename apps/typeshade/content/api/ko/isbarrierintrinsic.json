@@ -1,0 +1,7 @@
+{
+  "slug": "isbarrierintrinsic",
+  "source": "2ce3df64d7ff3070fdf4be4c9d5c13bccf4f8a43e6cf7d981ac1a7a1273bc6c7",
+  "texts": {
+    "summary": "name이 BARRIER_INTRINSICS 중 하나인지 여부입니다."
+  }
+}

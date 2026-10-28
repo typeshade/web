@@ -1,0 +1,10 @@
+{
+  "slug": "switchchain",
+  "source": "826db4be68a5a6ab179de596008a2da204898e5db3b5b7fcec51ae75097144d0",
+  "texts": {
+    "summary": "switch (scrut) { case n: …; default: … }를 체인 형태의 문장 빌더로 표현합니다. If(…).elif(…).else(…)와 같은 작성 형식으로 정수값에 따른 분기를 구성합니다. 기본값을 담을 Var(/api/var/)를 선언한 뒤 case 분기 안에서 값을 대입합니다.",
+    "description": "두 대상 모두에서 실제 `switch`를 생성합니다. `.case(n, body)`는 case 레이블을 추가합니다. `.default(body?)`는 선택적인 default 분기를 추가하고 체인을 끝냅니다. 이때 그 문장이 가장 안쪽 스코프에 추가됩니다.",
+    "members.case": "`case value:` 분기를 추가합니다. 체인을 반환합니다.",
+    "members.default": "선택적인 `default:` 분기를 추가하고 체인을 끝냅니다. `switch` 문장은 여기서 가장 안쪽 스코프에 추가되므로, `.default()`가 없는 체인은 아무것도 생성하지 않습니다."
+  }
+}

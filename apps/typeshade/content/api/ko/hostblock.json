@@ -1,0 +1,15 @@
+{
+  "slug": "hostblock",
+  "source": "8b5efe06698df353ece251f146c8b2a1121d5edb4ca73d74c98e25250c2de08b",
+  "texts": {
+    "summary": "호스트가 소유하는 유니폼 블록을 선언합니다. 호스트가 공급하는 값으로 이루어진 구조체 전체를, 두 타깃에서 모두 동작하는 선언 하나로 만듭니다.",
+    "description": "WGSL에서 호스트가 소유하는 바인드 그룹은 하나의 단위입니다. 호스트가 모듈에 `@group(0)`을 넘기고, 그 레이아웃이 기준입니다. 그래서 블록은 자체 선언이어야 하며, [`hostUniform`](/api/hostuniform/) 호출 여러 개로 나눠 쓸 수 없습니다. 그렇게 쓰면 다른 프로그램을 기술하게 됩니다.\n\nWGSL에서는 일반적인 `@group(N) @binding(M) var<uniform>` 블록입니다. 셰이더는 값을 읽기 위해 이 블록을 여전히 선언합니다. [`reflect`](/api/reflect/)는 모든 항목에 `owner: 'host'`를 표시하므로, 소비자는 이 항목의 레이아웃을 만들지 않아야 한다는 것을 알 수 있습니다.\n\nGLSL ES 3.00에서는 GLSL 호스트 prelude가 둘 중 하나를 제공하고 일치하는 쪽만 링크되므로, 표기는 호출하는 쪽이 고른다:\n\n- `glsl: 'std140-block'` (기본값)은 `layout(std140) uniform CameraUniforms { ... } u_camera;`를 생성합니다.\n- `glsl: 'loose'`는 멤버마다 `uniform mat4 u_matrix;` 하나씩을 생성하고, 모듈의 모든 `u_camera.u_matrix` 읽기를 `u_matrix`로 다시 씁니다. 이 다시 쓰기는 생성 전에 모듈의 노드 그래프에서 일어나므로, 관계없는 부분 문자열을 건드릴 수 없습니다. 또한 `minify()`를 거쳐도 이 다시 쓰기는 유지되며, [`reflect`](/api/reflect/)는 생성된 내용을 여전히 기술합니다.\n\nloose 블록의 멤버는 스칼라, 벡터 또는 행렬이어야 합니다. 기본 블록은 중첩 구조체를 표현할 방법이 없기 때문입니다. 이 호출은 이를 검사하며, 어기면 SD0016 오류가 발생합니다. 멤버 이름은 모듈의 모든 loose 블록에서 고유해야 합니다. 평탄화하면 모든 이름이 하나의 네임스페이스에 들어가기 때문입니다. 이름이 충돌하면 GLSL 생성 시점에 [`UnsupportedFeatureError`](/api/unsupportedfeatureerror/)가 발생합니다.",
+    "parameters.typeName": "구조체의 타입 이름이며, 호스트가 쓰는 철자 그대로입니다.",
+    "parameters.at": "WGSL의 `group`과 `binding` 슬롯이며, `as`는 블록 변수의 이름입니다.",
+    "parameters.fields": "멤버 목록이며, 호스트가 선언한 순서를 따릅니다.",
+    "parameters.opts": "`glsl`은 GLSL 표기를 고릅니다. `precision`은 `'loose'` 블록의 각 멤버에 적용하는 GLSL 전용 한정자입니다. std140 블록은 스테이지 기본값을 따릅니다.",
+    "returns": "[`UniformStruct`](/api/uniformstruct-interface/) 핸들입니다. `camera.field.u_matrix`는 선언된 형태에 맞춰 타입이 정해집니다.",
+    "exceptions.SD0016": "기본 블록이 표현할 수 없는 멤버를 `glsl: 'loose'`가 요구하면 SD0016이 발생합니다.",
+    "exceptions.UnsupportedFeatureError": "멤버 이름은 모듈의 모든 loose 블록에서 고유해야 합니다. 평탄화하면 모든 이름이 하나의 네임스페이스에 들어가기 때문입니다. 이름이 충돌하면 GLSL 생성 시점에 UnsupportedFeatureError가 발생합니다."
+  }
+}

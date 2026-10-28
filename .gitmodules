@@ -1,0 +1,9 @@
+[submodule "apps/typeshade/vendor/shader-dsl"]
+	path = apps/typeshade/vendor/shader-dsl
+	url = https://github.com/typeshade/typeshade
+[submodule "sources/typenn"]
+	path = sources/typenn
+	url = https://github.com/typeshade/typenn
+[submodule "sources/typecv"]
+	path = sources/typecv
+	url = https://github.com/typeshade/typecv

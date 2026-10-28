@@ -1,0 +1,69 @@
+---
+// The language reference's front door: the six tables the compiler documents the language
+// with, each with the number of names in it and one line on what it holds, and the error
+// codes and the design rules after them. The sections and
+// their counts come from the compiler (src/lib/language-reference.ts); the words come from
+// the dictionary, so a Korean reader gets Korean around English identifiers.
+import Docs from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { facts } from '../../lib/examples.ts';
+import { languageSections } from '../../lib/language-reference.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const r = copyFor(locale).docs.reference;
+const kinds = languageSections().map((section) => ({
+  ...r.kinds[section.kind],
+  href: localePath(locale, `/reference/${section.slug}/`),
+  count: r.entries(section.entries.length),
+}));
+// The error codes follow the six tables, counted from the compiler's two registries.
+const x = copyFor(locale).docs.errors;
+kinds.push({
+  name: x.h1,
+  summary: x.summary,
+  description: x.description,
+  href: localePath(locale, links.errors.href),
+  count: x.codes(facts.errorCodesTs + facts.errorCodesSd),
+});
+// Then the design rules, counted from the compiler's traceability tree.
+const rules = copyFor(locale).docs.rules;
+kinds.push({
+  name: rules.h1,
+  summary: rules.summary,
+  description: rules.description,
+  href: localePath(locale, links.rules.href),
+  count: rules.rulesCount(facts.rules),
+});
+const headings = [{ depth: 2, slug: 'reading', text: r.readingH }];
+---
+
+<Docs
+  locale={locale}
+  path={links.reference.href}
+  title={r.title}
+  description={r.description}
+  headings={headings}
+  editHref={editCopy(locale, 'docs')}
+  label={r.h1}
+  breadcrumbs={[{ name: r.reference, href: links.reference.href }]}
+  dateModified={facts.pinnedDate}
+>
+  <h1>{r.h1}</h1>
+  <p class="api-summary"><Rich text={r.intro} locale={locale} /></p>
+  <p class="guide-note"><Rich text={r.audience} locale={locale} /></p>
+  <dl class="api-list api-index">
+    {kinds.map((k) => (
+      <>
+        <dt><a href={k.href}>{k.name}</a> <span class="api-type">{k.count}</span></dt>
+        <dd><Rich text={k.summary} locale={locale} /></dd>
+      </>
+    ))}
+  </dl>
+
+  <h2 id="reading">{r.readingH}</h2>
+  <p><Rich text={r.readingP} locale={locale} /></p>
+  <p class="guide-note"><Rich text={r.note} locale={locale} /></p>
+</Docs>

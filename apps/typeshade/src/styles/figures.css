@@ -1,0 +1,134 @@
+/* Canvas figure: a framed box with a still image underneath the live canvas */
+.doc figure {
+  margin-block-start: 24px;
+}
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-3);
+}
+.figure-frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-line-1);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+}
+.figure-frame > img,
+.figure-frame > canvas {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.figure-frame > canvas {
+  pointer-events: none;
+}
+.figure-frame > canvas[data-backend='none'] {
+  opacity: 0;
+}
+/* The still is the fallback and not a backdrop: it is what a browser with no GPU API, a
+   reader with no script and a social preview get, and it goes the moment a backend is live.
+   mountShader draws the first frame before it writes data-backend, so there is a painted
+   frame behind this and no gap. A mount that dies calls degrade(), which puts data-backend
+   back to 'none', and the still returns with it. Without this the still stayed under a
+   canvas the shader leaves anywhere non-opaque, and on an example page, where the frame has
+   a block-size of its own, object-fit cropped the still and the canvas differently and both
+   croppings were on screen at once. */
+.figure-frame:has(> canvas:not([data-backend='none'])) > img {
+  display: none;
+}
+.figure-caption {
+  font-size: var(--text-ui);
+  line-height: var(--text-ui--line-height);
+  color: var(--color-text-2);
+}
+/* Two frames of the same pass, one per backend, read as one figure */
+.figure-pair {
+  display: grid;
+  gap: var(--ui-space-4);
+  margin-block-start: 24px;
+}
+.figure-pair .figure {
+  margin-block-start: 0;
+}
+@media (min-width: 40rem) {
+  .figure-pair {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ui-space-6);
+  }
+}
+.figure-split {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 50%;
+  inline-size: 2px;
+  translate: -1px 0;
+  background: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+/* A tile's cover, on the front page and in the gallery: the build-time still at 3:2 over the
+   canvas grey, with a hairline under it. The page scales it on hover. */
+.tile-cover {
+  display: block;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-block-end: 1px solid var(--color-line-1);
+  background: var(--color-surface-2);
+}
+.tile-cover img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: transform 400ms var(--ease-out);
+}
+/* A tile the runtime cannot draw gets Ant's Empty instead of a bare grey box: the outlined
+   mark, and one sentence saying why there is no picture. */
+.no-still {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  padding: 16px;
+  color: var(--color-text-3);
+  text-align: center;
+}
+.no-still svg {
+  inline-size: 40px;
+  block-size: 40px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.no-still-note {
+  max-inline-size: 30ch;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-text-2);
+}
+
+/* Diagnostic */
+.diagnostic {
+  margin-block-start: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  line-height: var(--text-code--line-height);
+  color: var(--color-text-2);
+  overflow-wrap: anywhere;
+}
+.diagnostic b {
+  color: var(--color-diag);
+  font-weight: 500;
+}

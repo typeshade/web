@@ -1,0 +1,11 @@
+{
+  "slug": "unpack2x16unorm",
+  "source": "d995d98d0fc9b02dee538a37b8e80ceca3c7d0fb7d20232217427f0e5246d193",
+  "texts": {
+    "summary": "u32에 담긴 16비트 unorm 값 두 개를 vec2<f32>로 언패킹합니다. 각 성분은 0에서 1 사이입니다. pack2x16unorm의 역연산입니다.",
+    "description": "GLSL ES 3.00에서는 이름이 `unpackUnorm2x16`이입니다.",
+    "targets.wgsl": "`unpack2x16unorm(v)`로 생성합니다.",
+    "targets.glsl": "`unpackUnorm2x16(v)`로 생성합니다.",
+    "targets.cpu": "기준값을 내는 오라클이 f64로 계산합니다."
+  }
+}

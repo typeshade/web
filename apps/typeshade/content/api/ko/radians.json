@@ -1,0 +1,11 @@
+{
+  "slug": "radians",
+  "source": "274e197a2b3a9565f78462b766fe0066897b43a818d27532c400cf6416518610",
+  "texts": {
+    "summary": "radians(deg): 도 단위 값을 라디안으로 성분별 변환합니다. 내장 함수가 쓰는 정확한 π/180을 그대로 씁니다.",
+    "description": "손으로 반올림한 상수를 쓴 `x.mul(DEG2RAD)` 대신 이 함수를 씁니다. [`degrees`](/api/degrees/)는 그 역함수입니다.",
+    "targets.wgsl": "`radians(x)`로 생성합니다.",
+    "targets.glsl": "`radians(x)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

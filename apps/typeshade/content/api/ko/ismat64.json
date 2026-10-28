@@ -1,0 +1,7 @@
+{
+  "slug": "ismat64",
+  "source": "23d14cf690a8b7481e431d016d386addfd5057603c4912f24895ea34e68beff6",
+  "texts": {
+    "summary": "ShaderType을 에뮬레이션 배정밀도 행렬(matNxN<f64>, mat2f64T 참조)로 좁히며, 이 행렬은 double-double 열로 이루어진 구조체로 생성됩니다."
+  }
+}

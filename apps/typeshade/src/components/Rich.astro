@@ -1,0 +1,143 @@
+---
+// Renders a copy string with inline links written as [text](key) and inline code in
+// backticks. `key` names a record in src/lib/links.ts, or a page ('home', 'motivation',
+// 'checks', 'examples', and the reference pages the copy names), which the locale prefixes.
+// An unknown key fails the build, and so does a reference page for a name the compiler has
+// stopped exporting. Inline code that is exactly a diagnostic code the compiler's registries
+// carry, `TS8010` or `SD0030`, links to that code's page. A design rule named in the prose,
+// "Rule 4.8" or "Rules 7.2, 7.5", links to that rule's page, the first mention of each rule
+// on a page only and never on the rule's own page, with the words as written; the Korean for
+// it links too. On a guide page, a rule that nothing in the compiler checks yet (`pending` or `code` in its traceability item at the pin) carries a
+// short note beside its name, docs.rules.flags: the reference's small outlined label, which
+// never breaks inside, so a phone wraps it whole to the next line. A formula written `$…$` in
+// LaTeX renders as MathML (src/lib/math.mjs), and one Temml cannot read fails the build.
+import { errorCodePath } from '../lib/error-codes.ts';
+import { renderMath } from '../lib/math.mjs';
+import { OPEN_VERIFICATIONS, mentionParts, ruleByNumber, rulePath } from '../lib/design-rules.ts';
+import { apiPage, links } from '../lib/links.ts';
+import { copyFor, defaultLocale, localePath, ruleWords, type Locale } from '../i18n/index.ts';
+
+interface Props {
+  text: string;
+  locale: Locale;
+  /** The text sits inside a link, a gallery tile say: every link it would carry is written as
+   *  its text, since a link inside a link closes the outer one where the inner one opens and
+   *  spills the rest of the tile onto the page. A rule it names is not linked either, so the
+   *  first link to that rule is still the first one the reader can follow. */
+  inert?: boolean;
+}
+const { text, locale, inert = false } = Astro.props;
+
+const PAGES: Record<string, string> = {
+  home: '/',
+  motivation: links.motivation.href,
+  quickStart: links.quickStart.href,
+  playground: links.playground.href,
+  editor: links.editor.href,
+  checks: links.checks.href,
+  examples: links.examples.href,
+  guide: links.guide.href,
+  languageBuiltins: links.languageBuiltins.href,
+  languageFromTypescript: links.languageFromTypescript.href,
+  languageFromWgsl: links.languageFromWgsl.href,
+  internalsGlslShader: links.internalsGlslShader.href,
+  api: links.api.href,
+  reference: links.reference.href,
+  referenceFunctions: links.referenceFunctions.href,
+  referenceTypes: links.referenceTypes.href,
+  rulesGuarantees: links.rulesGuarantees.href,
+  apiFn: apiPage('fn'),
+  apiModule: apiPage('module'),
+  apiReflect: apiPage('reflect'),
+  apiCompile: apiPage('compile'),
+  apiEmitModule: apiPage('emitModule'),
+  apiEmitGlsl: apiPage('emitGlslModule'),
+};
+
+type Part =
+  | { kind: 'text'; value: string }
+  | { kind: 'code'; value: string }
+  | { kind: 'link'; value: string; href: string; code: boolean; auto?: true }
+  | { kind: 'flag'; value: string }
+  | { kind: 'math'; value: string };
+
+// A dollar sign that is not a formula is written `\$` in copy, and reads as `$`.
+const unescapeDollars = (value: string): string => value.replace(/\\\$/g, '$');
+const parts: Part[] = [];
+const re = /\[([^\]]+)\]\(([A-Za-z][A-Za-z0-9]*)\)|`([^`]+)`|(?<!\\)\$([^$\s](?:[^$]*[^$\s])?)(?<!\\)\$/g;
+let last = 0;
+for (const m of text.matchAll(re)) {
+  if (m.index! > last) parts.push({ kind: 'text', value: unescapeDollars(text.slice(last, m.index)) });
+  if (m[4] !== undefined) {
+    parts.push({ kind: 'math', value: renderMath(m[4]) });
+  } else if (m[3] !== undefined) {
+    const errorPage = /^(?:TS8\d{3}|SD\d{4})$/.test(m[3]) ? errorCodePath(m[3]) : undefined;
+    parts.push(errorPage ? { kind: 'link', value: m[3], href: localePath(locale, errorPage), code: true, auto: true } : { kind: 'code', value: m[3] });
+  } else {
+    const key = m[2]!;
+    // A record of src/lib/links.ts that names a page of this site keeps the reader's locale, as
+    // a PAGES key does; a file (/llms.txt) and an external URL are linked as written.
+    const raw = (links as Record<string, { href: string }>)[key]?.href;
+    const href = key in PAGES ? localePath(locale, PAGES[key]!) : raw?.startsWith('/') && raw.endsWith('/') ? localePath(locale, raw) : raw;
+    if (!href) throw new Error(`[Rich] unknown link key '${key}' in: ${text.slice(0, 60)}`);
+    // A link whose text is an identifier is written [`name()`](key) and keeps the code font.
+    const label = m[1]!;
+    const code = /^`.+`$/.test(label);
+    parts.push({ kind: 'link', value: code ? label.slice(1, -1) : label, href, code });
+  }
+  last = m.index! + m[0].length;
+}
+if (last < text.length) parts.push({ kind: 'text', value: unescapeDollars(text.slice(last)) });
+
+// A rule named in the text. Every Rich on a page shares the page's locals, so a rule is linked
+// the first time the page names it; the page of the rule itself links nothing to it.
+const locals = Astro.locals as { linkedRules?: Set<string> };
+const linkedRules = (locals.linkedRules ??= new Set<string>());
+const here = Astro.url.pathname;
+const rules = copyFor(locale).docs.rules;
+// The page's route without its locale, and whether it is a page of the guide.
+const route = locale === defaultLocale ? here : here.replace(new RegExp(`^/${locale}(?=/)`), '');
+const onGuide = route.startsWith('/guide/');
+const withRules: Part[] = parts.flatMap((p): Part[] => {
+  if (p.kind !== 'text' || inert) return [p];
+  return mentionParts(p.value, (n) => rulePath(n) !== undefined, ruleWords()).flatMap((m): Part[] => {
+    if (m.kind === 'text' || linkedRules.has(m.number)) return [{ kind: 'text', value: m.value }];
+    const href = localePath(locale, rulePath(m.number)!);
+    if (href === here) return [{ kind: 'text', value: m.value }];
+    linkedRules.add(m.number);
+    const link: Part = { kind: 'link', value: m.value, href, code: false, auto: true };
+    if (!onGuide) return [link];
+    const verification = ruleByNumber(m.number)!.verification;
+    if (!OPEN_VERIFICATIONS.includes(verification)) return [link];
+    return [link, { kind: 'flag', value: rules.flags[verification as keyof typeof rules.flags] }];
+  });
+});
+
+// A link whose key the pattern above does not accept would reach the page as its own
+// square brackets, and nothing else would notice. Count what the copy wrote against what
+// this file turned into a link, and stop the build when they disagree.
+const written = (text.match(/\[[^\]]+\]\([^)]+\)/g) ?? []).length;
+const rendered = withRules.filter((p) => p.kind === 'link' && !p.auto).length;
+if (written !== rendered) {
+  throw new Error(`[Rich] ${written} link(s) written, ${rendered} rendered; a key may hold a character the pattern refuses: ${text.slice(0, 80)}`);
+}
+---
+
+{
+  withRules.map((p) =>
+    p.kind === 'text' ? (
+      p.value
+    ) : p.kind === 'code' ? (
+      <code>{p.value}</code>
+    ) : p.kind === 'math' ? (
+      <Fragment set:html={p.value} />
+    ) : p.kind === 'flag' ? (
+      <span class="ms-1.5 whitespace-nowrap rounded-sm border border-line-2 bg-surface-1 px-1.5 text-label text-text-2">{p.value}</span>
+    ) : inert ? (
+      p.code ? <code>{p.value}</code> : p.value
+    ) : (
+      <a href={p.href}>{p.code ? <code>{p.value}</code> : p.value}</a>
+    ),
+  )
+}
+

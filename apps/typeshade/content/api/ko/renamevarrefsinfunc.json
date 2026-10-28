@@ -1,0 +1,11 @@
+{
+  "slug": "renamevarrefsinfunc",
+  "source": "ce9825cfa1e581764a2e4e8f664023ca1fa77cb4788bfc08fc12e0b005491179",
+  "texts": {
+    "summary": "f의 본문에 있는 변수 참조의 이름을 바꿉니다.",
+    "description": "모든 변수 참조(`op: 'varref'`인 식)는 이름과 함께 `rename`에 전달됩니다. `rename`이 문자열을 반환하면 참조는 그 이름을 가리키도록 다시 지정됩니다. 그것이 `undefined`를 반환하면 참조는 그대로 둡니다. 바뀌지 않은 참조는 원래 객체를 유지하고, 이름이 하나도 바뀌지 않으면 `f` 자신을 반환한다(자세한 내용은 [`rewriteExprsInFunc`](/api/rewriteexprsinfunc/)에 있습니다).",
+    "parameters.f": "본문을 다시 쓸 함수입니다.",
+    "parameters.rename": "현재 변수 이름을 새 이름으로 대응시킵니다. 현재 이름을 유지하려면 `undefined`를 반환합니다.",
+    "returns": "이름을 바꾼 본문을 가진 새 `f` 객체입니다. 참조 이름이 하나도 바뀌지 않았을 때는 `f` 자신입니다."
+  }
+}

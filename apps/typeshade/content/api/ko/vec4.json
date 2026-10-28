@@ -1,0 +1,8 @@
+{
+  "slug": "vec4",
+  "source": "ef701769afed91240c995c867ff9e1a364d7cb53fcfae8e58951254b7f876b43",
+  "texts": {
+    "summary": "vec4<f32> 생성자이며, WGSL 방식으로 vec4라고 씁니다.",
+    "description": "일반 숫자 성분은 f32로 승격됩니다. 그래서 흔한 클립 공간 패턴 `vec4(pos, 0, 1)`은 뒤쪽 인자에 `f32()` 래퍼가 필요하지 않습니다."
+  }
+}

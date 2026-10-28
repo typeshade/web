@@ -1,0 +1,40 @@
+{
+  "note": "function/pow",
+  "read": {
+    "pin": "99ddf9d2",
+    "reviewed": "2026-10-13"
+  },
+  "inputs": {
+    "accuracy:*": "exact",
+    "accuracy:exp2": "ulp: 3 + 2 * |x| ULP",
+    "accuracy:log2": "absolute: 2^-21 absolute error for x in [0.5, 2], 3 ULP outside it",
+    "accuracy:pow": "inherited: inherited from exp2(y * log2(x))",
+    "accuracy:sqrt": "inherited: inherited from 1 / inverseSqrt(x)",
+    "assert:oracleIsMathPow": "true",
+    "assert:sameEmit": "true",
+    "compile:glsl-precision": "ok; glsl: precision highp float;",
+    "compile:int-literal": "ok; wgsl: return pow(x, 2.0);",
+    "compile:int-literal-glsl": "ok; glsl: return pow(x, 2.0);",
+    "compile:int-operands": "TS8036: pow takes an f32, or a vector of them; got i32. | editor: same",
+    "compile:module-const-no-value": "sha256:52bf49d3b895ee147121afa6c81bc0fd520387e729adcfae026f9e3dc3969685 TS8003: \"pow(-2., 0.5)\" is outside the domain of pow: the ba…",
+    "compile:module-const-value": "sha256:68a9fec7c584f600accb3d054bca08aaf02308e1fc996364abe9805cc1b8b213 TS8003: \"pow(-2., 2.)\" is outside the domain of pow: the bas…",
+    "compile:negative-literal": "sha256:a6dc23913f8bf4c7a22a88eed1c0e23b646706c8eb6abec4f1f339feb000eb9e TS8003: \"pow(-2.0, 0.5)\" is outside the domain of pow: the b…",
+    "compile:negative-whole": "sha256:f3f02d9745356403d13a7a9153b6ce4fb6e4c780dd272778a684255159517c08 TS8003: \"pow(-2.0, 2.0)\" is outside the domain of pow: the b…",
+    "compile:runtime-base": "ok; wgsl: return pow(x, 0.5);",
+    "compile:square-stays": "ok; wgsl: return pow(x, 2.0);",
+    "compile:starstar-assign": "TS8099: Unsupported expression statement \"a **= b\". | editor: same",
+    "compile:starstar-int": "TS8003: Cannot ** i32. ** is pow(a, b), which takes floating-point values only; cast first, e.g. f32(a) ** f32(b). | editor: same",
+    "compile:starstar-int-literal": "ok; wgsl: return pow(x, 2.0);",
+    "compile:starstar-rewrite": "ok; wgsl: a = pow(a, b);",
+    "compile:starstar-vector-scalar": "TS8003: Type mismatch: cannot ** vec3 and f32. ** is pow(a, b), which takes two values of one type; splat the exponent, e.g. v ** vec3(2.). | editor: same",
+    "compile:vector-scalar": "TS8036: pow takes arguments of one type; the first is vec3, this one f32. Splat the scalar to the vector's size: vec3(x). | editor: same",
+    "entry.line": "Returns `x` raised to the power of `y`, componentwise over vectors.",
+    "entry.rest": "sha256:8736d9eb10c9bc172de6d87ff96773f7c66b94214e011ff3ac5eafbd3d529154 The GPU result is undefined when `x` is negative, and on GLS…",
+    "entry.spelling.glsl": "pow(a, b)",
+    "entry.spelling.wgsl": "pow(a, b)",
+    "oracle:pow(-2.0, 0.5)": "NaN | NaN",
+    "oracle:pow(-2.0, 3.0)": "-8 | -8",
+    "oracle:pow(0.0, -1.0)": "Infinity | Infinity",
+    "oracle:pow(0.0, 0.0)": "1 | 1"
+  }
+}

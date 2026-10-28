@@ -1,0 +1,9 @@
+{
+  "slug": "typeshaderange",
+  "source": "fcba6aa2dd1a598b5218def7d8952053b1e9d65dac680c15a6cc950f9b4e1578",
+  "texts": {
+    "summary": "LSP 관례를 따르는, 0부터 세는 시작 위치를 포함하고 끝 위치를 제외하는 소스 범위 [start, end)입니다.",
+    "members.start": "범위에 포함되는 시작 위치입니다.",
+    "members.end": "범위에 포함되지 않는 끝 위치입니다."
+  }
+}

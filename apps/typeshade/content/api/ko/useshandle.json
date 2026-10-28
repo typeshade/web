@@ -1,0 +1,8 @@
+{
+  "slug": "useshandle",
+  "source": "6b999ba301c1fdf390c6a4590a6571db16280d1d433ef94952f22e5363401d75",
+  "texts": {
+    "summary": "module({ uses })가 받는 선언자 핸들입니다. 자체 선언이나 바인딩을 가진 값은 모두 여기에 해당합니다.",
+    "description": "[`uniformStruct`](/api/uniformstruct/)는 `{ struct, binding }`을 반환합니다. [`ioStruct`](/api/iostruct/), [`structDecl`](/api/structdecl/), [`constDecl`](/api/constdecl/)는 `{ decl }`을 반환합니다. [`storageBuffer`](/api/storagebuffer/)는 `{ binding }`을 돌려주며, 구조체 요소이면 `elementDecl`도 함께 반환합니다. [`resource`](/api/resource/)는 `{ binding }`을 반환합니다."
+  }
+}

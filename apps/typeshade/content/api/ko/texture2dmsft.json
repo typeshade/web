@@ -1,0 +1,8 @@
+{
+  "slug": "texture2dmsft",
+  "source": "b3ca208b81e6a76aa18c7afc9c001176226a631dbed8b96f752f5894cf84b8e3",
+  "texts": {
+    "summary": "다중 샘플 2D 텍스처입니다. MSAA 렌더 타깃의 리졸브 원본을 바인딩하며, 샘플을 하나씩 textureLoad로 읽어 샘플별 평균을 내는 루프 안에서 씁니다.",
+    "description": "(`sampleCount > 1 ? texture2dMsfT : texture2dfT`)처럼 생성 시점에 타입을 고르는 호스트는 한 셰이더 소스로 MSAA 경로와 단일 샘플 경로를 모두 제공할 수 있습니다."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "wgsllayout",
+  "source": "2f4921a89dacb5abadc69db2b33898c882c55e3ddb4918766d7167b7a31b2ac6",
+  "texts": {
+    "summary": "LayoutKind 규칙에 따라 구조체 하나의 바이트 레이아웃을 계산합니다. 각 필드의 오프셋, 정렬, 크기와 구조체 전체의 크기 및 정렬을 구합니다.",
+    "description": "`'std140'`에서는 구조체와 중첩된 모든 배열의 기본 정렬이 16으로 올림됩니다. `'std430'`에서는 자연 정렬이 적용됩니다.",
+    "parameters.struct": "레이아웃을 계산할 구조체입니다.",
+    "parameters.layout": "유니폼 버퍼에는 `'std140'`, 스토리지 버퍼에는 `'std430'`을 씁니다.",
+    "parameters.structs": "중첩된 구조체 타입 필드가 이름으로 참조할 수 있는 구조체들입니다. 기본값은 `struct` 자체만 담는 맵입니다.",
+    "returns": "[`StructLayout`](/api/structlayout/)을 반환합니다.",
+    "exceptions.Error": "필드 타입에 바이트 레이아웃이 없는 경우(텍스처 또는 샘플러), 중첩된 구조체가 `structs`에 없는 경우, 또는 `mat2` 필드를 `'std140'`으로 계산하는 경우에 던진다([`LayoutKind`](/api/layoutkind/) 참조)."
+  }
+}

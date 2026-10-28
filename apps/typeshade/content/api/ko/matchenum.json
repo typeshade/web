@@ -1,0 +1,8 @@
+{
+  "slug": "matchenum",
+  "source": "7d01ef4779a59d00f3147c98e88d20fbbcb319f569ba254d21e163b552bfbf68",
+  "texts": {
+    "summary": "enumU32 값에 대한 빠짐없는 정수 디스패치이다: matchEnum(kind, Kind, { Line: () => …, Fill: () => …, … }).",
+    "description": "모든 멤버에 분기가 있어야 합니다. 분기 하나라도 빼면 `tsc`가 오류를 냅니다. 분기들의 타입이 enum 키에 대한 매핑 타입이기 때문입니다. 그래서 멤버를 추가하면 그 멤버를 처리하지 않는 디스패치 지점이 모두 드러납니다. 이 함수는 직접 작성한 형태가 만드는 것과 같은 [`matchExpr`](/api/matchexpr/)를 만듭니다. 마지막에 선언된 멤버가 `switch`의 default가 됩니다. 그래서 생성되는 코드는 빠짐없는 표준 switch입니다. 분기는 인자가 없는 함수이며, 선언된 순서대로 호출됩니다."
+  }
+}

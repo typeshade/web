@@ -1,0 +1,9 @@
+{
+  "slug": "sub",
+  "source": "c45eaa929bc74c79f3b558290b36eee723c8eba003f0fc15f07e498dd017601b",
+  "texts": {
+    "summary": "a - b를 독립 함수로 계산합니다.",
+    "description": "`sub(1, smoothstep(e0, e1, x))`는 메서드 형태에서 `f32(1).sub(...)`로 적어야 하는 감소하는 램프를 만드는 식입니다. 두 형태 모두 `(1.0 - smoothstep(...))`을 생성합니다.\n\n두 피연산자 중 노드인 쪽이 다른 쪽의 타입을 정합니다. 일반 숫자 두 개는 거부됩니다.",
+    "exceptions.TypeError": "두 피연산자가 모두 일반 숫자일 때 발생합니다."
+  }
+}

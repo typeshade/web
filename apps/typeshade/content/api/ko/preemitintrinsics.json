@@ -1,0 +1,8 @@
+{
+  "slug": "preemitintrinsics",
+  "source": "260647d2e8cc23752317fa0049d212241b6af20b1bc9d59207c02ce3f5868e4d",
+  "texts": {
+    "summary": "fp64Lower가 어떤 백엔드도 실행하기 전에 재작성해 없애는 내장 함수 id입니다. 'f64', 'f64FromParts', 'f64Parts'입니다.",
+    "description": "[`PORTABLE_INTRINSICS`](/api/portableintrinsics/)에 있는 id는 [`spellIntrinsic`](/api/spellintrinsic/)까지 도달합니다. 이 상수의 id들은 도달하면 안 됩니다. [`isKnownIntrinsic`](/api/isknownintrinsic/)은 이들을 제외하므로, 하나라도 백엔드까지 살아남으면 그 백엔드는 호출이 지닌 `f64` 타입을 표기하라는 요청을 받을 때 `SD0040`을 던집니다. 이 실패는 드라이버가 잘못된 소스를 보기 전에 보고됩니다."
+  }
+}

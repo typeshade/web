@@ -1,0 +1,12 @@
+{
+  "slug": "textureload",
+  "source": "5be0d595255d8ecd54a2f3a324fd4810f76f7634ebec760db3aceb267f159cfc",
+  "texts": {
+    "summary": "정수 좌표에서 2D 텍스처의 텍셀 하나를 읽습니다. 텍스처의 원소 타입에 맞춰 vec4<f32>, vec4<u32> 또는 vec4<i32>를 반환합니다.",
+    "description": "WGSL은 밉 레벨 인자를 요구합니다. 기본 레벨에는 `0`을 넘깁니다. JS 숫자 레벨은 u32 리터럴로 승격되므로 `0`은 두 타깃 모두에서 올바른 정수 레벨을 생성합니다. 소수 레벨은 `SD0015`를 던집니다.\n\n좌표는 보통 `vec2<i32>`입니다. 여기서는 벡터나 스칼라 노드를 모두 받아들이며, 검사는 GPU 컴파일러가 합니다. CPU 평가는 `gpuStubs` 옵션이 켜져 있을 때 플레이스홀더를 반환합니다.\n\n정수 텍스처를 읽을 때는 이 함수를 씁니다. 정수 텍셀은 필터링할 수 없으므로 [`textureSample`](/api/texturesample/)과 [`textureSampleLevel`](/api/texturesamplelevel/)은 정수 텍스처의 키를 `tsc`에서 거부합니다.",
+    "exceptions.SD0015": "JS 숫자 레벨은 u32 리터럴로 승격되므로 0은 두 타깃 모두에서 올바른 정수 레벨을 생성합니다. 소수 레벨은 SD0015를 던집니다.",
+    "targets.wgsl": "`textureLoad(tex, coord, level)`.",
+    "targets.glsl": "`texelFetch(tex, coord, int(level))`.",
+    "targets.cpu": "오라클에는 텍스처 메모리와 이웃 프래그먼트가 없습니다. 모듈을 `{ gpuStubs: true }` 옵션으로 컴파일하지 않았다면 이 호출은 예외를 던집니다. 이 옵션을 켜면 플레이스홀더를 반환합니다."
+  }
+}

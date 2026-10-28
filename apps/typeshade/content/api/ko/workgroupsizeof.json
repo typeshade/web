@@ -1,0 +1,8 @@
+{
+  "slug": "workgroupsizeof",
+  "source": "7dc7def01a2c7e7b31378cfa36e9f530a62ab7c95fcd9c7fd2feba6d5bb3bce5",
+  "texts": {
+    "summary": "컴퓨트 진입점의 x 워크그룹 크기입니다. 구조화된 workgroupSize 필드를 먼저 보고, 없으면 @workgroup_size(n) 속성 문자열을 봅니다. 둘 다 없으면 undefined입니다.",
+    "description": "2차원 또는 3차원 워크그룹은 이 값보다 많은 인보케이션을 가집니다. 격자는 [`workgroupShapeOf`](/api/workgroupshapeof/)에서 읽습니다."
+  }
+}

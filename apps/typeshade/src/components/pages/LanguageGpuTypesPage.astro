@@ -1,0 +1,74 @@
+---
+// Language guide: GPU types. Content lives in language.topics.gpuTypes (src/i18n/en.ts,
+// src/i18n/ko.ts); the code samples are not copy, so they stay here.
+import Docs from '../../layouts/Docs.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import LiveShader from '../LiveShader.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).language.topics.gpuTypes;
+const headings = [
+  ['mapping', content.mapping], ['scalar', content.scalar], ['vector', content.vector], ['matrix', content.matrix], ['arrays', content.arrays],
+  ['live', content.live],
+].map(([slug, text]) => ({ depth: 2, slug, text }));
+
+// The live example's sample: a whole file. <LiveShader> supplies the vertex half and nothing
+// else (DESIGN.md, Live examples). Every line of the entry names a GPU type, which is what
+// this page is about. Code is not copy, so it stays here.
+const disc = `"use typeshade"
+
+class Uniforms {
+  resolution: vec2
+  center: vec2
+  radius: f32
+  tint: vec3
+}
+
+declare const u: uniform<Uniforms>
+
+@fragment
+export function main(@location(0) uv: vec2): vec4 {
+  const ratio: f32 = u.resolution.x / u.resolution.y
+  const p: vec2 = (uv - u.center) * vec2(ratio, 1.)
+  const d: f32 = length(p) - u.radius
+  const edge: f32 = 1. - smoothstep(0., 0.008, d)
+  return vec4(mix(vec3(0.15, 0.14, 0.91), u.tint, edge), 1.)
+}
+`;
+---
+
+<Docs locale={locale} path={links.languageGpuTypes.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
+  <h1>{content.h1}</h1><p>{content.intro}</p>
+  <h2 id="mapping">{content.mapping}</h2><p><Rich text={content.mappingP} locale={locale} /></p>
+  <TypeShadeCode code={`// TypeScript surface, GPU-specific value types\nlet value: f32 = 1\nlet index: u32 = 0\nlet direction: vec3 = vec3(0, 1, 0)`} />
+  <h2 id="scalar">{content.scalar}</h2><p>{content.scalarP}</p>
+  <p><Rich text={copyFor(locale).concepts.glslPrecision.entryLink} locale={locale} /></p>
+  <h2 id="vector">{content.vector}</h2><p>{content.vectorP}</p>
+  <TypeShadeCode code={`const uv: vec2 = vec2(0.5, 0.5)\nconst color: vec4 = vec4(1, 0, 0, 1)`} />
+  <h2 id="matrix">{content.matrix}</h2><p>{content.matrixP}</p>
+  <TypeShadeCode code={`type Camera = {\n  view: mat4\n}`} />
+  <h2 id="arrays">{content.arrays}</h2><p>{content.arraysP}</p>
+  <TypeShadeCode code={`declare const pixels: storage<array<f32>, "read_write">`} />
+  <h2 id="live">{content.live}</h2><p><Rich text={content.liveP} locale={locale} /></p>
+  <LiveShader
+    locale={locale}
+    id="gpu-types-disc"
+    title={content.liveTitle}
+    code={disc}
+    caption={content.liveCaption}
+    anchor={content.liveAnchor}
+    exercises={content.liveExercises}
+    file="disc.shade.ts"
+    aspect="3/2"
+    controls={{
+      center: { label: content.liveCenter, min: 0, max: 1, step: 0.002, value: [0.5, 0.5] },
+      radius: { label: content.liveRadius, min: 0.02, max: 0.45, step: 0.002, value: 0.2 },
+      tint: { label: content.liveTint, color: true, value: [1, 0.833, 0.224] },
+    }}
+  />
+  <p><a href={localePath(locale, links.languageResources.href)}>{content.next}</a></p>
+</Docs>

@@ -1,0 +1,31 @@
+---
+// Language guide: typeshade/algorithms, the first common module (compiler change 0072, surface
+// §72). Content lives in language.topics.algorithms (src/i18n/en.ts, src/i18n/ko.ts); the code
+// samples are not copy, so they stay here.
+import Docs from '../../layouts/Docs.astro';
+import ConceptDoc from '../ConceptDoc.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).language.topics.algorithms;
+const headings = [
+  ['host', content.host], ['functions', content.functions], ['fuse', content.fuse], ['tiers', content.tiers], ['device', content.device], ['later', content.later],
+].map(([slug, text]) => ({ depth: 2, slug, text }));
+---
+
+<Docs locale={locale} path={links.languageAlgorithms.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
+  <h1>{content.h1}</h1><p><Rich text={content.intro} locale={locale} /></p>
+  <h2 id="host">{content.host}</h2><p><Rich text={content.hostP} locale={locale} /></p>
+  <TypeShadeCode code={`import { fuse } from 'typeshade/fuse';\nimport { fill, add, relu, sumAxis, exclusiveScan, compact } from 'typeshade/algorithms';\nimport { fillUniform } from 'typeshade/random';\n\nawait fuse(() => {\n  fill(t, 1); // t[i] = 1\n  add(u, t, b); // u[i] = t[i] + b[i]\n  relu(v, u); // v[i] = max(u[i], 0): one dispatch with the two before it\n  sumAxis(rows, v, columns, 1); // a group of its own: it reads v at another index\n});\n\nawait fuse(() => {\n  fillUniform(noise, 12345);\n  exclusiveScan(offsets, flags, sums); // sums: the caller's scratch\n  compact(kept, rows, flags, offsets);\n});`} title="host.ts" />
+  <h2 id="functions">{content.functions}</h2><p><Rich text={content.functionsP} locale={locale} /></p>
+  <ConceptDoc locale={locale} rows={content.functionsRows} columns={content.functionsColumns} strongTerm />
+  <h2 id="fuse">{content.fuse}</h2><p><Rich text={content.fuseP} locale={locale} /></p>
+  <h2 id="tiers">{content.tiers}</h2><p><Rich text={content.tiersP} locale={locale} /></p>
+  <h2 id="device">{content.device}</h2><p><Rich text={content.deviceP} locale={locale} /></p>
+  <h2 id="later">{content.later}</h2><p><Rich text={content.laterP} locale={locale} /></p>
+  <p><a href={localePath(locale, links.languageRandom.href)}>{content.next}</a></p>
+</Docs>

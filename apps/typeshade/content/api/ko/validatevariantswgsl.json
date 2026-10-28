@@ -1,0 +1,12 @@
+{
+  "slug": "validatevariantswgsl",
+  "source": "d0985021d504ca8aa550d06d61a12962cd47b3897b0f764e31c374ad106f5147",
+  "texts": {
+    "summary": "family의 모든 변형을 실제 WGSL 컴파일러로 검증합니다.",
+    "description": "[`linkVariants`](/api/linkvariants/)의 WGSL 짝입니다. 열거 방식, 한 변형이 실패한 뒤에도 모든 변형을 시도하는 규칙, 키마다의 결과 형태가 같습니다. WGSL 모듈 하나가 두 진입점을 모두 담으므로, `createShaderModule()`을 호출한 뒤 `getCompilationInfo()`를 읽는 것이 검사의 전부입니다. `getCompilationInfo()`는 비동기이므로, 이 함수는 Promise를 반환하지만 [`linkVariants`](/api/linkvariants/)는 반환하지 않습니다.\n\n```ts\nconst device = await (await navigator.gpu.requestAdapter())!.requestDevice()\nconst failed = (await validateVariantsWgsl(device, family)).filter((r) => !r.ok)\nexpect(failed, failed.map((r) => `${r.key}: ${r.errors?.join('; ')}`).join('\\n')).toEqual([])\n```\n\n`createShaderModule()`은 잘못된 WGSL에서 예외를 던지지 않습니다. 오류는 `getCompilationInfo()`를 통해 전달됩니다. 이 함수는 그 메시지를 읽으므로, 예외 없이 컴파일되더라도 오류를 보고하는 셰이더는 여전히 실패입니다.",
+    "parameters.device": "`GPUDevice`, 또는 [`WgslValidator`](/api/wgslvalidator/)를 만족하는 모든 값입니다.",
+    "parameters.family": "열거할 family입니다. `family.keys`의 모든 키가 시도됩니다.",
+    "parameters.opts": "생성 옵션입니다. 모든 변형에 똑같이 적용됩니다.",
+    "returns": "키마다 결과 하나를 반환합니다. 순서는 `family.keys`를 따릅니다."
+  }
+}

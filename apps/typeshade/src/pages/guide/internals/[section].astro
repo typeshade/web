@@ -1,0 +1,13 @@
+---
+// One page per section of the compiler's AUTHORING.md internal reference.
+import { getCollection } from 'astro:content';
+import AuthoringPage from '../../../components/pages/AuthoringPage.astro';
+
+export async function getStaticPaths() {
+  const guide = await getCollection('guide');
+  return guide.filter((entry) => entry.id !== 'overview').map((entry) => ({ params: { section: entry.id } }));
+}
+const { section } = Astro.params;
+---
+
+<AuthoringPage locale="en" section={section!} />

@@ -1,0 +1,8 @@
+{
+  "slug": "texture2dut",
+  "source": "81855fe4e1a6e37562dfcf44834f4a63de0822652bb9efdcb8889ea013ff4b9d",
+  "texts": {
+    "summary": "부호 없는 정수 2D 텍스처입니다.",
+    "description": "이 텍스처는 [`textureLoad`](/api/textureload/)로 읽습니다. 이 함수는 `vec4<u32>`를 반환합니다. 정확한 32비트 값을 담으므로, GPU에 변경 없이 전달되어야 하는 id, 패킹된 색상, 비트필드 값을 조회하는 데 알맞습니다. 필터링할 수 없습니다. 이 텍스처에 [`textureSample`](/api/texturesample/)을 쓰면 `tsc` 오류가 난다([`TextureElem`](/api/textureelem/) 참조)."
+  }
+}

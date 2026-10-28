@@ -1,0 +1,11 @@
+{
+  "slug": "tanh",
+  "source": "be4951edbf98e127a5da6b02d8970d525e0f723868f50f37094e80ee3fc0d405",
+  "texts": {
+    "summary": "tanh(x): 성분별 쌍곡 탄젠트이며 sinh(x)/cosh(x)와 같습니다. x → ±∞일 때 ±1로 포화합니다.",
+    "description": "WGSL과 GLSL ES 3.00에서 같은 이름을 사용합니다.",
+    "targets.wgsl": "`tanh(x)`.",
+    "targets.glsl": "`tanh(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

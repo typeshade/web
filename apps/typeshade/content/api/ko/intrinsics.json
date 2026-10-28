@@ -1,0 +1,8 @@
+{
+  "slug": "intrinsics",
+  "source": "f9cdfc8db76afc5f4151bb0a0cc75d5e7628b2258a52dbb9ca3e918587528735",
+  "texts": {
+    "summary": "각 대상에서 내장 함수 id가 표기되는 방식을 담은 표입니다. 키는 id입니다.",
+    "description": "항목이 있는 내장 함수는 WGSL과 GLSL ES 3.00의 표기가 다른 것뿐입니다. 항목이 없는 내장 함수는 두 대상에서 같은 방식으로, `name(args)` 형태로 표기됩니다. 항목의 wgsl 멤버와 glsl 멤버는 각각 렌더링된 인자 식을 받아, 호출을 소스 텍스트로 반환합니다."
+  }
+}

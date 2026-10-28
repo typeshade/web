@@ -1,0 +1,133 @@
+---
+// What the design rules guarantee, at /reference/rules/guarantees/: every rule grouped by how
+// its traceability item says it is verified (a test, the implementation alone, listed as not
+// yet enforced, review), in reqs/README.md's order, each group with its count, and each rule
+// with its first sentence and the files that verify it at the pin. The grouping, the counts
+// and the files are src/lib/design-rules.ts; the rule's line is the compiler's English,
+// rendered by src/lib/rules-loader.ts; the words around them are docs.rules.guarantees.
+import { getCollection } from 'astro:content';
+import Docs, { type Heading } from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+import { facts } from '../../lib/examples.ts';
+import { assertRuleChapters, assertRuleReadings, designRules, rulesByVerification, type DesignRule } from '../../lib/design-rules.ts';
+import type { RuleHtml } from '../../lib/rules-loader.ts';
+import { fitDescription } from '../../lib/meta-description.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const d = copyFor(locale).docs;
+const r = d.reference;
+const x = d.rules;
+const g = x.guarantees;
+const en = copyFor('en').docs;
+assertRuleChapters(en.rules.chapters, x.chapters);
+assertRuleReadings(copyFor('en'));
+
+if (g.title.length < 45 || g.title.length > 60) {
+  throw new Error(`[rules] the guarantees page has a ${g.title.length}-character title, outside the 45 to 60 the SEO checks want: ${g.title}`);
+}
+const description = fitDescription(g.description, localeSettings[locale].metaDescriptionMax);
+
+const stored = new Map((await getCollection('rules')).map((s) => [s.id, (s.data as { html: RuleHtml }).html]));
+// A row's line is Markdown rendered once, so its links name the English pages.
+const localize = (html: string): string =>
+  locale === 'en' ? html : html.replace(/href="\/(api|reference\/errors|reference\/rules)\//g, `href="/${locale}/$1/`);
+const line = (rule: DesignRule): string => localize(stored.get(rule.slug)?.line ?? '');
+const page = (rule: DesignRule): string => localePath(locale, `/reference/rules/${rule.slug}/`);
+const blob = (file: string, at: number): string => `${facts.mirrorUrl}/blob/${facts.pinnedCommit}/${file}#L${at}`;
+
+const groups = rulesByVerification();
+// The counts the copy states are facts, pinned; the lists are the data. The two agree, or
+// the page would say one number over a list of another.
+const stated = { test: facts.rulesTest, code: facts.rulesCode, pending: facts.rulesPending, review: facts.rulesReview };
+for (const group of groups) {
+  if (group.rules.length !== stated[group.verification]) {
+    throw new Error(`[rules] ${group.rules.length} rules are verified by '${group.verification}', and facts says ${stated[group.verification]}`);
+  }
+}
+const headings: Heading[] = groups.map((group) => ({ depth: 2, slug: group.verification, text: g.heads[group.verification] }));
+
+const index = { label: x.h1, href: localePath(locale, links.rules.href) };
+const first = designRules()[0];
+const next = first ? { label: x.entry.heading(first.number), href: page(first) } : undefined;
+const filesLabel = g.filesLabel as Partial<Record<string, string>>;
+---
+
+<Docs
+  locale={locale}
+  path={links.rulesGuarantees.href}
+  title={g.title}
+  description={description}
+  headings={headings}
+  editHref={editCopy(locale, 'docs')}
+  previous={index}
+  next={next}
+  breadcrumbs={[
+    { name: r.reference, href: links.reference.href },
+    { name: x.h1, href: links.rules.href },
+    { name: g.h1, href: links.rulesGuarantees.href },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  <nav class="api-crumbs" aria-label={r.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, links.reference.href)}>{r.h1}</a>
+    <span aria-hidden="true">›</span>
+    <a href={index.href}>{x.h1}</a>
+  </nav>
+  <h1 lang={locale}>{g.h1}</h1>
+  <p class="api-kind" lang={locale}>{x.rulesCount(facts.rules)}</p>
+  <p class="api-summary" lang={locale}>{g.lead}</p>
+  <p class="guide-note" lang={locale}><Rich text={x.note} locale={locale} /></p>
+
+  {groups.map((group) => (
+    <section>
+      <h2 id={group.verification} lang={locale}>
+        {g.heads[group.verification]}
+        <span class="api-optional ms-2.5 align-middle">{x.kinds[group.verification]}</span>
+      </h2>
+      <p lang={locale}><Rich text={group.rules.length > 0 ? g.groups[group.verification] : g.none} locale={locale} /></p>
+      {group.rules.length > 0 && (
+        <dl class="api-list api-index">
+          {group.rules.map((rule) => (
+            <>
+              <dt>
+                <a href={page(rule)} lang={locale}>{x.entry.heading(rule.number)}</a>
+                <span class="text-meta text-text-3 ms-2" lang={locale}>{x.chapterH(rule.chapter, x.chapters[rule.chapter]!)}</span>
+              </dt>
+              <dd>
+                <p lang="en"><Fragment set:html={line(rule)} /></p>
+                {rule.files.length > 0 && (
+                  <p class="rule-verifiers">
+                    <span class="text-text-3" lang={locale}>{filesLabel[group.verification] ?? ''}</span>
+                    {rule.files.map((f) => (
+                      <a href={blob(f.file, f.line)}><code>{`${f.file}:${f.line}`}</code></a>
+                    ))}
+                  </p>
+                )}
+              </dd>
+            </>
+          ))}
+        </dl>
+      )}
+    </section>
+  ))}
+</Docs>
+
+<style>
+  /* The files under a rule's line: the label, then each file in the code face at the code
+     size, run together and wrapping as the line allows. A long path breaks anywhere before it
+     pushes a phone's page sideways. The paragraph sits in a <dd>, so its margin outranks
+     `.doc p`. */
+  .rule-verifiers {
+    margin-block-start: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 12px;
+    row-gap: 2px;
+    align-items: baseline;
+  }
+  .rule-verifiers code { font-size: var(--text-code); overflow-wrap: anywhere }
+  dd > p:first-child { margin-block-start: 0 }
+</style>

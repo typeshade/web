@@ -1,0 +1,8 @@
+{
+  "slug": "assembledas",
+  "source": "6a64b99d650a2868663a0fc3fec1b1e3ca8214075179643c77af76b9ed4e3a17",
+  "texts": {
+    "summary": "FuncDecl에 붙는 열거 불가능한 표식 키입니다. 선언을 module이 마지막으로 조립할 때 쓴 이름을 담습니다.",
+    "description": "[`FuncDecl`](/api/funcdecl/)에 붙는 열거 불가능한 표식 키입니다. 선언을 [`module`](/api/module/)이 마지막으로 조립할 때 쓴 이름을 담습니다. `Symbol.for` 심볼이므로 패키지가 두 벌 나란히 로드되어도 값이 유지됩니다."
+  }
+}

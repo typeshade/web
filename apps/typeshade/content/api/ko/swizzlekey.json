@@ -1,0 +1,7 @@
+{
+  "slug": "swizzlekey",
+  "source": "fbcba7bdf7064aa854c54bf58e3c58bd88b1dcc57a0abaa70b9b38f77e5532af",
+  "texts": {
+    "summary": "벡터 키 K에 대한 v.swizzle(S)의 키입니다. S의 글자가 하나이면 원소 스칼라이고, 그 밖에는 S의 길이를 N으로 하는 vecN<elem>입니다."
+  }
+}

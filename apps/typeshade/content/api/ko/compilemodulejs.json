@@ -1,0 +1,13 @@
+{
+  "slug": "compilemodulejs",
+  "source": "8969179ba7554b8522eca582710ba3a01a6dd2e6fc2e48ca7dcd0d3b87240947",
+  "texts": {
+    "summary": "JavaScript를 생성해 CPU용으로 모듈을 컴파일합니다. compileModule이 돌려주는 것과 같은 CpuModule 형태를 돌려주며, 결과도 비트 단위까지 같습니다.",
+    "description": "모든 핫 패스에서는 이 함수를 우선 씁니다.\n\n비트 동일성은 구조상 성립합니다. 모든 연산은 인터프리터가 호출하는 것과 똑같은 런타임 헬퍼를 호출합니다. 다만 IR 타입이 벡터를 허용하고 모듈이 실행 중 값이 누락될 수 없는 피연산자라면, 헬퍼가 각 성분에 적용하는 스칼라 연산을 씁니다. 값이 빠질 수 있는 경우의 예는 헬퍼의 `discard`와 배열 끝을 넘은 원소 읽기입니다. 이렇게 하면 두 경로가 서로 어긋날 수 없습니다. 달라지는 것은 작업이 일어나는 시점입니다. 이 함수는 호출마다 IR을 노드 단위로 순회하지 않습니다. 대신 각 함수 본문을 한 번만 순회하고 JavaScript 소스 문자열을 생성한 뒤 `new Function`으로 빌드합니다. 그래서 각 호출은 실제 지역 변수를 사용하는 코드를 실행합니다.\n\n인터프리터는 기준이자 대체 경로입니다. 생성기가 비트 단위로 똑같이 낼 수 없는 형태(raw 문, 플레이스홀더 문, 식 형태가 없는 대입 대상)를 담은 함수 본문은 그 함수만 인터프리터로 넘어갑니다. 그래서 반환된 모듈은 일부 함수는 컴파일되고 일부 함수는 인터프리터로 실행될 수 있으며, 호출하는 쪽에서 따로 처리할 것은 없습니다. `new Function` 자체를 쓸 수 없는 경우, 예를 들어 콘텐츠 보안 정책이 `unsafe-eval`을 금지하는 호스트에서는 생성 시 예외가 발생합니다. 호출자는 이 예외를 잡아 [`compileModule`](/api/compilemodule/)을 대신 호출합니다. 디버깅할 때는 인터프리터를 직접 쓰는 것이 좋습니다. 인터프리터는 사용자와 IR 사이에 생성된 소스를 두지 않기 때문입니다.",
+    "parameters.m": "평가할 모듈입니다.",
+    "parameters.opts": "[`compileModule`](/api/compilemodule/)이 받는 것과 같은 `precision`과 `gpuStubs`입니다.",
+    "returns": "컴파일된 모듈입니다. 이름으로 찾는 `fns`와 `setBinding`을 담습니다.",
+    "exceptions.ValidationError": "호스트가 `new Function`을 금지하면 `Error`가 발생합니다. 호출자는 이 오류를 잡고 [`compileModule`](/api/compilemodule/)로 대체해야 합니다. 모듈이 핵심 규칙을 어기면 [`ValidationError`](/api/validationerror/)를 던집니다. 함수가 실행된 뒤에는 `gpuStubs`가 꺼진 상태에서 GPU 전용 내장 함수를 호출하거나 raw 문에 닿았을 때 [`compileModule`](/api/compilemodule/)이 문서화한 것과 같은 오류가 발생합니다.",
+    "targets.cpu": "모듈을 JavaScript 함수로 컴파일하며, 이 함수는 f64로 실행됩니다."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && { [ ! -f vendor/shader-dsl/scripts/downstream-impact.ts ] || bun vendor/shader-dsl/scripts/downstream-impact.ts --hook --repo typeshade.github.io --submodule vendor/shader-dsl; }",
+            "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && node scripts/commit-gate.mjs",
+            "timeout": 90
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(node -e 'let s=\"\";process.stdin.on(\"data\",(d)=>(s+=d)).on(\"end\",()=>{try{process.stdout.write(JSON.parse(s).tool_input.file_path||\"\")}catch{}})'); case \"$f\" in *src/styles/*|*.astro|*src/components/*) r=$(git -C \"$(dirname \"$f\")\" rev-parse --show-toplevel 2>/dev/null) || r=\"$CLAUDE_PROJECT_DIR\"; [ -f \"$r/scripts/check-style.mjs\" ] || exit 0; out=$(node \"$r/scripts/check-style.mjs\" 2>&1) || { printf '%s\\n' \"$out\" >&2; exit 2; } ;; esac",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

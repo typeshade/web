@@ -1,0 +1,12 @@
+{
+  "slug": "resource",
+  "source": "248c7aa99c3e777d28e4d630bc11851543a326232253b8c30f37bc78c534bea2",
+  "texts": {
+    "summary": "구조체가 아닌 바인딩 리소스를 선언합니다. 텍스처나 샘플러가 여기에 해당합니다.",
+    "description": "바인딩 선언과 접근 노드를 이 호출 하나에서 얻습니다.\n\n`.node`는 넘긴 타입의 구체적인 키를 유지한다: `Node<'texture_2d<f32>'>`, `Node<'sampler'>`, `Node<'texture_2d_array<u32>'>`. 이 덕분에 텍스처 호출은 작성하는 줄에서 타입 검사를 받습니다. [`textureSample`](/api/texturesample/)은 샘플링할 2D 텍스처와 샘플러를 이 순서로 받으므로, 둘을 바꿔 쓰면 tsc 오류가 납니다. 필터링이 의미를 갖지 않는 자리에서는 정수 텍스처가 거부되며, 배열 텍스처는 레이어 인자를 반드시 요구합니다.\n\n`.binding`은 `module({ bindings })`에 넣거나 `uses`에 핸들을 넘길 때 씁니다. 주소 공간의 기본값은 `'uniform'`이며, 이는 텍스처와 샘플러의 관례입니다.",
+    "parameters.name": "생성되는 바인딩 이름입니다. 호스트가 바인딩할 때도 이 이름을 씁니다.",
+    "parameters.type": "리소스의 타입입니다. 예: `texture2dfT`, `texture2dArrayfT`, `samplerT`.",
+    "parameters.at": "`group`과 `binding` 슬롯, 그리고 선택 사항인 주소 공간(`space`)입니다.",
+    "returns": "[`Resource`](/api/resource-interface/) 핸들입니다. `.binding`과 `.node`를 가집니다."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "slug": "switch",
+  "source": "4203c209c1ce462aefabbebf4068597ff2a522fb4de88985a1959191b21147e4",
+  "texts": {
+    "summary": "switch (scrut) 체인을 연다: Switch(scrut).case(n, body)….default(body).",
+    "description": "판별값(scrutinee)은 읽기 위치이므로 읽기 전용 노드도 받습니다. 이 노드는 반드시 `i32` 또는 `u32`여야 합니다. WGSL과 GLSL ES 3.00은 모두 `switch`를 정수에 대해서만 정의하기 때문입니다.",
+    "parameters.scrut": "분기를 고를 기준이 되는 정수 값입니다.",
+    "returns": "`.case`와 `.default`에 쓸 체인입니다."
+  }
+}

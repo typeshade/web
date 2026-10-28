@@ -1,0 +1,7 @@
+{
+  "slug": "mat4f64t",
+  "source": "26df5f7cb0d7c0ffaa025a177a3c1be9f9eced12097d435d51a6b7673b74e367",
+  "texts": {
+    "summary": "4×4 에뮬레이션 배정밀도 행렬입니다. 생성 방식과 이 행렬에서 쓸 수 있는 행렬 연산은 mat2f64T 항목을 참고합니다."
+  }
+}

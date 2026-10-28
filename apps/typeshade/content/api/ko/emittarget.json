@@ -1,0 +1,8 @@
+{
+  "slug": "emittarget",
+  "source": "fda8deceec6f08a8a8df088d0c3f5006e03fe67eb85d1e2b20d1972ccf4ecfee",
+  "texts": {
+    "summary": "식별자를 계산하는 대상이 되는 생성 타깃입니다.",
+    "description": "백엔드가 스스로 쓰는 표기 그대로 씁니다."
+  }
+}

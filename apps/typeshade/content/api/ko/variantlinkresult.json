@@ -1,0 +1,10 @@
+{
+  "slug": "variantlinkresult",
+  "source": "ddac5168048d173b86392b9286b88d7090d779d2d27f01fe0bfcaa1b12695f58",
+  "texts": {
+    "summary": "변형 하나의 처리 결과입니다.",
+    "members.key": "`family.keys`에 있는 변형의 키입니다. 파이프라인 캐시가 이 변형에 쓸 id와 같습니다.",
+    "members.failedAt": "실패한 단계입니다. `ok`이면 이 값이 없습니다. `'emit'`은 GL 호출 전에 DSL이 예외를 던졌다는 뜻입니다. 이는 드라이버가 올바르게 보이는 소스를 거부하는 경우와는 다른 결함입니다.",
+    "members.log": "드라이버 로그 또는 던져진 메시지입니다. `ok`이면 이 값이 없습니다."
+  }
+}

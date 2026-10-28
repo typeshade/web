@@ -1,0 +1,143 @@
+---
+// Reproducible MNIST training journey. Numeric results come from the vendored,
+// committed experiment; the independent WebGL2 subset gate is cited separately.
+// The live lab trains in the visitor's browser; full-data numbers are prior validated runs.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import Docs from '../../layouts/Docs.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import MnistTrainer from '../MnistTrainer.astro';
+import MnistWalkthrough from '../MnistWalkthrough.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import { editCopy, links, typennLab } from '../../lib/links.ts';
+import { facts } from '../../lib/examples.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = copyFor(locale).mnist;
+const report = JSON.parse(
+  readFileSync(path.resolve('vendor/shader-dsl/journeys/mnist/full-results.json'), 'utf8'),
+);
+const train = report.configuration.trainCount as number;
+const test = report.configuration.testCount as number;
+const epochs = report.configuration.configuration.epochs as number;
+const cpu = report.cpuTraining.finalTest.accuracy as number;
+const gpu = report.fullWebGPUValidation.testMetrics.accuracy as number;
+const percent = (value: number) => (value * 100).toFixed(2) + '%';
+const count = (value: number) => value.toLocaleString('en-US');
+const source = links.mirror.href + '/blob/' + facts.pinnedCommit + '/journeys/mnist/softmax.shade.ts';
+const readme = links.mirror.href + '/blob/' + facts.pinnedCommit + '/journeys/mnist/README.md';
+const rawReport = links.mirror.href + '/blob/' + facts.pinnedCommit + '/journeys/mnist/full-results.json';
+const checks = 'https://github.com/typeshade/typeshade/actions/runs/38055608415';
+const commands = [
+  'bun install',
+  'bun run build',
+  './node_modules/.bin/playwright install --only-shell chromium',
+  'node --experimental-strip-types journeys/mnist/run.ts --download --train 1 --test 1 --epochs 1',
+  'node --experimental-strip-types journeys/mnist/test-webgl2.mjs --mnist --count 1024 --test 1000 --epochs 5',
+].join('\n');
+const fullCommand = 'node --experimental-strip-types journeys/mnist/run.ts --tier webgpu';
+// A TypeNN model and training loop for the same MLP. `batches` stands for any async iterable of
+// { images, labels, size }. Run against typenn@86b8df4 on the CPU tier.
+const typennSnippet = `import * as nn from "typenn";
+
+const device = await nn.device();
+const model = new nn.Sequential(
+  new nn.Flatten(),
+  new nn.Linear(784, 128),
+  new nn.ReLU(),
+  new nn.Dropout(0.2),
+  new nn.Linear(128, 10),
+).to(device);
+const optimizer = nn.optim.Adam(model.parameters(), { lr: 0.001 });
+const criterion = new nn.CrossEntropyLoss();
+
+for await (const batch of batches) {
+  await optimizer.zeroGrad();
+  const images = device.tensor(batch.images, {
+    shape: [batch.size, 1, 28, 28],
+  });
+  const loss = criterion.forward(model.forward(images), batch.labels);
+  await loss.backward();
+  await optimizer.step();
+  await loss.disposeGraph(model.parameters());
+}`;
+const headings = [
+  { depth: 2, slug: 'lab', text: c.demo.title },
+  { depth: 2, slug: 'model', text: c.modelH },
+  { depth: 2, slug: 'results', text: c.resultsH },
+  { depth: 2, slug: 'run', text: c.runH },
+  { depth: 2, slug: 'limits', text: c.limitsH },
+  { depth: 2, slug: 'source', text: c.sourceH },
+  { depth: 2, slug: 'typenn', text: c.typenn.h },
+];
+---
+
+<Docs locale={locale} path={links.mnist.href} title={c.title} description={c.description} headings={headings} editHref={editCopy(locale, 'mnist')}>
+  <h1>{c.h1}</h1>
+  <p>{c.intro}</p>
+  <p><strong>{c.browserH}</strong> {c.browserNote}</p>
+
+  <section>
+    <h2 id="lab">{c.demo.title}</h2>
+    <MnistTrainer locale={locale} />
+  </section>
+
+  <section>
+    <h2 id="model">{c.modelH}</h2>
+    <p>{c.modelP}</p>
+    <MnistWalkthrough locale={locale} />
+  </section>
+
+  <section>
+    <h2 id="results">{c.resultsH}</h2>
+    <p>{c.resultsP}</p>
+    <table>
+      <thead><tr><th scope="col">{c.backend}</th><th scope="col">{c.data}</th><th scope="col">{c.accuracy}</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">{c.cpu}</th><td>{count(train)} / {count(test)}, {epochs} {c.epochs}</td><td>{percent(cpu)}</td></tr>
+        <tr><th scope="row">{c.webgpu}</th><td>{count(train)} / {count(test)}, {epochs} {c.epochs}</td><td>{percent(gpu)}</td></tr>
+        <tr><th scope="row">{c.webgl2}</th><td>{c.webgl2Dataset}</td><td>{c.notEstablished}</td></tr>
+      </tbody>
+    </table>
+    <p>{c.softwareNote}</p>
+    <p>{c.webgl2Note} <a href={checks}>{c.validationRun}</a>.</p>
+  </section>
+
+  <section>
+    <h2 id="run">{c.runH}</h2>
+    <p>{c.runP}</p>
+    <TypeShadeCode lang="text" code={commands} title="WebGL2 numeric and subset training verification" />
+    <p>{c.fullP}</p>
+    <TypeShadeCode lang="text" code={fullCommand} title="Full WebGPU training" />
+    <p>{c.runtimeNote}</p>
+  </section>
+
+  <section>
+    <h2 id="limits">{c.limitsH}</h2>
+    <ul>{c.limits.map((limit) => <li>{limit}</li>)}</ul>
+  </section>
+
+  <section>
+    <h2 id="source">{c.sourceH}</h2>
+    <p>{c.sourceP}</p>
+    <ul>
+      <li><a href={source}>{c.kernelSource}</a></li>
+      <li><a href={readme}>{c.instructions}</a></li>
+      <li><a href={rawReport}>{c.resultRecord}</a></li>
+      <li><a href={checks}>{c.validationRun}</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 id="typenn">{c.typenn.h}</h2>
+    <p>{c.typenn.p}</p>
+    <TypeShadeCode code={typennSnippet} />
+    <ul>
+      <li><a href={typennLab(locale)}>{c.typenn.lab}</a></li>
+      <li><a href={links.typennGithub.href}>{c.typenn.github}</a></li>
+    </ul>
+  </section>
+</Docs>

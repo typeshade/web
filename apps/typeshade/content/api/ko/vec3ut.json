@@ -1,0 +1,7 @@
+{
+  "slug": "vec3ut",
+  "source": "6ad7bb6738d7e786df56371a8ba6b730ed047359ad26d59610350b2679b2c38a",
+  "texts": {
+    "summary": "기본 vec3<u32> 타입입니다. 주로 컴퓨트 셰이더의 global_invocation_id 내장 값(builtin)에 쓰입니다."
+  }
+}

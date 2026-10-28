@@ -1,0 +1,9 @@
+{
+  "slug": "packmodule",
+  "source": "c1535a2e6e01738ab7b537d61352df42a50dd342a9f5c825f80f6da3eb778406",
+  "texts": {
+    "summary": "컴파일된 모듈을 매니페스트로 변환합니다. 호스트가 파이프라인을 만들고 리소스를 바인딩하는 데 필요한 정보를 단순한 JSON 객체 하나에 담습니다.",
+    "description": "각 필드가 약속하는 내용은 `src/core/manifest.ts`의 `buildManifest`에서 볼 수 있습니다. 이 함수는 IR만으로 매니페스트를 만듭니다.\n\n`options.console`을 주면 기록된 변형이 추가됩니다. 이 변형은 진입점이 닿는 각 `console.*` 호출을 콘솔 버퍼에 쓰는 WGSL이며, 버퍼를 읽어 낼 때 쓰는 표도 함께 담습니다.\n\n`options.emit`은 기본값과 다른 옵션으로 프로그램을 생성한다(변경 0028). 옵션은 WGSL 생성기의 `parens`, `fp64Flavor`, `plugins`와 최적화 `level`입니다. 매니페스트의 `wgsl`, 기록된 변형의 `wgsl`, `glsl`, `bindings`는 이 옵션으로 생성된 결과이다(`fp64Flavor: 'integer'`이면 `_fp64` 가드를 바인딩하지 않습니다). 매니페스트는 `level`, `parens`, `fp64Flavor`를 `emit`에 기록하므로, `typeshade/emit`의 `repack`이 같은 옵션으로 프로그램을 다시 생성할 수 있습니다.\n\n플러그인은 함수이므로 매니페스트에 기록할 수 없습니다. 그래서 플러그인과 함께 `options.ir`을 주면 `TypeError`를 던집니다. 로드 시점의 생성기가 프로그램을 다시 생성할 수 없기 때문입니다.",
+    "exceptions.TypeError": "생성 옵션이 받지 않는 값이나 `emit.plugins`와 함께 준 `ir`에 대해 `TypeError`가 발생합니다."
+  }
+}

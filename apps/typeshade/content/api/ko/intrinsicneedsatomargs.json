@@ -1,0 +1,9 @@
+{
+  "slug": "intrinsicneedsatomargs",
+  "source": "1f4bf83b43ce5b01d31e3ff38512a403e50ae0a57ac7e4d25e6a806782d7e44b",
+  "texts": {
+    "summary": "name의 표기가 인자를 일반 인자 자리보다 더 강하게 결합하는 위치에 끼워 넣으면 true를 반환합니다. 인라인된 연산자의 피연산자나 .field 후위 연산의 대상 식이 그런 위치입니다.",
+    "description": "이 경우 호출하는 쪽은 모든 인자를 기본 식(primary expression)으로 렌더링해야 합니다. 이미 토큰 하나인 경우가 아니라면 괄호로 감쌉니다. 괄호 없는 `a + b`를 `a + b / c`에 끼워 넣으면 다른 산술 식으로 파싱되므로 이렇게 해야 합니다. 항목이 없는 id는 false를 반환합니다.",
+    "parameters.name": "내장 함수 id입니다."
+  }
+}

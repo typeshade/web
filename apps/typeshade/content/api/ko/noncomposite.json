@@ -1,0 +1,8 @@
+{
+  "slug": "noncomposite",
+  "source": "c564061035a26119caf79d3006bf8587b9d2a9e8ac3253a2b66c9328ef936d5b",
+  "texts": {
+    "summary": "복합 키를 never로 대응시키고, 나머지 모든 키는 그대로 통과시킵니다.",
+    "description": "스칼라 전용 메서드의 `this:` 경계로 쓰입니다. 그래서 벡터 수신 객체는 거부되고, 스칼라 수신 객체와 넓어진 `ReadonlyNode<string>`은 계속 쓸 수 있습니다. `string`은 유니언이 아니므로 조건부 타입이 분배되지 않고 그대로 통과시킵니다."
+  }
+}

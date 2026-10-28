@@ -1,0 +1,12 @@
+{
+  "slug": "typeeq",
+  "source": "86d664669a6824c77f1098e5de1a51d9cbf23fb3d5ae93d27ab6d83a3557ee4a",
+  "texts": {
+    "summary": "ShaderType의 구조적 동등성 검사입니다. 두 타입은 typeKey 문자열이 일치하면 같습니다. 그래서 boolT 같은 상수는 참조가 달라도, 새로 만든 { kind: 'scalar', scalar: 'bool' } 객체와 같다고 판정됩니다.",
+    "description": "`ShaderType`의 구조적 동등성 검사입니다. 두 타입은 [`typeKey`](/api/typekey/) 문자열이 일치하면 같습니다. 그래서 `boolT` 같은 상수는 참조가 서로 다르더라도, 새로 만든 `{ kind: 'scalar', scalar: 'bool' }` 객체와 같게 비교됩니다. 모든 이항 연산, 대입, `fn` 인자의 타입 검사는 `SD0002`(\"type mismatch\")를 내기 전에 이 검사를 실행합니다. 두 `ShaderType`을 비교할 때는 이 함수를 씁니다. `===`는 참조를 비교하고, 깊은 동등 비교는 같은 결과를 얻는 데 더 오래 걸립니다.",
+    "parameters.a": "첫 번째 타입입니다.",
+    "parameters.b": "두 번째 타입입니다.",
+    "returns": "두 타입의 키 문자열이 같으면 `true`를 반환합니다.",
+    "exceptions.SD0002": "모든 이항 연산, 대입, fn 인자 타입 검사가 SD0002를 내기 전에 수행하는 검사입니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "scalarkey",
+  "source": "6626b1ff0044a985897d6778f215465b2d508ebad098c2c1a98f725e1da98ab1",
+  "texts": {
+    "summary": "'bool'을 제외한 Scalar의 키 형태입니다. DSL이 인덱스나 비교에 사용할 수 있는 기본 스칼라를 요구하는 곳에서 사용합니다. 배열 인덱스(.at(i, elem)), 비트 연산자 피연산자, matchExpr와 Switch의 판별값이 이에 해당합니다.",
+    "description": "`'f64'`와 `'bool'`은 제외됩니다. `Switch`의 판별 대상은 WGSL `switch`로 바뀌어야 하는데, 이것은 정수 케이스만 받기 때문입니다. 배열 인덱스와 비트 연산 피연산자는 결코 불리언일 수 없습니다."
+  }
+}

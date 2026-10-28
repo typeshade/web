@@ -1,0 +1,31 @@
+---
+// Language guide: typeshade/random, the second common module (compiler change 0072, surface
+// §73). Content lives in language.topics.random (src/i18n/en.ts, src/i18n/ko.ts); the code
+// samples are not copy, so they stay here.
+import Docs from '../../layouts/Docs.astro';
+import ConceptDoc from '../ConceptDoc.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).language.topics.random;
+const headings = [
+  ['device', content.device], ['host', content.host], ['held', content.held], ['later', content.later],
+].map(([slug, text]) => ({ depth: 2, slug, text }));
+---
+
+<Docs locale={locale} path={links.languageRandom.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
+  <h1>{content.h1}</h1><p><Rich text={content.intro} locale={locale} /></p>
+  <h2 id="device">{content.device}</h2><p><Rich text={content.deviceP} locale={locale} /></p>
+  <TypeShadeCode code={`"use typeshade";\nimport { xorshift32, hash32, uniform } from "typeshade/random";\n\nexport function jitter(out: array<f32>, seed: u32): void {\n  for (let i: u32 = 0; i < out.length; i++) {\n    out[i] = uniform(hash32(seed ^ i));\n  }\n}`} title="jitter.shade.ts" />
+  <ConceptDoc locale={locale} rows={content.deviceRows} columns={content.deviceColumns} strongTerm />
+  <h2 id="host">{content.host}</h2><p><Rich text={content.hostP} locale={locale} /></p>
+  <TypeShadeCode code={`import { fillUniform, generator } from 'typeshade/random';\nimport { resident } from 'typeshade/runtime';\n\nconst noise = resident(1024, 'f32');\nfillUniform(noise, 12345); // element i is uniform(hash32(12345 ^ i))\nconst draw = generator(12345); // the same draws on the host\nconst first = draw();`} title="host.ts" />
+  <ConceptDoc locale={locale} rows={content.hostRows} columns={content.hostColumns} strongTerm />
+  <h2 id="held">{content.held}</h2><p><Rich text={content.heldP} locale={locale} /></p>
+  <h2 id="later">{content.later}</h2><p><Rich text={content.laterP} locale={locale} /></p>
+  <p><a href={localePath(locale, links.guide.href)}>{content.next}</a></p>
+</Docs>

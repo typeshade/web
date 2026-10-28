@@ -1,0 +1,17 @@
+{
+  "slug": "texturesample",
+  "source": "dab41315ac7bae53108bf124eb1a08715e5a8a57a769cdfff3fd0ddb908da7c0",
+  "texts": {
+    "summary": "2D 텍스처를 샘플링하여 vec4<f32>를 반환합니다.",
+    "description": "밉 레벨은 암묵적으로 정해집니다. 화면 공간 미분에서 나오는데, 미분은 프래그먼트 호출에만 존재합니다. 그래서 이 호출은 프래그먼트 전용이며, 모든 생성 시점에 실행되는 핵심 lint 규칙 `fragment-only-builtin`이 버텍스 또는 컴퓨트 스테이지에 나타나면 `SD0109`를 보고합니다. [`textureSampleLevel`](/api/texturesamplelevel/)은 레벨을 인자로 받으며 모든 스테이지에서 쓸 수 있으므로, 버텍스나 컴퓨트 셰이더는 이 형태를 씁니다.\n\n2D 배열 텍스처도 같은 이름을 씁니다. 첫 번째 인자의 키가 어느 오버로드를 쓸지 정합니다. `texture_2d_array<f32>`는 `layer` 인자를 요구하며, 이를 빼면 tsc 오류가 납니다. JS `number` 레이어는 `i32` 리터럴로 승격됩니다. 타깃마다 레이어를 적는 방식이 달라서 DSL이 그 차이를 흡수합니다. WGSL은 `textureSample(t, s, uv, layer)`처럼 레이어를 별도 인자로 받고, GLSL ES 3.00은 `texture(t, vec3(uv, float(layer)))`처럼 레이어를 좌표에 합칩니다. 두 표기 모두 코어 사양이므로, 배열 텍스처는 어느 타깃에서도 기능 선언이 필요하지 않습니다.\n\n정수 텍스처 키(`texture_2d<u32>`, `texture_2d<i32>`와 이들의 배열 짝)는 tsc에서 의도적으로 거부됩니다. 필터링은 가중 평균이고 정수 텍셀을 보간하는 것은 의미가 없으므로, WGSL에는 정수 텍스처용 `textureSample`이 아예 없습니다. GLSL의 `texture(usampler2D, …)`는 컴파일되겠지만, 이를 허용하면 WebGL2에서는 실행되고 WebGPU로는 표현할 수 없는 구문이 생깁니다. 두 타깃이 정수 텍스처에 공통으로 쓰는 함수는 [`textureLoad`](/api/textureload/), [`textureDimensions`](/api/texturedimensions/), [`textureNumLayers`](/api/texturenumlayers/)입니다.\n\nCPU 평가(`compileModule`)에는 텍스처를 읽을 방법이 없습니다. `gpuStubs` 옵션이 켜져 있으면 플레이스홀더를 반환합니다.",
+    "parameters.tex": "샘플링할 텍스처 바인딩, `resource(name, texture2dfT, at).node`이입니다.",
+    "parameters.smp": "필터링에 쓸 샘플러 바인딩입니다.",
+    "parameters.uv": "정규화된 텍스처 좌표입니다.",
+    "parameters.layer": "읽을 레이어입니다. 배열 텍스처에는 필수이고, 그 밖의 텍스처에는 거부됩니다.",
+    "returns": "필터링된 텍셀입니다.",
+    "exceptions.SD0109": "이 호출은 프래그먼트 전용이 됩니다. fragment-only-builtin lint 규칙은 핵심 규칙으로서 모든 생성 시점에 실행되며, 버텍스 또는 컴퓨트 스테이지에 나타나면 SD0109를 보고합니다. textureSampleLevel은 레벨을 인자로 받으며 모든 스테이지에서 쓸 수 있으므로, 버텍스나 컴퓨트 셰이더는 이 형태를 씁니다.",
+    "targets.wgsl": "`textureSample(tex, smp, uv)`.",
+    "targets.glsl": "`texture(tex, uv)`.",
+    "targets.cpu": "오라클에는 텍스처 메모리와 이웃 프래그먼트가 없습니다. `{ gpuStubs: true }`로 모듈을 컴파일하지 않으면 이 호출은 예외를 던집니다. 그 옵션으로 컴파일하면 플레이스홀더를 반환합니다."
+  }
+}

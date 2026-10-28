@@ -1,0 +1,8 @@
+{
+  "slug": "guarddefines",
+  "source": "a72a0e9df278ee890ee6e80c26719f0b5425e1824e4da4e54422d0f0aa78c921",
+  "texts": {
+    "summary": "emitGuarded에 넘기는 전처리기 define으로 각 축 값을 적는 방법입니다.",
+    "description": "불리언 축은 이름 하나만 받습니다. 이 이름은 값이 참일 때 정의됩니다. 그 밖의 축은 값마다 이름 하나씩 받습니다."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "slug": "emitidentityinput",
+  "source": "b4353acd7544fc811810320a975a840d1d3eeed7ad04b77ed6294781bc2f295e",
+  "texts": {
+    "summary": "플러그인을 제외하고, 생성된 텍스트를 바꾸는 생성 옵션입니다.",
+    "description": "이 목록은 명시되어 있습니다. 여기 있는 옵션은 모두 [`emitIdentity`](/api/emitidentity/)가 계산하는 식별자의 한 축입니다. 생성된 텍스트를 바꾸는 옵션은 식별자가 그것을 설명하도록 여기에 들어갑니다.",
+    "members.emulateCompute": "GLSL 전용입니다. `emitGlslModule({ emulateCompute })`는 컴퓨트 진입점을 프래그먼트 셰이더로 재작성하므로, 생성 모드에 해당합니다.\n\n식별자에서 이 표지는 컴퓨트에서 프래그먼트로 옮기는 재작성이 실행되었음을 기록합니다. 이 옵션을 넘겼기 때문이든, 옵션 없이 같은 경로를 타는 `portable` 컴퓨트 진입점을 모듈이 선언했기 때문이든 마찬가지입니다. 모듈을 [`emitIdentity`](/api/emitidentity/)의 세 번째 인자로 넘기면, 표지가 두 출처 중 어느 쪽에서든 도출됩니다.",
+    "members.overrideValues": "GLSL 전용입니다. 고정한 `override` 값은 `#define`이 되며, 이는 생성된 텍스트를 바꿉니다."
+  }
+}

@@ -1,0 +1,109 @@
+/* Fonts. Latin subsets only, self-hosted. */
+/* Formulas (src/lib/math.mjs): STIX Two Math 2.12, OFL 1.1 (public/fonts/LICENSE-STIX-Two.txt),
+   the whole face with its MATH table, so a formula draws the same on every system. A browser
+   fetches it only for a page that shows a formula. */
+@font-face {
+  font-family: 'STIX Two Math';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/stix-two-math-regular-2.12.woff2') format('woff2');
+}
+
+math {
+  font-family: 'STIX Two Math', math;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Variable';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* IBM Plex Sans KR, the Korean companion to Plex Sans: two weights, subset to the KS X 1001
+   syllables plus every character the copy uses (scripts/build-fonts.py). The unicode-range
+   keeps it off pages with no Hangul; Latin on Korean pages still comes from Plex Sans. */
+@font-face {
+  font-family: 'IBM Plex Sans KR';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-kr-400.woff2') format('woff2');
+  unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7AF, U+3000-303F, U+FF00-FFEF;
+}
+@font-face {
+  font-family: 'IBM Plex Sans KR';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-kr-600.woff2') format('woff2');
+  unicode-range: U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7AF, U+3000-303F, U+FF00-FFEF;
+}
+
+/* Korean pages: Latin in Plex Sans, Hangul in Plex Sans KR, with the taller line height
+   and the no-mid-word breaking Hangul needs. Plex KR sits a little high on the Latin
+   baseline, so body text drops half a size and headings lose their negative tracking. */
+/* :lang(ko) matches on the nearest ancestor's lang, so it still covers the guide's own
+   article even though that article carries lang="en" for its (untranslated) body: the guide
+   tables inherit this rule too, and anywhere would break an unbroken English run at any
+   character. break-word only breaks a run once it has nowhere else to wrap, so a Korean
+   sentence still wraps at its eojeol boundaries and an English word only splits when it
+   truly has no room to sit on its own line. */
+:lang(ko) body,
+:lang(ko) .doc {
+  font-family:
+    'IBM Plex Sans Variable', 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic',
+    'Noto Sans KR', system-ui, sans-serif;
+  line-height: 1.8;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+:lang(ko) h1,
+:lang(ko) h2,
+:lang(ko) h3,
+:lang(ko) h4 {
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+}
+:lang(ko) .figure-caption,
+:lang(ko) .site-nav,
+:lang(ko) .site-map {
+  line-height: 1.65;
+}
+/* IBM Plex Sans KR only ships 400 and 600, so a 500-weight label falls back to 400 for
+   Hangul while Latin renders true 500; land both scripts on 600 instead. */
+:lang(ko) .button {
+  font-weight: 600;
+}
+/* A single-line Ant control has no room for the 1.8 line height Korean prose asks for. */
+:lang(ko) .button,
+:lang(ko) .site-nav a,
+:lang(ko) .docs-group a,
+:lang(ko) .site-search {
+  line-height: 1.5;
+}

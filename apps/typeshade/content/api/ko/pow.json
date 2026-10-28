@@ -1,0 +1,11 @@
+{
+  "slug": "pow",
+  "source": "498cfdff2fa1f270b70d0a5f2c16a75681e8c1ab3af0c4ae787e089072f7324c",
+  "texts": {
+    "summary": "pow(a, b): a의 b 제곱을 성분별로 구합니다.",
+    "description": "JS 숫자 `b`는 `a`의 종류로 승격됩니다. 그래서 f32 밑이면 `pow(z, 4)`는 `pow(z, 4.0)`을 생성합니다. WGSL은 `a`와 `b`의 타입이 같아야 하므로, 벡터 `a`에는 벡터 `b`가 필요합니다. 벡터 `a`에 스칼라 `b`를 넘기면 여기의 타입 검사는 통과하지만, WGSL 컴파일러가 이를 거부합니다.",
+    "targets.wgsl": "`pow(a, b)`로 생성합니다.",
+    "targets.glsl": "`pow(a, b)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

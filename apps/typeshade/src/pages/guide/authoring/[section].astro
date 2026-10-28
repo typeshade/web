@@ -1,0 +1,10 @@
+---
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const guide = await getCollection('guide');
+  return guide.filter((entry) => entry.id !== 'overview').map((entry) => ({ params: { section: entry.id } }));
+}
+const { section } = Astro.params;
+return Astro.redirect(`/guide/internals/${section}/`);
+---

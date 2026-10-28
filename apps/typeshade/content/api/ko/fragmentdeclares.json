@@ -1,0 +1,14 @@
+{
+  "slug": "fragmentdeclares",
+  "source": "9e89c3778cc3467c7045097a7b4d108e57fad8245ad4205dc2607d5009f2f3a7",
+  "texts": {
+    "summary": "프래그먼트가 합성되어 들어가는 프로그램에서 선언하는 내용입니다. 합성기가 호스트 prelude를 대조하는 매니페스트입니다.",
+    "description": "이름은 생성된 표기 그대로입니다. 그래서 호스트와 실제로 충돌하는 것이 바로 이 이름입니다.",
+    "members.functions": "프래그먼트에서 정의하는 헬퍼 함수이다(진입점은 따로 나열합니다).",
+    "members.structs": "일반 struct 타입입니다. 유니폼 또는 스토리지 바인딩으로 쓰이는 struct는 블록으로 생성되므로, 그 이름은 대신 `bindings` 아래에 나타납니다.",
+    "members.bindings": "프래그먼트가 선언하는 리소스 바인딩을 바인딩 이름별로 나열합니다.",
+    "members.consts": "모듈 상수입니다.",
+    "members.overrides": "파이프라인 특수화 상수이다(`overrideConst`).",
+    "members.entryPoints": "스테이지 진입점입니다. 생성되었는지와 관계없이 모두 나열되므로, 선언만 요청한 합성기도 어떤 항목을 제외했는지 알 수 있습니다."
+  }
+}

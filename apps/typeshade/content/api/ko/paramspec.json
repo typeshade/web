@@ -1,0 +1,8 @@
+{
+  "slug": "paramspec",
+  "source": "97576bc4632cc8ace46ff30332e531bab9f86434f6b134c25ec6aa13b63b75df",
+  "texts": {
+    "summary": "externFn의 매개변수 레코드입니다. 매개변수 이름을 ShaderType에 대응시키는 맵이며 선언 순서를 따릅니다.",
+    "description": "extern 함수는 호출될 뿐, 파이프라인 진입점으로 쓰이지 않습니다. 그래서 이 레코드에는 스테이지 속성도, 구조체 핸들도 없습니다. [`FnParamSpec`](/api/fnparamspec/)은 `fn()`이 받는 더 풍부한 레코드입니다."
+  }
+}

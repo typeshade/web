@@ -1,0 +1,8 @@
+{
+  "slug": "depthattachment",
+  "source": "bdd490f1f3d0d0a54dfdd2e82c5af8669ab040b5a0525479972c701bb9856cd1",
+  "texts": {
+    "summary": "깊이 어태치먼트입니다. 텍스처 하나의 깊이 측면이며, 포맷에 스텐실 측면이 있으면 그 스텐실 객체도 가집니다.",
+    "description": "스텐실 측면이 없는 깊이 포맷은 `stencil`을 받지 않습니다. `stencil` 객체가 생략한 필드는 깊이 측면을 따릅니다. 읽기 전용 깊이는 스텐실 객체도 읽기 전용으로 만들고, load를 `'load'`로 둡니다. `stencil: { readOnly: false }`는 `stencil: {}`와 다릅니다."
+  }
+}

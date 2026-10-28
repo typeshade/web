@@ -1,0 +1,3 @@
+[submodule "vendor/shader-dsl"]
+	path = vendor/shader-dsl
+	url = https://github.com/typeshade/typeshade

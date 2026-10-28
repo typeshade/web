@@ -1,0 +1,116 @@
+---
+// The dialog every Report a problem link opens: a title, a description if the reader has one,
+// images, and Send. The Worker files the report as an issue on GitHub (worker/index.ts,
+// /data/issues/, docs/cloudflare.md), in the repository the link names (`data-report`); the
+// page's address, and the Playground's program where the page holds one, go along. The dialog
+// sits in a template and its script loads on the first click, so a page nobody reports from
+// carries neither. With no script, or where the Worker takes no reports, the link is GitHub's
+// own form.
+import { copyFor, type Locale } from '../i18n/index.ts';
+import { facts } from '../lib/examples.ts';
+import { ISSUE_IMAGE_TYPES, ISSUE_TEXT_MAX, ISSUE_TITLE_MAX } from '../lib/issue-data.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copyFor(locale).issue;
+---
+
+<template data-issue-template>
+  <dialog class="issue-dialog" aria-labelledby="issue-dialog-heading" data-issue-dialog data-pagefind-ignore>
+    <form method="dialog" class="issue-form" data-issue-form data-compiler={facts.pinnedCommit} data-copy={JSON.stringify(t.runtime)} data-send={t.send} data-close={t.close} data-cancel={t.cancel}>
+      <h2 id="issue-dialog-heading">{t.heading}</h2>
+      <label for="issue-title">{t.titleLabel}</label>
+      <input class="issue-input" id="issue-title" name="title" type="text" required maxlength={ISSUE_TITLE_MAX} autocomplete="off" />
+      <label for="issue-text">{t.textLabel}</label>
+      <div class="issue-box" data-issue-drop>
+        <textarea class="issue-text" id="issue-text" name="text" rows="5" maxlength={ISSUE_TEXT_MAX}></textarea>
+        <button type="button" class="issue-add" data-issue-add>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4" /><circle cx="15.5" cy="9" r="1.5" fill="currentColor" /></svg>
+          {t.addImages}
+        </button>
+        <input type="file" accept={ISSUE_IMAGE_TYPES.join(',')} multiple hidden data-issue-files />
+      </div>
+      <ul class="issue-attached" role="list" data-issue-attached hidden></ul>
+      {/* A person never meets this field and leaves it empty; a script that fills in every
+          field it finds fills it, and the Worker refuses the issue. */}
+      <input class="issue-trap" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div data-issue-challenge hidden></div>
+      <p class="issue-status" role="status" data-issue-status></p>
+      <p class="issue-note">{t.note}</p>
+      <div class="issue-actions">
+        <button type="button" class="button" data-issue-cancel>{t.cancel}</button>
+        <button type="submit" class="button button-primary" data-issue-send>{t.send}</button>
+      </div>
+    </form>
+  </dialog>
+</template>
+
+<script>
+  // Every Report a problem link opens the dialog; the dialog's own module loads on the first
+  // one. A click that opens a new tab follows the link, which is GitHub's own form.
+  document.addEventListener('click', (event) => {
+    const link = event.target instanceof Element ? event.target.closest('a[data-report]') : null;
+    if (!(link instanceof HTMLAnchorElement)) return;
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    void import('../scripts/issue-dialog.ts').then(({ openIssueDialog }) => openIssueDialog(link));
+  });
+</script>
+
+<style>
+  /* Ant's Modal on the search dialog's ground: an elevated card over a dimmed page, the title
+     at 16px, the controls at 14px, and the two buttons at the right of the foot. */
+  .issue-dialog {
+    inline-size: min(520px, 100vw - 2 * var(--gutter-x)); max-block-size: calc(100dvh - 2 * var(--gutter-x));
+    margin: 10vh auto auto; padding: 20px 24px; overflow: auto;
+    border: 0; border-radius: var(--radius-md); background: var(--color-elevated); color: var(--color-text-1);
+    box-shadow: var(--shadow-elevated); font-size: var(--text-ui); line-height: var(--text-ui--line-height);
+  }
+  .issue-dialog::backdrop { background: rgb(0 0 0 / 0.45); }
+  :global(:root[data-theme='dark']) .issue-dialog::backdrop { background: rgb(0 0 0 / 0.72); }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme='light'])) .issue-dialog::backdrop { background: rgb(0 0 0 / 0.72); } }
+  @media (max-width: 40rem) { .issue-dialog { margin-block-start: var(--gutter-x); } }
+  .issue-form { display: flex; flex-direction: column; }
+  /* Sent: the heading, the thanks, and Close. */
+  .issue-form[data-done] > :not(h2, .issue-status, .issue-actions) { display: none; }
+  h2 { margin: 0 0 16px; font-size: var(--text-h5); line-height: var(--text-h5--line-height); font-weight: 600; }
+  label { margin: 0 0 4px; color: var(--color-text-1); }
+  .issue-input, .issue-box {
+    margin: 0 0 16px; border: 1px solid var(--color-line-2); border-radius: var(--radius);
+    background: var(--color-ground); transition: border-color var(--motion);
+  }
+  .issue-input { padding: 4px 11px; color: var(--color-text-1); font: inherit; }
+  .issue-input:hover, .issue-box:hover { border-color: var(--color-primary-hover); }
+  /* The box is the textarea and its foot, one control the way GitHub's comment box is one. */
+  .issue-box { display: flex; flex-direction: column; margin-block-end: 8px; }
+  .issue-box:focus-within { border-color: var(--color-accent); box-shadow: var(--ring); }
+  .issue-box[data-dragging] { border-color: var(--color-accent); background: var(--color-primary-bg); }
+  .issue-text { display: block; padding: 4px 11px; border: 0; border-radius: var(--radius) var(--radius) 0 0; background: transparent; color: var(--color-text-1); font: inherit; resize: vertical; }
+  .issue-text:focus-visible { outline: 0; box-shadow: none; }
+  .issue-add {
+    display: flex; align-items: center; gap: 6px; padding: 5px 11px; border: 0; border-block-start: 1px dashed var(--color-line-2);
+    border-radius: 0 0 var(--radius) var(--radius); background: var(--color-surface-1); color: var(--color-text-2);
+    font: inherit; font-size: var(--text-label); line-height: var(--text-label--line-height); text-align: start; cursor: pointer;
+  }
+  .issue-add:hover { color: var(--color-primary-hover); }
+  .issue-add svg { flex: none; inline-size: 14px; block-size: 14px; }
+  .issue-attached { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; padding: 0; list-style: none; }
+  .issue-attached :global(li) { position: relative; display: flex; align-items: center; gap: 6px; block-size: 48px; border: 1px solid var(--color-line-1); border-radius: var(--radius); background: var(--color-surface-1); }
+  .issue-attached :global(img) { block-size: 46px; inline-size: auto; max-inline-size: 96px; border-radius: var(--radius) 0 0 var(--radius); object-fit: cover; }
+  .issue-attached :global(.issue-chip) { padding-inline-start: 10px; color: var(--color-text-2); font-family: var(--font-mono); font-size: var(--text-label); }
+  .issue-attached :global(button) {
+    display: grid; place-items: center; inline-size: 24px; block-size: 24px; margin-inline-end: 4px; padding: 0;
+    border: 0; border-radius: var(--radius-sm); background: none; color: var(--color-text-3); cursor: pointer;
+  }
+  .issue-attached :global(button:hover) { background: var(--fill-3); color: var(--color-text-1); }
+  .issue-attached :global(svg) { inline-size: 12px; block-size: 12px; }
+  /* Out of view and out of the tab order, where a person never meets it. */
+  .issue-trap { position: absolute; inset-inline-start: -10000px; inline-size: 1px; block-size: 1px; overflow: hidden; }
+  .issue-status { margin: 0 0 8px; color: var(--color-text-1); }
+  .issue-status:empty { display: none; }
+  .issue-note { margin: 0 0 16px; color: var(--color-text-2); font-size: var(--text-label); line-height: var(--text-label--line-height); }
+  .issue-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  :lang(ko) .issue-dialog { line-height: 1.6; }
+</style>

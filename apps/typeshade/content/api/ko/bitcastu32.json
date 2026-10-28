@@ -1,0 +1,11 @@
+{
+  "slug": "bitcastu32",
+  "source": "19630dac32a2c4fa2c9cae71bb5e701d1da2ef1328f4a063a8d2ebc568218bf7",
+  "texts": {
+    "summary": "f32의 비트 패턴을 u32로 재해석합니다.",
+    "description": "WGSL에서는 `bitcast<u32>(x)`로, GLSL에서는 `floatBitsToUint(x)`로 생성합니다.",
+    "targets.wgsl": "`bitcast<u32>(v)`.",
+    "targets.glsl": "`floatBitsToUint(v)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

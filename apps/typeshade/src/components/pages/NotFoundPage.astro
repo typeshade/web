@@ -1,0 +1,42 @@
+---
+// The not-found page. The host (Workers static assets, wrangler.jsonc) serves the root 404.html for every missing path, so that
+// page is English and, when the missing path is under /ko/, sends the reader on to /ko/404/,
+// a Korean page with Korean chrome. Both pages are noindex and out of the sitemap.
+import Base from '../../layouts/Base.astro';
+import Rich from '../Rich.astro';
+import { copyFor, defaultLocale, localePath, locales, type Locale } from '../../i18n/index.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copyFor(locale).notFound;
+// Base prefixes the locale itself, so this is the neutral path. The default locale has no
+// /404/ route, only the /404.html the host serves for every missing address.
+const path = locale === defaultLocale ? '/404.html' : '/404/';
+// The host serves this file for every missing path, so the English page also carries the
+// redirect that sends a reader under another locale's prefix on to that locale's own 404 page.
+const otherLocaleRedirects = locale === defaultLocale
+  ? locales.filter((l) => l !== defaultLocale).map((l) => ({ prefix: `/${l}/`, target: localePath(l, '/404/') }))
+  : [];
+// The language switch needs each locale's own 404 page. The default locale has no /404/ route,
+// only the /404.html the host serves, so localizing the neutral path would send the switch
+// to an address that does not exist.
+const switchTarget = Object.fromEntries(
+  locales.map((l) => [l, l === defaultLocale ? '/404.html' : localePath(l, '/404/')]),
+) as Partial<Record<Locale, string>>;
+---
+
+<Base locale={locale} path={path} switchTarget={switchTarget} title={t.title} description={t.description} noAlternates noindex>
+  {otherLocaleRedirects.length > 0 && (
+    <script is:inline define:vars={{ otherLocaleRedirects }}>
+      const hit = otherLocaleRedirects.find((r) => location.pathname.startsWith(r.prefix));
+      if (hit) location.replace(hit.target + location.search);
+    </script>
+  )}
+  <article class="wrap doc">
+    <h1>{t.h1}</h1>
+    <p>{t.p}</p>
+    <p><Rich text={t.links} locale={locale} /></p>
+  </article>
+</Base>

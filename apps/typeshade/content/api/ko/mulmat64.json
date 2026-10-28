@@ -1,0 +1,7 @@
+{
+  "slug": "mulmat64",
+  "source": "7b9c138160da4475a9fbda0548662f4f4ea0e72bbeb614985f1b09c56a7b030f",
+  "texts": {
+    "summary": "matNxN<f64> × matNxN<f64> → matNxN<f64>: 에뮬레이션 배정밀도 행렬 곱입니다."
+  }
+}

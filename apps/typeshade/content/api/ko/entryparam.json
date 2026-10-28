@@ -1,0 +1,7 @@
+{
+  "slug": "entryparam",
+  "source": "3b876d47682acf68248e2115f51e3f1a0724d3cbf7f293062e8aa57ee658f982",
+  "texts": {
+    "summary": "진입점 매개변수입니다. @builtin(...) 또는 @location(n)을 담습니다."
+  }
+}

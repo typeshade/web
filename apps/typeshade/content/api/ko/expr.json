@@ -1,0 +1,8 @@
+{
+  "slug": "expr",
+  "source": "3aef22973851138f98025bfe74517fab458f3cb495c310f5dfe490f546954c8b",
+  "texts": {
+    "summary": "중간 표현(IR)이 담을 수 있는 식 형태의 전부입니다. Node와 ReadonlyNode가 만들고, WGSL, GLSL, CPU 백엔드가 순회하며 생성하거나 평가하는 닫힌 집합입니다.",
+    "description": "IR이 담을 수 있는 식 형태의 전부입니다. [`Node`](/api/node/)와 [`ReadonlyNode`](/api/readonlynode/)가 만들고, WGSL, GLSL, CPU 백엔드가 순회하며 생성하거나 평가하는 닫힌 집합입니다. `op`를 판별자로 쓰는 판별 공용체이며 메서드가 없습니다. 그래서 패스는 모든 변형을 패턴 매칭할 수 있고(백엔드의 switch에서 `case`가 빠지면 tsc가 보고한다), 하위 트리를 자유롭게 공유할 수 있습니다. 모든 변형은 자신의 `type: ShaderType`을 가집니다. IR은 만들어질 때 타입이 완전히 정해지므로, 백엔드는 생성하는 동안 타입을 다시 추론하지 않습니다. 이 객체 리터럴은 직접 작성할 필요가 없습니다. `Node`의 체이닝 메서드(`.add()`, `.mul()` 등)와 [`vec4`](/api/vec4/), [`mod`](/api/mod/) 같은 독립 함수가 `type`을 채우고, 형태를 만들기 전에 피연산자를 검증합니다."
+  }
+}

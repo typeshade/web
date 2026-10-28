@@ -1,0 +1,8 @@
+{
+  "slug": "cmpop",
+  "source": "217b338d8b4909df5454180430b3e2fe4879a92fb15215ef0491e7ee6dc21aa6",
+  "texts": {
+    "summary": "Expr.compare에 붙는 연산자 태그로, 여섯 가지 관계 연산자를 나타냅니다.",
+    "description": "비교는 `bool`을 만듭니다. 피연산자가 벡터이면 `vecN<bool>`을 만듭니다. WGSL과 GLSL 백엔드는 이를 동일하게 표기하고, CPU 백엔드는 동일하게 계산합니다."
+  }
+}

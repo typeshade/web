@@ -1,0 +1,11 @@
+{
+  "slug": "sinh",
+  "source": "1c46edc71719d4b0611c8925499a45ccde956330ede38371e4b08c5b7fb1505f",
+  "texts": {
+    "summary": "sinh(x): 성분별 쌍곡 사인입니다.",
+    "description": "WGSL과 GLSL ES 3.00에서 같은 이름을 사용합니다. `atan(sinh(y))`는 `asinh(tan(x))`의 역함수입니다. 구데르만 형식 `2·atan(exp(y)) − π/2`보다 초월 함수가 하나 적고, y = 0 부근에서 수치 조건이 더 좋습니다.",
+    "targets.wgsl": "`sinh(x)`.",
+    "targets.glsl": "`sinh(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

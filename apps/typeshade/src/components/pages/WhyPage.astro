@@ -1,0 +1,31 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const content = copyFor(locale).motivation;
+const headings = [
+  ...content.sections.map((section) => ({ depth: 2, slug: section.id, text: section.h })),
+  { depth: 2, slug: 'next-steps', text: content.nextH },
+];
+---
+
+<Docs locale={locale} path={links.why.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'motivation')}>
+  <h1>{content.h1}</h1>
+  <p><Rich text={content.intro} locale={locale} /></p>
+
+  {content.sections.map((section) => (
+    <Fragment>
+      <h2 id={section.id}>{section.h}</h2>
+      <p><Rich text={section.p} locale={locale} /></p>
+    </Fragment>
+  ))}
+
+  <h2 id="next-steps">{content.nextH}</h2>
+  <p><Rich text={content.nextP} locale={locale} /></p>
+</Docs>

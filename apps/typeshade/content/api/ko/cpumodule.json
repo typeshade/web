@@ -1,0 +1,11 @@
+{
+  "slug": "cpumodule",
+  "source": "f131a5de4b7541d95eba4b78c52426a1668960f94bd9fa5c026d2538371ef5ee",
+  "texts": {
+    "summary": "CPU 백엔드 두 가지가 돌려주는 형태입니다. 호출하는 쪽은 compileModuleJs로 컴파일하고, 호출 지점을 고치지 않고 compileModule로 대체할 수 있습니다.",
+    "description": "`fns`는 모듈이 선언한 함수를 이름으로 모아 둔 표입니다. 각 함수는 선언 순서대로 매개변수를 위치로 받습니다. `setBinding`은 스토리지 또는 유니폼 바인딩의 값을, 그 바인딩을 읽는 함수가 실행되기 전에 넣습니다. 두 백엔드는 같은 호출에 같은 값을 돌려줍니다. `compileModuleJs(m).fns.f(args)`와 `compileModule(m).fns.f(args)`는 `Object.is` 기준으로 원소 하나하나가 같습니다.",
+    "members.fns": "모듈이 선언한 함수를 이름으로 모은 것입니다. 매개변수는 선언 순서에 따라 위치로 받습니다. 반환값은 함수의 결과이며, 그 형태는 [`CpuValue`](/api/cpuvalue/)입니다.",
+    "members.setBinding": "선언된 이름으로 스토리지 또는 유니폼 바인딩의 값을 넣습니다. 바인딩을 읽는 함수를 호출하기 전에 넣습니다.",
+    "members.dispatch": "선언된 크기의 `@compute` 진입점을 `workgroups` 워크그룹 수만큼 실행합니다. 1차원 격자이면 숫자 하나를, 아니면 세 개의 개수를 넘깁니다. 워크그룹의 모든 호출은 `workgroupBarrier()` / `storageBarrier()`마다 함께 진행합니다. 내장 매개변수(`global_invocation_id`, `local_invocation_id`, `local_invocation_index`, `workgroup_id`, `num_workgroups`)는 채워져 전달된다(로드맵 0.2 항목 5). 워크그룹 메모리는 워크그룹마다 영으로 시작합니다. 호출 단위 변수는 호출마다 그 초기화 식의 값으로 시작합니다. 바인딩은 `setBinding`이 넣은 값이며, 배열은 제자리에서 기록됩니다. 한 워크그룹의 호출들이 배리어에 대해 엇갈리면 예외를 던집니다. 예외는 그 배리어의 줄과 개수를 알려 줍니다. 배리어가 없는 커널은 `fns`를 통해 호출마다 따로 실행할 수도 있습니다."
+  }
+}

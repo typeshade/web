@@ -1,0 +1,10 @@
+{
+  "slug": "resource-interface",
+  "source": "5c21fa6d35f4eb787747abec7838dba43c071d7f2a08ec6375202a4de23d9387",
+  "texts": {
+    "summary": "단일 바인딩 핸들입니다. module에 넘기는 BindingDecl과 타입이 지정된 접근 노드를 함께 담습니다.",
+    "description": "텍스처, 샘플러, 호스트가 소유하는 유니폼에는 프록시할 필드가 없으므로, 핸들이 담는 것은 이것이 전부입니다. [`resource`](/api/resource/)(텍스처, 샘플러, 모듈이 소유하는 구조체가 아닌 모든 바인딩)와 [`hostUniform`](/api/hostuniform/)(호스트가 제공하는 스칼라, 벡터, 행렬 유니폼) 모두 이 핸들을 반환합니다. 그래서 이 타입은 리소스 타입을 받는 제네릭입니다. `node`는 구체적인 `T`를 유지한다(`Node<'texture_2d<f32>'>`, `Node<'sampler'>`, `Node<'vec4<f32>'>`). 그러므로 타입에 따라 달라지는 연산(`textureSample`, `.mul`)도 호출 지점에서 계속 타입 검사를 받습니다.",
+    "members.binding": "`module({ bindings })`에 넘기는 바인딩 선언입니다.",
+    "members.node": "선언된 타입 `T`를 키로 쓰는, 타입이 지정된 접근 노드입니다."
+  }
+}

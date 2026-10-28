@@ -1,0 +1,11 @@
+{
+  "slug": "atan2",
+  "source": "1c4302fa23c423be35c69ba79ad7f79674afb8121a4abab8a63cef3250cef6f3",
+  "texts": {
+    "summary": "atan2(y, x): 인수가 두 개인 아크탄젠트입니다. (y, x) 쌍에서 [-π, π] 범위의 전체 각을 구합니다.",
+    "description": "`x`의 부호가 사분면 정보를 담고 있으면 단일 인수 형태인 [`atan`](/api/atan/) 대신 이 함수를 써야 합니다. 예를 들어 2차원 오프셋에서 방향을 구할 때가 그렇습니다. WGSL에서는 `atan2`로, GLSL에서는 두 인수를 받는 `atan(y, x)`로 씁니다.",
+    "targets.wgsl": "`atan2(y, x)`.",
+    "targets.glsl": "`atan(y, x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

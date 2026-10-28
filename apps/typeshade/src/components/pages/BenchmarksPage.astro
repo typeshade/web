@@ -1,0 +1,137 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import { links } from '../../lib/links.ts';
+import { PROFILES, RETENTION_DAYS } from '../../lib/benchmarks/definitions.ts';
+import { regressionCatalog } from '../../lib/benchmarks/regression-contract.ts';
+import { REPORT_SECTIONS, REPORT_METRICS } from '../../lib/benchmarks/report.ts';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const c = copyFor(locale).benchmarks;
+const headings = [{ depth: 2, slug: 'run', text: c.runH }, { depth: 2, slug: 'results', text: c.resultsH }, { depth: 2, slug: 'sharing', text: c.sharingH }];
+---
+<Docs locale={locale} path={links.benchmarks.href} title={c.title} description={c.description} headings={headings} editHref="https://github.com/typeshade/typeshade.github.io/blob/main/src/components/pages/BenchmarksPage.astro">
+  <h1>{c.h1}</h1>
+  <p>{c.intro}</p>
+  <div data-benchmarks>
+    <script type="application/json" data-benchmark-copy set:html={JSON.stringify(c).replace(/</g, '\\u003c')} />
+    <h2 id="run">{c.runH}</h2>
+    <p>{c.comparisonScope}</p>
+    <p>{c.runInfo}</p>
+    <fieldset class="border border-line-1 rounded-md p-4" data-controls>
+      <legend>{c.profile}</legend>
+      <label class="flex flex-wrap items-center gap-3">{c.profile}
+        <select data-profile class="bg-surface-1 border border-line-1 rounded-md p-2">
+          {Object.entries(PROFILES).map(([key, value]) => <option value={key}>{c.profiles[key as keyof typeof PROFILES]}: {value.sizes.join(', ')} / {value.samples}</option>)}
+        </select>
+        <span class="text-ui text-text-2">{c.profileUnits}</span>
+      </label>
+    </fieldset>
+    <div class="flex flex-wrap gap-3 mt-4">
+      <button type="button" data-run class="bench-button" aria-describedby="benchmark-submission">{c.run}</button>
+      <button type="button" data-stop class="bench-button" disabled>{c.stop}</button>
+    </div>
+    <p id="benchmark-submission" data-submission-notice class="submission-notice text-ui text-text-2">{c.submissionNotice} <a href="#sharing">{c.submissionDetails}</a></p>
+    <p data-status role="status" aria-live="polite">{c.idle}</p>
+    <progress data-progress value="0" max="1" class="w-full" aria-label={c.progress} hidden></progress>
+    <section data-device hidden>
+      <h3>{c.deviceH}</h3>
+      <dl><dt>{c.webgpu}</dt><dd data-webgpu></dd><dt>{c.webgl}</dt><dd data-webgl></dd></dl>
+    </section>
+    <p data-software class="text-text-2" hidden>{c.software}</p>
+    <details class="mt-4"><summary>{c.comparisonH}</summary>
+      <p>{c.comparisonInfo}</p>
+      <dl>{regressionCatalog.builds.map((b, i) => <><dt>{i === 0 ? c.baseline : c.candidate}</dt><dd><code>{b.revision}</code></dd></>)}</dl>
+      <p>{c.comparisonTrust}</p>
+    </details>
+    <h2 id="results">{c.resultsH}</h2>
+    <p data-empty>{c.empty}</p>
+    <div data-report hidden>
+      <p data-verdict class="report-verdict" role="status"></p>
+      <div class="flex flex-wrap gap-4" data-report-controls>
+        <label class="flex items-center gap-3">{c.metricH}<select data-metric class="bg-surface-1 border border-line-1 rounded-md p-2">{REPORT_METRICS.map(metric => <option value={metric}>{c.metrics[metric]}</option>)}</select></label>
+        <label class="flex items-center gap-3">{c.size}<select data-size class="bg-surface-1 border border-line-1 rounded-md p-2"></select></label>
+      </div>
+      <p data-summary></p>
+      <p class="text-text-2">{c.chartInfo}</p>
+      <p class="text-ui text-text-2">{c.rangeInfo}</p>
+      <div class="benchmark-report" data-results>
+        {REPORT_SECTIONS.map(section => <figure class="report-section" data-section={section} hidden>
+          <figcaption><h3>{c.sections[section]}</h3><p>{c.sectionInfo[section]}</p></figcaption>
+          <div class="chart-legend"><span><i class="baseline-key" aria-hidden="true"></i>{c.baseline}</span><span><i class="candidate-key" aria-hidden="true"></i>{c.candidate}</span></div>
+          <p class="text-ui text-text-2" data-axis></p>
+          <ul class="chart-items" data-items></ul>
+          <details><summary>{c.sampleRanges}</summary><ul class="text-ui text-text-2" data-ranges></ul></details>
+        </figure>)}
+      </div>
+      <details><summary>{c.methodH}</summary>
+        <p>{c.comparisonTiming}</p><p>{c.comparisonProbes}</p><p>{c.timingUnavailable}</p><p>{c.comparisonMemory}</p><p>{c.protocol}</p><p>{c.limits}</p>
+      </details>
+    </div>
+    <h2 id="sharing">{c.sharingH}</h2>
+    <p>{c.privacy}</p><p>{c.attribution}</p><p>{c.retention.replace('{days}', String(RETENTION_DAYS))}</p><p>{c.trust}</p>
+    <details><summary>{c.inspect}</summary><pre data-record class="bench-record"></pre></details>
+    <div class="flex flex-wrap gap-3 mt-4">
+      <button type="button" data-download class="bench-button" disabled>{c.download}</button>
+      <button type="button" data-send class="bench-button" disabled>{c.send}</button>
+    </div>
+    <p data-send-status role="status" aria-live="polite"></p>
+    <template data-item-template>
+      <li class="chart-row">
+        <div class="chart-heading"><strong data-name></strong><span data-change></span></div>
+        <div class="chart-body"><div class="chart-values"><span data-baseline-value></span><span data-candidate-value></span></div>
+        <div class="chart-bars" data-bars aria-hidden="true">
+          <span class="chart-reference" data-reference></span>
+          <div class="bar-track"><span class="bar baseline-bar" data-baseline-bar></span><span class="bar-range" data-baseline-range></span></div>
+          <div class="bar-track"><span class="bar candidate-bar" data-candidate-bar></span><span class="bar-range" data-candidate-range></span></div>
+        </div></div>
+      </li>
+    </template>
+  </div>
+</Docs>
+<script>
+  import { mountBenchmarks } from '../../lib/benchmarks/client.ts';
+  document.querySelectorAll<HTMLElement>('[data-benchmarks]').forEach(mountBenchmarks);
+</script>
+<style>
+  .bench-button { border: 1px solid var(--color-line-2); border-radius: .375rem; padding: .45rem 1rem; background: var(--color-surface-1); color: var(--color-text-1); font: inherit; cursor: pointer; }
+  .bench-button[data-run], .bench-button[data-stop] { min-block-size: 44px; min-inline-size: 44px; }
+  .submission-notice { margin-block: .5rem 1rem; font-size: .875rem; }
+  .bench-button:disabled { opacity: .5; cursor: default; }
+  .bench-button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+  .bench-record { max-block-size: 24rem; overflow: auto; font-size: .75rem; }
+  dd { overflow-wrap: anywhere; }
+  .report-verdict { font-size: 1.25rem; font-weight: 600; }
+  .report-section { --section-color: var(--color-primary); border: 1px solid var(--color-line-1); border-radius: .5rem; padding: 1rem; margin: 1.5rem 0; min-inline-size: 0; }
+  .report-section[data-section='data'] { --section-color: #722ed1; }
+  .report-section[data-section='compute'] { --section-color: #08979c; }
+  .report-section[data-section='execution'] { --section-color: #d46b08; }
+  :global([data-theme='dark']) .report-section[data-section='data'] { --section-color: #b37feb; }
+  :global([data-theme='dark']) .report-section[data-section='compute'] { --section-color: #5cdbd3; }
+  :global([data-theme='dark']) .report-section[data-section='execution'] { --section-color: #ffc069; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .report-section[data-section='data'] { --section-color: #b37feb; }
+    :global(:root:not([data-theme='light'])) .report-section[data-section='compute'] { --section-color: #5cdbd3; }
+    :global(:root:not([data-theme='light'])) .report-section[data-section='execution'] { --section-color: #ffc069; }
+  }
+  .report-section h3 { margin-block: 0 .5rem; border-inline-start: .25rem solid var(--section-color); padding-inline-start: .5rem; }
+  .chart-legend, .chart-legend span, .chart-heading, .chart-values { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+  .chart-legend { font-size: .875rem; }
+  .chart-legend span { gap: .5rem; }
+  .chart-legend i { display: inline-block; inline-size: 1rem; block-size: .5rem; }
+  .baseline-key, .baseline-bar { background: var(--color-text-3); }
+  .candidate-key, .candidate-bar { background: var(--section-color); }
+  .chart-items { list-style: none; padding: 0; margin: 0; }
+  .chart-row { padding-block: .75rem; display: flex; gap: 1rem; align-items: center; }
+  .chart-heading { display: block; flex: 2; min-inline-size: 0; font-size: .9375rem; }
+  .chart-heading span { display: block; margin-block-start: .25rem; }
+  .chart-body { flex: 3; min-inline-size: 0; }
+  .chart-heading span, .chart-values { font-size: .8125rem; color: var(--color-text-2); font-variant-numeric: tabular-nums; }
+  .chart-values { margin-block: 0 .25rem; justify-content: space-between; }
+  .chart-bars { position: relative; padding-block: .25rem; }
+  .chart-reference { position: absolute; inset-block: 0; border-inline-start: 1px dashed var(--color-text-2); }
+  .bar-track { position: relative; block-size: .75rem; margin-block: .25rem; }
+  .bar { display: block; block-size: .75rem; border-radius: 2px; }
+  .bar-range { position: absolute; inset-block-start: .25rem; block-size: .25rem; border-block: 1px solid var(--color-text-1); min-inline-size: 1px; }
+  @media (max-width: 40rem) { .chart-row { display: block; } .chart-heading { display: flex; justify-content: space-between; margin-block-end: .5rem; } .chart-heading span { margin-block: 0; } }
+</style>

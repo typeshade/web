@@ -1,0 +1,12 @@
+{
+  "slug": "emitidentity",
+  "source": "541e4797664816c07a9937604e19e0ad4603c9362dccbf9202b503667f134288",
+  "texts": {
+    "summary": "생성 설정 하나에 대한 안정적이고 사람이 읽을 수 있는 식별자입니다.",
+    "description": "```ts\nemitIdentity('glsl-es300')                       // 'glsl-es300;parens=full;fp64=float;plugins=-#…'\nemitIdentity('glsl-es300', { plugins: obfuscate() })\n//   '…;plugins=mangle+prune-prototypes+alias-types+minify#…'\n```\n\n커밋된 산출물 옆에 식별자를 적어 두고(레지스트리 배너, 매니페스트 줄, 파일 이름), 빌드한 뒤에 이 값을 비교합니다. 식별자가 같으면 같은 생성 설정이 두 산출물을 만든 것입니다. 식별자가 다르면 읽을 수 있는 부분이 해시로 가려지지 않으므로, 어느 축이 바뀌었는지 알 수 있습니다.\n\n식별자는 대상, `parens`, `fp64Flavor`, `emulateCompute`, 오버라이드 값을 고정했는지 여부와 고정한 값, 플러그인 체인의 순서를 담습니다.\n\n플러그인 자체의 옵션은 담지 않습니다. `minify({ …a })`와 `minify({ …b })`는 여기서 모두 `minify`입니다. 더 세밀한 구분이 필요한 플러그인은 [`EmitPlugin.identity`](/api/emitplugin/)를 설정합니다. 이때는 이름 대신 이 값이 쓰입니다.",
+    "parameters.target": "산출물을 생성한 백엔드입니다.",
+    "parameters.opts": "생성 호출에 넘긴 것과 같은 옵션 객체입니다.",
+    "parameters.m": "생성된 모듈입니다. 선택 사항이며, 식별자가 모듈 하나의 생성을 설명할 때만 의미가 있습니다. `emulateCompute` 표지는 컴퓨트에서 프래그먼트로 옮기는 재작성이 실행되었음을 기록합니다. GLSL에서는 `portable`로 선언된 컴퓨트 진입점이 생성 옵션 없이도 이 재작성을 실행합니다. 따라서 모듈을 넘기지 않으면 portable 모듈의 GLSL 식별자가 일반 생성을 설명하게 됩니다. 여러 모듈을 아우르는 식별자(레지스트리 배너 등)는 이 인자를 생략하며, 옵션만을 뜻하는 의미를 그대로 유지합니다.",
+    "returns": "한 줄짜리 식별자입니다. 읽을 수 있는 요약, `#`, 그 요약의 32비트 다이제스트 순으로 이어집니다."
+  }
+}

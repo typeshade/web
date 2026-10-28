@@ -1,0 +1,8 @@
+{
+  "slug": "capsupportkind",
+  "source": "503ca74f7d350002663203286f66cbee1606b98d42d68d157e9f7c95382832a0",
+  "texts": {
+    "summary": "한 백엔드가 기능 하나를 지원하는 방식입니다. - 'native': 지원합니다. 생성할 것도 없고 호스트가 켤 것도 없습니다. - 'directive': 지원합니다. 생성된 소스가 이 기능을 선언합니다.",
+    "description": "생성기가 그 줄을 씁니다.\n- `'host-feature'`: 지원합니다. 파이프라인을 만들기 전에 호스트가 활성화해야 한다(WebGPU 디바이스 기능 또는 WebGL2 확장). [`hostFeaturesFor`](/api/hostfeaturesfor/)가 이 값을 찾아봅니다.\n- `'unsupported'`: 대상에 행이 없습니다. 생성기는 소스를 쓰기 전에 [`UnsupportedFeatureError`](/api/unsupportedfeatureerror/)(`SD0030`)를 던집니다.\n\n한 행이 소스 지시문과 호스트 기능을 함께 가질 수 있습니다. 이때는 `'directive'`가 우선합니다. 생성된 소스를 읽는 사람이 볼 수 있는 쪽이기 때문입니다."
+  }
+}

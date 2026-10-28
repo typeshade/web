@@ -1,0 +1,11 @@
+{
+  "slug": "hostfeaturesfor",
+  "source": "0be36542a175b1d8c40b6642762e2ae84e9d416364a895278cc144c27a3fd575",
+  "texts": {
+    "summary": "중립 id를 대상 하나의 호스트가 파이프라인을 만들기 전에 활성화해야 하는 기능 문자열로 바꿉니다.",
+    "description": "WebGL2에서 이 문자열은 `gl.getExtension`에 넘기는 확장 이름이고, WebGPU에서는 `requestDevice({ requiredFeatures })`에 넘기는 기능 이름입니다.\n\n입력으로는 `reflect(m).requiredFeatures`를 넣습니다. 리플렉션은 백엔드가 아니라 모듈을 받으므로, 이 값에 담긴 id는 중립입니다.\n\n호스트 쪽 짝이 없는 id는 모두 건너뜁니다. 이 대상에서 코어 사양으로 기본 제공되는 기능이나, 백엔드가 소스 지시문을 생성해서 처리하는 기능은 아무것도 더하지 않습니다. 이 함수가 필요한 이유가 여기에 있습니다. 호출 지점마다 프로파일을 `map`으로 훑으면 `undefined` 빈칸이 생기고, 호스트는 그 값을 그대로 `getExtension`에 넘기게 됩니다. 반환된 목록에는 빈칸이 없습니다.",
+    "parameters.be": "기능 프로파일로 변환을 수행하는 백엔드입니다.",
+    "parameters.caps": "중립 id 목록입니다. 보통 `reflect(m).requiredFeatures`를 넣습니다.",
+    "returns": "호스트 쪽 기능 문자열입니다. 입력 id의 순서를 따르며, 호스트 쪽 짝이 없는 id는 뺍니다."
+  }
+}

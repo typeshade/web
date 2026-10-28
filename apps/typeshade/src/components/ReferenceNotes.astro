@@ -1,0 +1,54 @@
+---
+// The sections a person wrote for one name of the language reference (DESIGN.md, Reference
+// notes), placed before the compiler reference on its page. src/lib/reference-notes.ts has drawn
+// every token and rendered the Markdown; a {{code}} token is a code frame here and a live marker
+// a LiveShader. A section a page in another language has no current translation of is shown in
+// English, under the line that says so. An entry without a note passes no view, and nothing
+// renders.
+import { Code } from 'astro-expressive-code/components';
+import LiveShader from './LiveShader.astro';
+import Rich from './Rich.astro';
+import { copyFor, type Locale } from '../i18n/index.ts';
+import type { NoteView } from '../lib/reference-notes.ts';
+
+interface Props {
+  locale: Locale;
+  view?: NoteView;
+}
+const { locale, view } = Astro.props;
+const e = copyFor(locale).docs.reference.entry;
+// A heading may name code in backticks; it is set in the code face, the way the generated
+// headings never need.
+const parts = (heading: string) =>
+  heading.split(/(`[^`]+`)/).filter(Boolean).map((p) => (/^`.+`$/.test(p) ? { code: p.slice(1, -1) } : { text: p }));
+---
+
+{view && view.sections.map((s) => (
+  <section data-reference-note={view.id} data-note-section={s.id} lang={s.fallback ? 'en' : locale}>
+    <h2 id={s.id}>{parts(s.heading).map((p) => ('code' in p ? <code>{p.code}</code> : p.text))}</h2>
+    {s.fallback && <p class="guide-note" lang={locale}><Rich text={e.noteUntranslated} locale={locale} /></p>}
+    {s.chunks.map((c) =>
+      c.kind === 'html' ? (
+        <Fragment set:html={c.html} />
+      ) : c.kind === 'code' ? (
+        <Code code={c.code} lang="ts" title={c.file} locale={locale} />
+      ) : c.kind === 'live' ? (
+        <LiveShader
+          locale={locale}
+          id={c.id}
+          title={c.title}
+          code={c.code}
+          files={c.files}
+          caption={c.caption}
+          file={c.file}
+          anchor={c.anchor}
+          exercises={c.exercises}
+          controls={c.controls}
+          aspect={c.aspect}
+          plot={c.plot}
+          compact={view.id === 'function/pow'}
+        />
+      ) : null,
+    )}
+  </section>
+))}

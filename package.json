@@ -1,0 +1,33 @@
+{
+  "name": "@typeshade/web",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.2",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev:typeshade": "pnpm --filter typeshade-site dev",
+    "dev:typenn": "pnpm --filter typenn-site dev",
+    "dev:typecv": "pnpm --filter typecv-site dev",
+    "build:typeshade": "pnpm --filter typeshade-site build",
+    "build:typenn": "pnpm --filter typenn-site build",
+    "build:typecv": "pnpm --filter typecv-site build",
+    "check:typeshade": "pnpm --filter typeshade-site check:types",
+    "check:typenn": "pnpm --filter typenn-site check",
+    "check:typecv": "pnpm --filter typecv-site check",
+    "prepare:source": "node scripts/prepare-source.mjs",
+    "test:scope": "node --test scripts/affected.test.mjs",
+    "test:ui": "node packages/ui/scripts/smoke-sites.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.3.0",
+      "react-dom": "19.3.0",
+      "antd": "5.29.3"
+    }
+  }
+}

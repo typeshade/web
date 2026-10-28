@@ -1,0 +1,13 @@
+---
+import { Code } from 'astro-expressive-code/components';
+
+interface Props {
+  code: string;
+  lang?: 'ts' | 'typescript' | 'js' | 'javascript' | 'wgsl' | 'glsl' | 'text';
+  title?: string;
+}
+
+const { code, lang = 'ts', title } = Astro.props;
+---
+
+<Code code={code} lang={lang} title={title} />

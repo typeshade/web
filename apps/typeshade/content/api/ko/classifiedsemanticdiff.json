@@ -1,0 +1,8 @@
+{
+  "slug": "classifiedsemanticdiff",
+  "source": "d5d5e96bf4fcca839a2fe15b5df989d07ec441657375b34e4bb1862b24a19509",
+  "texts": {
+    "summary": "선언된 변환 파이프라인(SemanticDiffOptions.transforms)에 맞춰 차이를 분류한 SemanticDiff입니다.",
+    "description": "네 버킷에는 선언된 변환 중 어느 것도 설명하지 못하는 차이만 담깁니다. 패리티 검사가 실패해야 하는 부분이 바로 이 차이입니다. `explained`에는 선언된 변환이 의도된 차이임을 증명한 모든 차이가 담기며, 분류를 검토할 수 있도록 세부 정보가 충분히 들어 있습니다."
+  }
+}

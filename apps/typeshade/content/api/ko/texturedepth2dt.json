@@ -1,0 +1,8 @@
+{
+  "slug": "texturedepth2dt",
+  "source": "7f7f77decd3a334d496e7280418006a8fee86c853fdd45b43ebafd95d20d4b36",
+  "texts": {
+    "summary": "2D 깊이 텍스처입니다. 그림자 맵이 곧 이 텍스처입니다.",
+    "description": "자체 요소 타입이 없는 단일 채널 float입니다. 이 텍스처를 읽으면 `vec4`가 아닌 `f32`가 나옵니다."
+  }
+}

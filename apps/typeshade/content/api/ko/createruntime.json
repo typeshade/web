@@ -1,0 +1,8 @@
+{
+  "slug": "createruntime",
+  "source": "a6a5034a318f4531cd3156672e1fdae61de5a5b09ab10f937af057847f05798d",
+  "texts": {
+    "summary": "런타임을 만듭니다. 호스트의 디바이스나 WebGL2 컨텍스트에서, 또는 환경이 가진 prefer의 첫 tier에서 만듭니다. 그 tier는 프로그램과 limits가 필요로 하는 기능과 한도를 갖춘 WebGPU 디바이스 또는 자체 WebGL2 컨텍스트입니다.",
+    "description": "쓸 수 있는 디바이스나 컨텍스트가 하나도 없는 환경에서는 거부하며, tier마다 그 이유를 밝힙니다."
+  }
+}

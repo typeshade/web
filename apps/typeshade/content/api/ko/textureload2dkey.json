@@ -1,0 +1,7 @@
+{
+  "slug": "textureload2dkey",
+  "source": "fb12c3df50bc53ba7dd896ecc1a46a7bf6ebb1773fc87c79a3417d9662288097",
+  "texts": {
+    "summary": "텍셀 로드가 받는 배열이 아닌 텍스처 키 전부입니다. 샘플링되는 요소 세 가지와 다중 샘플 f32 텍스처를 포함합니다."
+  }
+}

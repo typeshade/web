@@ -1,0 +1,8 @@
+{
+  "slug": "keyof",
+  "source": "c45118140700dbcd2729e2abccf03614c053c890f91e818a472f3e4e8b68da82",
+  "texts": {
+    "summary": "ShaderType 리터럴을 Node가 컴파일 시점 팬텀으로 지니는 정확한 문자열 키로 바꿉니다. KeyOf<typeof vec3fT>는 'vec3<f32>'로 풀리므로, vec2와 vec3 피연산자가 어긋나면 typeKey와 typeEq의 런타임 SD0002 검사보다 먼저 tsc에서 실패합니다.",
+    "description": "[`Node`](/api/node/)가 컴파일 시점 팬텀으로 지니는 정확한 문자열 키로 `ShaderType` 리터럴을 바꿉니다. `KeyOf<typeof vec3fT>`는 `'vec3<f32>'`로 풀립니다. 그래서 `vec2`와 `vec3` 피연산자가 어긋나면, [`typeKey`](/api/typekey/)와 [`typeEq`](/api/typeeq/)의 런타임 `SD0002` 검사가 잡아낼 오류보다 먼저 `tsc`에서 실패합니다. 이 타입은 리터럴 모양을 유지한 `T`에 대해서만 좁혀집니다. 이 모듈의 `as const satisfies ShaderType` 상수나 [`structT`](/api/structt/), [`arrayT`](/api/arrayt/)의 결과가 여기에 해당합니다. 넓어진 `ShaderType`은 `string` 폴백 타입으로 처리됩니다. 이 타입의 각 분기는 [`typeKey`](/api/typekey/)의 `case` 하나와 짝을 이루며, 새 `ShaderType` 변형은 두 곳 모두에 분기가 필요합니다."
+  }
+}

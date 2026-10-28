@@ -1,0 +1,639 @@
+---
+import Rich from './Rich.astro';
+import type { Locale } from '../i18n/index.ts';
+import { createPlaygroundModel } from '../lib/playground-model';
+import { exampleSourceHref } from '../lib/example-pages.ts';
+import { NO_STILL_REASONS } from '../../scripts/artifacts.mjs';
+import { GALLERY_AUTHOR_MAX, GALLERY_TITLE_MAX } from '../lib/example-data.ts';
+interface Props {
+  locale: Locale;
+  /** The example to open, for a page that already names one. The picker goes with it and
+   *  the page carries that example's source alone instead of all of them. */
+  seed?: string;
+  /** The build-time still of the seeded example, shown in the frame until the reader's own
+   *  program has drawn a frame over it. */
+  still?: string;
+  /** The template the Worker fills for an example newer than the build (worker/index.ts):
+   *  seeded like a page that names its example, with the example, its file name and its
+   *  still written in at request time. */
+  runtime?: boolean;
+}
+const { locale, seed, still, runtime = false } = Astro.props;
+const { t, host, examples, seeded, library, opening, importsBefore, importsAfter, fileName, sample, w, galleryGroups, blank, runtimeCopy } = createPlaygroundModel(locale, seed, runtime);
+---
+
+<section
+  class="ts-playground"
+  data-playground
+  data-sample={sample}
+  data-examples={JSON.stringify(examples)}
+  data-library={JSON.stringify(library)}
+  data-default-example={opening}
+  data-copy={JSON.stringify(runtimeCopy)}
+  data-blank={seeded ? undefined : blank}
+  data-view={seeded ? 'editor' : undefined}
+>
+  {!seeded && (
+    <div class="playground-gallery" data-gallery>
+      <div class="gallery-head">
+        <div>
+          <h2>{w.galleryTitle}</h2>
+          <p>{w.galleryIntro}</p>
+        </div>
+        <div class="gallery-blank">
+          <a href="#blank" data-open-blank><span aria-hidden="true">+</span> {w.blankTitle}</a>
+          <p><Rich text={w.blankNote} locale={locale} /></p>
+        </div>
+      </div>
+      {galleryGroups.map((group) => (
+        <section class="gallery-group" aria-labelledby={`gallery-${group.key}`}>
+          <h3 id={`gallery-${group.key}`}>{group.heading}</h3>
+          <ul class="gallery-grid" role="list">
+            {group.tiles.map((tile) => (
+              <li>
+                <a class="gallery-tile" href={`#example=${tile.id}`} data-open-example={tile.id}>
+                  <span class="tile-cover">
+                    {tile.host !== undefined ? <span class="tile-none">{w.hostTile}</span> : tile.still ? <img src={`/stills/${tile.id}.webp`} alt="" loading="lazy" decoding="async" /> : <span class="tile-none">{w.stillKinds[NO_STILL_REASONS[tile.id as keyof typeof NO_STILL_REASONS] as keyof typeof w.stillKinds] ?? w.noStill}</span>}
+                  </span>
+                  <span class="tile-title">{tile.title}</span>
+                  <span class="tile-note"><Rich text={tile.description} locale={locale} inert /></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  )}
+  <div class="playground-toolbar">
+    <div class="playground-pick">
+      <strong data-runtime="file-name">{fileName}</strong>
+      {!seeded && (
+        <div class="pick-row">
+          <button type="button" class="gallery-button" data-open-gallery>{w.openGallery}</button>
+          <label for="playground-example">{t.exampleLabel}</label>
+          <select id="playground-example" data-example>
+            {examples.filter((example) => example.host === undefined).map((example) => <option value={example.id}>{example.title}</option>)}
+            {examples.some((example) => example.host !== undefined) && (
+              <optgroup label={host.h}>
+                {examples.filter((example) => example.host !== undefined).map((example) => <option value={example.id}>{example.title}</option>)}
+              </optgroup>
+            )}
+          </select>
+        </div>
+      )}
+      {!seeded && <p data-example-note>{examples[0]?.description}</p>}
+    </div>
+    <div class="playground-actions"><button type="button" data-share>{t.share}</button><button type="button" data-submit>{t.submit.button}</button><button type="button" data-reset>{t.reset}</button><button type="button" class="primary" data-run>{t.run}</button></div>
+  </div>
+  <dialog class="submit-dialog" data-submit-dialog aria-labelledby="playground-submit-heading">
+    <form method="dialog" data-submit-form>
+      <h2 id="playground-submit-heading">{t.submit.title}</h2>
+      <p>{t.submit.intro}</p>
+      <label for="playground-submit-title">{t.submit.titleLabel}</label>
+      <input id="playground-submit-title" name="title" required maxlength={GALLERY_TITLE_MAX} autocomplete="off" />
+      <label for="playground-submit-author">{t.submit.authorLabel}</label>
+      <input id="playground-submit-author" name="author" maxlength={GALLERY_AUTHOR_MAX} autocomplete="nickname" />
+      <p class="submit-status" data-submit-status role="status" hidden></p>
+      <div class="submit-actions"><button type="button" data-submit-cancel>{t.submit.cancel}</button><button type="submit" class="primary" data-submit-send>{t.submit.send}</button></div>
+    </form>
+  </dialog>
+  <div class="playground-options" role="group" aria-label={t.emit.title}>
+    <div>
+      <label for="playground-level">{t.emit.optimization}</label>
+      <select id="playground-level" data-opt-level>
+        <option value="O0">{t.emit.levels.O0}</option>
+        <option value="O1">{t.emit.levels.O1}</option>
+        <option value="O2" selected>{t.emit.levels.O2}</option>
+      </select>
+    </div>
+    <div>
+      <label for="playground-parens">{t.emit.parens}</label>
+      <select id="playground-parens" data-opt-parens>
+        <option value="full" selected>full</option>
+        <option value="minimal">minimal</option>
+      </select>
+    </div>
+    <div>
+      <label for="playground-precision">{t.emit.precision}</label>
+      <select id="playground-precision" data-opt-precision>
+        <option value="highp" selected>highp</option>
+        <option value="mediump">mediump</option>
+      </select>
+    </div>
+    {/* Which primitives back the emulated-double helpers. It goes to reflect() as well as
+        to the emit: the `float` helpers bind an `_fp64` guard texture and the `integer` ones
+        bind none, so a reflection computed under the other flavour names a binding the
+        emitted module does not have. */}
+    <div>
+      <label for="playground-fp64">{t.emit.fp64}</label>
+      <select id="playground-fp64" data-opt-fp64>
+        <option value="float" selected>float</option>
+        <option value="integer">integer</option>
+      </select>
+    </div>
+    <div class="playground-check">
+      <input type="checkbox" id="playground-minify" data-opt-minify />
+      <label for="playground-minify">{t.emit.minify}</label>
+    </div>
+    {/* How minify re-spells a float literal. It has no effect with minify off, so it is
+        shown with it. */}
+    <div data-numbers-field hidden>
+      <label for="playground-numbers">{t.emit.numbers}</label>
+      <select id="playground-numbers" data-opt-numbers>
+        <option value="true" selected>true</option>
+        <option value="f32">f32</option>
+        <option value="false">false</option>
+      </select>
+    </div>
+    <div class="playground-check">
+      <input type="checkbox" id="playground-obfuscate" data-opt-obfuscate />
+      <label for="playground-obfuscate">{t.emit.obfuscate}</label>
+    </div>
+    <p data-level-note hidden><Rich text={t.emit.levelNote} locale={locale} /></p>
+    <p data-prelude-note hidden><Rich text={t.preludeNote} locale={locale} /></p>
+    {examples
+      .map((example) => ({ ...example, imports: example.imports.filter((file) => !(example.passes ?? []).some((p) => p.file === file)) }))
+      .filter((example) => example.imports.length > 0)
+      .map((example) => (
+        <p data-imports-note={example.id} hidden={example.id !== opening}>{importsBefore}{example.imports.map((file, i) => <>{i > 0 && ', '}<a href={exampleSourceHref(file)}><code>{file}</code></a></>)}{importsAfter}</p>
+      ))}
+  </div>
+
+  <div class="playground-grid">
+    <section class="pane source-pane">
+      {/* One tab per file in the workspace: the file the canvas runs first, then the files it
+          imports and any the reader adds. Built by src/scripts/playground.ts once the editor
+          is up; until then the tab names the one file there is. */}
+      <div class="pane-title file-bar">
+        <div class="file-tabs" role="group" aria-label={w.files} data-file-tabs>
+          <button type="button" class="file-tab" aria-current="true" data-file-tab={fileName || 'main'}>{fileName || t.editor}</button>
+        </div>
+        {/* Runs host.ts in a sandboxed frame over the canvas, and stops it (src/scripts/playground-host-run.ts). */}
+        <button type="button" class="file-run" data-run-host aria-pressed="false" aria-label={w.runHost} title={w.runHostTitle}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" data-icon-run><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 4v16l13-8z" /></svg><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" data-icon-stop hidden><rect x="6" y="6" width="12" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg><span data-run-host-label>{w.runHost}</span></button>
+        <button type="button" class="file-add" data-new-file aria-label={w.newFile} title={w.newFile}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M12 11v6M9 14h6" /></svg></button>
+        <button type="button" class="file-add" data-download aria-label={w.download} title={w.download}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg></button>
+        <button type="button" class="file-add" data-open-vscode aria-label={w.openInVsCode} title={w.openInVsCodeTitle}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" /></svg></button>
+        <kbd>TS</kbd>
+      </div>
+      <p data-file-error role="alert" hidden></p>
+      <p data-vscode-hint role="status" hidden><Rich text={w.openInVsCodeHint} locale={locale} /></p>
+      <div class="editor-host" data-editor aria-label={t.editor}></div>
+      <div class="diagnostics">
+        <div class="diagnostics-title"><span>{t.diagnostics}</span><span data-status>{t.idle}</span></div>
+        <ul data-diagnostics aria-live="polite"></ul>
+      </div>
+    </section>
+    {/* One tab strip over the whole result column: the canvas the module draws, the three
+        files the compiler emits from it, and what reflect() recovers. One panel is shown at
+        a time; the other panels keep whatever was last painted into them, so a tab switch
+        paints nothing and re-runs nothing. */}
+    <div class="result-column">
+      <div class="pane-title result-head">
+        <div class="output-tabs" role="tablist" aria-label={t.output}>
+          <button type="button" role="tab" id="pg-tab-result" aria-controls="pg-panel-result" data-target="result" aria-selected="true" tabindex="0">{t.resultTab}</button>
+          <button type="button" role="tab" id="pg-tab-wgsl" aria-controls="pg-output" data-target="wgsl" aria-selected="false" tabindex="-1">{t.wgslTab}</button>
+          <button type="button" role="tab" id="pg-tab-glslVertex" aria-controls="pg-output" data-target="glslVertex" aria-selected="false" tabindex="-1">{t.glslVertexTab}</button>
+          <button type="button" role="tab" id="pg-tab-glslFragment" aria-controls="pg-output" data-target="glslFragment" aria-selected="false" tabindex="-1">{t.glslFragmentTab}</button>
+          <button type="button" role="tab" id="pg-tab-reflection" aria-controls="pg-panel-reflection" data-target="reflection" aria-selected="false" tabindex="-1">{t.reflection}</button>
+          <button type="button" role="tab" id="pg-tab-console" aria-controls="pg-panel-console" data-target="console" aria-selected="false" tabindex="-1">{t.consoleTab}</button>
+        </div>
+        {/* The controls the selected tab owns, one group per tab, in the row the tabs are in. */}
+        <div class="canvas-meta" data-meta="result">
+          <label for="playground-engine">{t.engine}</label>
+          <select id="playground-engine" data-engine>
+            <option value="auto" selected>{t.engineGpu}</option>
+            <option value="webgpu">WebGPU</option>
+            <option value="webgl2">WebGL2</option>
+            <option value="cpu">{t.engineCpu}</option>
+          </select>
+          <label for="playground-resolution" data-cpu-only hidden>{t.resolution}</label>
+          <select id="playground-resolution" data-resolution data-cpu-only hidden>
+            <option value="64">64 × 48</option>
+            <option value="128">128 × 96</option>
+            <option value="192" selected>192 × 144</option>
+            <option value="384">384 × 288</option>
+            <option value="768">768 × 576</option>
+            <option value="1536">1536 × 1152</option>
+            <option value="3840">3840 × 2880 (4K)</option>
+            <option value="7680">7680 × 5760 (8K)</option>
+          </select>
+          <button type="button" data-draw-cpu data-cpu-only hidden disabled>{t.draw}</button>
+        </div>
+        <div class="output-meta" data-meta="text" hidden>
+          <span data-size></span>
+          <button type="button" data-copy-output>{t.copy}</button>
+        </div>
+        <div class="reflect-meta" data-meta="reflection" hidden>
+          <button type="button" data-run-cpu disabled>{t.runCpu}</button>
+        </div>
+        {/* A module that draws and logs, drawn on WebGPU, can have its whole frame recorded. */}
+        <div class="console-meta" data-meta="console" hidden>
+          <button type="button" data-record-frame hidden>{t.consoleRecordFrame}</button>
+        </div>
+      </div>
+      <div class="result-panels">
+        {/* Two canvases, one shown. The GPU one runs the program the WGSL and GLSL tabs
+            hold, through the same runtime every figure on the site uses; the CPU one runs
+            the fragment entry once per pixel through the oracle, which answers a different
+            question and is the fallback where there is no GPU API at all. A canvas takes one
+            context and these take two, so they are two elements and not one. */}
+        <div class="canvas-host" id="pg-panel-result" role="tabpanel" aria-labelledby="pg-tab-result">
+          {/* One frame for every engine, the width of the column at 4:3. The still of a seeded
+              example sits under the canvas until the reader's program has drawn. */}
+          <div class="gpu-frame" data-gpu-frame>
+            {still && <img src={still} alt="" loading="eager" decoding="async" />}
+            <canvas data-gpu-canvas data-backend="none" role="img" aria-label={t.canvas}></canvas>
+            <canvas data-canvas width="192" height="144" aria-label={t.canvas} data-cpu-only hidden></canvas>
+            {/* What the page is doing until the program's first frame is up: loading it,
+                compiling it, drawing it. The stylesheet takes it away once a GPU canvas draws or
+                the CPU canvas shows; the script takes it away on a failure, which the note under
+                the frame then explains. */}
+            <div class="frame-wait" data-frame-wait role="status" data-compiling={t.wait.compiling} data-drawing={t.wait.drawing}><span class="frame-wait-spin" aria-hidden="true"></span><span data-frame-wait-text>{t.wait.loading}</span></div>
+          </div>
+          {/* The transport: the shader clock the canvas draws at, held or run from zero, and
+              the frame on the whole screen. */}
+          <div class="transport" role="group" aria-label={w.clock} data-transport>
+            <button type="button" data-play aria-pressed="false" aria-label={w.pause} title={w.pause}><svg aria-hidden="true" viewBox="0 0 16 16" data-icon-pause><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg><svg aria-hidden="true" viewBox="0 0 16 16" data-icon-play hidden><path d="M4 2.5v11l9-5.5z"/></svg></button>
+            <button type="button" data-restart aria-label={w.restart} title={w.restart}><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M3 3v10h2V3zM6 8l7-5v10z"/></svg></button>
+            <output data-clock aria-label={w.clock}>0.00s</output>
+            <output data-fps></output>
+            <button type="button" class="transport-end" data-fullscreen aria-label={w.fullscreen} title={w.fullscreen}><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"/></svg></button>
+          </div>
+          <p data-drop-hint hidden></p>
+          <p data-gpu-note>{t.gpuIdle}</p>
+          {/* Which pixel the reader clicked in a module that logs, and how many lines it gave
+              the Console tab. */}
+          <p data-pixel-note hidden></p>
+          {/* While host.ts runs in its frame over the canvas. */}
+          <p data-host-note hidden>{w.hostNote}</p>
+          {/* What run() returned, under the picture it drew: the Console tab holds it too. */}
+          <p data-host-result hidden></p>
+          <p data-canvas-note data-cpu-only hidden>{t.canvasIdle}</p>
+          {/* Every binding and override the module declares, each with what the reader
+              supplies it with. Built by src/scripts/playground-bindings.ts after a compile. */}
+          <div class="bindings" data-bindings hidden role="group" aria-label={t.bindings.title}></div>
+        </div>
+        <pre id="pg-output" role="tabpanel" aria-labelledby="pg-tab-wgsl" data-output aria-live="polite" hidden></pre>
+        <div class="reflection" id="pg-panel-reflection" role="tabpanel" aria-labelledby="pg-tab-reflection" data-reflection aria-live="polite" hidden></div>
+        {/* The lines the last compute run's console calls delivered, CPU or WebGPU, or the
+            ones a module that draws delivered for a clicked pixel or a recorded frame. */}
+        <div class="console" id="pg-panel-console" role="tabpanel" aria-labelledby="pg-tab-console" data-console aria-live="polite" hidden><p><Rich text={t.consoleIdle} locale={locale} /></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Which view the tool opens on, set before the first paint so a link to an example never
+    shows the gallery for a frame and a bare link never shows the editor. The bundled script
+    below runs later and owns the view from then on. */}
+{!seeded && (
+  <script is:inline>
+    (function () {
+      var root = document.currentScript && document.currentScript.previousElementSibling;
+      if (!root || !root.hasAttribute('data-playground')) return;
+      var hash = location.hash.replace(/^#/, '');
+      root.setAttribute('data-view', /(^|&)(example|code|blank|share)(=|&|$)/.test(hash) ? 'editor' : 'gallery');
+    })();
+  </script>
+)}
+
+<script>
+  import '../scripts/playground.ts';
+</script>
+
+<style>
+  /* The tool's own region is the container white, the way the docs column is. The page field
+     is the same white now (src/styles/global.css), so the region reads as part of the page. */
+  :global(.playground-page) { background: var(--color-ground) }
+  /* The tool and its left column are `section` elements, and a documentation page puts a
+     section gap in front of every section it holds, so a page that embeds the tool would get
+     that gap twice over and inside the grid. The component owns its own spacing. */
+  .ts-playground { margin: 0; border: 1px solid var(--color-line-1); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface-1); }
+  /* The two views: the gallery a bare link opens on, and the tool. One is shown at a time, and
+     the tool stays mounted under the gallery so the editor is ready when a tile is picked. */
+  .ts-playground[data-view='gallery'] > :not([data-gallery]) { display: none; }
+  .ts-playground:not([data-view='gallery']) > [data-gallery] { display: none; }
+  .playground-gallery { padding: 20px 14px 28px; background: var(--color-ground); }
+  /* The heading and its line on the left, and on the right the one way in that is not an
+     example: a blank file, the button a new project is in an engine's start screen. */
+  .gallery-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 24px; margin-bottom: 4px; }
+  .gallery-head > div:first-child { flex: 1 1 32ch; max-width: 72ch; }
+  .gallery-head h2 { margin: 0 0 6px; font-size: 1.125rem; line-height: 1.4; }
+  .gallery-head p { margin: 0; color: var(--color-text-2); font-size: .875rem; line-height: 1.55; }
+  .gallery-blank { display: flex; flex: 0 1 18rem; flex-direction: column; gap: 6px; }
+  .gallery-blank a { align-self: flex-start; border: 1px solid var(--color-accent); border-radius: var(--radius-sm); padding: 7px 14px; background: var(--color-accent); color: var(--color-ground); font: 500 .8125rem/1.3 var(--font-sans); text-decoration: none; white-space: nowrap; }
+  .gallery-blank a:hover { filter: brightness(0.92); }
+  .gallery-blank a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .gallery-blank p { color: var(--color-text-3); font-size: .75rem; line-height: 1.5; }
+  .gallery-blank :global(code) { font: 400 .6875rem/1.5 var(--font-mono); }
+  .gallery-group { margin: 28px 0 0; }
+  .gallery-group h3 { margin: 0 0 10px; color: var(--color-text-2); font-size: .8125rem; font-weight: 600; letter-spacing: .02em; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .gallery-tile { display: flex; flex-direction: column; block-size: 100%; overflow: hidden; border: 1px solid var(--color-line-1); border-radius: var(--radius-md); background: var(--color-elevated); color: inherit; text-decoration: none; transition: border-color .15s; }
+  .gallery-tile:hover, .gallery-tile:focus-visible { border-color: var(--color-accent); }
+  .gallery-tile:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  .tile-cover { display: grid; place-items: center; aspect-ratio: 4 / 3; overflow: hidden; background: var(--color-surface-2); }
+  .tile-cover img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+  .tile-none { color: var(--color-text-3); font: 400 .6875rem/1.4 var(--font-mono); }
+  .tile-title { padding: 10px 12px 0; color: var(--color-text-1); font-size: .875rem; font-weight: 600; line-height: 1.4; }
+  .gallery-tile:hover .tile-title { color: var(--color-accent); }
+  .tile-note { margin: 2px 12px 12px; padding: 0; color: var(--color-text-2); font-size: .75rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .tile-note :global(code) { font: 400 .6875rem/1.5 var(--font-mono); }
+  .gallery-button { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 5px 9px; background: var(--color-ground); color: var(--color-text-1); font: 500 .75rem/1.3 var(--font-sans); white-space: nowrap; cursor: pointer; }
+  .gallery-button:hover { background: var(--color-surface-1); }
+
+  /* The file tabs sit where the pane's title was, the way an editor's open files do. The add
+     button closes the row; a row with more tabs than room scrolls sideways inside itself. */
+  .pane-title.file-bar { padding-block: 6px; gap: 6px; container: file-bar / inline-size; }
+  .file-bar kbd { flex: none; }
+  .file-tabs { display: flex; flex: 1 1 auto; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .file-tabs::-webkit-scrollbar { display: none; }
+  .file-tabs :global(.file-tab) { display: inline-flex; flex: none; align-items: center; gap: 6px; border: 0; border-radius: var(--radius-sm); padding: 4px 8px; background: transparent; color: var(--color-text-3); font: 500 .75rem/1.4 var(--font-mono); white-space: nowrap; cursor: pointer; }
+  .file-tabs :global(.file-tab:hover) { color: var(--color-text-1); }
+  .file-tabs :global(.file-tab[aria-current='true']) { background: var(--color-ground); color: var(--color-text-1); }
+  .file-tabs :global(.file-tab:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  .file-tabs :global(.file-pair) { display: inline-flex; flex: none; align-items: center; gap: 2px; }
+  /* A file drawn as a pass before the main file (compiler change 0026): its tab names the pass,
+     and the small toggle beside it says whether it is one. */
+  .file-tabs :global(.file-pass) { color: var(--color-accent); }
+  .file-tabs :global(.file-pass-toggle) { flex: none; border: 1px solid var(--color-line-2); border-radius: 3px; padding: 0 4px; background: none; color: var(--color-text-3); font: 500 .625rem/1.5 var(--font-sans); cursor: pointer; }
+  .file-tabs :global(.file-pass-toggle[aria-pressed='true']) { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-ground); }
+  .file-tabs :global(.file-pass-toggle:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  .file-tabs :global(.file-errors) { color: var(--color-diag); }
+  .file-tabs :global(.file-close) { flex: none; border: 0; padding: 0; background: none; cursor: pointer; display: inline-grid; place-items: center; inline-size: 16px; block-size: 16px; border-radius: 3px; color: var(--color-text-3); font: 400 .8125rem/1 var(--font-sans); }
+  .file-tabs :global(.file-close:hover) { background: var(--color-surface-2); color: var(--color-text-1); }
+  .file-tabs :global(.file-dirty)::after { content: ''; display: inline-block; inline-size: 6px; block-size: 6px; margin-inline-start: 4px; border-radius: 50%; background: var(--color-accent); vertical-align: middle; }
+  .file-tabs :global(input) { inline-size: 16ch; border: 1px solid var(--color-accent); border-radius: var(--radius-sm); padding: 2px 6px; background: var(--color-ground); color: var(--color-text-1); font: 400 .75rem/1.4 var(--font-mono); }
+  .file-tabs :global(input[aria-invalid='true']) { border-color: var(--color-diag); }
+  .file-tabs :global(.file-rename) { display: inline-flex; flex: none; align-items: center; }
+  .file-tabs :global(.file-suffix) { padding-inline: 2px 8px; color: var(--color-text-3); font: 500 .75rem/1.4 var(--font-mono); }
+  .file-add { flex: none; display: inline-grid; place-items: center; inline-size: 24px; block-size: 24px; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 0; background: var(--color-ground); color: var(--color-text-2); cursor: pointer; }
+  /* The header's icons (SiteHeader.astro): 24-unit strokes of 2, round ends, 16px, currentColor. */
+  .file-add svg { inline-size: 16px; block-size: 16px; }
+  /* Run host.ts: the 24px face of the buttons beside it, with its word, since a bare triangle
+     reads as the transport's play. */
+  .file-run { flex: none; display: inline-flex; align-items: center; gap: 4px; block-size: 24px; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 0 8px 0 6px; background: var(--color-ground); color: var(--color-text-2); font: 500 .75rem/1 var(--font-sans); white-space: nowrap; cursor: pointer; }
+  .file-run svg { inline-size: 14px; block-size: 14px; }
+  .file-run:hover { color: var(--color-text-1); background: var(--color-surface-1); }
+  .file-run:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  .file-run[aria-pressed='true'] { border-color: var(--color-accent); color: var(--color-accent); }
+  /* A narrow bar keeps its room for the tabs: the button is its icon alone, the 24px box of
+     the three beside it, and the aria-label names it. 32rem leaves the tabs about 280px with
+     the word, the width two tabs of an example's names take. */
+  @container file-bar (max-width: 32rem) {
+    .file-run { justify-content: center; inline-size: 24px; padding: 0; }
+    .file-run svg { inline-size: 16px; block-size: 16px; }
+    .file-run [data-run-host-label] { display: none; }
+  }
+  .file-add:hover { color: var(--color-text-1); background: var(--color-surface-1); }
+  [data-vscode-hint] { margin: 0; padding: 6px 12px; color: var(--color-text-2); font-size: .75rem; line-height: 1.45; background: var(--color-surface-1); border-bottom: 1px solid var(--color-line-1); }
+  [data-file-error] { margin: 0; padding: 6px 12px; color: var(--color-diag); font-size: .75rem; line-height: 1.45; background: var(--color-surface-1); border-bottom: 1px solid var(--color-line-1); }
+
+  /* The transport under the frame: the clock held or run, back to zero, and the frame on the
+     whole screen, the row every engine's viewport carries. */
+  .transport { display: flex; align-items: center; gap: 6px; }
+  .transport button { display: inline-grid; place-items: center; inline-size: 28px; block-size: 26px; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 0; background: var(--color-ground); color: var(--color-text-1); cursor: pointer; }
+  .transport button:hover { background: var(--color-surface-1); }
+  .transport button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  .transport svg { inline-size: 12px; block-size: 12px; fill: currentColor; }
+  .transport svg[hidden] { display: none; }
+  .transport output { color: var(--color-text-2); font: 400 .6875rem/1.3 var(--font-mono); font-variant-numeric: tabular-nums; }
+  .transport [data-clock] { min-inline-size: 7ch; }
+  .transport .transport-end { margin-inline-start: auto; }
+  .gpu-frame:fullscreen { border: 0; border-radius: 0; background: #000; }
+  .gpu-frame.dropping { outline: 2px dashed var(--color-accent); outline-offset: 2px; }
+  .canvas-host [data-drop-hint] { margin: 0; color: var(--color-text-3); font: 400 .6875rem/1.45 var(--font-sans); text-align: center; }
+
+  .playground-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 14px; border-bottom: 1px solid var(--color-line-1); background: var(--color-ground); }
+  .playground-toolbar strong { font: 500 .8125rem/1.4 var(--font-mono); }
+  /* The buttons keep their own width: a long example line wraps beside them instead of
+     squeezing a label under its neighbour. */
+  .playground-actions { display: flex; flex: none; gap: 8px; }
+  .playground-actions button { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 7px 11px; background: var(--color-ground); color: var(--color-text-1); font: 500 .75rem/1.3 var(--font-sans); white-space: nowrap; cursor: pointer; }
+  .playground-actions button:hover { background: var(--color-surface-1); }
+  .playground-actions .primary { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-ground); }
+  .playground-actions .primary:hover { background: var(--color-accent); filter: brightness(0.92); }
+  /* Submit's dialog: the site's modal (the search dialog's frame), a form of two fields. */
+  .submit-dialog { margin: auto; inline-size: min(28rem, calc(100vw - 32px)); border: 1px solid var(--color-line-2); border-radius: var(--radius-md); padding: 20px; background: var(--color-ground); color: var(--color-text-1); }
+  .submit-dialog::backdrop { background: rgb(0 0 0 / 0.4); }
+  .submit-dialog form { display: flex; flex-direction: column; gap: 6px; }
+  .submit-dialog h2 { margin: 0 0 4px; font-size: 1.0625rem; line-height: 1.35; }
+  .submit-dialog p { margin: 0 0 8px; color: var(--color-text-2); font-size: .8125rem; line-height: 1.5; }
+  .submit-dialog label { margin-top: 4px; font: 500 .75rem/1.3 var(--font-sans); }
+  .submit-dialog input { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 7px 9px; background: var(--color-ground); color: var(--color-text-1); font: 400 .875rem/1.4 var(--font-sans); }
+  .submit-dialog .submit-status { margin: 8px 0 0; color: var(--color-text-1); }
+  .submit-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+  .submit-actions button { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 7px 12px; background: var(--color-ground); color: var(--color-text-1); font: 500 .75rem/1.3 var(--font-sans); cursor: pointer; }
+  .submit-actions button:hover { background: var(--color-surface-1); }
+  .submit-actions .primary { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-ground); }
+  .submit-actions .primary:disabled { opacity: .6; cursor: default; }
+  /* One row: the file, the picker and its blurb read left to right, so the toolbar is a
+     toolbar and not a card. The blurb wraps inside its own space when it has to. */
+  .playground-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; min-width: 0; }
+  .playground-pick .pick-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-width: 0; }
+  .playground-pick .pick-row label { white-space: nowrap; }
+  .playground-pick label { color: var(--color-text-3); font-size: .6875rem; font-weight: 600; letter-spacing: .06em; }
+  .playground-pick select { max-width: 100%; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 5px 8px; background: var(--color-ground); color: var(--color-text-1); font: 500 .75rem/1.3 var(--font-sans); }
+  .playground-pick [data-example-note] { flex: 1 1 24ch; min-width: 0; max-width: 52ch; margin: 0; color: var(--color-text-3); font-size: .75rem; line-height: 1.45; }
+
+  .playground-options { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; padding: 8px 14px 10px; border-bottom: 1px solid var(--color-line-1); background: var(--color-ground); }
+  .playground-options label { display: block; margin-bottom: 4px; color: var(--color-text-3); font-size: .6875rem; font-weight: 600; letter-spacing: .06em; }
+  .playground-options select { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 6px 9px; background: var(--color-ground); color: var(--color-text-1); font: 400 .75rem/1.3 var(--font-mono); }
+  .playground-check { display: flex; align-items: center; gap: 6px; padding-bottom: 7px; }
+  .playground-check label { margin-bottom: 0; }
+  .playground-check input { accent-color: var(--color-accent); }
+  .playground-options [data-level-note], .playground-options [data-prelude-note], .playground-options [data-imports-note] { flex-basis: 100%; max-inline-size: var(--content); margin: 0; color: var(--color-text-3); font-size: .75rem; line-height: 1.5; }
+  .playground-options :global(code) { font: 400 .75rem/1.5 var(--font-mono); }
+
+  .output-meta { display: flex; flex: none; align-items: center; gap: 10px; }
+  .output-meta [data-size] { color: var(--color-text-3); font: 400 .6875rem/1.3 var(--font-mono); }
+  .output-meta button { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 3px 8px; background: var(--color-ground); color: var(--color-text-2); font: 500 .6875rem/1.3 var(--font-sans); cursor: pointer; }
+  .output-meta button:hover { color: var(--color-text-1); }
+  .output-tabs button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+
+  /* The source and the result are the two things a reader looks between, so they sit side
+     by side and end on the same line. The left column is the editor over its diagnostics;
+     the right one is a single tab strip over a single panel, so the reader trades the
+     canvas for the emitted text in place instead of scrolling between stacked panes. The
+     column widths follow the tool's own box and not the window's, since the Playground is
+     on a page of its own and inside a documentation column on every example page. */
+  .ts-playground { container-type: inline-size; }
+  .playground-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .pane { margin: 0; min-width: 0; }
+  .source-pane { display: flex; flex-direction: column; border-bottom: 1px solid var(--color-line-1); }
+  .result-column { display: flex; flex-direction: column; min-width: 0; }
+  /* One panel is shown and the rest carry `hidden`. The panels are flex and grid boxes, so
+     the attribute is spelled out here; `display` from a class would otherwise win. */
+  .result-panels { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+  .result-panels > [hidden] { display: none; }
+  /* The tabs and the controls the selected tab owns share one row while both fit; where
+     they do not, the controls take a row under the tabs instead of cutting a tab label in
+     half. The tablist's basis is what decides which of the two happens. */
+  .result-head { flex-wrap: wrap; gap: 8px; }
+  .result-head .output-tabs { flex: 1 1 21rem; overflow-x: auto; scrollbar-width: none; }
+  .result-head .output-tabs::-webkit-scrollbar { display: none; }
+  .result-head > [data-meta] { margin-inline-start: auto; }
+  .pane-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; color: var(--color-text-2); font-size: .75rem; font-weight: 500; background: var(--color-surface-2); }
+  .pane-title kbd { color: var(--color-text-3); font: 500 .6875rem/1.3 var(--font-mono); }
+  .editor-host, pre { box-sizing: border-box; width: 100%; margin: 0; border: 0; border-radius: 0; background: var(--color-ground); color: var(--color-text-1); font: 400 .8125rem/1.65 var(--font-mono); }
+  /* Flex bases of 0 so neither pane's content sets the row height: the editor and the output
+     take the room the row has and scroll inside it. The editor's floor is what sets the row
+     beside it, since the result column is one panel now and no longer two stacked ones. */
+  .editor-host { flex: 1 1 0; min-height: 420px; overflow: hidden; }
+  pre { flex: 1 1 0; min-height: 320px; padding: 16px; overflow: auto; white-space: pre; }
+  /* Under the editor, since that is where a reader looks when the source is wrong, and with
+     the compile status beside its title, so one row says how the last compile went. */
+  .diagnostics { min-height: 88px; padding: 10px 16px 12px; border-top: 1px solid var(--color-line-1); background: var(--color-surface-1); }
+  .diagnostics-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; color: var(--color-text-3); font-size: .6875rem; font-weight: 600; letter-spacing: .06em; }
+  .diagnostics-title [data-status] { color: var(--color-text-3); font: 500 .6875rem/1.3 var(--font-mono); letter-spacing: 0; }
+  [data-diagnostics] { margin: 0; padding: 0; list-style: none; color: var(--color-text-2); font: 400 .75rem/1.55 var(--font-mono); }
+  /* The rows are built by the script after the page loads, so they carry no scoping attribute
+     and a plain descendant selector would miss them, the way .reflection's contents do. */
+  [data-diagnostics] :global(li + li) { margin-top: 2px; }
+  /* A row is the message, which jumps to its line, and the code after it, which links to the
+     code's page the way an editor's problems list prints a code after the message. */
+  [data-diagnostics] :global(li) { display: flex; align-items: baseline; gap: 8px; }
+  [data-diagnostics] :global(.diag-code) { flex: none; color: var(--color-text-3); text-decoration: underline; text-decoration-color: var(--color-line-2); text-underline-offset: 2px; }
+  [data-diagnostics] :global(.diag-code:hover) { color: var(--color-accent); text-decoration-color: currentColor; }
+  [data-diagnostics] :global(button) { display: block; flex: 1 1 auto; min-width: 0; width: 100%; border: 0; border-radius: var(--radius-sm); padding: 2px 4px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  [data-diagnostics] :global(button:hover) { background: var(--color-surface-2); }
+  [data-diagnostics] :global(.at) { color: var(--color-text-3); }
+  /* Which half of the pipeline raised the row: TypeScript over the ambient lib, or the TypeShade front end. */
+  [data-diagnostics] :global(.source) { color: var(--color-text-3); font-weight: 600; }
+  [data-diagnostics] :global(.error) { color: var(--color-diag); }
+  .has-errors [data-status] { color: var(--color-diag); }
+  .has-errors .diagnostics { border-top-color: var(--color-diag); }
+  .has-output [data-status] { color: var(--color-accent); }
+  .output-tabs { display: flex; gap: 2px; margin: -3px 0; }
+  .output-tabs button { flex: none; border: 0; border-radius: var(--radius-sm); padding: 3px 8px; background: transparent; color: var(--color-text-3); font: 500 .75rem/1.4 var(--font-sans); white-space: nowrap; cursor: pointer; }
+  .output-tabs button:hover { color: var(--color-text-1); }
+  .output-tabs button[aria-selected='true'] { background: var(--color-ground); color: var(--color-text-1); }
+  .reflect-meta { display: flex; flex: none; align-items: center; }
+  .reflect-meta button { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 4px 9px; background: var(--color-ground); color: var(--color-text-1); font: 500 .6875rem/1.3 var(--font-sans); cursor: pointer; }
+  .reflect-meta button:hover:not(:disabled) { background: var(--color-surface-1); }
+  .reflect-meta button:disabled { opacity: .5; cursor: default; }
+  .console-meta { display: flex; flex: none; align-items: center; }
+  .console-meta button { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 4px 9px; background: var(--color-ground); color: var(--color-text-1); font: 500 .6875rem/1.3 var(--font-sans); cursor: pointer; }
+  .console-meta button:hover:not(:disabled) { background: var(--color-surface-1); }
+  .console-meta button:disabled { opacity: .5; cursor: default; }
+  /* The pane's contents are built by src/scripts/playground.ts after the page loads, so those
+     nodes never carry Astro's scoping attribute and a plain descendant selector would miss
+     them. The scoped parent is .reflection; everything under it is addressed globally. */
+  .canvas-meta { display: flex; flex: none; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+  .canvas-meta label { color: var(--color-text-3); font-size: .6875rem; font-weight: 600; letter-spacing: .06em; }
+  .canvas-meta select { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 3px 6px; background: var(--color-ground); color: var(--color-text-1); font: 400 .6875rem/1.3 var(--font-mono); }
+  .canvas-meta button { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 4px 9px; background: var(--color-ground); color: var(--color-text-1); font: 500 .6875rem/1.3 var(--font-sans); cursor: pointer; }
+  .canvas-meta button:hover:not(:disabled) { background: var(--color-surface-1); }
+  .canvas-meta button:disabled { opacity: .5; cursor: default; }
+  /* The canvas panel takes the room the row has and holds the canvas at the top of it, so
+     the box the picture is drawn in is the same size behind every tab. */
+  .canvas-host { display: flex; flex: 1 1 auto; flex-direction: column; align-items: stretch; gap: 8px; padding: 14px 16px 12px; background: var(--color-ground); }
+  .canvas-host [data-canvas-note], .canvas-host [data-gpu-note], .canvas-host [data-pixel-note], .canvas-host [data-host-note], .canvas-host [data-host-result] { align-self: center; margin: 0; min-height: 1.3em; max-width: 60ch; color: var(--color-text-2); font: 400 .6875rem/1.45 var(--font-mono); text-align: center; }
+  .canvas-host [hidden] { display: none; }
+  /* The picture takes the width of its column at 4:3, the way a Shadertoy pane does, and
+     every engine draws into the same box. The runtime matches a GPU canvas's drawing buffer
+     to the box; the rasteriser's grid is its own, shown at the box's size. */
+  .gpu-frame { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border: 1px solid var(--color-line-1); border-radius: var(--radius-sm); background: var(--color-surface-2); }
+  .gpu-frame > canvas, .gpu-frame > img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .gpu-frame > img { object-fit: cover; }
+  /* host.ts's sandboxed frame, over the canvas while it runs. */
+  .gpu-frame > :global(iframe[data-host-frame]) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .gpu-frame[data-logs='1'] > canvas { cursor: crosshair; }
+  .gpu-frame > canvas[data-gpu-canvas][data-backend='none'] { opacity: 0; }
+  .gpu-frame > canvas[data-canvas] { image-rendering: pixelated; }
+  /* The still is the seeded example's picture at the pin. It goes when the reader's program
+     has a frame up, and for good once they have edited it, since from then on it shows
+     something else. */
+  .gpu-frame:has(> canvas[data-gpu-canvas]:not([data-backend='none'])) > img, .gpu-frame[data-drawn] > img { display: none; }
+  .frame-wait { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: rgb(0 0 0 / 0.62); color: #fff; font: 500 .75rem/1.4 var(--font-sans); white-space: nowrap; pointer-events: none; }
+  .frame-wait[hidden], .gpu-frame:has(> canvas[data-gpu-canvas]:not([data-backend='none'])) > .frame-wait, .gpu-frame:has(> canvas[data-canvas]:not([hidden])) > .frame-wait { display: none; }
+  .frame-wait-spin { width: 12px; height: 12px; border: 2px solid rgb(255 255 255 / 0.35); border-top-color: #fff; border-radius: 50%; animation: frame-wait-spin .8s linear infinite; }
+  @keyframes frame-wait-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .frame-wait-spin { animation: none; } }
+
+  /* The bindings panel: one block per binding, its slot and name on a line, and the
+     controls under it. Built after the page loads, so its contents are addressed globally
+     under the scoped parent. */
+  .bindings { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--color-line-1); }
+  .bindings :global(.bindings-title) { margin: 0; color: var(--color-text-2); font: 600 .75rem/1.4 var(--font-sans); }
+  .bindings :global(.binding-rows) { display: flex; flex-direction: column; gap: 10px; }
+  .bindings :global(.binding) { display: flex; flex-direction: column; gap: 4px; }
+  .bindings :global(.binding.dragging), .bindings :global(.binding-line.dragging) { outline: 2px dashed var(--color-accent); outline-offset: 2px; }
+  .bindings :global(.binding-head) { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font: 400 .6875rem/1.5 var(--font-mono); }
+  .bindings :global(.binding-slot) { color: var(--color-text-3); }
+  .bindings :global(.binding-name) { color: var(--color-text-1); font: 500 .75rem/1.5 var(--font-mono); }
+  .bindings :global(.binding-kind) { color: var(--color-text-2); }
+  .bindings :global(.binding-line) { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding-inline-start: 12px; }
+  .bindings :global(.binding-field) { flex: none; min-width: 6.5rem; color: var(--color-text-2); font: 400 .6875rem/1.4 var(--font-mono); overflow-wrap: anywhere; }
+  .bindings :global(.binding-field:empty) { display: none; }
+  .bindings :global(.binding-controls) { display: flex; flex: 1 1 14rem; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+  .bindings :global(.binding-label) { color: var(--color-text-3); font: 400 .6875rem/1.4 var(--font-sans); }
+  .bindings :global(.binding-runtime), .bindings :global(.binding-note) { margin: 0; color: var(--color-text-2); font: 400 .6875rem/1.45 var(--font-sans); }
+  .bindings :global(input[type='range']) { flex: 1 1 5rem; min-width: 4rem; accent-color: var(--color-accent); }
+  .bindings :global(input[type='number']) { width: 9ch; min-width: 0; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 2px 4px; background: var(--color-ground); color: var(--color-text-1); font: 400 .6875rem/1.4 var(--font-mono); }
+  .bindings :global(input[type='color']) { width: 32px; height: 22px; padding: 0 2px; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); background: var(--color-ground); }
+  .bindings :global(input[type='file']) { max-width: 100%; font: 400 .6875rem/1.4 var(--font-sans); color: var(--color-text-2); }
+  .bindings :global(select) { border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 2px 6px; background: var(--color-ground); color: var(--color-text-1); font: 400 .6875rem/1.3 var(--font-mono); }
+  .bindings :global(.binding-array) { display: flex; flex: 1 1 100%; flex-direction: column; gap: 4px; }
+  .bindings :global(.binding-matrix) { display: grid; grid-template-rows: repeat(var(--rows), auto); grid-auto-flow: column; gap: 2px; }
+  .bindings :global(.binding-result) { margin: 0; padding: 6px 8px; max-height: 12rem; overflow: auto; border-radius: var(--radius-sm); background: var(--color-surface-1); color: var(--color-text-1); font: 400 .6875rem/1.5 var(--font-mono); white-space: pre; }
+  .bindings :global(.binding-storage) { display: flex; flex-direction: column; gap: 4px; }
+  .bindings :global(.binding-storage > .binding-label) { padding-inline-start: 12px; }
+  .console { flex: 1 1 0; min-height: 320px; padding: 14px 16px; overflow: auto; font: 400 .75rem/1.6 var(--font-mono); color: var(--color-text-2); }
+  .console :global(p) { margin: 0 0 8px; font-family: var(--font-sans); }
+  .console :global(ol) { margin: 0 0 8px; padding: 0; list-style: none; }
+  .console :global(li) { display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 1px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  /* What a line logged takes the rest of its row. Where the row has no 16rem left for it after
+     where the line ran (a phone), it goes under that, at the pane's width; a table keeps its own. */
+  .console :global(li > span:last-child) { flex: 1 1 16rem; min-width: 0; }
+  .console :global(.at) { flex: none; color: var(--color-text-3); }
+  /* Where a line ran, the way a host's printed console line says it (surface §66): the tier as
+     a tag, GPU in the accent's wash and the CPU oracle in a neutral one, then the file and line. */
+  .console :global(.tier) { flex: none; align-self: flex-start; margin-block-start: 1px; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 0 4px; background: var(--color-surface-2); color: var(--color-text-2); font: 500 .6875rem/1.5 var(--font-mono); }
+  .console :global(.tier[data-tier='GPU']) { border-color: var(--color-primary-border); background: var(--color-primary-bg); color: var(--color-accent); }
+  .console :global(.source) { flex: none; color: var(--color-text-3); }
+  .console :global(.source:empty), .console :global(.at:empty) { display: none; }
+  .console :global(.warn) { color: var(--color-text-1); font-weight: 500; }
+  .console :global(.error) { color: var(--color-diag); }
+  .console :global(table) { border-collapse: collapse; font: inherit; }
+  .console :global(th), .console :global(td) { padding: 1px 10px; border: 1px solid var(--color-line-1); text-align: left; font-weight: 400; }
+  .console :global(th) { color: var(--color-text-3); }
+  .reflection { flex: 1 1 0; min-height: 320px; padding: 14px 16px; overflow: auto; font: 400 .75rem/1.6 var(--font-mono); color: var(--color-text-2); }
+  .reflection :global(.group-title) { margin: 0 0 8px; color: var(--color-text-3); font: 600 .6875rem/1.3 var(--font-sans); letter-spacing: .06em; }
+  .reflection :global(.group + .group) { margin-top: 20px; }
+  .reflection :global(.entry + .entry) { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--color-line-1); }
+  .reflection :global(.entry-head) { margin-bottom: 4px; }
+  .reflection :global(.entry-head .stage) { color: var(--color-accent); }
+  .reflection :global(.entry-head .entry-name) { margin-left: 10px; color: var(--color-text-1); font-weight: 500; }
+  .reflection :global(.io-row) { display: flex; gap: 12px; padding: 1px 0; }
+  .reflection :global(.io-row .io-label) { flex: none; width: 5rem; color: var(--color-text-3); white-space: nowrap; }
+  .reflection :global(.io-row .io-value) { min-width: 0; overflow-wrap: anywhere; }
+  .reflection :global(.io-row .attr) { color: var(--color-text-3); }
+  .reflection :global(.arg-row input) { width: 16ch; border: 1px solid var(--color-line-2); border-radius: var(--radius-sm); padding: 2px 6px; background: var(--color-ground); color: var(--color-text-1); font: 400 .75rem/1.5 var(--font-mono); }
+  .reflection :global(.arg-row input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -1px; }
+  .reflection :global(.arg-row .io-value) { display: flex; flex-wrap: wrap; gap: 8px; }
+  .reflection :global(.arg-name) { align-self: center; color: var(--color-text-3); }
+  .reflection :global(.empty) { color: var(--color-text-3); }
+  .reflection :global(.to-binding) { flex: none; margin-inline-start: auto; border: 0; padding: 0 2px; background: none; color: var(--color-accent); font: 400 .6875rem/1.6 var(--font-sans); cursor: pointer; }
+  .reflection :global(.to-binding:hover) { text-decoration: underline; }
+  .reflection :global(.failed) { color: var(--color-diag); }
+  @container (min-width: 48rem) {
+    .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr)); gap: 12px; }
+    .playground-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
+    .source-pane { border-bottom: 0; border-right: 1px solid var(--color-line-1); }
+    /* Beside the result the editor shows 26 lines of the file at the 21px line height it is
+       created with, so the entry point of an example this long is in view without scrolling
+       and a widget Monaco anchors to a line can be placed. */
+    .editor-host { min-height: 560px; }
+  }
+  @media (max-width: 48rem) {
+    .playground-toolbar { align-items: stretch; flex-direction: column; }
+    /* Four buttons share a phone's row at their own widths, and wrap to a second row on a
+       screen too narrow for all four, so no label is cut. */
+    .playground-actions { flex-wrap: wrap; width: 100%; }
+    .playground-actions button { flex: 1 1 auto; padding-inline: 8px; }
+    .playground-options > div { flex: 1 1 45%; }
+    .playground-options select { width: 100%; }
+  }
+</style>

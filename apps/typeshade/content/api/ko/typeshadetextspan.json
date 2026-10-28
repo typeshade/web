@@ -1,0 +1,9 @@
+{
+  "slug": "typeshadetextspan",
+  "source": "51576075f4b219dfc2184e786a9eac601d1a2f30bc03036704d62504807a4385",
+  "texts": {
+    "summary": "Typeshade 정보를 편집기 위치로 되돌려 대응시키는 데 쓰는 UTF-16 소스 구간입니다.",
+    "members.start": "구간이 시작하는 UTF-16 오프셋입니다.",
+    "members.length": "UTF-16 코드 단위로 센 구간의 길이입니다."
+  }
+}

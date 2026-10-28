@@ -1,0 +1,7 @@
+{
+  "slug": "condexpr",
+  "source": "74927cef08454ea5bb7a4e591d0e3d4198aca4785e27e767c57d355554e604cf",
+  "texts": {
+    "summary": "조건에 따른 N개 분기 값 디스패치입니다. 처음으로 참인 조건의 값이 선택된다: condExpr([[c0, () => e0], [c1, () => e1]], () => eN)."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "slug": "emitfuncs",
+  "source": "104ea7f8b8e35d116136c1eb23097106b880689ffa155da093e7d1a56c71d101",
+  "texts": {
+    "summary": "함수 목록을 빈 줄로 이어 WGSL로 생성합니다. emitModule이 실행하는 것과 같은 하향 변환과 최적화 패스를 거칩니다.",
+    "description": "상수 폴딩, 불필요한 코드 제거, 바인딩 재사용은 전체 모듈 안에서와 정확히 같게 적용됩니다. 그래서 생성된 텍스트는 같은 선언에 대해 [`emitModule`](/api/emitmodule/)이 기록했을 함수 부분과 일치합니다.\n\n함수만 나열한 목록은 완전한 모듈이 아니므로 검증과 기능 게이트는 건너뜁니다. 표기에 필요한 패스만 실행합니다. [`emitFragment`](/api/emitfragment/)는 선언들이 모듈을 이루면 전체 패스 집합을 실행합니다.",
+    "targets.wgsl": "WebGPU용 WGSL을 생성합니다."
+  }
+}

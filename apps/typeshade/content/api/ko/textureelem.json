@@ -1,0 +1,8 @@
+{
+  "slug": "textureelem",
+  "source": "ed691e8ffccddef798c5f03f58fa009f8bc71f3a07510c77c9b962b714cf939e",
+  "texts": {
+    "summary": "샘플링되는 텍스처의 요소 타입입니다. WGSL의 texture_2d<T> 타입 매개변수이거나 GLSL ES 3.00의 샘플러 접두사입니다.",
+    "description": "세 가지 모두 두 타깃에서 코어 사양입니다.\n\n정수 텍스처는 필터링할 수 없습니다. 정수 텍셀을 보간하는 것은 정의되어 있지 않으며, WGSL은 `texture_2d<u32>`에 대한 `textureSample`을 거부합니다. GLSL은 최근접 필터링을 쓰면 `texture(usampler2D, …)`를 받아들입니다. 그러나 WebGL2에서는 컴파일되지만 WebGPU에서는 표현할 수 없는 구문은, 두 타깃용 코드를 한 번만 작성하는 방식이 막으려는 대상입니다.\n\n정수 텍스처는 [`textureLoad`](/api/textureload/), [`textureDimensions`](/api/texturedimensions/), [`textureNumLayers`](/api/texturenumlayers/)로 읽습니다. 정수 키에 쓰는 [`textureSample`](/api/texturesample/)과 [`textureSampleLevel`](/api/texturesamplelevel/)은 `tsc` 오류입니다."
+  }
+}

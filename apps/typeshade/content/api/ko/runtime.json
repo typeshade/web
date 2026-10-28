@@ -1,0 +1,8 @@
+{
+  "slug": "runtime",
+  "source": "d75e6b61c5a5ce82c0ee8b2017345285e4875487e3f06ef42e0bfe985e226581",
+  "texts": {
+    "summary": "기본 런타임입니다. configure가 지정한 런타임이거나, 호출 계층이 쓰는 디바이스의 런타임입니다. 그래서 두 계층 가운데 한쪽에서 만든 리소스를 다른 쪽에서 쓸 수 있습니다.",
+    "description": "WebGPU가 없는 곳에서는 호출 계층의 WebGL2 컨텍스트에 있는 런타임을 쓴다(변경 0054). WebGPU도 WebGL2도 없는 곳에서는 거부합니다."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "slug": "cpuvalue",
+  "source": "cc3837d90cea2bfe191703e3fa15eabd145b0a1270776ec988c3617f6a377164",
+  "texts": {
+    "summary": "CPU 백엔드(compileModule, compileModuleJs)가 값을 나타내는 방식입니다. 일반 JavaScript 값이며, typed array나 GPU 버퍼가 아닙니다.",
+    "description": "모든 종류의 스칼라(f32, f64, i32, u32, bool)는 `number` 또는 `boolean`이며, 배정밀도로 계산합니다. [`CpuPrecision`](/api/cpuprecision/)이 산술의 반올림 방식을 정합니다. 벡터와 행렬은 일차원 `number[]`입니다. 이 배열은 가변이며 참조로 공유됩니다. 셰이더 함수 안에서 `p.x = …`처럼 필드에 쓰면 호출한 쪽의 배열이 제자리에서 바뀝니다. 구조체는 [`CpuStruct`](/api/cpustruct/)입니다. 이것은 [`CpuModule`](/api/cpumodule/)의 함수가 받고 돌려주는 값 타입이며, `setBinding`이 받는 타입과도 같습니다."
+  }
+}

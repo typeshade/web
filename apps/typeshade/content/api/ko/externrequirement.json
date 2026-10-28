@@ -1,0 +1,8 @@
+{
+  "slug": "externrequirement",
+  "source": "3de6fc96cc122034d33d522349474ea6fe2ac7ff3a7b313ce2233e887b9d225b",
+  "texts": {
+    "summary": "모듈이 기대하는, 호스트가 제공하는 전역 값 하나입니다. externVar로 선언합니다.",
+    "description": "`type`은 DSL 타입 키이다([`typeKey`](/api/typekey/)가 돌려주는 문자열). `wgsl`과 `glsl`은 생성 과정이 쓰는 타깃별 표기이며, 호스트는 이 이름으로 전역을 제공합니다. `name`은 모듈이 쓰는 논리 이름입니다. `stage`가 있으면 선언이 지정한 권고 스테이지입니다."
+  }
+}

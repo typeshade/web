@@ -1,0 +1,11 @@
+{
+  "slug": "atanh",
+  "source": "d56ebf74fff4968adaac5712360f3ab7e6cb2b4f6241220a96bf66e627129aba",
+  "texts": {
+    "summary": "atanh(x): 역쌍곡탄젠트를 성분별로 구합니다.",
+    "description": "`|x| >= 1`은 WGSL과 GLSL 명세에 따라 정의되지 않습니다. 결과는 ±∞ 또는 NaN입니다. 반올림 때문에 값이 경계에 닿을 수 있으면, [`asin`](/api/asin/)과 [`acos`](/api/acos/)의 경우처럼 값을 `(-1, 1)` 열린 구간 안쪽으로 제한해야 합니다.",
+    "targets.wgsl": "`atanh(x)`.",
+    "targets.glsl": "`atanh(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

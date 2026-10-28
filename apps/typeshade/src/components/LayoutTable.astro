@@ -1,0 +1,57 @@
+---
+// The uniform block of the fixture, every cell from reflect(). The table sits at its natural
+// width, with the caption naming the standard and the block size.
+import { facts } from '../lib/examples.ts';
+import { typedError } from '../lib/typed-error.ts';
+import ScrollRegion from './ScrollRegion.astro';
+import { copyFor, type Locale } from '../i18n/index.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copyFor(locale).layout;
+
+const { layout } = typedError();
+if (layout.fields.length < 2) throw new Error('[LayoutTable] the fixture block reflects fewer than two fields');
+const standard = facts.layoutStandards[0];
+---
+
+<ScrollRegion label={t.region}>
+  <table class="layout-table font-mono text-text-2" data-own-stack>
+    <caption>{t.caption(layout.size)}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{t.field}</th>
+        <th scope="col">{t.type}</th>
+        <th scope="col" data-align="end">{t.offset}</th>
+        <th scope="col" data-align="end">{t.size}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        layout.fields.map((f) => (
+          <tr>
+            <td>{f.name}</td>
+            <td>{f.type}</td>
+            <td data-align="end">{f.offset}</td>
+            <td data-align="end">{f.size}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</ScrollRegion>
+
+<style>
+  /* A layout table sits in the document column with a visible caption above it and a
+     monospace grid of rows, so these outrank the column's own `.doc table`, `.doc th` and
+     `.doc td`. It keeps its natural width (DESIGN.md, Layout) and the code size, and the
+     ScrollRegion around it scrolls a row wider than the column. */
+  .layout-table { display: table; inline-size: auto; font-size: var(--text-code); line-height: var(--text-code--line-height) }
+  .layout-table th, .layout-table td { padding: 8px 28px 8px 0; text-align: start; border-block-start: 1px solid var(--color-line-1); background: none }
+  .layout-table th { font-weight: 500; color: var(--color-text-3); border-block-start: 0 }
+  .layout-table [data-align='end'] { text-align: end; white-space: nowrap }
+  .layout-table th:last-child, .layout-table td:last-child { padding-inline-end: 0 }
+  .layout-table caption { padding-block-end: 10px; text-align: start; font-family: var(--font-sans); font-size: var(--text-ui); color: var(--color-text-2) }
+</style>

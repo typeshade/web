@@ -1,0 +1,12 @@
+{
+  "slug": "if",
+  "source": "076866b6d54a9165b447ab4b47711461915e2f7e8856b01d797d9f70ac5a3bf3",
+  "texts": {
+    "summary": "가장 안쪽의 활성 스코프에 if (cond) { body }를 작성합니다.",
+    "description": "반환된 [`IfChain`](/api/ifchain/)에 `.elif(c, () => …)`와 `.else(() => …)`를 이어 붙입니다. 본문 콜백 안의 기본 `return`은 그 클로저만 빠져나갑니다. 분기에서 함수를 조기 반환하려면 [`Return`](/api/return/) 또는 [`ReturnIf`](/api/returnif/)를 씁니다.\n\n그 값은 어디에도 쓰이지 않으므로, 값을 돌려주는 본문은 빈 분기로 받아들이지 않고 `SD0115`로 거부합니다. `If(c, () => f32(1))`과 `If(c, () => Return(f32(1)))`은 세 글자 차이가 나고, 동작도 서로 다릅니다. 값이 필요하면 [`when`](/api/when/)을 사용합니다.",
+    "parameters.cond": "분기 조건입니다.",
+    "parameters.body": "분기의 문장들입니다. 앰비언트 함수로 작성합니다.",
+    "returns": "체인 객체입니다. `.elif`와 `.else`를 이어 쓸 수 있습니다.",
+    "exceptions.SD0115": "본문이 값을 돌려주면 `SD0115`가 발생합니다."
+  }
+}

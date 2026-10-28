@@ -1,0 +1,11 @@
+---
+import ErrorCodePage from '../../../../components/pages/ErrorCodePage.astro';
+import { errorCodePaths } from '../../../../lib/error-codes.ts';
+
+export function getStaticPaths() {
+  return errorCodePaths();
+}
+const { slug } = Astro.props;
+---
+
+<ErrorCodePage locale="ko" slug={slug} />

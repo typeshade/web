@@ -1,0 +1,7 @@
+{
+  "slug": "hasusetypeshadedirective",
+  "source": "54b55c6d2ebb3bc532c1698663f08c4176ba2dca7441c7793c6009909e2fdab7",
+  "texts": {
+    "summary": "SourceFile에 최상위 \"use typeshade\"가 하나 이상 있으면 true입니다."
+  }
+}

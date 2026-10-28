@@ -1,0 +1,8 @@
+{
+  "slug": "arrayelemkey",
+  "source": "ac3ffb18c23d8556b7b19a87dc9ea0f423fb7b4b1079c33032989904bb129cf9",
+  "texts": {
+    "summary": "배열 키의 원소 키입니다. array<f32,4> → 'f32', array<vec3<f32>> → 'vec3<f32>'이며, 배열이 아닌 키에는 never입니다.",
+    "description": "배열 키에서 원소 키를 구한다: `array<f32,4>` → `'f32'`, `array<vec3<f32>>` → `'vec3<f32>'`이며, 배열이 아닌 키에는 `never`이입니다. [`KeyOf`](/api/keyof/)의 `array` 분기와 반대되는 연산입니다. 그래서 `xs.at(i)`는 원소 타입을 다시 지정하지 않아도 타입이 정해집니다. 선언에 이미 원소 타입이 포함되어 있기 때문입니다."
+  }
+}

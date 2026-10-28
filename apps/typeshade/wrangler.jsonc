@@ -1,0 +1,50 @@
+// typeshade.dev on Cloudflare Workers (docs/cloudflare.md). The Astro build in dist/ is served
+// as static assets; the Worker in worker/index.ts runs first only on the routes below, where it
+// adds what the build does not have: the example data in R2, named current by D1.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "typeshade-site",
+  "main": "worker/index.ts",
+  // Not a secret: the account the Worker, the bucket and the database are in. CI then needs one
+  // secret, CLOUDFLARE_API_TOKEN.
+  "account_id": "7c029c2ac777ff3c45a4bcbe67918a1e",
+  "compatibility_date": "2026-09-01",
+  // The site answers at typeshade.dev only: typeshade-site.<account>.workers.dev would be a
+  // second copy of every page. A pull request's preview version (deploy.yml's
+  // cloudflare-preview) keeps its own workers.dev URL, which preview_urls turns on apart from
+  // workers_dev (it would follow workers_dev if left out).
+  "workers_dev": false,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // The routes are written with a trailing slash (astro.config.mjs), and a path without one
+    // redirects to it, the way GitHub Pages served the site.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    // The gallery's routes on the site only redirect to gallery.typeshade.dev, which the
+    // gallery's own Worker serves (wrangler.gallery.jsonc).
+    "run_worker_first": [
+      "/data/*",
+      "/s/*",
+      "/guide/examples/*",
+      "/ko/guide/examples/*",
+      "/gallery*",
+      "/ko/gallery*",
+      "/playground/gallery*",
+      "/ko/playground/gallery*",
+    ],
+  },
+  "r2_buckets": [{ "binding": "DATA", "bucket_name": "typeshade-data" }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "typeshade",
+      "database_id": "bd328565-57f1-47b9-b970-98fb2b3b792a",
+      "migrations_dir": "worker/migrations",
+    },
+  ],
+  // Daily at 03:17 UTC: delete the short links nobody has opened for a year (worker/index.ts).
+  "triggers": { "crons": ["17 3 * * *"] },
+  "observability": { "enabled": true },
+}

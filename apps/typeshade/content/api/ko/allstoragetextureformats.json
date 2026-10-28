@@ -1,0 +1,8 @@
+{
+  "slug": "allstoragetextureformats",
+  "source": "09a94be1721c6f844f2493795e2e90a02e726a6e4c3bf595eefd072b4cce3bad",
+  "texts": {
+    "summary": "StorageTextureFormat의 모든 값을 런타임 값으로 담은 목록입니다. 프런트엔드는 작성된 이름을 이 목록과 대조해 검증하고, 문서 생성기는 이 목록을 순회합니다.",
+    "description": "유니온 타입은 런타임 형태가 없으므로, 목록을 직접 적고 `satisfies`로 유니온 타입과 계속 맞춥니다."
+  }
+}

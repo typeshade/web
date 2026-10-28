@@ -1,0 +1,33 @@
+---
+// Expressive Code puts the horizontal scroller on its own <pre>, so the region attributes go
+// there, added at build time to the rendered string.
+interface Props {
+  /** Names the content, for example "Authored fragment, gradient-pass.ts". */
+  label?: string;
+  /** Holds each token that carries a hyphen, a slash or a closing angle bracket together on
+   *  one line. A wrapped line may break after any of the three, which cuts `->` in two and
+   *  parts `>(` from the call it opens, so a frame narrow enough to wrap its lines (the
+   *  construct cards) asks for this. A token wider than the frame it is in then scrolls
+   *  inside the frame instead of breaking. */
+  holdTokens?: boolean;
+}
+const { label = '', holdTokens = false } = Astro.props;
+
+const escape = (s: string): string => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+// Expressive Code writes one span per token, with the theme's two colours in its style, so a
+// token is held together by adding to that style and nothing has to know its shape. A span
+// carrying a space is a run of punctuation and space between two tokens, and it keeps the
+// break opportunity the line wraps at.
+const hold = (s: string): string =>
+  s.replace(/<span style="([^"]*)">([^<]*)<\/span>/g, (whole, style: string, text: string) =>
+    /[-/>]/.test(text) && !/\s/.test(text) ? `<span style="white-space:pre;${style}">${text}</span>` : whole,
+  );
+
+const rendered = await Astro.slots.render('default');
+if (!rendered.includes('<pre')) throw new Error(`[CodeFrame] '${label}' rendered no <pre>`);
+const marked = holdTokens ? hold(rendered) : rendered;
+const html = marked.replace('<pre', `<pre tabindex="0" role="region" aria-label="${escape(label)}"`);
+---
+
+<Fragment set:html={html} />

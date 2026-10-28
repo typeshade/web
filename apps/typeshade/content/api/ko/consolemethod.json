@@ -1,0 +1,7 @@
+{
+  "slug": "consolemethod",
+  "source": "8843ff9eef0f58c9722d897f0d3be882a38f0fcf470b0acd5c7e7753da5ae10a",
+  "texts": {
+    "summary": "TypeShade 소스 컴파일러가 현재 하향 변환하는 콘솔 메서드입니다."
+  }
+}

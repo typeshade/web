@@ -1,0 +1,8 @@
+{
+  "slug": "isvec",
+  "source": "30cd0e946bca2f40953de522b5cd816ef35c1805a38152cee0d0a013612f882c",
+  "texts": {
+    "summary": "ShaderType을 기본 { kind: 'vec' } 분기로 좁힙니다. 이 분기의 elem은 'f32' | 'i32' | 'u32'입니다.",
+    "description": "에뮬레이션 배정밀도 벡터는 별도의 `'vec64'` 종류이며, 이를 판별하려면 [`isVec64`](/api/isvec64/)를 씁니다. 이항 연산의 타입 해석은 `isMat(a) && isVec(b)`와 `isVec(a) && isScalar(b)` 같은 조건으로 이 술어를 써서, 벡터-스칼라 브로드캐스트, 행렬-벡터 곱, 같은 종류의 연산 가운데 하나를 고릅니다. `.x`/`.y`/`.r`/`.g` 스위즐 가드도 이 술어로 벡터가 아닌 수신 객체를 거부합니다."
+  }
+}

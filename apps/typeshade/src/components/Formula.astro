@@ -1,0 +1,17 @@
+---
+// One formula on a page built from components: LaTeX in, MathML out at build time
+// (src/lib/math.mjs). A formula in copy is written `$…$` and Rich renders it; this is the
+// display form, a formula on a line of its own.
+import { renderMath } from '../lib/math.mjs';
+
+interface Props {
+  /** The formula in LaTeX. Not copy: a formula reads the same in every language. */
+  tex: string;
+  /** Inline in the running text instead of on a line of its own. */
+  inline?: boolean;
+}
+const { tex, inline = false } = Astro.props;
+const html = renderMath(tex, !inline);
+---
+
+<Fragment set:html={html} />

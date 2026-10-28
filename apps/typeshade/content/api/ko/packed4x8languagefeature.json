@@ -1,0 +1,8 @@
+{
+  "slug": "packed4x8languagefeature",
+  "source": "094504a917706c9060d1ce40e42a545430c176dac29c4815b35148fd5c58892e",
+  "texts": {
+    "summary": "PACKED_4X8_IDS를 사용하는 모듈이 의존하는 WGSL 언어 기능이며, navigator.gpu.wgslLanguageFeatures가 붙이는 이름입니다.",
+    "description": "확장(extension)이 아닙니다. Tint에서 측정한 결과, `enable packed_4x8_integer_dot_product;`는 거부되지만(\"expected extension\") 호출은 지시문 없이 컴파일됩니다. 그래서 생성할 지시문이 없고, 검사는 호스트에서 해야 합니다."
+  }
+}

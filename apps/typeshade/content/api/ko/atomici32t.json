@@ -1,0 +1,7 @@
+{
+  "slug": "atomici32t",
+  "source": "b45433dfaad8547a8ccc365a9df28d6b192ba6e678311aec4097bc4293a6d0ab",
+  "texts": {
+    "summary": "atomic<i32>: atomicU32T의 부호 있는 짝입니다."
+  }
+}

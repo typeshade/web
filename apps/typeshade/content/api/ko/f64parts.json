@@ -1,0 +1,11 @@
+{
+  "slug": "f64parts",
+  "source": "ddd44ce8df46bb4de3ea3c9192b1a30be46465ec0d285417f411f95f60a48673",
+  "texts": {
+    "summary": "f64의 (hi, lo) 쌍을 일반 vec2<f32>로 돌려줍니다. f64를 vec2 버퍼 필드나 스테이지 출력에 저장할 때 씁니다.",
+    "description": "f64의 (hi, lo) 쌍을 일반 `vec2<f32>`로 돌려줍니다. f64를 `vec2` 버퍼 필드나 스테이지 출력에 저장할 때 씁니다. 생성된 f64는 이미 그 쌍이므로 비용은 들지 않습니다. `f64FromParts(v.x, v.y)`가 원래 값을 되돌립니다.",
+    "targets.wgsl": "백엔드가 실행되기 전에 `fp64Lower`가 `f32` 레인 쌍으로 다시 씁니다.",
+    "targets.glsl": "백엔드가 실행되기 전에 `fp64Lower`가 `f32` 레인 쌍으로 다시 씁니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

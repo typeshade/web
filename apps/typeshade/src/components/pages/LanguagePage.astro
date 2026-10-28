@@ -1,0 +1,70 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import ConceptDoc from '../ConceptDoc.astro';
+import Rich from '../Rich.astro';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).language.overview;
+const headings = [
+  ['boundary', content.boundaryH], ['syntax', content.syntaxH], ['gpu', content.gpuH], ['functions', content.functionH],
+  ['resources', content.resourceH], ['stages', content.stageH], ['complete', content.completeH], ['typescript', content.tsH],
+  ['references', content.refsH], ['next', content.nextH],
+].map(([slug, text]) => ({ depth: 2, slug, text: text.replace(/`/g, '') }));
+---
+
+<Docs locale={locale} path="/guide/language/" title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
+  <h1>{content.h1}</h1>
+  <p>{content.intro}</p>
+
+  <h2 id="boundary"><Rich text={content.boundaryH} locale={locale} /></h2>
+  <p><Rich text={content.boundaryP} locale={locale} /></p>
+  <TypeShadeCode code={'"use typeshade"'} lang="ts" />
+  <p>{content.boundaryNote}</p>
+
+  <h2 id="syntax">{content.syntaxH}</h2>
+  <p>{content.syntaxP}</p>
+  <ConceptDoc locale={locale} rows={content.syntaxTableRows} columns={[content.syntaxTableHeader1, 'TypeShade', content.syntaxTableHeader3]} />
+
+  <h2 id="gpu">{content.gpuH}</h2>
+  <p><Rich text={content.gpuP} locale={locale} /></p>
+  <TypeShadeCode code={'declare const camera: uniform<Camera>\ndeclare const pixels: storage<array<f32>, "read_write">\n\n@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  const i = gid.x\n  pixels[i] = pixels[i] + camera.pos.x\n}'} lang="ts" title="compute.ts" />
+  <p><Rich text={content.gpuNote} locale={locale} /></p>
+
+  <h2 id="functions">{content.functionH}</h2>
+  <p>{content.functionP}</p>
+  <TypeShadeCode code={'function addBias(value: f32): f32 {\n  return value + 0.5\n}\n\n@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  pixels[gid.x] = addBias(camera.pos.x)\n}'} lang="ts" title="helper + entry" />
+  <p><Rich text={content.functionNote} locale={locale} /></p>
+
+  <h2 id="resources">{content.resourceH}</h2>
+  <p><Rich text={content.resourceP} locale={locale} /></p>
+  <TypeShadeCode code={'declare const camera: uniform<Camera>\ndeclare const source: storage<f32>\ndeclare const pixels: storage<f32, "read_write">'} lang="ts" title="resources" />
+  <p><Rich text={content.resourceNote} locale={locale} /></p>
+
+  <h2 id="stages">{content.stageH}</h2>
+  <p><Rich text={content.stageP} locale={locale} /></p>
+  <TypeShadeCode code={'@vertex\nexport function vs(@builtin("vertex_index") vid: u32): vec4 {\n  return positions[vid]\n}\n\n@fragment\nexport function fs(): vec4 {\n  return vec4(1, 0, 0, 1)\n}'} lang="ts" title="pipeline stages" />
+
+  <h2 id="complete">{content.completeH}</h2>
+  <p>{content.completeP}</p>
+  <TypeShadeCode code={'"use typeshade";\n\nclass Camera {\n  view: mat4;\n  pos: vec3;\n}\n\ndeclare const camera: uniform<Camera>;\ndeclare const pixels: storage<array<f32>, "read_write">;\n\n@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  const i = gid.x;\n  pixels[i] = pixels[i] + camera.pos.x;\n}'} lang="ts" title="paint.ts" />
+
+  <h2 id="typescript">{content.tsH}</h2>
+  <ConceptDoc locale={locale} rows={content.tsRows} columns={['TypeScript', 'TypeShade']} />
+  <p>{content.tsNote}</p>
+
+  <h2 id="references">{content.refsH}</h2>
+  <p>{content.refsP}</p>
+  <ul>
+    <li><a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html">TypeScript Handbook — Everyday Types</a></li>
+    <li><a href="https://www.typescriptlang.org/docs/handbook/2/functions.html">TypeScript Handbook — Functions</a></li>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide">MDN — JavaScript Guide</a></li>
+    <li><a href="https://thebookofshaders.com/">The Book of Shaders</a></li>
+  </ul>
+
+  <h2 id="next">{content.nextH}</h2>
+  <p>{content.nextP} <a href={localePath(locale, links.quickStart.href)}>{content.nextLink}</a></p>
+</Docs>

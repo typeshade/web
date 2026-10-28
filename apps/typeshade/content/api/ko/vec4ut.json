@@ -1,0 +1,7 @@
+{
+  "slug": "vec4ut",
+  "source": "0139f877757e18c5002d4fad70fc699c98afd3377a05e5d0d5fa40ee41d7810f",
+  "texts": {
+    "summary": "기본 vec4<u32>입니다. 4개 성분으로 된 부호 없는 정수 리소스나 유니폼 필드로 쓰이며, 컴퓨트 커널의 매개변수 블록이 그 예이다(resource)."
+  }
+}

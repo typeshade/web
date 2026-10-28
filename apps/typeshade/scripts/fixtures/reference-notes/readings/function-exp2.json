@@ -1,0 +1,17 @@
+{
+  "note": "function/exp2",
+  "read": {
+    "pin": "c89f6b22",
+    "reviewed": "2026-10-12"
+  },
+  "inputs": {
+    "accuracy:exp2": "ulp: 3 + 2 * |x| ULP",
+    "assert:oracleIsPowerOfTwo": "true",
+    "compile:int-argument": "TS8036: exp2 takes an f32, or a vector of them; got i32. | editor: same",
+    "compile:stays": "ok; wgsl: return exp2(x);",
+    "entry.spelling.glsl": "exp2(a)",
+    "entry.summary": "Returns `2` raised to the power of `x`, componentwise over vectors.",
+    "oracle:exp2(-1.0)": "0.5 | 0.5",
+    "oracle:exp2(3.0)": "8 | 8"
+  }
+}

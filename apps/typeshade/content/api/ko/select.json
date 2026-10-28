@@ -1,0 +1,11 @@
+{
+  "slug": "select",
+  "source": "ad16f47da1154e8bcff7919e4b8c2cafa411004d8885f7b6aa468defc11d8b7c",
+  "texts": {
+    "summary": "select: ReadonlyNode.select의 독립 함수 버전입니다.",
+    "description": "`select(cond, ifTrue, ifFalse)`는 `ReadonlyNode.select`의 독립 함수 버전입니다. 두 분기는 같은 키를 가져야 합니다. JS 숫자 두 개를 넘기면 결과는 f32입니다.",
+    "targets.wgsl": "`select(a, b, c)`로 생성합니다.",
+    "targets.glsl": "`(c ? b : a)`로 생성합니다.",
+    "targets.cpu": "오라클에는 이 함수의 구현이 없습니다."
+  }
+}

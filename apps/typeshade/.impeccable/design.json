@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-21T00:00:00.000Z",
+  "title": "Design System: TypeShade",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Ant Blue",
+        "canonical": "#1677ff",
+        "tonalRamp": ["#002c8c", "#003eb3", "#0958d9", "#1677ff", "#4096ff", "#69b1ff", "#91caff", "#e6f4ff"]
+      },
+      "diagnostic": {
+        "role": "tertiary",
+        "displayName": "Diagnostic Red",
+        "canonical": "#ff4d4f",
+        "tonalRamp": ["#5c0011", "#a8071a", "#cf1322", "#f5222d", "#ff4d4f", "#ff7875", "#ffa39e", "#fff1f0"]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Container White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#141414", "#1f1f1f", "#262626", "#303030", "#d9d9d9", "#f0f0f0", "#fafafa", "#ffffff"]
+      },
+      "layout": {
+        "role": "neutral",
+        "displayName": "Layout Ground",
+        "canonical": "#f5f5f5",
+        "tonalRamp": ["#000000", "#141414", "#1f1f1f", "#262626", "#e6e6e6", "#f0f0f0", "#f5f5f5", "#fafafa"]
+      },
+      "line-2": {
+        "role": "neutral",
+        "displayName": "Control Border",
+        "canonical": "#d9d9d9",
+        "tonalRamp": ["#303030", "#424242", "#595959", "#8c8c8c", "#bfbfbf", "#d9d9d9", "#f0f0f0", "#fafafa"]
+      },
+      "text-1": {
+        "role": "neutral",
+        "displayName": "Primary Text",
+        "canonical": "rgb(0 0 0 / 0.88)",
+        "tonalRamp": ["rgb(0 0 0 / 0.88)", "rgb(0 0 0 / 0.65)", "rgb(0 0 0 / 0.45)", "rgb(0 0 0 / 0.25)", "rgb(0 0 0 / 0.06)", "rgb(0 0 0 / 0.04)", "rgb(0 0 0 / 0.02)", "rgb(0 0 0 / 0)"]
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "Dark Blue Fill",
+        "canonical": "#1668dc",
+        "tonalRamp": ["#111a2c", "#112545", "#15325b", "#15417e", "#1554ad", "#1668dc", "#3c89e8", "#65a9f3"]
+      },
+      "dark-ground": {
+        "role": "neutral",
+        "displayName": "Dark Container",
+        "canonical": "#141414",
+        "tonalRamp": ["#000000", "#141414", "#1f1f1f", "#262626", "#303030", "#424242", "#595959", "#8c8c8c"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Front headline", "purpose": "The front page's own headline, the one size outside the ramp: 32px to 48px, 52px past 90rem." },
+      "h1": { "displayName": "Page title", "purpose": "The h1 of a document or reference page." },
+      "h2": { "displayName": "Section", "purpose": "A front page section's heading and a document's h2." },
+      "h5": { "displayName": "Card title", "purpose": "A tile's name, a map row's term, the site name in the header, a large button's label." },
+      "prose": { "displayName": "Prose", "purpose": "Body text in a document column and a front page section's paragraph." },
+      "ui": { "displayName": "Interface", "purpose": "The site's default: nav links, buttons, menu rows, captions, table cells." },
+      "meta": { "displayName": "Small label", "purpose": "A menu group title, a tag, the footer's legal line, the version chip." },
+      "code": { "displayName": "Code", "purpose": "Code frames, identifiers, diagnostics, the layout table." }
+    },
+    "shadows": [
+      { "name": "elevation", "value": "0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12), 0 9px 28px 8px rgb(0 0 0 / 0.05)", "purpose": "Ant's three-layer elevation: the showcase card at rest, a hovered tile, dropdown panels, the search dialog, the skip link." },
+      { "name": "elevation-dark", "value": "0 6px 16px 0 rgb(0 0 0 / 0.32), 0 3px 6px -4px rgb(0 0 0 / 0.48), 0 9px 28px 8px rgb(0 0 0 / 0.2)", "purpose": "The same elevation on the dark ground." },
+      { "name": "secondary", "value": "0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 6px -1px rgb(0 0 0 / 0.02), 0 2px 4px 0 rgb(0 0 0 / 0.02)", "purpose": "A hovered previous/next card in the documentation." },
+      { "name": "button", "value": "0 2px 0 rgb(0 0 0 / 0.02)", "purpose": "Ant's resting shadow on the default button face." },
+      { "name": "button-primary", "value": "0 2px 0 rgb(5 145 255 / 0.1)", "purpose": "Ant's resting shadow on the filled button face." },
+      { "name": "focus-ring", "value": "0 0 0 4px rgb(5 145 255 / 0.1)", "purpose": "The focus wash, paired with a 2px accent outline at 2px offset." }
+    ],
+    "motion": [
+      { "name": "motion", "value": "0.2s cubic-bezier(0.645, 0.045, 0.355, 1)", "purpose": "The site's one transition: colour, border, background and shadow on hover and press." },
+      { "name": "ease-out", "value": "cubic-bezier(0.645, 0.045, 0.355, 1)", "purpose": "The curve on its own, used for the 400ms cover scale on a hovered gallery tile." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "40rem" },
+      { "name": "md", "value": "48rem" },
+      { "name": "lg", "value": "64rem" },
+      { "name": "xl", "value": "80rem" },
+      { "name": "headline", "value": "90rem" },
+      { "name": "table-stack", "value": "45rem" }
+    ],
+    "measures": [
+      { "name": "container", "value": "1200px", "purpose": "Header, footer, front page, documentation grid." },
+      { "name": "content", "value": "740px", "purpose": "A document column, about 72 characters of prose." },
+      { "name": "wide", "value": "960px", "purpose": "A docs figure that needs more than the column." },
+      { "name": "nav-height", "value": "64px", "purpose": "The header bar." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Ant's default face: 32px, a #d9d9d9 border on the ground, the primary blue arriving on hover.",
+      "html": "<a class=\"ds-btn\" href=\"#\">Quick start</a>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 32px; padding: 4px 15px; border: 1px solid var(--color-line-2, #d9d9d9); border-radius: 6px; background: var(--color-ground, #fff); color: var(--color-text-1, rgb(0 0 0 / 0.88)); box-shadow: 0 2px 0 rgb(0 0 0 / 0.02); font: 400 0.875rem/1.5714 'IBM Plex Sans Variable', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif; text-decoration: none; white-space: nowrap; cursor: pointer; transition: color 0.2s cubic-bezier(0.645,0.045,0.355,1), border-color 0.2s cubic-bezier(0.645,0.045,0.355,1); } .ds-btn:hover { color: #4096ff; border-color: #4096ff; } .ds-btn:active { color: #0958d9; border-color: #0958d9; } .ds-btn:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; box-shadow: 0 0 0 4px rgb(5 145 255 / 0.1); }"
+    },
+    {
+      "name": "Primary Button, large",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The page's action: Ant's filled face at the large size, 40px with 16px text and an 8px radius.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Open the Playground <svg class=\"ds-btn-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M13.025 1l-2.847 2.828 6.176 6.176h-16.354v3.992h16.354l-6.176 6.176 2.847 2.828 10.975-11z\"/></svg></a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 7px 15px; border: 1px solid var(--color-primary, #1677ff); border-radius: 8px; background: var(--color-primary, #1677ff); color: #fff; box-shadow: 0 2px 0 rgb(5 145 255 / 0.1); font: 400 1rem/1.5 'IBM Plex Sans Variable', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif; text-decoration: none; white-space: nowrap; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.645,0.045,0.355,1), border-color 0.2s cubic-bezier(0.645,0.045,0.355,1); } .ds-btn-primary:hover { background: #4096ff; border-color: #4096ff; } .ds-btn-primary:active { background: #0958d9; border-color: #0958d9; } .ds-btn-icon { width: 12px; height: 12px; fill: currentColor; transition: transform 0.2s cubic-bezier(0.645,0.045,0.355,1); } .ds-btn-primary:hover .ds-btn-icon { transform: translateX(2px); } .ds-btn-primary:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; box-shadow: 0 0 0 4px rgb(5 145 255 / 0.1); }"
+    },
+    {
+      "name": "Picture Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A tile in the front page's gallery: the running example as the cover, the name under it, the elevation shadow on hover.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-cover\"></div><span class=\"ds-card-name\">Metaballs</span></div>",
+      "css": ".ds-card { overflow: hidden; border: 1px solid var(--color-line-1, #f0f0f0); border-radius: 8px; background: var(--color-elevated, #fff); transition: box-shadow 0.2s cubic-bezier(0.645,0.045,0.355,1), border-color 0.2s cubic-bezier(0.645,0.045,0.355,1); } .ds-card:hover { border-color: transparent; box-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12), 0 9px 28px 8px rgb(0 0 0 / 0.05); } .ds-card-cover { aspect-ratio: 3 / 2; border-block-end: 1px solid var(--color-line-1, #f0f0f0); background: var(--color-surface-2, #f0f0f0); } .ds-card-name { display: block; padding: 16px; font: 600 1rem/1.5 'IBM Plex Sans Variable', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif; color: var(--color-text-1, rgb(0 0 0 / 0.88)); }"
+    },
+    {
+      "name": "Menu Row",
+      "kind": "nav",
+      "refersTo": "menu-item",
+      "description": "The documentation sidebar as an Ant Menu: a 40px row, the quaternary fill on hover, the current page in the primary over its wash.",
+      "html": "<nav class=\"ds-menu\"><p class=\"ds-menu-group\">Get started</p><a class=\"ds-menu-item\" href=\"#\">Introduction</a><a class=\"ds-menu-item\" href=\"#\" aria-current=\"page\">Quick start</a><a class=\"ds-menu-item\" href=\"#\">Playground</a></nav>",
+      "css": ".ds-menu { display: flex; flex-direction: column; gap: 2px; width: 240px; } .ds-menu-group { margin: 0 0 4px; padding: 8px 16px; font: 400 0.75rem/1.5 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif; color: var(--color-text-3, rgb(0 0 0 / 0.45)); } .ds-menu-item { display: flex; align-items: center; min-height: 40px; padding: 8px 16px; border-radius: 6px; font: 400 0.875rem/1.5714 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif; color: var(--color-text-2, rgb(0 0 0 / 0.65)); text-decoration: none; transition: color 0.2s cubic-bezier(0.645,0.045,0.355,1), background-color 0.2s cubic-bezier(0.645,0.045,0.355,1); } .ds-menu-item:hover { color: var(--color-text-1, rgb(0 0 0 / 0.88)); background: rgb(0 0 0 / 0.04); } .ds-menu-item[aria-current='page'] { color: var(--color-primary, #1677ff); background: var(--color-primary-bg, #e6f4ff); font-weight: 600; } .ds-menu-item:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Pill",
+      "kind": "input",
+      "refersTo": "search-pill",
+      "description": "The header's search control: a 32px pill on the quaternary fill that opens the Pagefind dialog.",
+      "html": "<button class=\"ds-search\" type=\"button\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M20 20l-3.5-3.5\"/></svg><span>Search</span></button>",
+      "css": ".ds-search { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding-inline: 12px; border: 0; border-radius: 6px; background: rgb(0 0 0 / 0.02); color: var(--color-text-3, rgb(0 0 0 / 0.45)); font: 400 0.875rem/1.5714 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: color 0.2s cubic-bezier(0.645,0.045,0.355,1), background-color 0.2s cubic-bezier(0.645,0.045,0.355,1); } .ds-search svg { width: 16px; height: 16px; } .ds-search:hover { background: rgb(0 0 0 / 0.04); color: var(--color-text-1, rgb(0 0 0 / 0.88)); } .ds-search:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; box-shadow: 0 0 0 4px rgb(5 145 255 / 0.1); }"
+    },
+    {
+      "name": "Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "The 12px chip the version, an optional parameter and a target's support state all use.",
+      "html": "<span class=\"ds-tag\">v0.0.1</span> <span class=\"ds-tag ds-tag-native\">Supported</span> <span class=\"ds-tag ds-tag-none\">Not supported</span>",
+      "css": ".ds-tag { display: inline-block; padding: 0 7px; border: 1px solid var(--color-line-2, #d9d9d9); border-radius: 4px; background: var(--color-surface-1, #fafafa); font: 400 0.75rem/1.6667 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif; color: var(--color-text-2, rgb(0 0 0 / 0.65)); white-space: nowrap; } .ds-tag-native { color: var(--color-primary, #1677ff); border-color: var(--color-primary-border, #91caff); background: var(--color-primary-bg, #e6f4ff); } .ds-tag-none { color: var(--color-diag, #ff4d4f); border-color: var(--color-diag, #ff4d4f); background: none; }"
+    },
+    {
+      "name": "Showcase Card",
+      "kind": "custom",
+      "refersTo": "showcase-card",
+      "description": "The front page's live editor: an elevated card with the file name as an active tab in a 56px head bar, the code pane beside the canvas, the controls under both.",
+      "html": "<div class=\"ds-showcase\"><div class=\"ds-showcase-head\"><span class=\"ds-showcase-file\">first.shade.ts</span><button class=\"ds-showcase-act\" type=\"button\">Edit</button><button class=\"ds-showcase-act\" type=\"button\">Reset</button></div><div class=\"ds-showcase-body\"><div class=\"ds-showcase-code\">\"use typeshade\"</div><div class=\"ds-showcase-canvas\"></div></div><div class=\"ds-showcase-controls\"><span class=\"ds-showcase-label\">warp</span><input type=\"range\" min=\"0.5\" max=\"4\" step=\"0.1\" value=\"2.4\" /></div><p class=\"ds-showcase-caption\">The file on the left, drawn on the right.</p></div>",
+      "css": ".ds-showcase { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--color-line-1, #f0f0f0); border-radius: 8px; background: var(--color-elevated, #fff); box-shadow: 0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12), 0 9px 28px 8px rgb(0 0 0 / 0.05); font-family: 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif; } .ds-showcase-head { display: flex; align-items: center; gap: 8px; height: 56px; padding-inline: 16px; border-block-end: 1px solid var(--color-line-1, #f0f0f0); } .ds-showcase-file { display: inline-flex; align-items: center; align-self: stretch; margin-inline-end: auto; box-shadow: inset 0 -2px 0 var(--color-primary, #1677ff); font-size: 0.875rem; font-weight: 600; color: var(--color-text-1, rgb(0 0 0 / 0.88)); } .ds-showcase-act { height: 24px; padding: 0 8px; border: 1px solid var(--color-line-2, #d9d9d9); border-radius: 4px; background: var(--color-ground, #fff); color: var(--color-text-1, rgb(0 0 0 / 0.88)); font: 400 0.75rem/1.5 inherit; cursor: pointer; transition: color 0.2s cubic-bezier(0.645,0.045,0.355,1), border-color 0.2s cubic-bezier(0.645,0.045,0.355,1); } .ds-showcase-act:hover { color: #4096ff; border-color: #4096ff; } .ds-showcase-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .ds-showcase-code { padding: 0.75rem 1rem; border-inline-end: 1px solid var(--color-line-1, #f0f0f0); font: 400 0.8125rem/1.6 'IBM Plex Mono', ui-monospace, Menlo, monospace; color: var(--color-text-1, rgb(0 0 0 / 0.88)); } .ds-showcase-canvas { aspect-ratio: 4 / 3; background: linear-gradient(120deg, #121f8c, #ff9e2e); } .ds-showcase-controls { display: flex; align-items: center; gap: 12px; padding: 16px; border-block-start: 1px solid var(--color-line-1, #f0f0f0); } .ds-showcase-controls input[type='range'] { flex: 1; accent-color: var(--color-primary, #1677ff); } .ds-showcase-label { font: 400 0.875rem/1.4 'IBM Plex Mono', ui-monospace, Menlo, monospace; color: var(--color-text-2, rgb(0 0 0 / 0.65)); } .ds-showcase-caption { margin: 0; padding: 0 16px 16px; font-size: 0.875rem; color: var(--color-text-3, rgb(0 0 0 / 0.45)); }"
+    },
+    {
+      "name": "Canvas Figure",
+      "kind": "custom",
+      "refersTo": "card-cover",
+      "description": "The site's one picture type: a framed box on #f0f0f0 holding the build-time still with the live canvas over it, and a tertiary caption under it.",
+      "html": "<figure class=\"ds-figure\"><div class=\"ds-figure-frame\"></div><figcaption class=\"ds-figure-caption\">The gradient pass, drawn by WebGPU.</figcaption></figure>",
+      "css": ".ds-figure { display: flex; flex-direction: column; gap: 12px; margin: 0; } .ds-figure-frame { position: relative; aspect-ratio: 3 / 2; overflow: hidden; border: 1px solid var(--color-line-1, #f0f0f0); border-radius: 8px; background: var(--color-surface-2, #f0f0f0); } .ds-figure-caption { font: 400 0.875rem/1.5714 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif; color: var(--color-text-3, rgb(0 0 0 / 0.45)); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Ant Design v5's language as plain CSS tokens",
+    "overview": "Ant Design v5's language, written as plain CSS custom properties in src/styles/global.css. There is no React and no antd package: the tokens at the top of that file are the whole system, and every component style in the site is built from them. Ant supplies the palette, the neutral scale, the radii, the elevation, the control heights and the button, card, list, menu, anchor and table shapes. IBM Plex supplies the letterforms, because it is self-hosted and has a matching Korean cut.\n\nThe site is flat until something is a card. A card at rest is a 1px #f0f0f0 border on the container's white, with no shadow; the showcase card on the front page is the one surface elevated at rest, because it is what the page is about. Colour on a page comes from the shaders: the chrome holds one blue and one red, and the greys carry everything else.\n\nDark is Ant's dark algorithm, with the link and rail blue lifted one step so it clears 4.5:1 on the #141414 ground. Motion is Ant's single 0.2s curve on hover and press. The shaders move; the chrome does not.",
+    "keyCharacteristics": [
+      "Ant Design v5 tokens as plain CSS custom properties, no React and no antd package",
+      "One blue (#1677ff) and one red (#ff4d4f); every other colour is a grey",
+      "Three radii: 4px on a tag, 6px on a control, 8px on a card or code frame",
+      "Flat at rest, elevated on state, with the showcase card the one exception",
+      "IBM Plex Sans and Mono, self-hosted, with a Korean cut at 400 and 600",
+      "Three measures: the 1200px container, the 740px document column, the 960px wide figure",
+      "One transition, 0.2s cubic-bezier(0.645, 0.045, 0.355, 1)"
+    ],
+    "rules": [
+      { "name": "The Two Families Rule", "body": "Plex Sans carries interface and prose; Plex Mono carries code, identifiers, diagnostics, the version tag, the layout table and a uniform's own field name. A word that names something the compiler reads is set in the mono face wherever it appears.", "section": "typography" },
+      { "name": "The Single Blue Rule", "body": "The page has one blue and one red. A new state finds its colour in the primary's own wash (#e6f4ff), border (#91caff) or text hover (#69b1ff) before it introduces a hue.", "section": "colors" },
+      { "name": "The Resting Flat Rule", "body": "A surface earns its shadow from state or from being the one thing the page is about. The showcase card is elevated at rest because it is the page's subject; a tile, a pager and a table row are flat until the pointer is on them.", "section": "elevation" },
+      { "name": "The Container Rule", "body": "A full-width page is laid out in the 1200px container with the gutters; a page of prose is laid out in the 740px column. A third measure needs a reason.", "section": "layout" }
+    ],
+    "dos": [
+      "Do build a new surface from the tokens at the top of src/styles/global.css; both palettes live there and nowhere else.",
+      "Do use the default button face for everything but the page's own action, which is the filled face at the large size (40px, 16px text, 8px radius).",
+      "Do give a card a 1px #f0f0f0 border, an 8px radius and 16px of body padding, and let the elevation shadow arrive on hover as the border goes transparent.",
+      "Do set interface text at 14px and prose at 16px, with headings at 38, 30, 24, 20 and 16px, each at weight 600.",
+      "Do put every canvas over its build-time still, so the frame is never empty.",
+      "Do keep the one transition: 0.2s cubic-bezier(0.645, 0.045, 0.355, 1) on colour, border, background and shadow."
+    ],
+    "donts": [
+      "Don't add a third hue. The chrome has one blue and one red, and the colour on a page comes from the shaders.",
+      "Don't use a colour gradient, a glow or a coloured card border.",
+      "Don't write a utility class into the markup. Tailwind is kept for its @theme tokens and preflight.",
+      "Don't put a resting shadow on a surface that is not the page's subject.",
+      "Don't invent a fourth radius or a fourth measure.",
+      "Don't set a label in capitals, a tracked eyebrow line above a heading, or a metadata string joined by middle dots."
+    ]
+  }
+}

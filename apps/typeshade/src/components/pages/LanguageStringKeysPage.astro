@@ -1,0 +1,38 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import Rich from '../Rich.astro';
+import { copyFor, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).language.topics.stringKeys;
+const headings = ['keys', 'record', 'numeric', 'host', 'collections'].map((slug) => ({
+  depth: 2, slug, text: content[slug as 'keys' | 'record' | 'numeric' | 'host' | 'collections'],
+}));
+const host = `import { gain } from './gain.shade.ts';\nconst value = gain('g', { r: 1.2, g: 1, b: 0.8 });`;
+---
+
+<Docs locale={locale} path={links.languageStringKeys.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
+  <h1>{content.h1}</h1><p>{content.intro}</p>
+  <h2 id="keys">{content.keys}</h2>
+  <p><Rich text={content.keysP} locale={locale} /></p>
+  <p><Rich text={content.operationsP} locale={locale} /></p>
+  <h2 id="record">{content.record}</h2>
+  <p><Rich text={content.recordP} locale={locale} /></p>
+  <TypeShadeCode code={`"use typeshade";
+type Channel = "r" | "g" | "b";
+export function gain(c: Channel, by: Record<Channel, f32>): f32 {
+  return by[c];
+}`} />
+  <h2 id="numeric">{content.numeric}</h2>
+  <p><Rich text={content.numericP} locale={locale} /></p>
+  <h2 id="host">{content.host}</h2>
+  <p><Rich text={content.hostP} locale={locale} /></p>
+  <TypeShadeCode code={host} title="host.ts" />
+  <p><Rich text={content.deviationP} locale={locale} /></p>
+  <h2 id="collections">{content.collections}</h2>
+  <p><Rich text={content.collectionsP} locale={locale} /></p>
+  <p><Rich text={content.exampleP} locale={locale} /></p>
+</Docs>

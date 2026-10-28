@@ -1,0 +1,7 @@
+{
+  "slug": "mat3f64t",
+  "source": "bee33bd51bb3fc9870d5a704bf95e387ce6f55d0847bb2ee84b2eb777d0e219a",
+  "texts": {
+    "summary": "3×3 에뮬레이션 배정밀도 행렬입니다. 생성 방식과 이 행렬에서 쓸 수 있는 행렬 연산은 mat2f64T 항목을 참고합니다."
+  }
+}

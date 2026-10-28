@@ -1,0 +1,7 @@
+{
+  "slug": "texture2dit",
+  "source": "954c5ed88d8dfd9fc1ff747ac41306a66760a16c61f72552d4e5cffe11ba9c95",
+  "texts": {
+    "summary": "부호 있는 정수 2D 텍스처입니다. texture2duT의 부호 있는 짝이며, 로드만 허용하는 계약도 같습니다."
+  }
+}

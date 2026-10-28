@@ -1,0 +1,10 @@
+{
+  "slug": "handlearray",
+  "source": "ac194d2a0e1bed8335663d4cd811c6d7b13c998cf189f84fdf1b0495e4cb3309",
+  "texts": {
+    "summary": "원소가 구조체 핸들인, 크기가 고정된 array<Element, N> 유니폼 필드이다: patterns: arrayOf.",
+    "description": "필드 프록시는 타입이 지정된 `.at(i)` 메서드를 제공합니다. 이 메서드는 원소의 필드 프록시, 즉 `U.field.patterns.at(k).id`를 반환합니다. 선언되는 WGSL 타입은 `array<T, N>`이입니다.",
+    "members.element": "원소의 구조체 핸들입니다.",
+    "members.count": "배열의 길이입니다."
+  }
+}

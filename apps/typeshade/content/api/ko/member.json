@@ -1,0 +1,8 @@
+{
+  "slug": "member",
+  "source": "77b6fd58b2e69fd587241112130c7ae01484421eee130bb9e2ff0020c1a27426",
+  "texts": {
+    "summary": "저수준 구조체 멤버 접근(base.name)으로, 필드 타입을 직접 지정합니다.",
+    "description": "셰이더는 보통 구조체 선언이 제공하는 타입이 붙은 getter로 필드를 읽습니다. 이 함수는 그 getter들이 기반으로 삼는 기본 요소입니다."
+  }
+}

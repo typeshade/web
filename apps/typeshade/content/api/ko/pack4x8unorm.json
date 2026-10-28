@@ -1,0 +1,10 @@
+{
+  "slug": "pack4x8unorm",
+  "source": "f4dcc6b3f06878c7416d01d2fdb605dd6078cc0676afb029a8ac3c7eac988458",
+  "texts": {
+    "summary": "vec4<f32>를 u32 하나에 RGBA8로 패킹합니다.",
+    "targets.wgsl": "`pack4x8unorm(v)`로 생성합니다.",
+    "targets.glsl": "`(uint(floor(0.5 + clamp(v.x, 0.0, 1.0) * 255.0)) | (uint(floor(0.5 + clamp(v.y, 0.0, 1.0) * 255.0)) << 8) | (uint(floor(0.5 + clamp(v.z, 0.0, 1.0) * 255.0)) << 16) | (uint(floor(0.5 + clamp(v.w, 0.0, 1.0) * 255.0)) << 24))`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

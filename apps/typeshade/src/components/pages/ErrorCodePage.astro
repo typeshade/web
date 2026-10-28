@@ -1,0 +1,329 @@
+---
+// One diagnostic code on a page of its own, at /reference/errors/<code>/. MDN's order for an
+// error: the code, its constant and what it means; When it fires, the registry's own
+// documentation; an Example, a "use typeshade" program compiled at build time with what the
+// compiler reported; How to fix it, the registry's hint first and the program corrected;
+// The rule this enforces, from the design rules (src/lib/design-rules.ts); See also; and the
+// Source lines that raise it. A section with nothing true in it is left out, and a code with
+// no example says why under its summary. Everything about the code is src/lib/error-codes.ts;
+// the words around it are docs.errors in every dictionary.
+import { Code } from 'astro-expressive-code/components';
+import Docs, { type Heading } from '../../layouts/Docs.astro';
+import CodeFrame from '../CodeFrame.astro';
+import LinkColumns from '../LinkColumns.astro';
+import Rich from '../Rich.astro';
+import { copyFor, guideSection, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
+import { facts } from '../../lib/examples.ts';
+import {
+  assertErrorLines,
+  errorCode,
+  errorCodePath,
+  errorPageOrder,
+  siteHref,
+  type ErrorCodeEntry,
+  type ErrorGroup,
+  type ReportedDiagnostic,
+} from '../../lib/error-codes.ts';
+import { languageEntries, languageEntryPath } from '../../lib/language-reference.ts';
+import { assertRuleReadings, rulePath, rulesForCode } from '../../lib/design-rules.ts';
+import type { RuleHtml } from '../../lib/rules-loader.ts';
+import { getEntry } from 'astro:content';
+import { apiPage, editCopy, links } from '../../lib/links.ts';
+import { META_MIN, fitDescription } from '../../lib/meta-description.ts';
+
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+const { locale, slug } = Astro.props;
+const d = copyFor(locale).docs;
+const r = d.reference;
+const x = d.errors;
+const e = x.entry;
+const entry = errorCode(slug);
+assertErrorLines(x.lines);
+assertRuleReadings(copyFor('en'));
+
+const siteLine = entry.name ? (x.lines as Record<string, string>)[entry.name] ?? '' : '';
+// The lead: the registry's first sentence, or where the registry documents nothing, the
+// dictionary's line in the page's language.
+const lead = entry.line ? { text: entry.line, lang: 'en' } : { text: siteLine, lang: locale };
+const head = entry.name ? `${entry.code} ${entry.name}` : entry.code;
+
+const title = e.title(head, entry.family === 'sd' ? entry.line : '');
+if (title.length < 45 || title.length > 60) {
+  throw new Error(`[error-code] ${entry.code} has a ${title.length}-character title, outside the 45 to 60 the SEO checks want: ${title}`);
+}
+const plain = (text: string): string => text.replace(/`/g, '');
+const composed = e.description(head, plain(lead.text));
+const description = fitDescription(composed.length < META_MIN ? `${composed} ${e.fill}` : composed, localeSettings[locale].metaDescriptionMax);
+
+const kind = entry.family === 'sd' ? e.kindSd : entry.name ? e.kindTs : e.kindRetired;
+// When it fires: the registry's documentation, where it says more than the lead above it.
+const when = entry.docs.join(' ') !== entry.line ? entry.docs : [];
+// An SD code's registry text is its summary first, which is the lead; what follows it is the
+// file's own comments on the entry.
+const whenParagraphs = entry.family === 'sd' ? when.slice(1) : when;
+const example = entry.example;
+const counterpart = entry.counterpart;
+const showFix = entry.hint.length > 0 || example !== null;
+const FILE = 'example.shade.ts';
+
+// A line the code's own diagnostic points at is marked in the frame. A BACKEND diagnostic
+// sits on the file's first line because it is about the whole module, so it marks nothing.
+const marks = (diagnostics: readonly ReportedDiagnostic[], code: string): string => {
+  const lines = [...new Set(diagnostics.filter((d) => d.code === code && d.code !== 'TS8015' && d.line > 0).map((d) => d.line))];
+  return lines.length > 0 ? `{${lines.join(',')}}` : '';
+};
+
+// See also: the codes this one names or is named by, the guide page its group is about, the
+// names of the language reference its registry text writes in code, and the index.
+const GUIDE: Partial<Record<ErrorGroup, { href: string; label: string; code?: boolean }>> = {
+  file: { href: links.guide.href, label: d.labels.languageGuide },
+  types: { href: links.languageTypes.href, label: d.labels.topics.types },
+  functions: { href: links.languageFunctions.href, label: d.labels.topics.functions },
+  controlFlow: { href: links.languageControlFlow.href, label: d.labels.topics.controlFlow },
+  entries: { href: links.languageStages.href, label: d.labels.topics.stages },
+  resources: { href: links.languageResources.href, label: d.labels.topics.resources },
+  f64: { href: links.fromTsDouble.href, label: d.labels.mappingSections.fromTypescript.double },
+  targets: { href: links.conceptsWgsl.href, label: d.labels.conceptPages.wgslAndGlsl },
+  builder: { href: apiPage('fn'), label: e.builderPage },
+  lint: { href: `${links.internals.href}diagnostics/`, label: guideSection(locale, 'diagnostics').title },
+};
+const byTitle = new Map<string, string>();
+for (const le of languageEntries()) {
+  const path = languageEntryPath(le.kind, le.name);
+  // A name two tables carry (`f32` the type and `f32()` the cast) goes to the first one listed.
+  if (!byTitle.has(le.title)) byTitle.set(le.title, path);
+}
+const referenceLinks: { href: string; label: string }[] = [];
+for (const span of entry.spans) {
+  const m = /^(@?[A-Za-z_][A-Za-z0-9_]*)(\(.*\))?$/.exec(span);
+  if (!m) continue;
+  const path = byTitle.get(m[1]!);
+  if (!path || referenceLinks.some((l) => l.label === m[1])) continue;
+  referenceLinks.push({ href: localePath(locale, path), label: m[1]! });
+  if (referenceLinks.length === 6) break;
+}
+const related = entry.related.map((code) => ({ code, href: localePath(locale, errorCodePath(code)!), entry: errorCode(code.toLowerCase()) }));
+const guide = GUIDE[entry.group];
+
+// The design rules this code enforces, each with the first sentence of its text. That line is
+// Markdown rendered once (src/lib/rules-loader.ts), so its links name the English pages.
+const rules = await Promise.all(
+  rulesForCode(entry.code).map(async (rule) => {
+    const stored = await getEntry('rules', rule.slug);
+    const html = (stored?.data as { html: RuleHtml } | undefined)?.html.line ?? '';
+    return {
+      rule,
+      href: localePath(locale, rulePath(rule.number)!),
+      line: locale === 'en' ? html : html.replace(/href="\/(api|reference\/errors|reference\/rules)\//g, `href="/${locale}/$1/`),
+    };
+  }),
+);
+
+const lineFor = (other: ErrorCodeEntry): { text: string; lang: string } =>
+  other.line ? { text: other.line, lang: 'en' } : { text: (other.name && (x.lines as Record<string, string>)[other.name]) || '', lang: locale };
+
+const sections = [
+  { id: 'when-it-fires', label: e.whenH, show: whenParagraphs.length > 0 },
+  { id: 'example', label: e.exampleH, show: example !== null },
+  { id: 'in-the-front-end', label: e.frontEndH, show: counterpart !== null },
+  { id: 'how-to-fix-it', label: e.fixH, show: showFix },
+  { id: 'rules', label: e.ruleH(rules.length), show: rules.length > 0 },
+  { id: 'see-also', label: e.seeAlsoH, show: true },
+  { id: 'source', label: e.sourceH, show: true },
+].filter((s) => s.show);
+const headings: Heading[] = sections.map((s) => ({ depth: 2, slug: s.id, text: s.label }));
+
+// Previous and next walk the codes in the index's order, and step out to the index at the
+// front and to the design rules at the end, which is what the sidebar lists next.
+const order = errorPageOrder();
+const at = order.findIndex((o) => o.code === entry.code);
+const index = { label: x.h1, href: localePath(locale, links.errors.href) };
+const before = order[at - 1];
+const after = order[at + 1];
+const previous = before ? { label: before.code, href: localePath(locale, `/reference/errors/${before.slug}/`) } : index;
+const next = after ? { label: after.code, href: localePath(locale, `/reference/errors/${after.slug}/`) } : { label: d.rules.h1, href: localePath(locale, links.rules.href) };
+const meta = `title:${head}`;
+const gapText = entry.gap === 'retired' ? e.retired : entry.gap === 'builder' ? e.builder : entry.gap === 'internal' ? e.internal : entry.gap === 'unwritten' ? e.unwritten : '';
+---
+
+<Docs
+  locale={locale}
+  path={`/reference/errors/${entry.slug}/`}
+  title={title}
+  description={description}
+  headings={headings}
+  editHref={editCopy(locale, 'docs')}
+  previous={previous}
+  next={next}
+  label={entry.code}
+  meta={meta}
+  breadcrumbs={[
+    { name: r.reference, href: links.reference.href },
+    { name: x.h1, href: links.errors.href },
+    { name: entry.code, href: `/reference/errors/${entry.slug}/` },
+  ]}
+  dateModified={facts.pinnedDate}
+>
+  <nav class="api-crumbs" aria-label={r.breadcrumbs} lang={locale}>
+    <a href={localePath(locale, links.reference.href)}>{r.h1}</a>
+    <span aria-hidden="true">›</span>
+    <a href={index.href}>{x.h1}</a>
+  </nav>
+  <h1><code>{entry.code}</code></h1>
+  <p class="api-kind" lang={locale} data-pagefind-meta={`${e.kindMeta}:${kind}`}>
+    {kind}{entry.name && <> <code class="text-text-2">{entry.name}</code></>}
+  </p>
+  <p class="api-summary" lang={lead.lang}><Rich text={lead.text} locale={locale} /></p>
+  {!entry.line && siteLine && <p class="guide-note" lang={locale}>{e.undocumented}</p>}
+  {gapText && <p lang={locale}><Rich text={gapText} locale={locale} /></p>}
+  <p class="guide-note" lang={locale}><Rich text={x.note} locale={locale} /></p>
+
+  {whenParagraphs.length > 0 && (
+    <section>
+      <h2 id="when-it-fires" lang={locale}>{e.whenH}</h2>
+      {whenParagraphs.map((p) => <p lang="en"><Rich text={p} locale={locale} /></p>)}
+    </section>
+  )}
+
+  {example && (
+    <section>
+      <h2 id="example" lang={locale}>{e.exampleH}</h2>
+      <CodeFrame label={`${e.exampleH}, ${FILE}`}>
+        <Code code={example.trigger} lang="ts" title={FILE} meta={marks(example.diagnostics, entry.code)} locale={locale} />
+      </CodeFrame>
+      {example.deprecations && <p lang={locale}><Rich text={e.deprecations} locale={locale} /></p>}
+      {example.consoleGpu && <p lang={locale}><Rich text={e.consoleGpu} locale={locale} /></p>}
+      <p lang={locale}><Rich text={example.channel === 'backend' ? e.backend : example.channel === 'diagnose' ? e.diagnose : e.compiled} locale={locale} /></p>
+      <div class="error-report" lang="en">
+        {example.diagnostics.map((dg) => (
+          <p class="diagnostic">
+            <b>{dg.code && dg.code !== entry.code && errorCodePath(dg.code) ? <a href={localePath(locale, errorCodePath(dg.code)!)}>{dg.code}</a> : dg.code}</b>{' '}
+            {dg.severity}{dg.line > 0 && <span lang={locale}>, {e.lineAt(dg.line)}</span>}: {dg.message}
+          </p>
+        ))}
+        {example.thrown && (
+          <p class="diagnostic"><b>{example.thrown.code}</b> {example.thrown.message}</p>
+        )}
+      </div>
+    </section>
+  )}
+
+  {counterpart && (
+    <section>
+      <h2 id="in-the-front-end" lang={locale}>{e.frontEndH}</h2>
+      <p lang={locale}><Rich text={e.frontEnd} locale={locale} /></p>
+      <CodeFrame label={`${e.frontEndH}, ${FILE}`}>
+        <Code code={counterpart.program} lang="ts" title={FILE} meta={marks(counterpart.diagnostics, counterpart.code)} locale={locale} />
+      </CodeFrame>
+      <div class="error-report" lang="en">
+        {counterpart.diagnostics.map((dg) => (
+          <p class="diagnostic">
+            <b>{dg.code && errorCodePath(dg.code) ? <a href={localePath(locale, errorCodePath(dg.code)!)}>{dg.code}</a> : dg.code}</b>{' '}
+            {dg.severity}{dg.line > 0 && <span lang={locale}>, {e.lineAt(dg.line)}</span>}: {dg.message}
+          </p>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {showFix && (
+    <section>
+      <h2 id="how-to-fix-it" lang={locale}>{e.fixH}</h2>
+      {entry.hint && (
+        <p><span lang={locale}>{e.hint}</span> <span lang="en"><Rich text={entry.hint} locale={locale} /></span></p>
+      )}
+      {example && (
+        <>
+          <p lang={locale}><Rich text={example.channel === 'diagnose' ? e.fixedDiagnose : e.fixed} locale={locale} /></p>
+          <CodeFrame label={`${e.fixH}, ${FILE}`}>
+            <Code code={example.fix} lang="ts" title={FILE} locale={locale} />
+          </CodeFrame>
+          {example.files.length > 0 && <p lang={locale}><Rich text={e.otherFiles} locale={locale} /></p>}
+          {example.files.map((f) => (
+            <CodeFrame label={`${e.fixH}, ${f.name}`}>
+              <Code code={f.text} lang="ts" title={f.name} locale={locale} />
+            </CodeFrame>
+          ))}
+        </>
+      )}
+    </section>
+  )}
+
+  {rules.length > 0 && (
+    <section>
+      <h2 id="rules" lang={locale}>{e.ruleH(rules.length)}</h2>
+      <dl class="api-list api-index">
+        {rules.map((o) => (
+          <>
+            <dt>
+              <a href={o.href} lang={locale}>{d.rules.entry.heading(o.rule.number)}</a>
+              <span class="api-optional" lang={locale}>{d.rules.kinds[o.rule.verification]}</span>
+            </dt>
+            <dd lang="en"><Fragment set:html={o.line} /></dd>
+          </>
+        ))}
+      </dl>
+    </section>
+  )}
+
+  <section>
+    <h2 id="see-also" lang={locale}>{e.seeAlsoH}</h2>
+    {related.length > 0 && (
+      <dl class="api-list api-index">
+        {related.map((o) => {
+          const l = lineFor(o.entry)
+          return (
+            <>
+              <dt>
+                <a href={o.href}><code>{o.code}</code></a>
+                {o.entry.name && <span class="api-type"><code>{o.entry.name}</code></span>}
+              </dt>
+              <dd lang={l.lang}><Rich text={l.text} locale={locale} /></dd>
+            </>
+          )
+        })}
+      </dl>
+    )}
+    <LinkColumns>
+      {guide && <li><a href={localePath(locale, guide.href)} lang={locale}><Rich text={guide.label} locale={locale} /></a></li>}
+      {entry.family === 'sd' && <li><a href={localePath(locale, apiPage('TypeShadeError'))} lang="en"><code>TypeShadeError</code></a></li>}
+      {referenceLinks.map((l) => <li><a href={l.href} lang="en"><code>{l.label}</code></a></li>)}
+      <li><a href={index.href} lang={locale}>{x.h1}</a></li>
+    </LinkColumns>
+  </section>
+
+  <section>
+    <h2 id="source" lang={locale}>{e.sourceH}</h2>
+    {entry.sites.length > 0 ? (
+      <>
+        <p lang={locale}>{e.sourceP(facts.pinnedCommit)}</p>
+        <ul class="error-sites">
+          {entry.sites.map((s) => (
+            <li>
+              <a href={siteHref(facts.mirrorUrl, facts.pinnedCommit, s)}><code>{`${s.file}:${s.line}`}</code></a>
+              {s.count > 1 && <span class="text-text-3" lang={locale}> ({e.sites(s.count)})</span>}
+            </li>
+          ))}
+        </ul>
+      </>
+    ) : (
+      <p lang={locale}>{e.noSites}</p>
+    )}
+  </section>
+</Docs>
+
+<style>
+  /* The compiler's report under a frame: one diagnostic per line, the shared `.diagnostic`
+     face. A code in it that has a page of its own links there in the report's red. */
+  .error-report { margin-block-start: 8px }
+  .error-report :global(.diagnostic) { margin-block-start: 6px }
+  .error-report :global(.diagnostic b a) { color: inherit; text-decoration: underline; text-decoration-color: currentColor; text-underline-offset: 3px }
+  /* The source lines, one file per row, in the code face at the code size. The list sits in
+     the document column, so its margin outranks `.doc ul`. */
+  .error-sites { margin-block-start: 12px; padding-inline-start: 0; list-style: none }
+  .error-sites li { margin-block-start: 4px }
+  .error-sites code { font-size: var(--text-code); overflow-wrap: anywhere }
+</style>

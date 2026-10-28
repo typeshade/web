@@ -1,0 +1,8 @@
+{
+  "slug": "buildinfo",
+  "source": "ff0f46620b9003982a9ecfd516e85d89d4712e4fafdffd56f439b41afd844f41",
+  "texts": {
+    "summary": "패키지 정보의 고정된 복사본입니다. 소스 체크아웃에는 리비전이 기록되지 않습니다.",
+    "description": "패키징은 수정되지 않은 소스의 리비전을 확인한 뒤에만 생성된 JavaScript에 기록할 수 있다(변경 0083). `typeshade`와 `typeshade/runtime`에서 내보냅니다."
+  }
+}

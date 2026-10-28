@@ -1,0 +1,8 @@
+{
+  "slug": "accuracyof",
+  "source": "511175e0e257b86e16afda8b6fce8ba7947e3f1fd4851684f4062075322d7f3e",
+  "texts": {
+    "summary": "내장 함수 id, 이항 연산자 또는 행렬 곱이 IR에 적힌 그대로 f32로 계산될 때, WGSL §15.7.4가 허용하는 결과의 범위를 반환합니다. 결과가 하나로 정해지고 두 타깃이 모두 그 값을 반환하면 { kind: 'exact' }를 돌려줍니다. 그렇지 않으면 determinismReport가 나열할 분류와 오차 한계를 반환합니다.",
+    "description": "표에 없는 이름이면 `undefined`를 돌려줍니다. 테스트 스위트는 컴파일러가 낼 수 있는 모든 id에 대해 이 경우를 실패로 처리합니다. 그래서 실제 id의 반환값은 `undefined`가 될 수 없습니다."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "slug": "sqrt",
+  "source": "f56bd599d0adfc3230156d1c4f6a4df07deb96b4ac47048517c27e6c88da353c",
+  "texts": {
+    "summary": "sqrt(x): 성분별 제곱근입니다.",
+    "description": "`x < 0`은 명세상 정의되지 않습니다. 1/√x만 필요할 때는 [`inverseSqrt`](/api/inversesqrt/)를 씁니다. 그 호출 한 번이 제곱근과 나눗셈을 대신합니다.",
+    "targets.wgsl": "`sqrt(x)`. `f64` 피연산자이면 fp64 패스가 이를 `df64` 헬퍼로 다시 씁니다.",
+    "targets.glsl": "`sqrt(x)`. `f64` 피연산자이면 fp64 패스가 이를 `df64` 헬퍼로 다시 씁니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

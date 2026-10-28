@@ -1,0 +1,13 @@
+{
+  "slug": "stencilstate",
+  "source": "ef88ea08a072b70483dac333ed3ac7657958dc5fb8092e81b4061713a3ff38b3",
+  "texts": {
+    "summary": "파이프라인의 스텐실 검사입니다.",
+    "description": "면에 관한 네 필드는 두 면에 모두 적용됩니다.",
+    "members.front": "stencilFront입니다. 앞면에 대한 재정의이며, 각 필드는 그 면에서 공통 필드를 대신합니다.",
+    "members.back": "stencilBack입니다. 뒷면에 대한 재정의이며, 각 필드는 그 면에서 공통 필드를 대신합니다.",
+    "members.readMask": "stencilReadMask입니다. 0부터 0xFFFFFFFF까지이며, 기본값은 0xFFFFFFFF입니다. 두 tier 모두 낮은 8비트만 씁니다.",
+    "members.writeMask": "stencilWriteMask입니다. 0부터 0xFFFFFFFF까지이며, 기본값은 0xFFFFFFFF입니다. 두 tier 모두 낮은 8비트만 씁니다.",
+    "members.reference": "setStencilReference입니다. `depth.stencil`이 있는 이 파이프라인의 그리기마다 쓰는 참조 값입니다. 0부터 255까지의 정수이며, 소수는 거부합니다. 설정하지 않으면 그리기는 패스의 값을 씁니다. 선언한 참조 값은 그 그리기에서 `pass.setStencilReference`보다 우선합니다."
+  }
+}

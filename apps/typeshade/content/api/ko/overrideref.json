@@ -1,0 +1,8 @@
+{
+  "slug": "overrideref",
+  "source": "94bd9ca9191a1feb942e35f996ecf34159a4c521e986b4f197fdb62347175426",
+  "texts": {
+    "summary": "파이프라인 특수화 상수를 읽는 노드로, overrideConst(...) 선언의 읽기 쪽입니다.",
+    "description": "결과는 [`ReadonlyNode`](/api/readonlynode/)이고, 최적화기는 이를 불투명한 값으로 다룹니다. 값은 파이프라인을 만들 때까지 기호로 남으므로, 상수 접기나 죽은 분기 제거 패스가 이 값이 조건인 분기를 접으면 안 됩니다. 작성 코드는 `overrideConst`가 돌려주는 핸들로 읽습니다. 이 함수는 그 핸들 밑에 있는 기본 요소입니다."
+  }
+}

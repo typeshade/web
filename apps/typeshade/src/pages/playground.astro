@@ -1,0 +1,52 @@
+---
+import Playground from '../components/Playground.astro';
+import Base from '../layouts/Base.astro';
+import { copyFor, localePath, type Locale } from '../i18n/index.ts';
+import { links } from '../lib/links.ts';
+import { GALLERY_ORIGIN } from '../lib/gallery-data.ts';
+import { githubNewIssue } from '../lib/issue-data.ts';
+
+const locale = 'en' as Locale;
+const t = copyFor(locale);
+---
+
+<Base
+  locale={locale}
+  path="/playground/"
+  title={t.playground.title}
+  description={t.playground.description}
+  searchable searchTitle="Playground">
+  <main class="playground-page">
+    <header class="playground-intro">
+      <h1>{t.playground.h1}</h1>
+      <p>{t.playground.intro}</p>
+      <p class="playground-links">
+        <a href={localePath(locale, links.quickStart.href)}>{t.docs.quickStart}</a>
+        <a href={localePath(locale, links.guide.href)}>{t.docs.authoringGuide}</a>
+        <a href={new URL(localePath(locale, '/'), GALLERY_ORIGIN).href}>{t.playground.galleryLink}</a>
+        <a href={githubNewIssue('compiler')} data-report="compiler">{t.docs.reportIssue}</a>
+      </p>
+    </header>
+    <Playground locale={locale} />
+  </main>
+</Base>
+
+<style>
+  /* A tool page, so the heading is one line above the tool and not a landing page above it:
+     the editor and the canvas are what the reader came for, and both fit the first screen.
+     The region sits in the site's shell, the same measure the header, the footer and the
+     documentation grid take, so the tool's edges line up with the header's over it, and the
+     space over the heading is the space a documentation page gives its own h1. */
+  .playground-page { max-inline-size: var(--container); margin-inline: auto; padding: 32px var(--gutter-x) 64px; }
+  /* The intro sits on the tool's content edge and not on the region's: the tool's 1px border
+     and the 14px its toolbar is padded by, so the heading, the sentence and the links line up
+     with the file name in the toolbar under them. */
+  .playground-intro { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-bottom: 14px; padding-inline: 15px; }
+  h1 { margin: 0; font-size: 1.5rem; line-height: 1.25; }
+  .playground-intro p { margin: 0; color: var(--color-text-2); font-size: .875rem; line-height: 1.5; }
+  /* The links wrap to a second row where a phone has no room for them in one. */
+  .playground-links { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-left: auto; }
+  .playground-links a { color: var(--color-accent); text-decoration: none; white-space: nowrap; }
+  .playground-links a:hover { text-decoration: underline; }
+  @media (min-width: 64rem) { .playground-page { padding-block-start: 40px; } }
+</style>

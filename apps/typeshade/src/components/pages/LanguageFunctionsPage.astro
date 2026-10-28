@@ -1,0 +1,81 @@
+---
+// Language guide: Functions. Content lives in language.topics.functions (src/i18n/en.ts,
+// src/i18n/ko.ts); the code samples are not copy, so they stay here.
+import Docs from '../../layouts/Docs.astro';
+import TypeShadeCode from '../TypeShadeCode.astro';
+import ConceptDoc from '../ConceptDoc.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links } from '../../lib/links.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = copyFor(locale).language.topics.functions;
+const headings = [
+  ['anatomy', content.anatomy], ['params', content.params], ['helper', content.helper], ['call', content.call],
+  ['entry', content.entry], ['builtin', content.builtin], ['compute', content.compute], ['graphics', content.graphics],
+  ['scope', content.scope], ['boundary', content.boundary], ['example', content.example],
+].map(([slug, text]) => ({ depth: 2, slug, text }));
+---
+
+<Docs locale={locale} path={links.languageFunctions.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
+  <h1>{content.h1}</h1>
+  <p><Rich text={content.intro} locale={locale} /></p>
+
+  <h2 id="anatomy">{content.anatomy}</h2>
+  <p>{content.anatomyP}</p>
+  <TypeShadeCode code={`function addBias(value: f32): f32 {\n  return value + 0.5\n}`} />
+  <p set:html={content.anatomyNote} />
+
+  <h2 id="params">{content.params}</h2>
+  <p>{content.paramsP}</p>
+  <TypeShadeCode code={`function mix(a: vec4, b: vec4, amount: f32): vec4 {\n  return a + (b - a) * amount\n}`} />
+  <ConceptDoc locale={locale} rows={content.paramsTable.slice(1)} columns={content.paramsTable[0]} />
+  <p><Rich text={content.paramsRefP} locale={locale} /></p>
+  <TypeShadeCode code={`function swap(@inout a: f32, @inout b: f32): void {\n  const t = a\n  a = b\n  b = t\n}\n\nfunction add(a: f32, b: f32, @out c: f32): void {\n  c = a + b\n}\n\nfunction spread(x: f32, y: f32): f32 {\n  let lo = x\n  let hi = y\n  if (lo > hi) {\n    swap(lo, hi)\n  }\n  let s: f32\n  add(hi, -lo, s)\n  return s\n}`} />
+
+  <h2 id="helper">{content.helper}</h2>
+  <p>{content.helperP}</p>
+  <TypeShadeCode code={`function saturate(x: f32): f32 {\n  return clamp(x, 0.0, 1.0)\n}\n\nfunction remap(x: f32): f32 {\n  return saturate(x * 2.0 - 1.0)\n}`} />
+  <p>{content.helperNote}</p>
+
+  <h2 id="call">{content.call}</h2>
+  <p>{content.callP}</p>
+  <TypeShadeCode code={`function addBias(value: f32): f32 {\n  return value + 0.5\n}\n\nfunction shade(value: f32): f32 {\n  const biased = addBias(value)\n  return clamp(biased, 0.0, 1.0)\n}`} />
+  <p><Rich text={content.callNote} locale={locale} /></p>
+
+  <h2 id="entry">{content.entry}</h2>
+  <p><Rich text={content.entryP} locale={locale} /></p>
+  <TypeShadeCode code={`@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  pixels[gid.x] = addBias(camera.pos.x)\n}`} />
+  <p><Rich text={content.entryNote} locale={locale} /></p>
+
+  <h2 id="builtin">{content.builtin}</h2>
+  <p>{content.builtinP}</p>
+  <TypeShadeCode code={`@compute([64, 1, 1])\nexport function paint(\n  @builtin("global_invocation_id") gid: vec3u\n) {\n  const i = gid.x\n  pixels[i] = pixels[i] + camera.pos.x\n}`} />
+  <ConceptDoc locale={locale} rows={content.builtinTable.slice(1)} columns={content.builtinTable[0]} />
+
+  <h2 id="compute">{content.compute}</h2>
+  <p><Rich text={content.computeP} locale={locale} /></p>
+  <TypeShadeCode code={`@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  const i = gid.x\n  pixels[i] = pixels[i] + camera.pos.x\n}`} />
+  <p>{content.computeNote}</p>
+
+  <h2 id="graphics">{content.graphics}</h2>
+  <p>{content.graphicsP}</p>
+  <TypeShadeCode code={`@vertex\nexport function vs(\n  @builtin("vertex_index") vid: u32,\n  vin: VsIn\n): vec4 {\n  return camera.view * vec4(vin.position, 1)\n}\n\n@fragment\nexport function fs(@builtin("position") pid: vec4): vec4 {\n  return vec4(pid.x, 0, 0, 1)\n}`} />
+  <p><Rich text={content.graphicsNote} locale={locale} /></p>
+
+  <h2 id="scope">{content.scope}</h2>
+  <p>{content.scopeP}</p>
+  <TypeShadeCode code={`function exposure(color: vec3, amount: f32): vec3 {\n  const factor = amount + 1.0\n  return color * factor\n}`} />
+  <p><Rich text={content.scopeNote} locale={locale} /></p>
+
+  <h2 id="boundary">{content.boundary}</h2>
+  <ul>{content.boundaryItems.map((item) => <li>{item}</li>)}</ul>
+
+  <h2 id="example">{content.example}</h2>
+  <p>{content.exampleP}</p>
+  <TypeShadeCode code={`"use typeshade";\n\nfunction addBias(value: f32): f32 {\n  return value + 0.5;\n}\n\n@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  const value = camera.pos.x;\n  pixels[gid.x] = addBias(value);\n}`} />
+  <p><Rich text={content.exampleNote} locale={locale} /></p>
+
+  <p><a href={localePath(locale, links.languageControlFlow.href)}>{content.next}</a></p>
+</Docs>

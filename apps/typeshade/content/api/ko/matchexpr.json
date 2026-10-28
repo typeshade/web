@@ -1,0 +1,9 @@
+{
+  "slug": "matchexpr",
+  "source": "35715f92d9ef596b683eb936d5b09c4cfa989b469108573be9db68655a85cd1c",
+  "texts": {
+    "summary": "스칼라 판별값(scrutinee)에 대한 타입이 정해진 다중 분기 디스패치이며, switch (scrutinee) { case v0: r0; …; default: dflt }의 식 형태입니다.",
+    "description": "각 분기는 정수 case 값과 그 결과를 짝지은 것입니다. 결과는 노드로 주거나, 노드를 만드는 인자 없는 함수로 줄 수 있습니다. default도 같은 두 형태를 받습니다.\n\n생성 전에 함수 본문의 모든 `matchExpr`는 `var` 슬롯과 `switch` 문으로 다시 쓰입니다. 이 문은 각 분기의 값을 그 슬롯에 씁니다. 분기가 10개 이상이면 정수가 아닌 판별값을 i32로 캐스팅합니다. WGSL의 `switch`는 정수에만 쓸 수 있기 때문입니다.\n\n모든 분기의 타입은 default의 타입과 같아야 합니다. 공유된 `R extends string` 제약이 대부분의 불일치를 `tsc`에서 거부합니다. 런타임까지 넘어온 불일치는 예외를 던집니다.",
+    "exceptions.TypeShadeError": "분기의 타입이 default의 타입과 다를 때 발생하며, 코드는 `SD0011`이입니다."
+  }
+}

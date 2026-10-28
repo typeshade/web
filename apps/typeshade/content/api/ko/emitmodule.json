@@ -1,0 +1,9 @@
+{
+  "slug": "emitmodule",
+  "source": "0d32c6241ae9632b953e7d4c04dc7a36d39ed94c10262c4bbef0fa2c135324a6",
+  "texts": {
+    "summary": "ModuleDecl을 완전한 WGSL 모듈 문자열로 생성합니다. 결과는 device.createShaderModule에 바로 넘길 수 있습니다.",
+    "description": "유효성 검사, 기능 검사, 하향 변환 패스, 옵티마이저를 실행한 뒤 `enable` 지시문, 구조체, 바인딩, 상수, 함수를 조립합니다.\n\n`opts`는 선택 사항인 [`EmitOptions`](/api/emitoptions/)입니다. `plugins`는 생성 시점의 변환을 받습니다. 예를 들어 `typeshade/emit-prod` 하위 경로의 배포용 플러그인이 여기에 해당합니다. `parens`는 표현식마다 괄호를 몇 개 둘지 고릅니다.",
+    "targets.wgsl": "WebGPU용 WGSL을 생성합니다."
+  }
+}

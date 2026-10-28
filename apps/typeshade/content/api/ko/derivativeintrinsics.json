@@ -1,0 +1,8 @@
+{
+  "slug": "derivativeintrinsics",
+  "source": "72de299135813ffebe65a62b493e257ef9a8402d0dff8b021432c1b29e46e147",
+  "texts": {
+    "summary": "값이 이웃한 인보케이션 사이의 차이인 내장 함수들입니다. 그래서 WGSL은 이 호출 지점에서 균일한 제어 흐름을 요구합니다. 여기에는 미분 함수 자체와, 세부 수준(LOD)을 암묵적으로 유도하는 모든 샘플링 형태가 포함됩니다.",
+    "description": "이 목록은 위의 카탈로그에서 파생되며 따로 나열하지 않습니다. 카탈로그에 샘플링 id를 추가하면 구조상 자동으로 이 목록에 들어옵니다. 명시적 `Level`이나 `Grad` 형태가 아닌 `textureSample…` id는 모두 암묵적 LOD가 필요합니다. `dpdx`, `dpdy`, `fwidth`와 그 `Coarse`, `Fine` 변형은 미분 함수입니다. `textureSampleLevel`, `textureSampleGrad`, `textureSampleCompareLevel`은 작성자가 적은 세부 수준을 그대로 가지므로 어디에서나 쓸 수 있습니다. 그래서 암묵적 LOD를 쓰는 호출에 대한 진단은 이 셋을 해결책으로 적습니다.\n\n이 목록과 `fragment-only-builtin`의 `FRAGMENT_ONLY_IDS`는 묻는 질문이 다릅니다. 그쪽은 어느 스테이지가 id에 닿을 수 있는지를 묻고, id마다 해결 문장을 함께 둡니다. 그 맵은 이 집합의 부분 집합입니다. 해결 문장은 계산되지 않고 직접 쓰이므로, 맵은 파생하지 않고 테스트로 고정합니다."
+  }
+}

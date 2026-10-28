@@ -1,0 +1,8 @@
+{
+  "slug": "fp64loweroptions",
+  "source": "a60a81fed4c42106aa0582c4975b789c7946001bf007738400160be84a23ffed",
+  "texts": {
+    "summary": "fp64Lower의 옵션입니다.",
+    "members.flavor": "주입된 `df64_*` 헬퍼 함수를 뒷받침하는 기반 연산을 고릅니다. 생략하면 `'float'`가 선택됩니다. `'integer'`가 알맞은 경우는 [`Fp64Flavor`](/api/fp64flavor/)에 설명되어 있습니다."
+  }
+}

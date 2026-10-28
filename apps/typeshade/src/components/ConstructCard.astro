@@ -1,0 +1,147 @@
+---
+// One TypeScript construct on /guide/language/from-typescript/, as an Ant Card. The card
+// itself is what separates one construct from the next, so a reader can see where a
+// construct ends even when its code runs tall, and the code sits in two panes instead of
+// three table columns, which gives each pane about twice the width a cell had. It sits
+// beside MappingTable.astro: use the table where a row is a one-line spelling, and this
+// where a row is a whole program beside the shader text it emits.
+//
+// Props
+//   locale     the page's locale, passed on to <Code> so the copy button speaks it.
+//   id         the card's anchor, the row's id in kebab case (`ternary-scalar`), so a page
+//              can link one construct: `/guide/language/from-typescript/control-flow/#ternary-scalar`.
+//   name       the construct's name, from the dictionary. Rendered through Rich, so it may
+//              carry backticked code: most constructs are named by the keyword spelling them.
+//   becomes    one sentence saying what the construct becomes, the copy that used to be the
+//              table's middle column and now runs at the card's full width. Rich, so it may
+//              carry code and a [text](linkKey) link to the .shade.ts example that uses it.
+//   ts         the TypeScript, taken from the program the build compiles. Not copy.
+//   tsTitle    the title bar over the left pane. One pair of titles serves the whole page,
+//              so no card repeats a column heading.
+//   emitTitle  the title bar over the right pane.
+//   wgsl       the emitted WGSL, or null on a construct the compiler refuses.
+//   diagnostic the compiler's own code and message, on a construct it refuses. A card
+//              carries one of `wgsl` and `diagnostic`, and a card with both or with neither
+//              stops the build.
+//   refusedLabel     the badge beside the name of a refused construct.
+//   diagnosticTitle  the label over the refusal, where an emitting card has its title bar.
+//
+// CSS: src/styles/global.css, under "The construct card". The classes are .construct-cards,
+// .construct-card, .construct-card-head, .construct-card-name, .construct-card-badge,
+// .construct-card-note, .construct-card-panes, .construct-card-pane,
+// .construct-card-pane-title and .construct-card-refusal. The panes sit side by side from
+// 48rem and stack below it, the TypeScript first.
+import { Code } from 'astro-expressive-code/components';
+import CodeFrame from './CodeFrame.astro';
+import Rich from './Rich.astro';
+import { localePath, type Locale } from '../i18n/index.ts';
+import { errorCodePath } from '../lib/error-codes.ts';
+
+// Named on a line of its own: the Astro compiler hoists an exported type alias by taking the
+// text up to its last closing brace, the way MappingTable.astro's header comment describes.
+export type ConstructDiagnostic = { readonly code: string; readonly message: string };
+
+interface Props {
+  locale: Locale;
+  id: string;
+  name: string;
+  becomes: string;
+  ts: string;
+  tsTitle: string;
+  emitTitle: string;
+  wgsl: string | null;
+  diagnostic: ConstructDiagnostic | null;
+  refusedLabel: string;
+  diagnosticTitle: string;
+}
+const { locale, id, name, becomes, ts, tsTitle, emitTitle, wgsl, diagnostic, refusedLabel, diagnosticTitle } = Astro.props;
+
+if ((wgsl === null) === (diagnostic === null)) {
+  const what = wgsl === null ? 'no emit and no diagnostic' : 'an emit and a diagnostic at once';
+  throw new Error(`[ConstructCard] '${name}' carries ${what}`);
+}
+
+// The accessible name of a code region: the pane's title and the construct it belongs to, so
+// a reader walking the page's regions hears which card each one is in. The backticks in the
+// name are markup for Rich and have no place in a label.
+const plain = name.replace(/`/g, '');
+const region = (title: string): string => `${title}, ${plain}`;
+// The compiler's code on a refused construct links to that code's page.
+const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(locale, errorCodePath(diagnostic.code)!) : undefined;
+---
+
+<li id={id} class="construct-card rounded-md border border-line-1 bg-(--color-elevated)">
+  <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+    <h3 class="construct-card-name font-semibold text-text-1 wrap-anywhere"><Rich text={name} locale={locale} /></h3>
+    {diagnostic && <span class="inline-block rounded-sm border border-diag bg-transparent px-[7px] text-label whitespace-nowrap text-diag">{refusedLabel}</span>}
+  </div>
+  <p class="construct-card-note max-inline-[62ch] text-ui text-text-2"><Rich text={becomes} locale={locale} /></p>
+  <div class="mbs-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2">
+    <div class="construct-card-pane min-inline-0">
+      <CodeFrame label={region(tsTitle)} holdTokens>
+        <Code code={ts} lang="ts" title={tsTitle} locale={locale} wrap />
+      </CodeFrame>
+    </div>
+    {wgsl !== null ? (
+      <div class="construct-card-pane min-inline-0">
+        <CodeFrame label={region(emitTitle)} holdTokens>
+          <Code code={wgsl} lang="wgsl" title={emitTitle} locale={locale} wrap />
+        </CodeFrame>
+      </div>
+    ) : (
+      <div class="construct-card-refusal min-inline-0">
+        <p class="construct-card-pane-title flex min-block-[34px] items-center text-ui text-text-3">{diagnosticTitle}</p>
+        <p class="diagnostic">{diagnostic!.code.length > 0 && <b>{errorPage ? <a href={errorPage}>{diagnostic!.code}</a> : diagnostic!.code}</b>} {diagnostic!.message}</p>
+      </div>
+    )}
+  </div>
+</li>
+
+<style>
+  /* One TypeScript construct per card on /guide/language/from-typescript/. An Ant Card, and
+     the card is what separates one construct from the next: the same page as three columns of
+     code put a hairline between rows that ran ten lines tall, and a reader could not see where
+     a construct ended. The head names the construct, the sentence under it runs at the card's
+     full width, and the panes sit side by side from 48rem and stack below it with the
+     TypeScript first. Every measure is relative to the card, so the cards stay inside the
+     document column (DESIGN.md, the Container Rule) at every width.
+
+     The card sits in the document column, so its list item, heading and paragraphs meet
+     `.doc li`, `.doc h3` and `.doc p`; the margins and the heading's size outrank them here. */
+  .construct-card { margin: 0; padding: 16px }
+  .construct-card-name { margin: 0; font-size: var(--text-h5); line-height: var(--text-h5--line-height) }
+  .construct-card-name :global(code), .construct-card-note :global(code) { font-family: var(--font-mono); font-size: 0.9em }
+  /* The card is as wide as two panes need and a card at the head of a wide column can be the
+     whole column; the sentence under the name keeps the measure a front page paragraph keeps,
+     so it does not run 130 characters across a card nobody meant to be a page. */
+  .construct-card-note { margin-block-start: 8px }
+  /* This outranks `.doc .expressive-code`, whose 24px of space above would open a gap between
+     a pane and the frame in it. */
+  .construct-card-pane :global(.expressive-code) {
+    margin: 0; --ec-brdRad: var(--radius-md); --ec-brdCol: var(--color-line-1); --ec-frm-shdCol: transparent;
+    --ec-codePadBlk: 10px; --ec-codePadInl: 12px; --ec-codeFontSize: var(--text-code); --ec-codeLineHt: 1.6;
+  }
+  .construct-card-pane :global(.expressive-code .copy) { display: none }
+  /* A pane is about 280px wide in the document column, and a line of a real program is longer
+     than that, so a line wraps at a space and reads on under the hanging indent Expressive
+     Code gives it. A name breaks inside itself only where the name alone is wider than the
+     pane. Two rules keep a break off the middle of a name: <CodeFrame holdTokens> holds a
+     token with a hyphen or an angle bracket in it together, and `overflow-wrap: normal`
+     overrides Expressive Code's own emergency break, so the two lines on this page that carry
+     a name longer than the pane scroll inside their frame instead of cutting the name in two.
+     The width is reset because Expressive Code marks a wrapping block `pre.wrap`, and the
+     site's own layout class of that name would give it the page's measure inside a card. */
+  .construct-card-pane :global(.expressive-code pre.wrap) { inline-size: auto; margin-inline: 0 }
+  .construct-card-pane :global(.expressive-code pre.wrap .ec-line .code) { overflow-wrap: normal; min-inline-size: 0 }
+  /* No copy button, so the first line keeps no room for one at its end. */
+  .construct-card-pane :global(.expressive-code :nth-child(1 of .ec-line) .code) { padding-inline-end: var(--ec-codePadInl) }
+  /* A refused construct: where the emitting card has a second frame, this one has the
+     compiler's own code and message in the diagnostic colour, under the label that says what
+     it is. It is no code frame, because nothing here was emitted. The label stands as tall as
+     a frame's title bar and the message starts where the frame's first line of code starts,
+     so the two panes of a refused construct read as one row. */
+  .construct-card-pane-title { margin: 0 }
+  .construct-card-refusal .diagnostic { margin-block-start: 10px }
+  /* The code keeps the diagnostic's red as a link, underlined so it reads as one. */
+  .construct-card-refusal .diagnostic b a { color: inherit; text-decoration: underline; text-underline-offset: 3px }
+</style>

@@ -1,0 +1,8 @@
+{
+  "slug": "transformmat64",
+  "source": "c8b752e256f2b02018b61ee105ffe02ea16800b8e6bc96f32ae157640b917a94",
+  "texts": {
+    "summary": "matNxN<f64> × vecN<f64> → vecN<f64>: 에뮬레이션된 배정밀도 행렬-벡터 곱입니다.",
+    "description": "일반 `.mul`은 행렬 피연산자를 거부합니다. 이 함수는 [`transformMat4`](/api/transformmat4/)에 대응하는 f64 함수입니다."
+  }
+}

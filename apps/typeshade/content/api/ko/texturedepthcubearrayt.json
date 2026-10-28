@@ -1,0 +1,8 @@
+{
+  "slug": "texturedepthcubearrayt",
+  "source": "44bba49a4f653d59c609d55327f024e3c2674e55348d3d5aa5633d290746329e",
+  "texts": {
+    "summary": "큐브 깊이 텍스처의 배열입니다. 하나의 바인딩에 점광원 N개의 그림자 맵이 들어갑니다.",
+    "description": "[`textureCubeArrayfT`](/api/texturecubearrayft/)와 마찬가지로 WebGPU에서만 쓸 수 있습니다."
+  }
+}

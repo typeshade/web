@@ -1,0 +1,8 @@
+{
+  "slug": "enumu32",
+  "source": "3796a07faa6e0432a66a6839a2b43c2ab367ecb176ed4b99c725b6e29fcee00f",
+  "texts": {
+    "summary": "이름-값 맵으로 u32 열거형을 선언합니다. const Kind = enumU32 형태로 씁니다.",
+    "description": "`const` 타입 매개변수가 리터럴 키를 보존하므로, [`matchEnum`](/api/matchenum/)이 멤버마다 분기 하나를 요구할 수 있습니다. 값은 switch에 생성되는 정수 case 라벨입니다."
+  }
+}

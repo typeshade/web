@@ -1,0 +1,208 @@
+/* typeshade.dev's global styles: the tokens, the fonts, the base rules, dark mode, the chrome
+   every page shares, and the rules for markup the site does not author (Expressive Code,
+   Pagefind, the Markdown under .doc). A page or a component styles itself with Tailwind
+   utilities on these tokens in its own markup, and its scoped <style> for what utilities say
+   badly; `bun run check:style` fails on a page's class here (DESIGN.md, Styling).
+   Ant Design v5's design language as plain CSS custom properties: its blue (var(--ui-blue-6)), its
+   neutral text and border scale, 6px radii on controls and 8px on cards and code frames, its
+   three-layer elevation, 14px interface text with 16px prose, and its button, card, list,
+   menu and table shapes. No React and no antd package: the tokens below are the whole
+   system. Light follows the system, or the switch in the header. */
+
+/* A `hover:` utility applies wherever the pointer is, the way every `:hover` rule in this
+   file does. Tailwind's own variant waits for `(hover: hover)`, which would drop a hover
+   state on a pen or a hybrid screen that the site's own rules still draw. */
+@custom-variant hover (&:hover);
+
+@theme {
+  --font-sans: 'IBM Plex Sans Variable', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Ant's neutrals: container white, the var(--ui-gray-1) fill its tab bars and table heads use,
+     then the two fills above it. */
+  --color-ground: var(--ui-white);
+  --color-surface-1: var(--ui-gray-1);
+  --color-surface-2: var(--ui-gray-3);
+  --color-surface-3: #e6e6e6;
+  --color-line-1: var(--ui-gray-3);
+  --color-line-2: #d9d9d9;
+  --color-text-1: rgb(0 0 0 / 0.88);
+  --color-text-2: rgb(0 0 0 / 0.65);
+  --color-text-3: rgb(0 0 0 / 0.45);
+  --color-text-4: rgb(0 0 0 / 0.25);
+  --color-accent: var(--ui-blue-6);
+  --color-diag: #ff4d4f;
+
+  --radius-sm: var(--ui-radius-sm);
+  --radius: var(--ui-radius-control);
+  --radius-md: var(--ui-radius-panel);
+
+  /* Ant's one motion, so `transition-[color]` and its kin move the way --motion does. */
+  --default-transition-duration: var(--ui-motion-duration);
+  --default-transition-timing-function: var(--ui-motion-easing);
+
+  /* The 12px label: a tag, a caption at the foot of a card, a menu group's title. */
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.6667;
+
+  --text-code: 0.8125rem;
+  --text-code--line-height: 1.6;
+  --text-meta: 0.875rem;
+  --text-meta--line-height: 1.5714;
+  --text-ui: 0.875rem;
+  --text-ui--line-height: 1.5714;
+  --text-prose: 1rem;
+  --text-prose--line-height: 1.5;
+  --text-h5: 1rem;
+  --text-h5--line-height: 1.5;
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.4;
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 1.3333;
+  --text-h2: 1.875rem;
+  --text-h2--line-height: 1.35;
+  --text-h1: 2.375rem;
+  --text-h1--line-height: 1.21;
+
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+}
+
+:root {
+  color-scheme: light dark;
+  /* What holds the page off the screen under the cap below, where the shell is the whole
+     viewport. It is as small as a focus ring and a code frame's border can sit in. */
+  --gutter-x: 16px;
+  /* The reading measure: running text in a document column stops here. Its longest line on
+     the introduction is 99 characters of English at 16px and 73 of Korean. */
+  --content: min(700px, 100vw - 2 * var(--gutter-x));
+  /* The wider measure the site map and the docs' figures use. */
+  --wide: min(1040px, 100vw - 2 * var(--gutter-x));
+  /* The shell's measure. The header, the footer, the front page, the documentation grid and
+     the Playground all read it, so the page keeps one left edge and one right edge at every
+     width. Under 1600px the shell is the whole viewport and the gutter is the only margin;
+     above it the shell centres and the margin grows. The cap is where the document column
+     stops growing away from its text: the viewport alone took the column to 1316px at a 1920
+     screen. At 1600 the column is 996px there, wide enough for a code frame and a table to
+     spread while a paragraph keeps its measure. A 1320px cap left 300px of grey on each side
+     of a 1920 screen, and the page read as cramped. */
+  --container: 1600px;
+  --nav-height: 64px;
+  --section-gap: 48px;
+  /* The space between the front page's sections: Ant separates by space, with no rule. */
+  --front-gap: 64px;
+
+  /* Ant's blue, and the states around it. --color-accent is the one that carries text and
+     rails; --color-primary fills a solid control. */
+  --color-primary: var(--ui-blue-6);
+  --color-primary-hover: var(--ui-blue-5);
+  --color-primary-active: var(--ui-blue-7);
+  --color-primary-bg: #e6f4ff;
+  --color-primary-border: #91caff;
+  --color-primary-text-hover: #69b1ff;
+  /* What a card, a dropdown and the dialog sit on. Ant's dark algorithm lifts them off the
+     ground; in light they stay the container's white. */
+  --color-elevated: var(--ui-white);
+  --color-selection: #bae0ff;
+
+  /* Ant's fills, over the container's own ground. */
+  --fill-2: rgb(0 0 0 / 0.06);
+  --fill-3: rgb(0 0 0 / 0.04);
+  --fill-4: rgb(0 0 0 / 0.02);
+
+  /* Ant's three-layer elevation, its resting card shadow, and the two button shadows. */
+  --shadow-elevated:
+    0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12),
+    0 9px 28px 8px rgb(0 0 0 / 0.05);
+  --shadow-secondary:
+    0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 6px -1px rgb(0 0 0 / 0.02), 0 2px 4px 0 rgb(0 0 0 / 0.02);
+  --shadow-button: 0 2px 0 rgb(0 0 0 / 0.02);
+  --shadow-button-primary: 0 2px 0 rgb(5 145 255 / 0.1);
+
+  --ring: 0 0 0 4px rgb(5 145 255 / 0.1);
+  --ease-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --motion: 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+@media (min-width: 40rem) {
+  :root {
+    --gutter-x: 24px;
+    --section-gap: 56px;
+    --front-gap: 80px;
+  }
+}
+
+/* Dark: chosen with the switch in the header, or the system's setting when nothing is chosen.
+   Ant's dark algorithm. The same tokens twice, since plain CSS cannot share a block between
+   the two selectors. The link and rail blue is lifted one step off Ant's dark primary, which
+   does not clear 4.5:1 on the var(--ui-gray-10) ground; the solid fill keeps #1668dc. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-ground: var(--ui-gray-10);
+  --color-surface-1: #1f1f1f;
+  --color-surface-2: #262626;
+  --color-surface-3: #303030;
+  --color-line-1: #303030;
+  --color-line-2: #424242;
+  --color-text-1: rgb(255 255 255 / 0.85);
+  --color-text-2: rgb(255 255 255 / 0.65);
+  --color-text-3: rgb(255 255 255 / 0.45);
+  --color-text-4: rgb(255 255 255 / 0.25);
+  --color-accent: #3c89e8;
+  --color-diag: #e87d7f;
+  --color-primary: #1668dc;
+  --color-primary-hover: #3c89e8;
+  --color-primary-active: #1554ad;
+  --color-primary-bg: #111a2c;
+  --color-primary-border: #15325b;
+  --color-primary-text-hover: #65a9f3;
+  --color-elevated: #1f1f1f;
+  --color-selection: #15325b;
+  --fill-2: rgb(255 255 255 / 0.08);
+  --fill-3: rgb(255 255 255 / 0.08);
+  --fill-4: rgb(255 255 255 / 0.04);
+  --shadow-elevated:
+    0 6px 16px 0 rgb(0 0 0 / 0.32), 0 3px 6px -4px rgb(0 0 0 / 0.48),
+    0 9px 28px 8px rgb(0 0 0 / 0.2);
+  --shadow-secondary:
+    0 1px 2px 0 rgb(0 0 0 / 0.16), 0 1px 6px -1px rgb(0 0 0 / 0.12), 0 2px 4px 0 rgb(0 0 0 / 0.12);
+  --shadow-button: 0 2px 0 rgb(0 0 0 / 0.15);
+  --shadow-button-primary: 0 2px 0 rgb(0 0 0 / 0.15);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-ground: var(--ui-gray-10);
+    --color-surface-1: #1f1f1f;
+    --color-surface-2: #262626;
+    --color-surface-3: #303030;
+    --color-line-1: #303030;
+    --color-line-2: #424242;
+    --color-text-1: rgb(255 255 255 / 0.85);
+    --color-text-2: rgb(255 255 255 / 0.65);
+    --color-text-3: rgb(255 255 255 / 0.45);
+    --color-text-4: rgb(255 255 255 / 0.25);
+    --color-accent: #3c89e8;
+    --color-diag: #e87d7f;
+    --color-primary: #1668dc;
+    --color-primary-hover: #3c89e8;
+    --color-primary-active: #1554ad;
+    --color-primary-bg: #111a2c;
+    --color-primary-border: #15325b;
+    --color-primary-text-hover: #65a9f3;
+    --color-elevated: #1f1f1f;
+    --color-selection: #15325b;
+    --fill-2: rgb(255 255 255 / 0.08);
+    --fill-3: rgb(255 255 255 / 0.08);
+    --fill-4: rgb(255 255 255 / 0.04);
+    --shadow-elevated:
+      0 6px 16px 0 rgb(0 0 0 / 0.32), 0 3px 6px -4px rgb(0 0 0 / 0.48),
+      0 9px 28px 8px rgb(0 0 0 / 0.2);
+    --shadow-secondary:
+      0 1px 2px 0 rgb(0 0 0 / 0.16), 0 1px 6px -1px rgb(0 0 0 / 0.12), 0 2px 4px 0 rgb(0 0 0 / 0.12);
+    --shadow-button: 0 2px 0 rgb(0 0 0 / 0.15);
+    --shadow-button-primary: 0 2px 0 rgb(0 0 0 / 0.15);
+  }
+}

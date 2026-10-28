@@ -1,0 +1,11 @@
+{
+  "slug": "cosh",
+  "source": "222aca595069ba1e0c15903f2b5e375ace7b8f99c24cc8d63a9df315a4cbcf3a",
+  "texts": {
+    "summary": "cosh(x): 쌍곡코사인을 성분별로 구합니다. sinh와 짝을 이루는 함수입니다.",
+    "description": "WGSL과 GLSL ES 3.00에서 같은 이름으로 씁니다.",
+    "targets.wgsl": "`cosh(x)`.",
+    "targets.glsl": "`cosh(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

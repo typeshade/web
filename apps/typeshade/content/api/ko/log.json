@@ -1,0 +1,11 @@
+{
+  "slug": "log",
+  "source": "d3c0c98fd6af15be2b01ac6ab6ac9842fa6b2ad9faed25a6560d41fa761301b0",
+  "texts": {
+    "summary": "log(x): 자연로그이며, 성분별로 계산합니다.",
+    "description": "[`log2`](/api/log2/)는 밑이 2인 형태입니다. 명세상 `x <= 0`에서는 값이 정의되지 않으므로, 인자가 0에 이를 수 있다면 [`max`](/api/max/)로 인자에 하한을 둡니다.",
+    "targets.wgsl": "`log(x)`로 생성합니다.",
+    "targets.glsl": "`log(x)`로 생성합니다.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "slug": "comparefunction",
+  "source": "204f090248b1e30954b783d909dd3ed33a3c177096f69942723ff6dd91ce3edb",
+  "texts": {
+    "summary": "WebGPU의 GPUCompareFunction입니다. 깊이 검사가 프래그먼트를 저장된 값과 비교하는 방식입니다."
+  }
+}

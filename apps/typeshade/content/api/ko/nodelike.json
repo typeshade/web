@@ -1,0 +1,8 @@
+{
+  "slug": "nodelike",
+  "source": "d8914c7ee8756c37e9ee645e3fb5af6b7b4e5453100174a054a84db808fc9dac",
+  "texts": {
+    "summary": "노드를 읽는 자리에서 받아들여지는 모든 값입니다. 가변 노드든 읽기 전용 노드든 모든 노드와, f32 리터럴로 승격되는 JS 숫자가 여기에 해당합니다.",
+    "description": "읽을 때는 [`ReadonlyNode`](/api/readonlynode/) 상위 타입을 씁니다. 그래서 `Let()`, 매개변수, 상수 피연산자는 값을 소비하는 모든 자리에서 받아들여집니다. 변경이 필요한 것은 `.assign()`뿐이며, 이 메서드는 가변 하위 타입인 [`Node`](/api/node/)를 요구합니다."
+  }
+}

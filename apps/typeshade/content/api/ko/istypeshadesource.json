@@ -1,0 +1,7 @@
+{
+  "slug": "istypeshadesource",
+  "source": "0913d3a553d52596f7f5e484ec48f67d1d3603d5d2f752432b8b46fd2c1b4b5d",
+  "texts": {
+    "summary": "TypeScript 소스 문자열이 \"use typeshade\" 지시문으로 TypeShade를 사용하도록 선택했는지 여부를 돌려줍니다."
+  }
+}

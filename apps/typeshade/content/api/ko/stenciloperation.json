@@ -1,0 +1,7 @@
+{
+  "slug": "stenciloperation",
+  "source": "5400e42fa620036ad989a4faa783f1e112574780b5a03fa2294acddb00343736",
+  "texts": {
+    "summary": "WebGPU의 GPUStencilOperation입니다. 스텐실 검사가 픽셀에 저장된 값에 하는 일입니다."
+  }
+}

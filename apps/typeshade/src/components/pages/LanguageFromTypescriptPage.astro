@@ -1,0 +1,78 @@
+---
+// Language guide: the index of the TypeScript construct set. It says how to read a card and
+// names its six sections, one page each; the cards themselves are on those pages
+// (LanguageFromTypescriptSectionPage.astro). The words live in
+// language.mapping.fromTypescript (src/i18n/en.ts, src/i18n/ko.ts); the rows do not. Each
+// construct carries a short `"use typeshade"` program that src/lib/typescript-lowering.ts
+// compiles with the pinned compiler at build time, and the count beside a section here is
+// that section's own row count, read off the generator.
+import Docs from '../../layouts/Docs.astro';
+import Rich from '../Rich.astro';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
+import { editCopy, links, mappingSet } from '../../lib/links.ts';
+import { loweringSections } from '../../lib/typescript-lowering.ts';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = copyFor(locale).language.mapping.fromTypescript;
+const sections = loweringSections();
+
+// A construct with no words about it, or words about a construct that has gone, is a page
+// half written. Both stop the build here, where the generator and the dictionary can be put
+// back in step. The check reads every section, so it holds for the whole set and not only
+// for the rows one section page renders.
+const ids = sections.flatMap((s) => s.rows.map((r) => r.id));
+const missing = ids.filter((id) => !(id in c.rows));
+const spare = Object.keys(c.rows).filter((id) => !ids.includes(id));
+if (missing.length > 0 || spare.length > 0) {
+  const parts = [
+    missing.length > 0 ? `no line for ${missing.join(', ')}` : '',
+    spare.length > 0 ? `a line for the row(s) ${spare.join(', ')}, which the generator no longer carries` : '',
+  ].filter(Boolean);
+  throw new Error(`[from-typescript] the dictionary and src/lib/typescript-lowering.ts disagree: ${parts.join('; ')}`);
+}
+
+const pages = mappingSet('languageFromTypescript').sections.map(({ key, link }) => {
+  const group = sections.find((s) => s.key === key);
+  if (!group) throw new Error(`[from-typescript] src/lib/typescript-lowering.ts has no '${key}' section`);
+  return {
+    h: c.sections[key].h,
+    href: localePath(locale, links[link].href),
+    summary: c.pages[key].description,
+    count: group.rows.length,
+  };
+});
+
+const headings = [
+  { depth: 2, slug: 'reading', text: c.readingH },
+  { depth: 2, slug: 'sections', text: c.pagesH },
+];
+---
+
+<Docs
+  locale={locale}
+  path={links.languageFromTypescript.href}
+  title={c.title}
+  description={c.description}
+  headings={headings}
+  editHref={editCopy(locale, 'language')}
+>
+  <h1>{c.h1}</h1>
+  <p>{c.intro}</p>
+
+  <h2 id="reading">{c.readingH}</h2>
+  <p><Rich text={c.readingP} locale={locale} /></p>
+  <p><Rich text={c.guidesP} locale={locale} /></p>
+
+  <h2 id="sections">{c.pagesH}</h2>
+  <dl class="api-list api-index">
+    {pages.map((p) => (
+      <>
+        <dt><a href={p.href}>{p.h}</a> <span class="api-type">{c.constructs(p.count)}</span></dt>
+        <dd>{p.summary}</dd>
+      </>
+    ))}
+  </dl>
+
+  <p><Rich text={c.sourceP} locale={locale} /></p>
+</Docs>

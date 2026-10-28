@@ -1,0 +1,8 @@
+{
+  "slug": "scalar",
+  "source": "687f2ba3fe76a3a5a73dd83b1856e9212048acdc85811ee972fb975ff24bf448",
+  "texts": {
+    "summary": "기본 스칼라 종류 네 가지입니다. WGSL과 GLSL ES 3.00이 모두 하드웨어에서 직접 표현하는 종류이며, kind가 'scalar'인 ShaderType이 담을 수 있는 집합입니다.",
+    "description": "이항 연산자가 이 중 두 가지를 섞으면, 결과는 기본 승격 순서 `f32` > `i32` > `u32`를 따릅니다. 에뮬레이션된 배정밀도는 별도의 `ShaderType` 종류인 [`f64T`](/api/f64t/)입니다. 그래서 기본 승격에 들어가지 않으며, 스칼라 종류로 분기하는 모든 코드 경로가 이를 따로 판단한다([`ShaderType`](/api/shadertype/) 참고)."
+  }
+}

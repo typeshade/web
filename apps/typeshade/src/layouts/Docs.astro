@@ -1,0 +1,203 @@
+---
+// A documentation page: the sidebar on the left, the document in the middle, and on a wide
+// screen an outline of the page on the right. Under 64rem the sidebar folds into a bar
+// under the header. Every page ends with a link to the file it is written in, a link to
+// report a problem with the page, and previous and next, which follow the sidebar's order. The
+// document is what the search indexes; the sidebar, the outline, the pager and the two links
+// stay out of it.
+import { getCollection } from 'astro:content';
+import Base from './Base.astro';
+import DocsNavigation from '../components/DocsNavigation.astro';
+import { links, sidebar, type Destination } from '../lib/links.ts';
+import { copyFor, guideSection, localePath, type Locale } from '../i18n/index.ts';
+import { githubNewIssue, ISSUE_REPOS } from '../lib/issue-data.ts';
+
+export interface Heading {
+  readonly depth: number;
+  readonly slug: string;
+  readonly text: string;
+}
+
+interface Props {
+  locale?: Locale;
+  /** The locale-neutral route, for example '/guide/checks/'. */
+  path: string;
+  title: string;
+  description: string;
+  /** Headings for the outline; the shallowest level sits at the margin. */
+  headings?: readonly Heading[];
+  /** Where the page's text is written, on GitHub. */
+  editHref?: string;
+  /** The document is in another language than the page's chrome. */
+  bodyLang?: string;
+  /** Keep the page out of search indexes, the site's own included (a template preview). */
+  noindex?: boolean;
+  /** A page of the API reference: the category whose members the sidebar opens. */
+  openCategory?: string;
+  /** What the phone's bar and the pager call this page, where the sidebar does not list it. */
+  label?: string;
+  /** Previous and next, for a page the sidebar's flat list does not hold. */
+  previous?: Destination;
+  next?: Destination;
+  /** What search should record about the page beyond its text, as Pagefind writes it. */
+  meta?: string;
+  /** The breadcrumb trail this page already shows, for Base's BreadcrumbList. */
+  breadcrumbs?: readonly { name: string; href: string }[];
+  /** The pinned commit's date, for Base's WebPage.dateModified. */
+  dateModified?: string;
+}
+const { locale = 'en', path, title, description, headings = [], editHref = '#', bodyLang, noindex = false, openCategory, label, meta, breadcrumbs, dateModified } = Astro.props;
+const d = copyFor(locale).docs;
+
+// The compiler internals' sections follow their overview in the sidebar while the reader is on
+// one of them, so previous and next walk the whole internal reference one section at a time. A
+// section is named in the page's own language.
+const guide = (await getCollection('guide')).sort((a, b) => a.data.order - b.data.order);
+const sections = guide
+  .filter((entry) => entry.id !== 'overview')
+  .map((entry) => ({ label: guideSection(locale, entry.id).title, href: localePath(locale, `/guide/internals/${entry.id}/`) }));
+
+const groups = sidebar(locale, sections, openCategory, path);
+const here = localePath(locale, path);
+// The Playground is in the sidebar but renders outside this layout and has no pager of its
+// own, so the walk steps over it: Quick Start leads into the language guide.
+const flat = groups.flatMap((g) => g.items).filter((i) => i.href !== localePath(locale, links.playground.href));
+const at = flat.findIndex((i) => i.href === here);
+// Previous and next follow the sidebar, unless the page passed its own: the reference walks
+// a category alphabetically, and the reference's own index pages are not in the flat list.
+const previous = Astro.props.previous ?? (at > 0 ? flat[at - 1] : undefined);
+const next = Astro.props.next ?? (at >= 0 && at < flat.length - 1 ? flat[at + 1] : undefined);
+const current = label ?? (at >= 0 ? flat[at]!.label : undefined);
+const outline = headings.filter((h) => h.depth === 2 || h.depth === 3);
+// The issue dialog (src/components/IssueDialog.astro). An issue about text the compiler writes
+// (the reference, the internals) belongs in the compiler's repository, which is where the edit
+// link points.
+const reportRepo = editHref.startsWith(`https://github.com/${ISSUE_REPOS.compiler}/`) ? 'compiler' : 'site';
+// A section of the guide has h3 headings under the page's h1, so the outline indents from
+// the shallowest heading it was given.
+const top = outline.length > 0 ? Math.min(...outline.map((h) => h.depth)) : 2;
+---
+
+<Base locale={locale} path={path} title={title} description={description} noindex={noindex} breadcrumbs={breadcrumbs} dateModified={dateModified}>
+  <details class="docs-local" data-pagefind-ignore>
+    <summary>{current ?? title}</summary>
+    <nav aria-label={title}>
+      <DocsNavigation locale={locale} path={path} here={here} label={current ?? title} groups={groups} breadcrumbs={breadcrumbs} />
+    </nav>
+  </details>
+  {outline.length > 0 && (
+    <details class="docs-toc" data-pagefind-ignore>
+      <summary>{d.onThisPage}</summary>
+      <nav aria-label={d.onThisPage}>
+        <ul>{outline.map((h) => <li class={`depth-${h.depth - top + 2}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+      </nav>
+    </details>
+  )}
+  <div class={outline.length > 0 ? 'docs' : 'docs docs-wide'}>
+    <aside class="docs-sidebar" data-pagefind-ignore>
+      <nav class="docs-sidebar-in" aria-label={title}>
+        <DocsNavigation locale={locale} path={path} here={here} label={current ?? title} groups={groups} breadcrumbs={breadcrumbs} />
+      </nav>
+    </aside>
+    <article class="doc docs-content" lang={bodyLang} data-pagefind-body={noindex ? undefined : true} data-pagefind-meta={meta} data-permalink={d.permalink}>
+      <slot />
+      <p class="docs-edit" lang={locale} data-pagefind-ignore>
+        <a href={editHref}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z" /></svg>
+          {d.editPage}
+        </a>
+        <a href={githubNewIssue(reportRepo)} data-report={reportRepo}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="12" cy="12" r="1.5" fill="currentColor" /></svg>
+          {d.reportIssue}
+        </a>
+      </p>
+      <nav class="docs-pager" aria-label={`${d.previous} / ${d.next}`} lang={locale} data-pagefind-ignore>
+        {previous ? <a class="docs-pager-prev" href={previous.href}><span>{d.previous}</span>{previous.label}</a> : <span></span>}
+        {next ? <a class="docs-pager-next" href={next.href}><span>{d.next}</span>{next.label}</a> : <span></span>}
+      </nav>
+    </article>
+    {outline.length > 0 && (
+      <aside class="docs-outline" data-pagefind-ignore>
+        <nav aria-label={d.onThisPage}>
+          <p class="docs-outline-title" lang={locale}>{d.onThisPage}</p>
+          <ul>{outline.map((h) => <li class={`depth-${h.depth - top + 2}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+        </nav>
+      </aside>
+    )}
+  </div>
+  <script is:inline>
+    // The reference opens a category of up to 88 members in the sidebar, so the page a reader
+    // is on can sit below the fold of that list. Bring it into view inside the sidebar's own
+    // scroller, the way VitePress does, without moving the page.
+    ;(() => {
+      const box = document.querySelector('.docs-sidebar-in');
+      const here = box?.querySelector('a[aria-current="page"]');
+      if (!box || !here) return;
+      const top = here.offsetTop;
+      if (top > box.clientHeight - 48) box.scrollTop = top - box.clientHeight / 2;
+    })()
+
+    // A permalink beside every h2 and h3 in the document, shown on hover or focus, the way
+    // VitePress marks a heading a reader can link to directly.
+    ;(() => {
+      const content = document.querySelector('.docs-content');
+      if (!content) return;
+      const label = content.getAttribute('data-permalink') ?? 'Link to heading';
+      content.querySelectorAll('h2[id], h3[id]').forEach((h) => {
+        const a = document.createElement('a');
+        a.className = 'header-anchor';
+        a.href = `#${h.id}`;
+        a.setAttribute('aria-label', label);
+        // The mark is chrome on top of the heading, not part of it: out of the search index,
+        // the way the sidebar and the outline already stay out (data-pagefind-ignore).
+        a.setAttribute('data-pagefind-ignore', '');
+        a.textContent = '#';
+        h.append(a);
+      });
+    })()
+
+    // The outline marks the heading currently in view, the way the sidebar marks the current
+    // page. A heading counts as current once it has crossed a line near the top of the
+    // viewport; the last one that has is the one on screen.
+    ;(() => {
+      const links = Array.from(document.querySelectorAll('.docs-outline a[href^="#"], .docs-toc a[href^="#"]'));
+      if (links.length === 0) return;
+      const byId = new Map();
+      links.forEach((a) => {
+        const id = a.getAttribute('href')?.slice(1);
+        const h = id ? document.getElementById(id) : null;
+        if (h) byId.set(a, h);
+      });
+      if (byId.size === 0) return;
+
+      const mark = (id) => {
+        links.forEach((a) => {
+          if (a.getAttribute('href') === `#${id}`) a.setAttribute('aria-current', 'location');
+          else a.removeAttribute('aria-current');
+        });
+      };
+      let queued = false;
+      const update = () => {
+        queued = false;
+        const line = 96;
+        let currentId;
+        for (const [a, h] of byId) {
+          if (h.getBoundingClientRect().top - line <= 0) currentId = a.getAttribute('href')?.slice(1);
+        }
+        mark(currentId ?? links[0]?.getAttribute('href')?.slice(1));
+      };
+      const onScroll = () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(update);
+      };
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+
+      // The phone panel is a reader's whole viewport; collapse it once a section is chosen.
+      const toc = document.querySelector('.docs-toc');
+      if (toc) links.forEach((a) => a.addEventListener('click', () => { toc.open = false; }));
+    })();
+  </script>
+</Base>

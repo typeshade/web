@@ -1,0 +1,51 @@
+---
+// The 1200 x 630 social card. scripts/capture-og.ts photographs this route and removes it
+// from dist afterwards; a plain build removes it too (astro.config.mjs).
+import '../styles/global.css';
+import { heroCopy } from '../lib/hero-copy.ts';
+import { MARK } from '../lib/mark.ts';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1200" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Social card, TypeShade</title>
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-sans-latin-wght-normal.woff2" crossorigin />
+  </head>
+  <body>
+    <div class="og-card" data-og-card>
+      <div class="og-text">
+        <div class="og-wordmark">
+          <img src={MARK.src} alt="" width="48" height="48" />
+          TypeShade
+        </div>
+        <h1 class="og-h1">{heroCopy.h1}</h1>
+        <p class="og-sub">{heroCopy.sub}</p>
+        <p class="og-domain">typeshade.dev</p>
+      </div>
+      <div class="og-figure">
+        <img src="/stills/plasma-twin.webp" alt="" />
+      </div>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  :root { color-scheme: light }
+  html, body { block-size: 630px; overflow: hidden; background: #fff }
+  .og-card {
+    display: grid; grid-template-columns: 640px 1fr; inline-size: 1200px; block-size: 630px;
+    background: #fff; color: #1a1a1a;
+  }
+  .og-text { display: flex; flex-direction: column; justify-content: center; padding: 64px 48px 64px 72px }
+  .og-wordmark { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 600 }
+  .og-wordmark img { inline-size: 32px; block-size: 32px; border-radius: 7px }
+  .og-h1 { margin-block-start: 36px; font-size: 54px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; max-inline-size: 11em }
+  .og-sub { margin-block-start: 20px; font-size: 22px; line-height: 1.45; color: #454545; max-inline-size: 22em }
+  .og-domain { margin-block-start: 36px; font-family: var(--font-mono); font-size: 18px; color: #6b6b6b }
+  .og-figure { padding: 48px 48px 48px 0; display: flex; align-items: center }
+  .og-figure img { inline-size: 100%; block-size: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #b9b9b2 }
+</style>

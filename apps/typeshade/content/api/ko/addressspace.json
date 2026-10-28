@@ -1,0 +1,8 @@
+{
+  "slug": "addressspace",
+  "source": "b8ef5e22d8c59ed6c53f7509908059fe06aa6d768924e22ae795def86f81fadb",
+  "texts": {
+    "summary": "리소스 바인딩이 놓이는 BindingDecl.space 값입니다. WGSL의 var<uniform> 또는 var<storage, ...>에 해당합니다.",
+    "description": "`BindingDecl.space`는 리소스 바인딩이 놓이는 공간입니다. WGSL의 `var<uniform>`인지 `var<storage, ...>`인지를 정하며, 이 선택에 따라 WGSL 선언 표기가 달라집니다. GLSL에서는 `uniform` 블록을 쓸지, 에뮬레이션된 스토리지 버퍼 경로를 쓸지를 고른다(WebGL2의 GLSL ES 3.00에는 내장 스토리지 버퍼가 없습니다). [`BindingDecl.access`](/api/bindingdecl/)는 이 값이 `'storage'`일 때만 적용되는 접근 모드입니다."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "slug": "exp",
+  "source": "8294a311c47169c6645999dd5b0dff0d5eb453470b2c96f6e3471f15556e2196",
+  "texts": {
+    "summary": "exp(x): eˣ를 성분별로 구합니다. exp2는 밑이 2인 형태입니다.",
+    "targets.wgsl": "`exp(x)`.",
+    "targets.glsl": "`exp(x)`.",
+    "targets.cpu": "오라클이 f64로 계산합니다."
+  }
+}

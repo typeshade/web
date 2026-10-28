@@ -1,0 +1,16 @@
+.lab-app {
+  display: grid;
+  gap: 30px;
+  min-width: 0;
+}
+
+.lab-app > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lab-status {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}

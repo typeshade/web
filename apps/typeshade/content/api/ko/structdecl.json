@@ -1,0 +1,11 @@
+{
+  "slug": "structdecl",
+  "source": "c5ed7008b8ec4e19d36285329b32dbfd0733fe6c7b5b52372cb4fd2c7581d5bb",
+  "texts": {
+    "summary": "스테이지 경계를 넘지 않는 일반 구조체를 선언합니다.",
+    "description": "스테이지 경계를 넘지 않는 일반 구조체를 선언합니다. 스토리지 버퍼의 요소 타입이거나, 다른 구조체 안에 중첩된 구조체입니다. 필드는 `@location`이나 `@builtin` 속성이 없는 일반 셰이더 타입입니다. 이 점만이 [`ioStruct`](/api/iostruct/)와 다릅니다.\n\n돌려주는 핸들은 다음 항목을 제공한다:\n\n- `.decl`: `module({ structs })`에 넘기거나, 핸들을 `uses`에 넘깁니다.\n- `.type`: 구조체의 셰이더 타입입니다. 매개변수, 중첩 필드, 또는 [`storageBuffer`](/api/storagebuffer/) 요소가 이 타입을 받습니다.\n- `.of(node).field`: 원시 노드로 들고 있는 값에서 타입이 지정된 필드를 읽습니다. `.get(node, 'field')`는 같은 읽기를 위치 인자 형태로 적은 것입니다. 한 호출 지점에서 짧은 이름 하나로 여러 필드를 읽는 경우에 잘 맞습니다.\n- `.var(name)`: 구조체의 가변 `var`를 만듭니다. `.construct({ ... })`는 식 하나로 구조체를 만듭니다. 둘 다 [`ioStruct`](/api/iostruct/)에 있는 것과 같습니다.\n\n스토리지 버퍼의 요소 타입으로 쓰면, 이 타입은 [`storageBuffer`](/api/storagebuffer/)가 받는 인자가 됩니다. 그러면 `buf.at(i)`는 `.of` 단계 없이 이 구조체의 필드 프록시를 바로 반환합니다.",
+    "parameters.name": "생성되는 구조체 이름입니다.",
+    "parameters.fields": "필드 맵입니다. 각 값은 일반 셰이더 타입입니다.",
+    "returns": "위에서 설명한 [`PlainStruct`](/api/plainstruct/) 핸들입니다."
+  }
+}

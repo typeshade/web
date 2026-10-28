@@ -1,0 +1,15 @@
+{
+  "slug": "emitglslstages",
+  "source": "494d6af67d5277a9325d1535fc94e538d50f8d3cdea2278a37a187eea6473c3c",
+  "texts": {
+    "summary": "모듈의 두 스테이지를 모두 생성하며, 모듈을 한 번만 하향 변환하고 최적화합니다.",
+    "description": "결과는 `emitGlslModule(m, 'vertex')`와 `emitGlslModule(m, 'fragment')`를 각각 호출한 결과와 같습니다. 옵티마이저가 두 스테이지에 대해 한 번만 실행되므로 비용은 약 절반입니다. 이 함수는 파이프라인을 만드는 호스트에서 씁니다. 그런 호스트에는 두 스테이지가 항상 필요합니다.\n\n`opts.vertexEntry`와 `opts.fragmentEntry`는 스테이지마다 생성할 엔트리를 이름으로 지정합니다. 이 옵션은 한 스테이지의 엔트리를 여러 개 선언한 모듈에서 씁니다. GLSL은 스테이지마다 `main()`을 하나만 허용합니다. 따라서 프래그먼트 엔트리가 둘인 모듈은 `fragmentEntry`로 `main()`이 될 엔트리를 정해야 합니다. 나머지 엔트리는 그 스테이지의 소스에서 빠집니다. 이름을 지정하지 않으면 그 스테이지는 [`UnsupportedFeatureError`](/api/unsupportedfeatureerror/)(`SD0030`)를 던집니다. 모든 옵티마이저 패스가 함수 하나씩 작동하므로, 출력은 모듈이 가진 다른 엔트리에 따라 달라지지 않습니다.",
+    "parameters.m": "생성할 모듈입니다.",
+    "parameters.opts": "[`GlslEmitOptions`](/api/glslemitoptions/)에 `vertexEntry`와 `fragmentEntry`를 더한 옵션입니다.",
+    "returns": "버텍스 소스와 프래그먼트 소스입니다. 각 소스의 첫 줄은 `#version 300 es`이입니다.",
+    "exceptions.Error": "[`emitGlslModule`](/api/emitglslmodule/)과 같은 오류가 발생합니다.",
+    "exceptions.UnsupportedFeatureError": "GLSL은 스테이지마다 main()을 하나만 허용합니다. 그래서 프래그먼트 엔트리가 둘인 모듈에는 어느 엔트리가 main()이 될지 fragmentEntry로 지정해야 합니다. 나머지 엔트리는 그 스테이지의 소스에서 빠집니다. 이름을 지정하지 않으면 그 스테이지는 UnsupportedFeatureError (SD0030)를 던집니다.",
+    "exceptions.SD0030": "GLSL은 스테이지마다 main()을 하나만 허용합니다. 그래서 프래그먼트 엔트리가 둘인 모듈에는 어느 엔트리가 main()이 될지 fragmentEntry로 지정해야 합니다. 나머지 엔트리는 그 스테이지의 소스에서 빠집니다. 이름을 지정하지 않으면 그 스테이지는 UnsupportedFeatureError (SD0030)를 던집니다.",
+    "targets.glsl": "WebGL2용 GLSL ES 3.00을 생성합니다."
+  }
+}

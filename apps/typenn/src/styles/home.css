@@ -1,0 +1,301 @@
+/* Home: show the API first, then guide the reader into the compiler path. */
+.home-content {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+.home-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(480px, 1.05fr);
+  gap: clamp(44px, 7vw, 96px);
+  align-items: center;
+  padding: 44px 0 88px;
+}
+.home-copy {
+  max-width: 610px;
+}
+.eyebrow {
+  margin: 0 0 13px;
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.075em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.home-copy h1 {
+  max-width: 660px;
+  margin: 0;
+  font-size: clamp(42px, 5.5vw, 72px);
+  font-weight: 600;
+  line-height: 1.07;
+  letter-spacing: -0.052em;
+}
+.home-copy h1 span {
+  color: var(--muted);
+}
+.lead {
+  max-width: 66ch;
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.65;
+}
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+.button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-3);
+  padding: 9px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-control);
+  font-size: 13px;
+  font-weight: 550;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease;
+}
+.button-primary {
+  border-color: var(--ui-blue-6);
+  color: white;
+  background: var(--ui-blue-6);
+}
+.button-primary:hover {
+  border-color: var(--ui-blue-7);
+  color: white;
+  background: var(--ui-blue-7);
+}
+.button-quiet {
+  color: var(--ink);
+  background: var(--panel);
+}
+.button-quiet:hover {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--line));
+  color: var(--brand);
+}
+.release-note {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.home-code {
+  min-width: 0;
+}
+.code-frame,
+.playground-code {
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-panel);
+  background: var(--code-bg);
+  box-shadow: 0 14px 36px #10182816;
+}
+.code-caption {
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--ui-white) 17;
+  color: var(--ui-gray-2);
+  font-size: 11px;
+  font-weight: 550;
+}
+.code-file {
+  overflow: hidden;
+  color: var(--ui-white) 72;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.code-frame .astro-code {
+  max-height: 480px;
+  overflow: auto;
+  padding: 18px 20px;
+  margin: 0;
+  background: transparent !important;
+  color: #d6e4ff;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.execution-result {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-control);
+  color: var(--muted);
+  background: var(--panel);
+  font-size: 11px;
+}
+.execution-result code {
+  color: var(--ink);
+  font-size: 11px;
+}
+.result-dot,
+.backend-chip i,
+.result-success i {
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  border-radius: 50%;
+  background: var(--success);
+}
+.result-label {
+  margin-left: auto;
+}
+.home-path,
+.home-learning,
+.home-status {
+  padding: 64px 0;
+  border-top: 1px solid var(--line);
+}
+.section-heading-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--ui-space-6);
+  margin-bottom: 26px;
+}
+.section-heading-row h2,
+.learning-copy h2,
+.home-status h2 {
+  max-width: 750px;
+  margin: 0;
+  font-size: clamp(27px, 3.5vw, 42px);
+  font-weight: 550;
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+}
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2);
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 550;
+}
+.text-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.path-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.path-strip article {
+  min-width: 0;
+  padding: 24px 28px 26px 0;
+}
+.path-strip article + article {
+  padding-left: 28px;
+  border-left: 1px solid var(--line);
+}
+.path-index {
+  color: var(--brand);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+}
+.path-strip h3 {
+  margin: 15px 0 6px;
+  font-size: 20px;
+  font-weight: 550;
+}
+.path-strip p {
+  max-width: 39ch;
+  min-height: 50px;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.path-strip code {
+  color: var(--ink);
+  font-size: 10px;
+}
+.fine-print {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.home-path > .fine-print {
+  margin: 14px 0 0;
+}
+.home-learning {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 80px;
+}
+.learning-copy > p:last-child,
+.home-status > div > p:last-child {
+  max-width: 62ch;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.learning-links,
+.link-list,
+.next-links {
+  border-top: 1px solid var(--line);
+}
+.learning-links a,
+.link-list a,
+.next-links a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.learning-links a:hover strong,
+.link-list a:hover strong,
+.next-links a:hover strong {
+  color: var(--brand);
+}
+.learning-links strong,
+.link-list strong,
+.next-links strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 550;
+}
+.learning-links small,
+.link-list small,
+.next-links small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.learning-links b,
+.link-list b,
+.next-links b {
+  color: var(--brand);
+  font-size: 15px;
+  font-weight: 400;
+}
+.home-status {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--ui-space-8);
+}
+.home-status .button {
+  flex: 0 0 auto;
+}

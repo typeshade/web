@@ -1,0 +1,54 @@
+---
+import LiveShader from './LiveShader.astro';
+import Rich from './Rich.astro';
+import LinkColumns from './LinkColumns.astro';
+import { copyFor, localePath, type Locale } from '../i18n/index.ts';
+import type { FunctionLesson } from '../i18n/function-lessons-en.ts';
+import { FUNCTION_PLOT_FILES, demoSource, demoControls, demoCondition, demoCalculation, functionDemo, relatedDemos } from '../lib/function-demos.ts';
+
+interface Props { locale: Locale; name: string; lesson: FunctionLesson }
+const { locale, name, lesson } = Astro.props;
+const t = copyFor(locale).docs.reference.demo;
+const demo = functionDemo(name);
+const inputLabel = ['sin', 'cos', 'tan', 'atan2', 'degrees'].includes(name) ? t.angleInput : name === 'radians' ? t.degreeInput : t.probe;
+const parameterLabel = (t.parameters as Record<string, string>)[name] ?? t.parameter;
+---
+
+{demo && (
+  <section data-function-demo={name} lang={locale}>
+    <h2 id="interactive-example">{t.heading}</h2>
+    <p><code>{`y = ${demo.expression.replaceAll('u.k', 'k')}`}</code></p>
+    <LiveShader
+      locale={locale}
+      id={`reference-function-${name}`}
+      title={name}
+      code={demoSource(demo)}
+      file={`${name}-plot.shade.ts`}
+      files={FUNCTION_PLOT_FILES}
+      caption={t.caption}
+      anchor={t.window}
+      exercises={[lesson.try]}
+      controls={{ ...demoControls(demo, inputLabel, parameterLabel), view3d: { label: t.view3d, toggle: true, value: false } }}
+      aspect="1/1"
+      compact
+      plot={{ x: demo.x, y: demo.y }}
+    />
+    <h2 id="practical-use">{t.useHeading}</h2>
+    <p><Rich text={lesson.use} locale={locale} /></p>
+    <p data-function-calculation>{t.calculation}: <code>{demoCalculation(demo)}</code></p>
+    <p class="guide-note">{t.calculationNote}</p>
+    <h2 id="input-limits">{t.cautionHeading}</h2>
+    <p>{t.condition}: <Rich text={demoCondition(demo)} locale={locale} /></p>
+    <p><Rich text={lesson.caution} locale={locale} /></p>
+    <p class="guide-note"><Rich text={t.sources} locale={locale} /></p>
+    <h2 id="related-functions">{t.related}</h2>
+    <LinkColumns>
+      {relatedDemos(name).map((other) => <li><a href={localePath(locale, `/reference/functions/${other}/`)}><code>{other}</code></a></li>)}
+    </LinkColumns>
+  </section>
+)}
+
+<style>
+  /* The entry's own introduction already separates this first section from the title. */
+  section > h2:first-child { margin-block-start: 28px }
+</style>

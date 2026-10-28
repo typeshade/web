@@ -1,0 +1,7 @@
+{
+  "slug": "vec2ut",
+  "source": "582a8f107978e5f4fc2dcaa2eb2ce2c30e91c203847d1c6c842623d3ed6f42b3",
+  "texts": {
+    "summary": "기본 vec2<u32>입니다. 2성분 부호 없는 정수 필드이며, 예를 들어 패킹된 피킹 ID를 담고 location으로 선언한 varying 같은 필드에 쓰입니다."
+  }
+}

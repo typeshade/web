@@ -1,0 +1,8 @@
+{
+  "slug": "continue",
+  "source": "ec599e685943028e5d0a801414e9ff80fa6e90bab6370120fed1b802267dbe99",
+  "texts": {
+    "summary": "가장 안쪽 스코프에 continue;를 넣습니다. 가장 가까이 둘러싼 루프의 다음 반복으로 건너뜁니다.",
+    "description": "`Loop` 안에 중첩된 `If`나 `Switch`의 본문은 그 자체로 루프 경계가 아닙니다. 그러므로 루프 안의 가드 안에 쓴 `Continue()`도 여전히 그 루프를 대상으로 합니다."
+  }
+}

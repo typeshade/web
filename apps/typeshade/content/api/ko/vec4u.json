@@ -1,0 +1,8 @@
+{
+  "slug": "vec4u",
+  "source": "a978025e7f3f2fe689a224ecb8a17a15595a61ddfa9f2b2f5c8c4f5f6c5414c2",
+  "texts": {
+    "summary": "vec4<u32> 생성자이며, WGSL 방식으로 vec4u라고 씁니다.",
+    "description": "일반 숫자 성분은 u32로 승격됩니다. 패킹된 부호 없는 매개변수 블록이나 `texture_2d<u32>`의 텍셀은 이 타입의 형태를 띱니다."
+  }
+}
