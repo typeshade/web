@@ -9,10 +9,10 @@
   flex-wrap: wrap;
   gap: 4px 16px;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
 }
 .kg-summary b {
-  color: var(--ink);
+  color: var(--ui-text);
   font-weight: 600;
 }
 .kg-toolbar {
@@ -25,7 +25,7 @@
 }
 .kg-hint {
   font-size: 12px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
 }
 .kg-buttons {
   display: flex;
@@ -34,16 +34,16 @@
 .kg-buttons button {
   min-width: 32px;
   min-height: 32px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-control);
-  background: var(--panel);
-  color: var(--ink);
+  background: var(--ui-surface);
+  color: var(--ui-text);
   font: inherit;
   cursor: pointer;
 }
 .kg-buttons button:focus-visible,
 .kg-node:focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--ui-link);
   outline-offset: 2px;
 }
 .kg-viewport {
@@ -51,9 +51,9 @@
   overflow: hidden;
   touch-action: pan-y pinch-zoom;
   cursor: grab;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-panel);
-  background: var(--soft);
+  background: var(--ui-surface-muted);
   max-width: 100%;
 }
 .kg-viewport:active {
@@ -63,32 +63,32 @@
   display: block;
 }
 .kg-node rect {
-  fill: var(--panel);
-  stroke: var(--line);
+  fill: var(--ui-surface);
+  stroke: var(--ui-border);
   stroke-width: 1;
 }
 .kg-node text {
   font-family: var(--font-sans);
-  fill: var(--ink);
+  fill: var(--ui-text);
   font-size: 12px;
 }
 .kg-node .kg-title {
   font-weight: 600;
 }
 .kg-node .kg-shape {
-  fill: var(--muted);
+  fill: var(--ui-text-muted);
   font-family: var(--font-mono);
   font-size: 11px;
 }
 .kg-node .kg-tag {
-  fill: var(--muted);
+  fill: var(--ui-text-muted);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 .kg-input rect {
-  fill: var(--soft);
-  stroke: var(--muted);
+  fill: var(--ui-surface-muted);
+  stroke: var(--ui-text-muted);
   stroke-dasharray: 4 3;
 }
 .kg-idle {
@@ -101,16 +101,16 @@
   stroke: none;
 }
 .kg-badge circle {
-  fill: var(--panel);
+  fill: var(--ui-surface);
   stroke-width: 2;
 }
 .kg-badge text {
   font-size: 11px;
   font-weight: 700;
-  fill: var(--ink);
+  fill: var(--ui-text);
 }
 .kg-edge polyline {
-  stroke: var(--muted);
+  stroke: var(--ui-text-muted);
 }
 .kg-edge.kg-g0 polyline,
 .kg-g0 .kg-band,
@@ -210,7 +210,7 @@
   stroke-width: 2;
 }
 .kg-badge circle {
-  fill: var(--panel);
+  fill: var(--ui-surface);
 }
 .kg-tooltip {
   position: absolute;
@@ -220,9 +220,9 @@
   gap: 3px;
   padding: 8px 10px;
   border-radius: var(--ui-radius-control);
-  background: var(--panel);
-  border: 1px solid var(--line);
-  color: var(--ink);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  color: var(--ui-text);
   font-size: 12px;
   line-height: 1.45;
   box-shadow: 0 4px 16px rgb(0 0 0 / 0.18);
@@ -232,7 +232,7 @@
   font-size: 13px;
 }
 .kg-tooltip span {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   overflow-wrap: anywhere;
 }
 .kg-legend,
@@ -244,7 +244,7 @@
   flex-wrap: wrap;
   gap: 6px 14px;
   font-size: 12px;
-  color: var(--ink);
+  color: var(--ui-text);
 }
 .kg-groups {
   flex-direction: column;
@@ -291,32 +291,12 @@
 }
 .kg-note {
   margin: 8px 0 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 12px;
   line-height: 1.6;
 }
 .kg-warn {
-  color: var(--danger);
-}
-.kg-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0 0;
-}
-.kg-tabs button {
-  border: 1px solid var(--line);
-  border-radius: var(--ui-radius-control);
-  background: var(--panel);
-  color: var(--ink);
-  padding: 4px 10px;
-  font: inherit;
-  font-size: 12px;
-  cursor: pointer;
-}
-.kg-tabs button[aria-selected="true"] {
-  border-color: var(--brand);
-  color: var(--brand);
+  color: var(--ui-danger);
 }
 @media (max-width: 560px) {
   .kg-toolbar {

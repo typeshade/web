@@ -11,15 +11,15 @@
   align-items: center;
   gap: var(--ui-space-2);
   margin: 0 0 22px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 11px;
 }
 .breadcrumbs a:hover {
-  color: var(--brand);
+  color: var(--ui-link);
 }
 .page-heading {
   padding: 7px 0 34px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--ui-border);
 }
 .page-heading h1 {
   margin: 0;
@@ -35,7 +35,7 @@
 }
 .doc-section {
   padding: 33px 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--ui-border);
 }
 .doc-section h2 {
   margin: 0 0 12px;
@@ -52,13 +52,13 @@
 .doc-section p {
   max-width: 72ch;
   margin: 10px 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 14px;
   line-height: 1.8;
 }
 .doc-section p code,
 .note code {
-  color: var(--ink);
+  color: var(--ui-text);
   font-size: 0.92em;
 }
 .code-frame {
@@ -72,16 +72,16 @@
   gap: var(--ui-space-1);
   margin: 20px 0 0;
   padding: 14px 16px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-control);
-  background: var(--soft);
+  background: var(--ui-surface-muted);
   font-size: 13px;
 }
 .note strong {
   font-weight: 600;
 }
 .note span {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   line-height: 1.7;
 }
 .next-links {
@@ -91,18 +91,18 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   margin-top: 22px;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
+  border-bottom: 1px solid var(--ui-border);
 }
 .execution-lanes > div {
   padding: 20px 18px 20px 0;
 }
 .execution-lanes > div + div {
   padding-left: 18px;
-  border-left: 1px solid var(--line);
+  border-left: 1px solid var(--ui-border);
 }
 .lane-label {
-  color: var(--brand);
+  color: var(--ui-link);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
 }
@@ -113,8 +113,8 @@
 .backend-table {
   overflow-x: auto;
   margin: 20px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
+  border-bottom: 1px solid var(--ui-border);
 }
 .table-row {
   display: grid;
@@ -122,22 +122,22 @@
   min-width: 610px;
   gap: 14px;
   padding: 12px 10px;
-  border-bottom: 1px solid var(--line);
-  color: var(--muted);
+  border-bottom: 1px solid var(--ui-border);
+  color: var(--ui-text-muted);
   font-size: 12px;
 }
 .table-row:last-child {
   border-bottom: 0;
 }
 .table-head {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 .table-row strong {
-  color: var(--ink);
+  color: var(--ui-text);
   font-weight: 550;
 }
 .doc-pagination {
@@ -146,7 +146,7 @@
   gap: 20px;
   padding-top: 22px;
   margin-top: 30px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
 }
 .doc-pagination a {
   position: relative;
@@ -161,7 +161,7 @@
   text-align: right;
 }
 .doc-pagination small {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 10px;
 }
 .doc-pagination strong {
@@ -172,41 +172,41 @@
   position: absolute;
   right: 0;
   top: 19px;
-  color: var(--brand);
+  color: var(--ui-link);
 }
 .doc-pagination a:hover strong {
-  color: var(--brand);
+  color: var(--ui-link);
 }
 .api-list {
   padding: 0;
   margin: 20px 0 0;
   list-style: none;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
 }
 .api-list li {
   display: grid;
   grid-template-columns: minmax(185px, 0.65fr) 1fr;
   gap: 20px;
   padding: 13px 2px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--ui-border);
   font-size: 12px;
 }
 .api-list code {
-  color: var(--ink);
+  color: var(--ui-text);
 }
 .api-list span {
-  color: var(--muted);
+  color: var(--ui-text-muted);
 }
 .api-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0 28px;
   margin-top: 20px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
 }
 .api-columns > div {
   padding: 18px 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--ui-border);
 }
 .api-columns p {
   margin: 0;

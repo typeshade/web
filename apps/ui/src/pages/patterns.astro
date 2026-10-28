@@ -1,0 +1,185 @@
+---
+import Button from "@typeshade/site-ui/astro/Button";
+import IconButton from "@typeshade/site-ui/astro/IconButton";
+import Field from "@typeshade/site-ui/astro/Field";
+import Checkbox from "@typeshade/site-ui/astro/Checkbox";
+import Dialog from "@typeshade/site-ui/astro/Dialog";
+import Toolbar from "@typeshade/site-ui/astro/Toolbar";
+import Panel from "@typeshade/site-ui/astro/Panel";
+import Patterns from "../components/Patterns";
+import "../styles.css";
+---
+
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>TypeShade interaction patterns</title>
+  </head>
+  <body>
+    <main id="main">
+      <h1>Interaction patterns</h1>
+      <a href="/">Back to controls</a>
+      <section aria-labelledby="native-heading">
+        <h2 id="native-heading">Native forms and dialogs</h2>
+        <Panel aria-label="Native controls">
+          <div class="example-grid">
+            <Field
+              id="native-name"
+              label="Native model name"
+              description="The label and description share the control ID."
+              required
+            />
+            <Field
+              as="select"
+              id="native-backend"
+              label="Native execution tier"
+            >
+              <option value="gpu">WebGPU</option>
+              <option value="cpu">CPU</option>
+            </Field>
+            <Field
+              id="native-invalid"
+              label="Invalid native field"
+              error="Enter a valid value."
+            />
+            <Field
+              as="textarea"
+              id="native-notes"
+              label="Native notes"
+              rows={3}
+            />
+          </div>
+          <Checkbox id="native-keep" label="Remember this configuration" />
+          <Toolbar label="Native actions">
+            <Button data-open-dialog>Open configuration</Button>
+            <IconButton
+              label="Explain configuration"
+              description="Configuration affects the next run. Escape dismisses this hint."
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 10v7M12 6v2" />
+              </svg>
+            </IconButton>
+            <Button hidden data-testid="hidden-action">
+              Hidden action
+            </Button>
+          </Toolbar>
+        </Panel>
+        <Dialog id="sample-dialog" aria-labelledby="sample-dialog-heading">
+          <form method="dialog">
+            <h2 id="sample-dialog-heading">Configure a run</h2>
+            <Field id="dialog-name" label="Run name" required />
+            <Field as="textarea" id="dialog-notes" label="Run notes" rows={3} />
+            <Toolbar label="Configuration actions">
+              <Button data-close-dialog>Cancel configuration</Button>
+              <Button type="submit" value="save" variant="primary">
+                Save configuration
+              </Button>
+            </Toolbar>
+          </form>
+        </Dialog>
+      </section>
+      <section aria-labelledby="native-tabs-heading">
+        <h2 id="native-tabs-heading">Progressive native tabs</h2>
+        <div class="ui-tabs" data-native-tabs>
+          <div
+            class="ui-tablist"
+            role="tablist"
+            aria-label="Native output formats"
+          >
+            <button
+              type="button"
+              role="tab"
+              id="native-tab-a"
+              aria-controls="native-panel-a"
+              aria-selected="true"
+            >
+              WGSL
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="native-tab-b"
+              aria-controls="native-panel-b"
+              aria-selected="false"
+              tabindex="-1"
+            >
+              GLSL
+            </button>
+          </div>
+          <div
+            role="tabpanel"
+            id="native-panel-a"
+            aria-labelledby="native-tab-a"
+          >
+            WGSL output
+          </div>
+          <div
+            role="tabpanel"
+            id="native-panel-b"
+            aria-labelledby="native-tab-b"
+          >
+            GLSL output
+          </div>
+        </div>
+      </section>
+      <section aria-labelledby="menus-heading">
+        <h2 id="menus-heading">Navigation disclosures</h2>
+        <details data-demo-menu>
+          <summary>Languages</summary>
+          <a href="#native-heading">English</a>
+          <a href="#native-heading" lang="ko">
+            한국어
+          </a>
+        </details>
+        <details data-demo-menu>
+          <summary>Versions</summary>
+          <a href="#native-heading">Current version</a>
+        </details>
+        <details data-demo-menu data-modal-menu>
+          <summary>Mobile navigation</summary>
+          <a href="#native-heading">Overview</a>
+          <Button>Last navigation action</Button>
+        </details>
+      </section>
+      <Patterns client:load />
+    </main>
+  </body>
+</html>
+<script>
+  import { controlDialog } from "@typeshade/site-ui/dom/dialog";
+  import { enhanceTabs } from "@typeshade/site-ui/dom/tabs";
+  import { bindDisclosureMenus } from "@typeshade/site-ui/dom/menus";
+  const dialog = document.querySelector<HTMLDialogElement>("#sample-dialog")!;
+  const modal = controlDialog(dialog);
+  const trigger =
+    document.querySelector<HTMLButtonElement>("[data-open-dialog]")!;
+  trigger.addEventListener("click", () => modal.open(trigger));
+  document
+    .querySelector("[data-close-dialog]")!
+    .addEventListener("click", () => modal.close());
+  enhanceTabs(document.querySelector<HTMLElement>("[data-native-tabs]")!);
+  bindDisclosureMenus(
+    [...document.querySelectorAll<HTMLDetailsElement>("[data-demo-menu]")],
+    document.querySelector<HTMLDetailsElement>("[data-modal-menu]")!,
+  );
+</script>
+<style>
+  [data-native-tabs]:not([data-ui-tabs-ready]) .ui-tablist {
+    display: none;
+  }
+  details {
+    margin-block: 16px;
+  }
+  details a {
+    display: inline-block;
+    margin: 8px 16px;
+  }
+  summary {
+    cursor: pointer;
+  }
+</style>

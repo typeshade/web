@@ -1,4 +1,5 @@
 ---
+import Button from '@typeshade/site-ui/astro/Button';
 import Docs from '../../layouts/Docs.astro';
 import Rich from '../Rich.astro';
 import MappingTable from '../MappingTable.astro';
@@ -89,7 +90,7 @@ if (format) {
       <div class="precision-probe-controls">
         <label for="precision-context">{t.contextLabel}</label>
         <select id="precision-context" data-precision-context><option value="webgl2">WebGL 2</option><option value="webgl">WebGL 1</option></select>
-        <button type="button" class="button" disabled data-precision-inspect>{t.inspect}</button>
+        <Button variant="secondary" size="default" type="button"  disabled data-precision-inspect>{t.inspect}</Button>
       </div>
       <p class="guide-note" role="status" data-precision-status>{t.deviceIdle}</p>
       <div class="precision-report" data-precision-report hidden role="region" aria-label={t.deviceH} tabindex="0">

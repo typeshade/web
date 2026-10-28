@@ -1,7 +1,7 @@
 @import "@typeshade/site-ui/tokens.css";
-@import "@typeshade/site-ui/product-theme.css";
 @import "@typeshade/site-ui/semantics.css";
 @import "@typeshade/site-ui/controls.css";
+@import "@typeshade/site-ui/compositions.css";
 :root {
   --ui-font-sans: system-ui, sans-serif;
 }
@@ -14,6 +14,9 @@ body {
   color: var(--ui-text);
   font-family: var(--ui-font-sans);
   line-height: 1.6;
+}
+a {
+  color: var(--ui-link);
 }
 main {
   max-inline-size: 1100px;

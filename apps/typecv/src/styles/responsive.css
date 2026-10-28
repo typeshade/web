@@ -52,7 +52,7 @@
     overflow-x: auto;
     padding: 0 0 15px;
     margin-bottom: 25px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--ui-border);
   }
   .sidebar-home,
   .sidebar-heading,
@@ -98,16 +98,6 @@
   .home-status {
     align-items: start;
     flex-direction: column;
-  }
-  .playground-workbench {
-    grid-template-columns: 1fr;
-  }
-  .playground-controls {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .playground-output {
-    min-height: 330px;
   }
 }
 @media (max-width: 560px) {
@@ -155,7 +145,7 @@
   }
   .path-strip article + article {
     padding-left: 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--ui-border);
     border-left: 0;
   }
   .path-strip p {
@@ -198,26 +188,10 @@
   }
   .execution-lanes > div + div {
     padding: 16px 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--ui-border);
     border-left: 0;
   }
   .execution-lanes > div {
     padding: 16px 0;
-  }
-  .playground-controls,
-  .playground-output {
-    padding: 16px;
-  }
-  .select-grid {
-    grid-template-columns: 1fr;
-  }
-  .playground-disclosure {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  .playground-code pre {
-    overflow-x: auto;
-    padding: 15px 13px;
-    font-size: 10px;
   }
 }

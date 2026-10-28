@@ -16,14 +16,14 @@
 }
 .lab-intro {
   margin: 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 14px;
   line-height: 1.7;
   max-width: 80ch;
 }
 .lab-section {
   padding-top: 22px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--ui-border);
 }
 .lab-section h2 {
   margin: 0 0 14px;
@@ -41,12 +41,12 @@
   flex-direction: column;
   gap: 10px;
   padding: 14px;
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-panel);
 }
 .lab-card.is-selected {
-  border-color: var(--brand);
+  border-color: var(--ui-link);
 }
 .lab-card-select {
   display: flex;
@@ -55,7 +55,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--ink);
+  color: var(--ui-text);
   text-align: left;
   cursor: pointer;
   font: inherit;
@@ -65,7 +65,7 @@
   font-weight: 600;
 }
 .lab-card-task {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 12px;
   font-family: "IBM Plex Mono", monospace;
 }
@@ -78,7 +78,7 @@
   line-height: 1.5;
 }
 .lab-facts dt {
-  color: var(--muted);
+  color: var(--ui-text-muted);
 }
 .lab-facts dd {
   margin: 0;
@@ -91,9 +91,6 @@
   margin-top: auto;
 }
 .lab-graph-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-2);
   margin: 12px 0;
 }
 .lab-form {
@@ -109,20 +106,15 @@
   margin: 12px 0;
 }
 .lab-status {
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 13px;
   line-height: 1.5;
 }
 .lab-note {
   margin: 0;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 12px;
   line-height: 1.6;
-}
-.lab-error {
-  margin: 0;
-  color: var(--danger);
-  font-size: 13px;
 }
 .lab-charts {
   display: grid;
@@ -134,39 +126,39 @@
 }
 .lab-charts figcaption {
   margin-bottom: 6px;
-  color: var(--muted);
+  color: var(--ui-text-muted);
   font-size: 12px;
 }
 .lab-chart {
   display: block;
   width: 100%;
   height: auto;
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-panel);
 }
 .lab-grid {
-  stroke: var(--line);
+  stroke: var(--ui-border);
 }
 .lab-axis {
-  fill: var(--muted);
+  fill: var(--ui-text-muted);
   font-size: 11px;
   font-family: "IBM Plex Mono", monospace;
 }
 .lab-line {
-  stroke: var(--brand);
+  stroke: var(--ui-link);
   stroke-width: 2;
 }
 .lab-dot {
-  fill: var(--brand);
+  fill: var(--ui-link);
 }
 .lab-chart-empty {
-  fill: var(--muted);
+  fill: var(--ui-text-muted);
   font-size: 13px;
 }
 .lab-warning {
   margin-top: 8px;
-  color: var(--ink);
+  color: var(--ui-text);
 }
 .lab-image-try {
   display: flex;
@@ -179,7 +171,7 @@
   touch-action: none;
   cursor: crosshair;
   background: #000;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-control);
 }
 .lab-try-side {
@@ -198,7 +190,7 @@
   justify-content: space-between;
   gap: var(--ui-space-3);
   padding: 5px 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--ui-border);
   font-size: 14px;
 }
 .lab-text-try,

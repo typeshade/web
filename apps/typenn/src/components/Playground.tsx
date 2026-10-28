@@ -1,5 +1,13 @@
-import { ThemeProvider } from "@typeshade/site-ui/react";
-import { Button, Input, Select } from "antd";
+import {
+  ThemeProvider,
+  Button,
+  Input,
+  Select,
+  Field,
+  Panel,
+  EmptyState,
+  Alert,
+} from "@typeshade/site-ui/react";
 import Prism from "prismjs";
 import "prismjs/components/prism-typescript";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -213,7 +221,7 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
     <ThemeProvider>
       <section className="playground-app" aria-label={words.input}>
         <div className="playground-workbench">
-          <div className="playground-controls">
+          <Panel className="playground-controls">
             <div className="control-heading">
               <span className="eyebrow">TypeNN Runtime</span>
               <h2>{words.input}</h2>
@@ -239,8 +247,7 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
               disabled={running}
             />
             <div className="select-grid">
-              <label className="field-label">
-                {words.operation}
+              <Field label={words.operation} disabled={running}>
                 <Select<Operation>
                   value={operation}
                   disabled={running}
@@ -254,9 +261,8 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
                     { value: "matmul-relu", label: words.relu },
                   ]}
                 />
-              </label>
-              <label className="field-label">
-                {words.backend}
+              </Field>
+              <Field label={words.backend} disabled={running}>
                 <Select<DevicePreference>
                   value={preference}
                   disabled={running}
@@ -271,10 +277,10 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
                     { value: "webgl2", label: words.webgl2 },
                   ]}
                 />
-              </label>
+              </Field>
             </div>
             <Button
-              type="primary"
+              variant="primary"
               size="large"
               loading={running}
               disabled={running}
@@ -284,9 +290,9 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
               {running ? words.running : words.run}
             </Button>
             <p className="field-help">{words.software}</p>
-          </div>
+          </Panel>
 
-          <div className="playground-output">
+          <Panel className="playground-output">
             <div className="output-header">
               <div>
                 <span className="eyebrow">{words.result}</span>
@@ -307,10 +313,10 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
               )}
             </div>
             {running ? (
-              <div className="result-empty" role="status">
+              <EmptyState busy>
                 <span className="loading-line"></span>
                 <p>{words.compiling}</p>
-              </div>
+              </EmptyState>
             ) : result ? (
               <div className="matrix-result" role="status" aria-live="polite">
                 <span className="result-caption">Float32Array · [2, 2]</span>
@@ -326,18 +332,18 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
                 {fallback && <p className="field-help">{fallback}</p>}
               </div>
             ) : error ? (
-              <div className="result-error" role="alert">
+              <Alert tone="danger" live>
                 <strong>{words.errorTitle}</strong>
                 <code>{error}</code>
                 <p>{words.errorHelp}</p>
-              </div>
+              </Alert>
             ) : (
-              <div className="result-empty">
+              <EmptyState>
                 <span className="empty-mark" aria-hidden="true">
                   [ ]
                 </span>
                 <p>{words.waiting}</p>
-              </div>
+              </EmptyState>
             )}
             <p className="readback-note">{words.readback}</p>
             {graph && (
@@ -361,7 +367,7 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
                 </p>
               </div>
             )}
-          </div>
+          </Panel>
         </div>
 
         <div className="playground-code">

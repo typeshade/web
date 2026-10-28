@@ -4,23 +4,8 @@
   fill: currentColor;
   transition: transform var(--motion);
 }
-.button:hover .button-icon {
+.ui-button:hover .button-icon {
   transform: translateX(2px);
-}
-/* Ant Alert, the info face: a 1px #91caff rule over the primary's own #e6f4ff wash, with the
-   info-circle at the left. The two pre-release notes on the site use it. */
-.alert {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--ui-space-2);
-  margin-block-start: 16px;
-  padding: 12px 16px;
-  border: 1px solid var(--color-primary-border);
-  border-radius: var(--radius-md);
-  background: var(--color-primary-bg);
-  font-size: var(--text-ui);
-  line-height: var(--text-ui--line-height);
-  color: var(--color-text-1);
 }
 /* The icon is centred on the first line, not on the box: half the line box less the icon.
    `.doc p` would otherwise add its 16px to the paragraph inside a guide's alert and drop
@@ -32,28 +17,26 @@
   fill: var(--color-primary);
   margin-block-start: calc((var(--text-ui--line-height) * 1em - 16px) / 2);
 }
-.alert p,
-.doc .alert p {
+.ui-alert p,
+.doc .ui-alert p {
   margin: 0;
 }
-.alert a {
+.ui-alert a {
   color: var(--color-accent);
   text-decoration: none;
   transition: color var(--motion);
 }
-.alert a:hover {
+.ui-alert a:hover {
   color: var(--color-primary-text-hover);
 }
-.alert code {
+.ui-alert code {
   font-family: var(--font-mono);
   font-size: 0.9em;
 }
-.doc h2 + .alert {
+.doc h2 + .ui-alert {
   margin-block-start: 0;
 }
-
-/* Ant Tabs, on the front page and over every example page's code: a 40px head with a 2px
-   primary underline on the active tab. The head needs the script, so it stays out of the page
+/* The tab head needs the script, so it stays out of the page
    until the script has run; with no script every panel is in the flow and they stack, which
    is also what the search index reads. */
 .tabs-panel {
@@ -63,40 +46,22 @@
 .tabs-panel > .expressive-code {
   block-size: 100%;
 }
-.tabs-head {
+.tabs-head.ui-tablist {
   display: none;
   gap: var(--ui-space-4);
   border-block-end: 1px solid var(--color-line-1);
 }
-[data-front-tabs][data-ready] .tabs-head {
+[data-front-tabs][data-ready] .tabs-head.ui-tablist {
   display: flex;
-}
-.tabs-head button {
-  block-size: 40px;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: inset 0 -2px 0 transparent;
-  color: var(--color-text-2);
-  font-family: inherit;
-  font-size: var(--text-ui);
-  cursor: pointer;
-  transition:
-    color var(--motion),
-    box-shadow var(--motion);
-}
-.tabs-head button:hover {
-  color: var(--color-primary-hover);
-}
-.tabs-head button[aria-selected='true'] {
-  color: var(--color-accent);
-  box-shadow: inset 0 -2px 0 var(--color-accent);
-  font-weight: 600;
-}
-.tabs-head button:focus-visible {
-  border-radius: var(--radius-sm);
 }
 .wide {
   inline-size: var(--wide);
   margin-inline: auto;
+}
+
+.ui-alert {
+  display: flex;
+  align-items: start;
+  gap: var(--ui-space-2);
+  margin-block-start: var(--ui-space-4);
 }

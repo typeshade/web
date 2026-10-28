@@ -79,7 +79,7 @@ const tag = 'inline-block rounded-sm border border-line-2 bg-surface-1 px-[7px] 
   <p class="text-label text-text-2"><Rich text={hp.tiersNote} locale={locale} /></p>
 
   <div class="mbs-6 flex min-inline-0 flex-col gap-4" data-front-tabs>
-    <div class="tabs-head" role="tablist" aria-label={hp.files}>
+    <div class="tabs-head ui-tablist" role="tablist" aria-label={hp.files}>
       {panes.map((pane, i) => (
         <button type="button" role="tab" id={`${paneId(pane.key)}-tab`} aria-controls={paneId(pane.key)} aria-selected={i === 0 ? 'true' : 'false'}>{pane.label}</button>
       ))}

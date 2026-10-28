@@ -1,4 +1,5 @@
 ---
+import Button from '@typeshade/site-ui/astro/Button';
 // Compiler work happens once at the site build, and only the JSON Pack crosses to
 // the browser. The client uses the compiler repository's shared browser session.
 import { readFileSync } from 'node:fs';
@@ -67,8 +68,8 @@ const sourceUrl = 'https://github.com/typeshade/typeshade/blob/' + facts.pinnedC
   <p id="mnist-epochs-error" data-epochs-error role="alert" class="text-diagnostic" hidden></p>
   <p class="mnist-note">{words.resourceNote}</p>
   <div class="mnist-actions">
-    <button class="button button-primary" type="button" data-start>{words.start}</button>
-    <button class="button" type="button" data-cancel disabled>{words.cancel}</button>
+    <Button variant="primary" size="default"  type="button" data-start>{words.start}</Button>
+    <Button variant="secondary" size="default"  type="button" data-cancel disabled>{words.cancel}</Button>
   </div>
   <p class="mnist-note">{words.dataNote}</p>
   <p role="status" aria-live="polite" class="mnist-status" data-status>{words.idle}</p>
@@ -96,8 +97,8 @@ const sourceUrl = 'https://github.com/typeshade/typeshade/blob/' + facts.pinnedC
       <p class="mnist-note">{words.drawNote}</p>
       <canvas width="280" height="280" data-draw aria-label={words.canvas}></canvas>
       <div class="mnist-actions">
-        <button class="button" type="button" data-clear>{words.clear}</button>
-        <button class="button" type="button" data-sample disabled>{words.sample}</button>
+        <Button variant="secondary" size="default"  type="button" data-clear>{words.clear}</Button>
+        <Button variant="secondary" size="default"  type="button" data-sample disabled>{words.sample}</Button>
       </div>
       <p data-ground-truth class="mnist-label"></p>
     </div>

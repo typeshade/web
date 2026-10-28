@@ -231,54 +231,10 @@ const jsonLd = {
         if (!document.documentElement.dataset.theme) syncThemeButtons();
       });
     </script>
-    <script is:inline>
-      const drops = [...document.querySelectorAll('.site-menu-drop')];
-      const panel = document.querySelector('.site-menu');
-      const all = panel ? [...drops, panel] : drops;
-
-      function closeAllBut(except) {
-        for (const d of all) if (d !== except && d.open) d.open = false;
-      }
-      for (const d of drops) d.addEventListener('toggle', () => { if (d.open) closeAllBut(d); });
-
-      document.addEventListener('click', (e) => {
-        for (const d of all) if (d.open && !d.contains(e.target)) d.open = false;
-      });
-      document.addEventListener('keydown', (e) => {
-        if (e.key !== 'Escape') return;
-        const open = all.find((d) => d.open);
-        if (open) { open.open = false; open.querySelector('summary')?.focus(); }
-      });
-
-      if (panel) {
-        const summary = panel.querySelector(':scope > summary');
-        let restoreOverflow = '';
-        panel.addEventListener('toggle', () => {
-          if (panel.open) {
-            closeAllBut(panel);
-            restoreOverflow = document.documentElement.style.overflow;
-            document.documentElement.style.overflow = 'hidden';
-          } else {
-            document.documentElement.style.overflow = restoreOverflow;
-          }
-        });
-        panel.addEventListener('keydown', (e) => {
-          if (!panel.open) return;
-          if (e.key === 'Escape') {
-            e.preventDefault();
-            panel.open = false;
-            summary?.focus();
-            return;
-          }
-          if (e.key !== 'Tab') return;
-          const focusable = [...panel.querySelectorAll('summary, a[href], button:not([disabled])')].filter((el) => el.offsetParent !== null);
-          if (focusable.length === 0) return;
-          const first = focusable[0];
-          const last = focusable[focusable.length - 1];
-          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-        });
-      }
+    <script>
+      import { bindDisclosureMenus } from '@typeshade/site-ui/dom/menus';
+      const menus = [...document.querySelectorAll<HTMLDetailsElement>('.site-menu-drop, .site-menu')];
+      bindDisclosureMenus(menus, document.querySelector<HTMLDetailsElement>('.site-menu') ?? undefined);
     </script>
   </body>
 </html>

@@ -1,0 +1,27 @@
+---
+import Button from "./Button.astro";
+import type { HTMLAttributes } from "astro/types";
+type Props = HTMLAttributes<"button"> & { label: string; description?: string };
+const {
+  label,
+  description,
+  class: className,
+  title,
+  ...attributes
+} = Astro.props;
+---
+
+<span class="ui-tooltip-host" data-ui-tooltip={description ?? title ?? label}>
+  <Button
+    {...attributes}
+    class:list={["ui-icon-button", className]}
+    size="small"
+    aria-label={label}
+  >
+    <slot />
+  </Button>
+</span>
+<script>
+  import { enhanceTooltips } from "../dom/tooltip";
+  enhanceTooltips();
+</script>

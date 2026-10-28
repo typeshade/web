@@ -52,7 +52,7 @@
     overflow-x: auto;
     padding: 0 0 15px;
     margin-bottom: 25px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--ui-border);
   }
   .sidebar-home,
   .sidebar-heading,
@@ -104,7 +104,7 @@
   }
   .playground-controls {
     border-right: 0;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--ui-border);
   }
   .playground-output {
     min-height: 330px;
@@ -155,7 +155,7 @@
   }
   .path-strip article + article {
     padding-left: 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--ui-border);
     border-left: 0;
   }
   .path-strip p {
@@ -198,7 +198,7 @@
   }
   .execution-lanes > div + div {
     padding: 16px 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--ui-border);
     border-left: 0;
   }
   .execution-lanes > div {

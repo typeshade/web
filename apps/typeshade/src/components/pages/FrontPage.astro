@@ -1,4 +1,5 @@
 ---
+import Alert from '@typeshade/site-ui/astro/Alert';
 import LinkButton from '@typeshade/site-ui/astro/LinkButton';
 // The front page: a two-column hero in Ant Design's grammar. The headline, the sentence and
 // the actions on the left; on the right the showcase card, where the file that draws the
@@ -125,7 +126,7 @@ const quickStart = localePath(locale, links.quickStart.href);
         </CodeFrame>
       </div>
       <div class="flex min-inline-0 flex-col gap-4 lg:gap-6" data-front-tabs>
-        <div class="tabs-head" role="tablist" aria-label={f.targets.h}>
+        <div class="tabs-head ui-tablist" role="tablist" aria-label={f.targets.h}>
           <button type="button" role="tab" id="targets-tab-wgsl" aria-controls="targets-panel-wgsl" aria-selected="true">{f.targets.wgsl}</button>
           <button type="button" role="tab" id="targets-tab-glsl" aria-controls="targets-panel-glsl" aria-selected="false">{f.targets.glsl}</button>
         </div>
@@ -192,13 +193,13 @@ const quickStart = localePath(locale, links.quickStart.href);
 
   <section class={`front-install ${section}`}>
     <h2 class={heading}>{f.install.h}</h2>
-    <div class="alert alert-info">
+    <Alert>
       <svg class="alert-icon" viewBox="0 0 1024 1024" aria-hidden="true" focusable="false">
         <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z" />
         <path d="M464 336a48 48 0 1096 0 48 48 0 10-96 0zm72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z" />
       </svg>
       <p><Rich text={f.install.p} locale={locale} /></p>
-    </div>
+    </Alert>
     <InstallCommand locale={locale} />
     {/* A paragraph of the section like the others, so it keeps the lead's measure and type. */}
     <p class="mbs-6 flex max-inline-[62ch] flex-wrap gap-3 text-prose text-text-2 text-pretty">
@@ -216,10 +217,10 @@ const quickStart = localePath(locale, links.quickStart.href);
   .front-section h2:lang(ko) { letter-spacing: 0; line-height: 1.4 }
   /* Inline code in the copy. Expressive Code's own `pre > code` keeps its face and size. */
   .front-lede :global(code), .front-section :global(:not(pre) > code) { font-family: var(--font-mono); font-size: 0.9em }
-  .front-section > p :global(a:not(.button)), .front-gallery-lead :global(a:not(.button)), .front-map-row dd :global(a) {
+  .front-section > p :global(a:not(.ui-button)), .front-gallery-lead :global(a:not(.ui-button)), .front-map-row dd :global(a) {
     color: var(--color-accent); text-decoration: none; transition: color var(--motion);
   }
-  .front-section > p :global(a:not(.button):hover), .front-gallery-lead :global(a:not(.button):hover), .front-map-row dd :global(a:hover) {
+  .front-section > p :global(a:not(.ui-button):hover), .front-gallery-lead :global(a:not(.ui-button):hover), .front-map-row dd :global(a:hover) {
     color: var(--color-primary-text-hover);
   }
   .front-section :global(.expressive-code) { margin: 0 }

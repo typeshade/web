@@ -1,0 +1,10 @@
+---
+import type { HTMLAttributes } from "astro/types";
+type Props = Omit<HTMLAttributes<"input">, "type"> & { label: string };
+const { label, class: className, ...attributes } = Astro.props;
+---
+
+<label class:list={["ui-native-checkbox", className]}>
+  <input {...attributes} type="checkbox" />
+  <span>{label}</span>
+</label>

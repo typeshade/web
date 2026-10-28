@@ -109,6 +109,7 @@ export function ThemeSwitch({
   return (
     <ThemeProvider>
       <Switch
+        className="ui-theme-switch"
         checked={dark}
         onChange={change}
         aria-label={dark ? lightLabel : darkLabel}
@@ -129,3 +130,5 @@ export {
   Select,
   Checkbox,
 } from "./controls";
+
+export { Toolbar, Panel, EmptyState, Alert, Tabs } from './compositions';

@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { stat, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { chromium } from "playwright";
+import { checkPlayground } from "./playground-checks.mjs";
 
 const roots = process.argv.slice(2).map((directory) => resolve(directory));
 assert.ok(roots.length, "Pass one or more built site directories.");
@@ -19,7 +20,14 @@ try {
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     try {
-      for (const route of ["/", "/ko/", "/playground/", "/lab/", "/ko/lab/"]) {
+      for (const route of [
+        "/",
+        "/ko/",
+        "/playground/",
+        "/ko/playground/",
+        "/lab/",
+        "/ko/lab/",
+      ]) {
         try {
           await stat(resolve(root, "." + route, "index.html"));
         } catch {
@@ -120,6 +128,15 @@ try {
         );
       }
       await page.setViewportSize({ width: 1440, height: 900 });
+      await checkPlayground(
+        page,
+        base,
+        root.includes("typeshade")
+          ? "typeshade"
+          : root.includes("typenn")
+            ? "typenn"
+            : "typecv",
+      );
       await page.goto(base + "/");
       assert.equal(
         await page.evaluate(() =>
@@ -132,14 +149,14 @@ try {
       );
       assert.equal(
         await page
-          .locator(".button-primary")
+          .locator('.ui-button[data-variant="primary"]')
           .first()
           .evaluate((node) => getComputedStyle(node).color),
         "rgb(255, 255, 255)",
         "Primary action styles resolve",
       );
       const actionFont = await page
-        .locator(".button-primary")
+        .locator('.ui-button[data-variant="primary"]')
         .first()
         .evaluate((node) =>
           getComputedStyle(node).fontFamily.split(",")[0].trim(),

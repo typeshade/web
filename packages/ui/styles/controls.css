@@ -1,5 +1,4 @@
-/* The .button aliases support existing static markup during incremental adoption. */
-:is(.ui-button, .button, .button-primary, .button-secondary) {
+.ui-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -25,7 +24,7 @@
     border-color var(--ui-motion-duration),
     color var(--ui-motion-duration);
 }
-:is(.ui-button[data-variant="primary"], .button-primary) {
+.ui-button[data-variant="primary"] {
   --ui-button-bg: var(--ui-accent);
   --ui-button-text: var(--ui-on-accent);
   --ui-button-border: var(--ui-accent);
@@ -51,23 +50,19 @@
   --ui-button-hover-bg: var(--ui-danger);
   --ui-button-active-bg: var(--ui-danger);
 }
-:is(.ui-button, .button, .button-primary, .button-secondary):hover:not(
-    :disabled
-  ) {
+.ui-button:hover:not(:disabled) {
   color: var(--ui-button-hover-text, var(--ui-focus));
   border-color: var(--ui-button-hover-border, var(--ui-focus));
   background: var(--ui-button-hover-bg, var(--ui-surface-muted));
 }
-:is(.ui-button, .button, .button-primary, .button-secondary):active:not(
-    :disabled
-  ) {
+.ui-button:active:not(:disabled) {
   background: var(--ui-button-active-bg, var(--ui-surface-muted));
 }
 .ui-button[data-size="small"] {
   min-block-size: var(--ui-control-height-small);
   padding: 2px 8px;
 }
-:is(.ui-button[data-size="large"], .button-lg) {
+.ui-button[data-size="large"] {
   min-block-size: var(--ui-control-height-large);
   padding: 8px 16px;
   font-size: 16px;
@@ -94,7 +89,7 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-:is(.ui-button, .button, .ui-link):focus-visible,
+:is(.ui-button, .ui-link):focus-visible,
 .ui-field :is(input, textarea, .ant-select-selector):focus-visible,
 .ui-field .ant-select-focused .ant-select-selector,
 .ui-checkbox:has(input:focus-visible) {
@@ -148,12 +143,12 @@
   }
 }
 @media (pointer: coarse) {
-  :is(.ui-button, .button, .button-primary, .button-secondary) {
+  .ui-button {
     min-block-size: var(--ui-control-height-large);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  :is(.ui-button, .button, .button-primary, .button-secondary) {
+  .ui-button {
     transition: none;
   }
   .ui-spinner {
@@ -161,11 +156,18 @@
   }
 }
 @media (forced-colors: active) {
-  :is(.ui-button, .button, .button-primary, .button-secondary) {
+  .ui-button {
     border-color: ButtonText;
   }
   .ui-button:disabled {
     color: GrayText;
     border-color: GrayText;
   }
+}
+
+.ui-theme-switch.ant-switch {
+  background: #8c8c8c;
+}
+.ui-theme-switch.ant-switch.ant-switch-checked {
+  background: var(--ui-accent);
 }
