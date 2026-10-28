@@ -1,0 +1,42 @@
+name: Public site HTTP check
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  http:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Compare public responses from the Actions runner
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, re, subprocess, tempfile
+          user_agents = {
+              'curl-default': None,
+              'browser': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+              'site-health-check': 'TypeShade-Deployment-Check/1.0',
+          }
+          for url in ['https://cv.typeshade.dev/', 'https://nn.typeshade.dev/', 'https://typeshade.dev/']:
+              for client, user_agent in user_agents.items():
+                  with tempfile.TemporaryDirectory() as directory:
+                      root = pathlib.Path(directory)
+                      args = ['curl', '--location', '--silent', '--show-error', '--max-time', '20',
+                              '--dump-header', str(root / 'headers'), '--output', str(root / 'body'),
+                              '--write-out', '%{http_code}']
+                      if user_agent:
+                          args += ['--user-agent', user_agent]
+                      result = subprocess.run(args + [url], capture_output=True, text=True, timeout=25)
+                      headers = (root / 'headers').read_text(errors='replace') if (root / 'headers').exists() else ''
+                      body = (root / 'body').read_text(errors='replace') if (root / 'body').exists() else ''
+                      title = re.search(r'<title[^>]*>(.*?)</title>', body, re.I | re.S)
+                      safe_headers = [line for line in headers.splitlines() if re.match(
+                          r'^(HTTP/|content-type:|server:|cf-mitigated:|location:)', line, re.I)]
+                      print(json.dumps({'url': url, 'client': client, 'exit': result.returncode,
+                                        'status': result.stdout.strip(), 'headers': safe_headers,
+                                        'title': title.group(1)[:150] if title else None}))
+          PY
