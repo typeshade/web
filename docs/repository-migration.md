@@ -11,13 +11,22 @@ performed by this work.
   authorized the CI/CD transition. The final stack merge is `f7d4584`. At that commit, the
   application/source tree matches `9d12c05`, whose complete ten-job CI run `40671210525` passed.
   The only additional files are the read-only readiness workflow/helper/tests from PR #8.
-  The post-merge website CI run is separate; do not describe a queued/running check as a pass.
+  Post-merge run [40690726064](https://github.com/typeshade/web/actions/runs/40690726064)
+  at `6f0da24` subsequently passed all ten jobs, including all four TypeCV browser shards.
 - Readiness run [40688434326](https://github.com/typeshade/web/actions/runs/40688434326)
   ran inside GitHub Actions. It confirmed that production operations and previews are disabled,
   the Cloudflare credential is available at repository/organization scope, and the TypeCV
   record-reader credential is not available there. All three production environments are missing.
   The check failed on these prerequisites and skipped the environment-scoped credential jobs.
-  Cloudflare write permissions have not been verified from Actions.
+  Cloudflare write permissions were not verified by this first inspection.
+- After the owner registered the administrative Actions secret, setup run
+  [40695653261](https://github.com/typeshade/web/actions/runs/40695653261) passed. It created
+  all three production environments with main-only branch policies, generated the TypeCV
+  record-reader environment secret, and explicitly set both operation switches to false.
+  Readiness run [40695996488](https://github.com/typeshade/web/actions/runs/40695996488) then
+  passed all four jobs: configuration plus effective credentials and Worker deployment reads
+  for all three sites, including the TypeShade gallery. These reads do not prove storage or
+  deployment write permission.
 - The managed executor replaces outbound GitHub authentication with its connected app identity.
   Explicitly invalid authentication also returned the same authenticated user/app in a diagnostic.
   Adding a runtime PAT or reinstalling the GitHub app did not grant environment/secret/variable
@@ -39,10 +48,20 @@ performed by this work.
   Cleanup now reports that it was not attempted when previews are disabled and no account is
   configured. A retained account still permits cleanup after uploads are disabled; keep that
   account setting until existing PR Workers are removed.
+- `production-operations.yml` changes the production switch through the administrative
+  Actions secret. Enabling requires a successful Deployment readiness run on the same main
+  commit, all seven legacy publishing workflows disabled, and no active runs for those
+  workflows. Disable mode remains available for rollback without requiring readiness.
+  This workflow does not deploy, change previews, or write to Cloudflare.
+- Read-only checks after setup found the existing TypeCV KV namespace and all three required
+  R2 buckets. The D1 migration ledger already contains the eight checked-in migrations.
+  Worker traffic still targets the previous versions listed below; refresh immediately before
+  dispatching production deploy. The check receipt is `artifacts/migration/pre-cutover.json`
+  in the execution workspace and contains resource metadata, not credential values.
 
-Next: run setup after the admin secret is registered, rerun Deployment readiness, and verify
-the remaining Cloudflare/storage prerequisites. Only then stop the old publishers, refresh
-rollback IDs and enable the new production operations. Library cleanup PRs remain unmerged.
+Next: pass readiness on the final operational-workflow commit, stop the old publishers, verify
+no publishing runs remain, refresh rollback IDs and enable production operations. Deploy and
+verify the three sites before merging library cleanup PRs, which currently remain unmerged.
 Historical observations below describe their original check time, not the latest merge state.
 
 ## Ownership
