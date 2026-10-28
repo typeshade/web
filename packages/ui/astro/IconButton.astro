@@ -1,5 +1,6 @@
 ---
-import "../styles/compositions.css";
+import "../styles/tooltip.css";
+import { cn, iconButtonStyles } from "../recipes";
 import Button from "./Button.astro";
 import type { HTMLAttributes } from "astro/types";
 type Props = HTMLAttributes<"button"> & { label: string; description?: string };
@@ -15,7 +16,7 @@ const {
 <span class="ui-tooltip-host" data-ui-tooltip={description ?? title ?? label}>
   <Button
     {...attributes}
-    class:list={["ui-icon-button", className]}
+    class={cn(iconButtonStyles, className)}
     size="small"
     aria-label={label}
   >

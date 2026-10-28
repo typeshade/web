@@ -9,6 +9,7 @@ const common = new Set([
   "antd/dist/reset.css",
   "@typeshade/site-ui/tokens.css",
   "@typeshade/site-ui/semantics.css",
+  "@typeshade/site-ui/tailwind.css",
   "@typeshade/site-ui/motion.css",
 ]);
 const local = new Set([
@@ -21,12 +22,23 @@ const local = new Set([
 for (const site of ["typenn", "typecv", "typeshade"]) {
   const file = resolve(`apps/${site}/src/styles/global.css`);
   const css = readFileSync(file, "utf8");
+  assert.ok(
+    css.startsWith("@layer theme, base, antd, components, utilities;"),
+    `${site}: declare cascade order before Tailwind imports`,
+  );
+  if (site !== "typeshade")
+    assert.match(
+      css,
+      /@import "antd\/dist\/reset\.css" layer\(base\);/,
+      `${site}: reset must not override component utilities`,
+    );
   const imports = [...css.matchAll(/@import\s+['"]([^'"]+)['"];?/g)];
   assert.ok(imports.length, `${site}: explicit global layers`);
   assert.equal(
     css
       .replace(/\/\*[\s\S]*?\*\//g, "")
       .replace(/@import[^;]+;/g, "")
+      .replace(/@layer theme, base, antd, components, utilities;/g, "")
       .trim(),
     "",
     `${site}: global entry must only assemble base layers`,

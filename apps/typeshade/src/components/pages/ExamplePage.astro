@@ -1,4 +1,6 @@
 ---
+import TabList from "@typeshade/site-ui/astro/TabList";
+import Tab from "@typeshade/site-ui/astro/Tab";
 import '../CodeTabs.css';
 import '../GalleryTile.css';
 import '../ShaderFigure.css';
@@ -152,18 +154,16 @@ const editable = example.corpus === 'shade';
           </div>
 
           <div class="example-stage-code flex block-[360px] min-inline-0 min-block-0 flex-col border-bs border-bs-line-1 bg-(--color-elevated)">
-            <div class="tabs-head ui-tablist" role="tablist" aria-label={p.tabs} data-example-tabs>
+            <TabList class="tabs-head" aria-label={p.tabs} data-example-tabs>
               {panes.map((pane, i) => (
-                <button
-                  type="button"
-                  role="tab"
+                <Tab
                   id={`${paneId(pane.key)}-tab`}
                   aria-controls={paneId(pane.key)}
                   aria-selected={i === 0 ? 'true' : 'false'}
                   data-runtime-tab={template ? pane.key : undefined}
-                >{pane.label}</button>
+                >{pane.label}</Tab>
               ))}
-            </div>
+            </TabList>
             {/* The tab already names the pane, so the frame inside it carries no title bar of
                 its own; the label stays as the code region's accessible name. The source pane
                 opens on the line the shader starts at (src/scripts/example-stage.ts). */}

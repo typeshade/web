@@ -1,0 +1,15 @@
+---
+import { cn, tabStyles } from "../recipes";
+import type { HTMLAttributes } from "astro/types";
+type Props = Omit<HTMLAttributes<"button">, "type" | "role"> & { id: string; "aria-controls": string };
+const { class: className, ...attributes } = Astro.props;
+---
+
+<button
+  {...attributes}
+  type="button"
+  role="tab"
+  class={cn(tabStyles, className)}
+>
+  <slot />
+</button>

@@ -7,7 +7,8 @@
     "astro",
     "react",
     "styles",
-    "dom"
+    "dom",
+    "recipes"
   ],
   "exports": {
     "./tokens.css": "./styles/tokens.css",
@@ -15,9 +16,7 @@
     "./react": "./react/index.tsx",
     "./product-theme.css": "./styles/product-theme.css",
     "./semantics.css": "./styles/semantics.css",
-    "./controls.css": "./styles/controls.css",
     "./react/controls": "./react/controls.tsx",
-    "./compositions.css": "./styles/compositions.css",
     "./dom/*": "./dom/*.ts",
     "./product-header.css": "./styles/product-header.css",
     "./product-footer.css": "./styles/product-footer.css",
@@ -26,13 +25,16 @@
     "./product-reading.css": "./styles/product-reading.css",
     "./product-home.css": "./styles/product-home.css",
     "./motion.css": "./styles/motion.css",
-    "./react/theme": "./react/theme.tsx"
+    "./react/theme": "./react/theme.tsx",
+    "./recipes": "./recipes/index.ts",
+    "./tailwind.css": "./styles/tailwind.css"
   },
   "peerDependencies": {
+    "antd": ">=5 <6",
     "astro": ">=6 <8",
     "react": ">=19 <20",
-    "antd": ">=5 <6",
-    "react-dom": ">=19 <20"
+    "react-dom": ">=19 <20",
+    "@ant-design/cssinjs": ">=1.24 <2"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -43,11 +45,19 @@
     },
     "react-dom": {
       "optional": true
+    },
+    "@ant-design/cssinjs": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.7.0"
   }
 }

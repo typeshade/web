@@ -1,4 +1,13 @@
-import "../styles/compositions.css";
+import {
+  cn,
+  toolbarStyles,
+  panelStyles,
+  emptyStateStyles,
+  alertVariants,
+  tabListStyles,
+  tabStyles,
+  tabPanelStyles,
+} from "../recipes";
 import {
   useEffect,
   useId,
@@ -16,7 +25,7 @@ export function Toolbar({
   return (
     <div
       {...props}
-      className={`ui-toolbar ${className}`}
+      className={cn(toolbarStyles, className)}
       role="group"
       aria-label={label}
     />
@@ -26,7 +35,7 @@ export function Panel({
   className = "",
   ...props
 }: HTMLAttributes<HTMLElement>) {
-  return <section {...props} className={`ui-panel ${className}`} />;
+  return <section {...props} className={cn(panelStyles, className)} />;
 }
 export function EmptyState({
   children,
@@ -39,7 +48,7 @@ export function EmptyState({
 }) {
   return (
     <div
-      className={`ui-empty-state ${className}`}
+      className={cn(emptyStateStyles, className)}
       role={busy ? "status" : undefined}
       aria-busy={busy || undefined}
     >
@@ -59,7 +68,7 @@ export function Alert({
   return (
     <div
       {...props}
-      className={`ui-alert ${className}`}
+      className={cn(alertVariants({ tone }), className)}
       data-tone={tone}
       role={live ? (tone === "danger" ? "alert" : "status") : undefined}
     />
@@ -98,12 +107,18 @@ export function Tabs({
     });
   }, [items, onChange]);
   return (
-    <div className="ui-tabs">
-      <div className="ui-tablist" role="tablist" aria-label={label} ref={list}>
+    <div className="ui-tabs min-w-0">
+      <div
+        className={tabListStyles}
+        role="tablist"
+        aria-label={label}
+        ref={list}
+      >
         {items.map((item, index) => (
           <button
             type="button"
             role="tab"
+            className={tabStyles}
             key={item.key}
             id={`${id}-tab-${index}`}
             aria-controls={`${id}-panel-${index}`}
@@ -119,6 +134,7 @@ export function Tabs({
         <div
           key={item.key}
           role="tabpanel"
+          className={tabPanelStyles}
           id={`${id}-panel-${index}`}
           aria-labelledby={`${id}-tab-${index}`}
           hidden={active !== item.key}

@@ -1,10 +1,10 @@
 ---
-import "../styles/compositions.css";
+import { cn, dialogStyles } from "../recipes";
 import type { HTMLAttributes } from "astro/types";
 type Props = HTMLAttributes<"dialog"> & { "aria-labelledby": string };
 const { class: className, ...attributes } = Astro.props;
 ---
 
-<dialog {...attributes} class:list={["ui-dialog", className]}>
+<dialog {...attributes} class={cn(dialogStyles, className)}>
   <slot />
 </dialog>

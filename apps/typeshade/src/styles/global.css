@@ -1,6 +1,8 @@
+@layer theme, base, antd, components, utilities;
 @import 'tailwindcss';
 @import '@typeshade/site-ui/tokens.css';
 @import '@typeshade/site-ui/semantics.css';
+@import '@typeshade/site-ui/tailwind.css';
 @import './tokens.css';
 @import './ui-theme.css';
 @import './fonts.css';

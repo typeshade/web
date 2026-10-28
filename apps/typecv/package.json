@@ -19,7 +19,8 @@
     "astro": "7.4.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "three": "0.184.0"
+    "three": "0.184.0",
+    "@ant-design/cssinjs": "1.24.0"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

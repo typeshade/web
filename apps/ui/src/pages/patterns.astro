@@ -1,4 +1,7 @@
 ---
+import { tabPanelStyles } from "@typeshade/site-ui/recipes";
+import TabList from "@typeshade/site-ui/astro/TabList";
+import Tab from "@typeshade/site-ui/astro/Tab";
 import Button from "@typeshade/site-ui/astro/Button";
 import IconButton from "@typeshade/site-ui/astro/IconButton";
 import Field from "@typeshade/site-ui/astro/Field";
@@ -85,34 +88,27 @@ import "../styles.css";
       </section>
       <section aria-labelledby="native-tabs-heading">
         <h2 id="native-tabs-heading">Progressive native tabs</h2>
-        <div class="ui-tabs" data-native-tabs>
-          <div
-            class="ui-tablist"
-            role="tablist"
-            aria-label="Native output formats"
-          >
-            <button
-              type="button"
-              role="tab"
+        <div class="ui-tabs min-w-0" data-native-tabs>
+          <TabList aria-label="Native output formats">
+            <Tab
               id="native-tab-a"
               aria-controls="native-panel-a"
               aria-selected="true"
             >
               WGSL
-            </button>
-            <button
-              type="button"
-              role="tab"
+            </Tab>
+            <Tab
               id="native-tab-b"
               aria-controls="native-panel-b"
               aria-selected="false"
               tabindex="-1"
             >
               GLSL
-            </button>
-          </div>
+            </Tab>
+          </TabList>
           <div
             role="tabpanel"
+            class={tabPanelStyles}
             id="native-panel-a"
             aria-labelledby="native-tab-a"
           >
@@ -120,6 +116,7 @@ import "../styles.css";
           </div>
           <div
             role="tabpanel"
+            class={tabPanelStyles}
             id="native-panel-b"
             aria-labelledby="native-tab-b"
           >

@@ -1,5 +1,5 @@
 ---
-import "../styles/compositions.css";
+import { cn, alertVariants } from "../recipes";
 import type { HTMLAttributes } from "astro/types";
 type Props = HTMLAttributes<"div"> & {
   tone?: "info" | "danger" | "success";
@@ -15,7 +15,7 @@ const {
 
 <div
   {...attributes}
-  class:list={["ui-alert", className]}
+  class={cn(alertVariants({ tone }), className)}
   data-tone={tone}
   role={live ? (tone === "danger" ? "alert" : "status") : undefined}
 >

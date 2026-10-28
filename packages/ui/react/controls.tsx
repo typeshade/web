@@ -1,5 +1,14 @@
 import "../styles/controls.css";
 import {
+  cn,
+  buttonVariants,
+  type ButtonVariants,
+  iconButtonStyles,
+  linkStyles,
+  spinnerStyles,
+  fieldStyles,
+} from "../recipes";
+import {
   createContext,
   useContext,
   useId,
@@ -63,22 +72,29 @@ export function Field({
       value={{ id: controlId, describedBy, invalid, required, disabled }}
     >
       <div
-        className={classes("ui-field", className)}
+        className={cn(fieldStyles.root, className)}
         data-invalid={invalid || undefined}
         data-disabled={disabled || undefined}
       >
-        <label className="ui-field-label" htmlFor={controlId}>
+        <label className={fieldStyles.label} htmlFor={controlId}>
           {label}
           {required && <span aria-hidden="true"> *</span>}
         </label>
         {children}
         {description && (
-          <p className="ui-field-description" id={`${controlId}-description`}>
+          <p
+            className={fieldStyles.description}
+            id={`${controlId}-description`}
+          >
             {description}
           </p>
         )}
         {invalid && (
-          <p className="ui-field-error" id={`${controlId}-error`} role="alert">
+          <p
+            className={fieldStyles.error}
+            id={`${controlId}-error`}
+            role="alert"
+          >
             {error}
           </p>
         )}
@@ -115,7 +131,7 @@ export function Input({ className, ...props }: InputProps) {
       {...props}
       {...field}
       status={field.status ?? props.status}
-      className={classes("ui-input", className)}
+      className={cn("ui-input w-full min-w-0", className)}
     />
   );
 }
@@ -126,7 +142,7 @@ export function TextArea({ className, ...props }: TextAreaProps) {
       {...props}
       {...field}
       status={field.status ?? props.status}
-      className={classes("ui-input", className)}
+      className={cn("ui-input w-full min-w-0", className)}
     />
   );
 }
@@ -137,7 +153,7 @@ export function NumberInput({ className, ...props }: InputNumberProps<number>) {
       {...props}
       {...field}
       status={field.status ?? props.status}
-      className={classes("ui-number-input", className)}
+      className={cn("ui-number-input w-full min-w-0", className)}
     />
   );
 }
@@ -151,7 +167,7 @@ export function Select<Value extends string = string>({
       {...props}
       {...field}
       status={field.status ?? props.status}
-      className={classes("ui-select", className)}
+      className={cn("ui-select w-full min-w-0", className)}
     />
   );
 }
@@ -168,12 +184,10 @@ export function Checkbox({
   );
 }
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "quiet";
-  tone?: "neutral" | "danger";
-  size?: "small" | "default" | "large";
-  loading?: boolean;
-};
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  ButtonVariants & {
+    loading?: boolean;
+  };
 export function Button({
   variant = "secondary",
   tone = "neutral",
@@ -191,12 +205,12 @@ export function Button({
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={classes("ui-button", className)}
+      className={cn(buttonVariants({ variant, tone, size }), className)}
       data-variant={variant}
       data-tone={tone}
       data-size={size}
     >
-      {loading && <span className="ui-spinner" aria-hidden="true" />}
+      {loading && <span className={spinnerStyles} aria-hidden="true" />}
       {children}
     </button>
   );
@@ -214,7 +228,7 @@ export function IconButton({
     <Button
       {...props}
       aria-label={label}
-      className={classes("ui-icon-button", className)}
+      className={cn(iconButtonStyles, className)}
     >
       <span aria-hidden="true">{children}</span>
     </Button>
@@ -226,7 +240,7 @@ export function Link({
   ...props
 }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) {
   return (
-    <a {...props} className={classes("ui-link", className)}>
+    <a {...props} className={cn(linkStyles, className)}>
       {children}
     </a>
   );
