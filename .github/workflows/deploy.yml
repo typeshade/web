@@ -165,7 +165,7 @@ jobs:
           set -euo pipefail
           pnpm exec wrangler d1 migrations apply typeshade --remote --config wrangler.jsonc
           echo "D1 migrations applied before Worker deploy. Rolling back Worker versions does not reverse database migrations." >> "$GITHUB_STEP_SUMMARY"
-      - name: Deploy and smoke-check TypeShade site, then gallery
+      - name: Deploy and verify TypeShade site, then gallery
         if: needs.validate.outputs.site == 'typeshade'
         working-directory: apps/typeshade
         env:
@@ -176,7 +176,7 @@ jobs:
           set -euo pipefail
           deploy_one() {
             local config="$1" url="$2" label="$3"
-            local key report log version rollback current status
+            local key report log version rollback current deployments
             key="${config//./_}"
             report="$RUNNER_TEMP/${SITE}-${key}-report.json"
             log="$RUNNER_TEMP/${SITE}-${key}-deploy.log"
@@ -190,22 +190,15 @@ jobs:
               echo "New version: ${current}"
               echo "Rollback command: \`${rollback}\`"
             } >> "$GITHUB_STEP_SUMMARY"
-            status=""
-            for attempt in {1..12}; do
-              status="$(curl --location --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 20 "$url" || true)"
-              if [ "$status" = 200 ]; then
-                echo "HTTP smoke passed for ${url} (${status})." >> "$GITHUB_STEP_SUMMARY"
-                return 0
-              fi
-              sleep 5
-            done
-            echo "::error::HTTP smoke failed for ${url}; the deployed version is ${current}. Roll back with: ${rollback}"
-            echo "HTTP smoke failed for ${url}; inspect the deployment and use the rollback command above if needed." >> "$GITHUB_STEP_SUMMARY"
-            return 1
+            deployments="$RUNNER_TEMP/${SITE}-${key}-current.json"
+            pnpm exec wrangler deployments list --json --config "$config" > "$deployments"
+            node ../../scripts/deploy-worker-report.mjs verify-current "$deployments" "$current"
+            echo "Cloudflare confirms ${current} receives 100% of traffic." >> "$GITHUB_STEP_SUMMARY"
+            node ../../scripts/check-production-http.mjs "$url"
           }
           deploy_one wrangler.jsonc https://typeshade.dev/ "TypeShade"
           deploy_one wrangler.gallery.jsonc https://gallery.typeshade.dev/ "TypeShade gallery"
-      - name: Deploy and smoke-check TypeNN or TypeCV
+      - name: Deploy and verify TypeNN or TypeCV
         if: needs.validate.outputs.site != 'typeshade'
         working-directory: apps/${{ needs.validate.outputs.site }}
         env:
@@ -232,18 +225,11 @@ jobs:
             echo "New version: ${CURRENT}"
             echo "Rollback command: \`${ROLLBACK}\`"
           } >> "$GITHUB_STEP_SUMMARY"
-          STATUS=""
-          for attempt in {1..12}; do
-            STATUS="$(curl --location --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 20 "$URL" || true)"
-            if [ "$STATUS" = 200 ]; then
-              echo "HTTP smoke passed for ${URL} (${STATUS})." >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::error::HTTP smoke failed for ${URL}; the deployed version is ${CURRENT}. Roll back with: ${ROLLBACK}"
-          echo "HTTP smoke failed for ${URL}; inspect the deployment and use the rollback command above if needed." >> "$GITHUB_STEP_SUMMARY"
-          exit 1
+          DEPLOYMENTS="$RUNNER_TEMP/${SITE}-wrangler_jsonc-current.json"
+          pnpm exec wrangler deployments list --json --config "$CONFIG" > "$DEPLOYMENTS"
+          node ../../scripts/deploy-worker-report.mjs verify-current "$DEPLOYMENTS" "$CURRENT"
+          echo "Cloudflare confirms ${CURRENT} receives 100% of traffic." >> "$GITHUB_STEP_SUMMARY"
+          node ../../scripts/check-production-http.mjs "$URL"
 
   deployment-disabled:
     needs: [validate, build]

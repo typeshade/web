@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   currentVersionId,
+  assertCurrentVersion,
   previousTraffic,
   rollbackCommand,
 } from './deploy-worker-report.mjs';
@@ -26,6 +27,7 @@ test('captures the currently serving version traffic and builds a reversible com
     rollbackCommand('wrangler.gallery.jsonc', previous.specs),
     `pnpm exec wrangler versions deploy ${current}@100 --config wrangler.gallery.jsonc --yes`,
   );
+  assert.deepEqual(assertCurrentVersion(history, current), { id: current, percentage: 100 });
 });
 
 test('preserves a weighted production deployment for rollback', () => {
@@ -39,6 +41,18 @@ test('preserves a weighted production deployment for rollback', () => {
     },
   ]);
   assert.deepEqual(traffic.specs, [`${current}@75`, `${old}@25`]);
+  assert.throws(() => assertCurrentVersion([{ created_on: '2026-10-27', versions: [
+    { version_id: current, percentage: 75 }, { version_id: old, percentage: 25 },
+  ] }], current), /does not route 100%/);
+});
+
+test('requires the expected version to be the exact 100 percent current deployment', () => {
+  assert.throws(() => assertCurrentVersion([{ created_on: '2026-10-27', versions: [
+    { version_id: old, percentage: 100 },
+  ] }], current), /does not route 100%/);
+  assert.throws(() => assertCurrentVersion([{ created_on: '2026-10-27', versions: [
+    { version_id: current, percentage: 100 },
+  ] }], 'not-a-version'), /Expected Worker version ID is invalid/);
 });
 
 test('extracts Wrangler’s deployed version ID from captured output', () => {
