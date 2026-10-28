@@ -7,6 +7,6 @@
     "parameters.name": "생성되는 상수 이름이며, 모든 참조가 이 이름으로 적습니다.",
     "parameters.type": "상수의 셰이더 타입입니다. 선언된 타입 그대로 생성됩니다.",
     "parameters.value": "값을 담고 있는, 상수 폴딩이 가능한 리터럴 노드입니다.",
-    "returns": "`module({ consts })`에 넣을 `ConstDecl`이입니다. `.node`를 담고 있습니다."
+    "returns": "`module({ consts })`에 넣을 `ConstDecl`입니다. `.node`를 담고 있습니다."
   }
 }

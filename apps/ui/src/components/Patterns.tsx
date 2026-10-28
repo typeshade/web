@@ -46,7 +46,7 @@ export default function Patterns() {
               {
                 key: "source",
                 label: "Source",
-                children: <p>Generated source stays available here.</p>,
+                children: <p>Generated source preview.</p>,
               },
               {
                 key: "diagnostics",

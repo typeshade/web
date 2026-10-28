@@ -5,3 +5,5 @@ The public website follows the TypeNN design system in `references/typenn/DESIGN
 TypeCV-specific content gives precedence to runnable computer vision operations, linked technical documentation, and reproducible experiment records. The geometry playground reports real result and execution metrics. The video lab labels the currently available frame preview separately from the planned GPU reconstruction pipeline. It does not display a recorded point cloud as if it came from the selected video.
 
 The site is public and does not request sign-in. Video decoding stays in the browser. Controls use standard labels, visible keyboard focus, and mobile layouts. Colors and typography inherit the TypeNN tokens; illustrations and data displays must communicate actual algorithm output rather than decorative accuracy claims.
+
+Writing and translation follow [Website content](../../docs/content-style.md). Review English first, then translate it into Korean with the same meaning, tone and scope. All published UI, documentation and experiment descriptions are in review scope.

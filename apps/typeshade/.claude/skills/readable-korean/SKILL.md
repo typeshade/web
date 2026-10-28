@@ -1,15 +1,15 @@
 ---
 name: readable-korean
-description: "Write and review Korean content published on official technical pages: documentation, reference articles, translations, headings, and labels. Remove translationese, obscure terminology, forced Korean renderings, and conversational teaching prompts. Use neutral factual prose with Wikipedia-like word choice and English where it improves technical clarity."
+description: "Write and review Korean content published on official technical pages: documentation, reference articles, translations, headings, and labels. Translate reviewed English developer documentation into natural Korean, preserving its meaning, tone, structure and calls to action."
 ---
 
 # Korean writing for official technical pages
 
 ## Outcome
 
-Write clear Korean content for official technical pages. Use Korean Wikipedia as a reference
-for neutral, factual explanations and familiar word choice. Keep the format appropriate to
-the technical document being written.
+Translate the reviewed English source into natural Korean. Follow the repository
+`docs/content-style.md` and the owner's Blend2D, React, Vue, MapLibre and Mapbox references.
+Preserve the source tone, explanation, examples and calls to action.
 
 Apply this skill when drafting or reviewing published Korean technical prose, translating an explanation,
 choosing a heading, or correcting awkward wording. Read the surrounding paragraph and the
@@ -24,16 +24,15 @@ current wording preferences take precedence over earlier style conventions.
 - Use neutral polite endings such as `~입니다`, `~합니다`, `~됩니다`, and `~있습니다` in
   published explanations. Keep a consistent written register.
 - State the definition or main fact first. Then describe the mechanism, example and limitation.
-- Describe the subject directly. Avoid addressing the reader with teaching prompts such as
-  `알아보겠습니다`, `살펴보겠습니다`, `이해해 보겠습니다`, or `이제 알 수 있습니다`. A required procedure can
-  still state an action; an explanation should state what the system does.
+- Translate direct instructions, reader questions and calls to action when the English uses
+  them. Do not add a presenter's narration or an invitation absent from the source.
 - Include numbers when they explain the subject. Do not insert a quantity merely to satisfy
   a sentence template.
 - Give each paragraph one subject. Split a sentence when its conditions or modifiers hide the main point.
 - Prefer direct statements with a clear subject. Use a passive construction when the actor is
   unknown or irrelevant; do not replace every passive mechanically.
-- Avoid praise, persuasion, rhetorical questions, teacher-like prompts, exaggerated emphasis
-  and assurances such as "쉽게 이해할 수 있습니다" without an actual explanation.
+- Preserve the English tone without adding praise, persuasion or assurances. Task headings
+  and reader questions are appropriate when they translate the source.
 - Avoid ceremonial words such as `해당`, `상기`, `본 기능`, and `수행되어진다` when a plain noun
   or verb works. Judge the sentence in context, not through an absolute word blacklist.
 - Do not vary endings merely to meet a count. Repeated `~합니다` can be appropriate. Improve a
@@ -110,7 +109,7 @@ For an unfamiliar term, prefer an explanation such as `workgroup은 셰이더 �
 
 1. Identify the reader, the question and the facts the passage must convey.
 2. Read the surrounding text and the technical source. Separate definitions, operations and limits.
-3. Rewrite the meaning in natural Korean. Keep code, numbers, qualifiers and support conditions accurate.
+3. Translate the reviewed English into natural Korean. Keep code, numbers, qualifiers and support conditions accurate.
 4. Choose terminology by actual usage. Keep English when it improves recognition or accuracy.
 5. Remove translationese, repeated claims and unnecessary modifiers. Check that a pronoun has a clear referent.
 6. Read the result as a Korean document, without comparing sentence order with English.

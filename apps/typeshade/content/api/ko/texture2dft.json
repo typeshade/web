@@ -2,7 +2,7 @@
   "slug": "texture2dft",
   "source": "f5ac192c6c21eacbaf0a8ae12dd94b5327d19503ef534d1c8e7a4d63aa734526",
   "texts": {
-    "summary": "샘플링하는 2D float 텍스처입니다. textureSample과 textureLoad가 쓰는 일반적인 단일 레이어 바인딩 타입이며, 색 램프, 룩업 테이블, 아틀라스에 쓴다(리소스).",
+    "summary": "샘플링하는 2D float 텍스처입니다. textureSample과 textureLoad가 쓰는 일반적인 단일 레이어 바인딩 타입이며, 색 램프, 룩업 테이블, 아틀라스에 씁니다(resource).",
     "description": "정확한 정수 텍셀이 필요하면 [`texture2duT`](/api/texture2dut/) 또는 [`texture2diT`](/api/texture2dit/)를 씁니다."
   }
 }

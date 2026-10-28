@@ -1,0 +1,17 @@
+/* Shared output from @typeshade/site-ui/code/highlight. */
+.ts-inline-code span,
+.ts-code-block span {
+  color: var(--shiki-light, inherit);
+}
+
+[data-theme="dark"] .ts-inline-code span,
+[data-theme="dark"] .ts-code-block span {
+  color: var(--shiki-dark, var(--shiki-light, inherit));
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .ts-inline-code span,
+  html:not([data-theme="light"]) .ts-code-block span {
+    color: var(--shiki-dark, var(--shiki-light, inherit));
+  }
+}

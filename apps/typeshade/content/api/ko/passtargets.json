@@ -3,7 +3,7 @@
   "source": "35a483b57776793959d7441d51ae2965c1bb5c7695c5530d428b826fbb6a838c",
   "texts": {
     "summary": "렌더 패스의 어태치먼트입니다. 텍스처 또는 호스트가 설정한 캔버스 컨텍스트입니다.",
-    "description": "색상 대상은 `Texture`, 컨텍스트, 또는 `{ target, clear, load, store }`이다. `load`의 기본값은 `'clear'`이고, `clear`의 기본값은 투명한 검정, `[0, 0, 0, 0]`이입니다. `store`의 기본값은 `'store'`이입니다. 깊이 대상은 `Texture` 또는 `DepthAttachment`이입니다. 그 `clear`의 기본값은 1이며, 역방향 투영은 이 값을 0으로 둡니다. `load`의 기본값은 `'clear'`이고 `store`의 기본값은 `'store'`이입니다.",
-    "members.color": "탈출구(Rule 11.17)입니다. 호스트의 `GPUTexture` 또는 `GPUTextureView`이입니다. 캔버스 컨텍스트도 타깃이 될 수 있다(WebGPU. WebGL2에서는 런타임 자신의 컨텍스트나 캔버스만 해당합니다)."
+    "description": "색상 대상은 `Texture`, 컨텍스트, 또는 `{ target, clear, load, store }`이다. `load`의 기본값은 `'clear'`이고, `clear`의 기본값은 투명한 검정, `[0, 0, 0, 0]`입니다. `store`의 기본값은 `'store'`입니다. 깊이 대상은 `Texture` 또는 `DepthAttachment`입니다. 그 `clear`의 기본값은 1이며, 역방향 투영은 이 값을 0으로 둡니다. `load`의 기본값은 `'clear'`이고 `store`의 기본값은 `'store'`입니다.",
+    "members.color": "탈출구(Rule 11.17)입니다. 호스트의 `GPUTexture` 또는 `GPUTextureView`입니다. 캔버스 컨텍스트도 타깃이 될 수 있다(WebGPU. WebGL2에서는 런타임 자신의 컨텍스트나 캔버스만 해당합니다)."
   }
 }

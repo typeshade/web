@@ -1,0 +1,20 @@
+{
+  "sourceRevision": "715fd1b694508014315e1a505aa2c970051a7f3a",
+  "overrides": {
+    "sfm-quickstart.md": {
+      "sha256": "1c78c7e96a991dbf8500890cf87bd61c38119021f8da74dcbc9cec819ecf03bc"
+    },
+    "lab-run-records.md": {
+      "sha256": "7b82f49b86e5f9f4e0ae52e5ad4f15b94dbb73a6f37c1baabd7dfea3767e63be"
+    },
+    "multi-video.md": {
+      "sha256": "4f38b2622fe932270d9a7c117b8c3f9fffe566e3e7272182d79584f61773ff1e"
+    },
+    "klt-tracking.md": {
+      "sha256": "26ad00999d5fd2c0e82f7592c8dddc6269e8b6d1b7186c2d318ff126b0067f08"
+    },
+    "gpu-throughput.md": {
+      "sha256": "fc686d670408918cc6bba11f4cb84c99d49f1880038929fe59a8c52237878ed8"
+    }
+  }
+}

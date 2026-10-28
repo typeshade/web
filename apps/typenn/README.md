@@ -13,13 +13,9 @@ architecture reference; the site's product claims and visual system are TypeNN-s
 
 ## Develop
 
-```sh
-npm ci
-npm run dev
-```
-
-English routes are served under `/`; the separately written Korean routes are under `/ko/`.
-Run `npm run build` to prerender the full route set into `dist/`.
+From the workspace root, run `pnpm dev:typenn` to start the site or
+`pnpm build:typenn` to prerender the English routes under `/` and their Korean translations
+under `/ko/` into `apps/typenn/dist/`. Run `pnpm check:typenn` to check the site types.
 
 ## Browser Playground runtime
 
@@ -27,20 +23,17 @@ The Playground uses the actual compiled TypeNN package. Its ESM bundle is vendor
 `src/vendor/typenn/`, with the source commit and Apache-2.0 license recorded alongside it. This
 lets the static site run without an npm package release or remote CDN at demo time.
 
-To refresh it from a local TypeNN checkout:
+The workspace build refreshes it from `sources/typenn` before building. To refresh it directly:
 
 ```sh
-cd /path/to/typenn
-npm ci
-npm run build
-cd website
-npm ci
-npm run build
+cd /workspace/web
+pnpm --filter typenn build
+pnpm --filter typenn-site sync:typenn
 ```
 
-The website prebuild syncs TypeNN's compiled JavaScript bundle. `sync:typenn` also works directly;
-set `TYPE_NN_ROOT` when the TypeNN checkout is not the website's parent or adjacent checkout. The
-Playground supports small 2×2 MatMul, Add, and MatMul→ReLU operations. It reads the displayed
+The website prebuild syncs TypeNN's compiled JavaScript bundle. Set `TYPE_NN_ROOT` when the TypeNN
+checkout is not `sources/typenn`. The Playground supports small 2×2 MatMul, Add, and MatMul→ReLU
+operations. It reads the displayed
 result with `Tensor.data()` and releases the graph afterward. It is a correctness demonstration,
 not a performance benchmark.
 
@@ -60,15 +53,15 @@ cross-origin downloads. The mirror is the R2 bucket `typenn-data`, prefix `datas
 `http://localhost:4321` and `http://127.0.0.1:4321`. `MIRROR_BASE` in `src/lab/datasets.ts` holds
 the URL. The site deploy builds and uploads no dataset. To rebuild the mirror:
 
-1. Run `npm run datasets`. It writes `cifar10/`, `cifar100/` and `index.json` under `public/data/`.
+1. Run `pnpm --filter typenn-site datasets`. It writes `cifar10/`, `cifar100/` and `index.json` under `public/data/`.
 2. Upload the contents of `public/data/` to the bucket `typenn-data` under `datasets/v1/`.
 3. Do not commit `public/data/`. A local build can read another mirror: set
-   `PUBLIC_TYPENN_DATA_BASE` (with a trailing slash) when you run `npm run build`.
+   `PUBLIC_TYPENN_DATA_BASE` (with a trailing slash) when you run `pnpm build:typenn`.
 
 ```sh
-npm run datasets                              # cifar10 and cifar100, into public/data/
-python3 scripts/fetch_datasets.py --all       # all seven, for the parity test
-python3 scripts/fetch_datasets.py --only mnist
+pnpm --filter typenn-site datasets            # cifar10 and cifar100, into public/data/
+python3 apps/typenn/scripts/fetch_datasets.py --all       # all seven, for the parity test
+python3 apps/typenn/scripts/fetch_datasets.py --only mnist
 ```
 
 The script needs Python 3 and numpy. It downloads each source to `.dataset-cache/` (skipped when
@@ -76,14 +69,14 @@ present), checks its SHA-256 against a table in the script, and writes per datas
 `manifest.json` and binary parts. `public/data/index.json` lists the mirrored datasets. The script
 keeps every output file at 20 MiB or less and splits larger arrays into `.partN.bin` files.
 
-`npm run test:keras` checks the browser decoder. It takes the five source files from
+`pnpm --filter typenn-site test:keras` checks the browser decoder. It takes the five source files from
 `.dataset-cache/` when they are there, and downloads the missing ones from the Keras storage into a
 temporary directory (about 60 MB). It checks each file's SHA-256, decodes each dataset and compares
 the SHA-256 and the length of every array with `scripts/keras-expected.json`. CI runs it in the
 `cpu` job. The fixture comes from the mirror, which equals Keras 3.15.1 `load_data()` element for
 element. When the five mirrored datasets are in `public/data/` (`python3 scripts/fetch_datasets.py
 --all`), the test also compares the arrays with the mirror directly. Rebuild the fixture from the
-mirror with `npm run test:keras -- --write-fixture`. Override the directories with
+mirror with `pnpm --filter typenn-site test:keras -- --write-fixture`. Override the directories with
 `TYPENN_DATASET_CACHE` and `TYPENN_DATASET_MIRROR`.
 
 | Dataset             | Source                                             | License and citation                                                                                                               |
@@ -106,7 +99,9 @@ dataset. The page loads the five Keras datasets from the Keras storage and the C
 and `MaxPool2d` (site-defined over `Tensor.conv2d` and `Tensor.maxPool`), the losses and the Adam
 or SGD optimizer, and evaluates on the full test split after each epoch. `src/lab/train.ts` holds
 the training loop, `src/lab/datasets.ts` the loader for the mirror, `src/lab/keras.ts` the loader for the Keras storage, and
-`src/components/Lab.tsx` the page.
+`src/components/Lab.tsx` the page. Run the dataset checks with
+`pnpm --filter typenn-site test:datasets` and graph layout checks with
+`pnpm --filter typenn-site test:graph`.
 
 The CNN preset uses `Conv2d` and `MaxPool2d`. The TypeNN declarations do not export them, so
 `src/lab/train.ts` defines both as `Module` subclasses. It creates their trainable leaves with the
@@ -114,8 +109,8 @@ runtime's `createParameter`, as TypeNN's own `Linear` does.
 
 ### Lab automation
 
-The page exposes `window.__typennLab`. Its `run` method uses the same code path as the Start
-button, and it updates the page too:
+The page exposes `window.__typennLab`. Its `run` method calls the same training function as the
+Start button and also updates the page:
 
 ```ts
 interface LabApi {
@@ -129,7 +124,13 @@ interface LabApi {
 
 A `RunResult` holds `config`, `tier`, `epochs` (`trainLoss` and `test` for each epoch), `steps`,
 `samplesSeen`, `seconds`, `test`, `completed`, `kind` (`"quick"` for the Try section's short run, else `"full"`), `capped` (the run ended at `maxSteps`), `userAgent`, `typennCommit` and `finishedAt`.
-`typennCommit` comes from `src/vendor/typenn/version.json`, which `npm run sync:typenn` writes.
+`typennCommit` comes from `src/vendor/typenn/version.json`, which `pnpm --filter typenn-site sync:typenn` writes.
+
+For an opt-in comparison of the host-batch and device-resident training paths, run
+`pnpm --filter typenn-site measure:lab -- --main /path/to/pre-migration-typenn` with the old
+checkout's library `dist/` built. The tool uses synthetic datasets and reports browser-upload bytes
+and step times. If it runs on SwiftShader, its timings are software-renderer measurements, not
+hardware GPU results.
 
 ## Project documents
 

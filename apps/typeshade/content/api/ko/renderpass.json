@@ -3,7 +3,7 @@
   "source": "24f9bc88d7d4e4b0fbd85bdef73e749945a79a4cb9d289d549ed1b502fa335e9",
   "texts": {
     "summary": "프레임의 렌더 패스입니다. 그리기가 여기에 기록됩니다.",
-    "description": "`raw`는 `GPURenderPassEncoder`이입니다.",
+    "description": "`raw`는 `GPURenderPassEncoder`입니다.",
     "members.raw": "탈출구(Rule 11.17)입니다. 호스트가 직접 그리기를 기록할 때 쓰는 이 패스의 `GPURenderPassEncoder`이다(WebGL2에서는 예외가 발생합니다).",
     "members.draw": "그리기를 기록합니다. `bindings`는 파이프라인의 진입점이 닿는 바인딩이다(변경 0030).",
     "members.setViewport": "WebGPU의 setViewport입니다. x와 y는 뷰포트 범위 안의 정수입니다. width와 height는 0부터 뷰포트 한도까지의 정수입니다. 0 <= minDepth <= maxDepth <= 1이어야 합니다. `minDepth`를 생략하면 0, `maxDepth`를 생략하면 1입니다. 기본값은 어태치먼트 전체입니다. WebGL2 런타임은 `frag_depth`를 쓰는 프래그먼트에 대해 0부터 1이 아닌 깊이 범위를 거부합니다. WebGPU에서 이를 확인하려면 `createRuntime({ prefer: ['webgl2'] })`로 호스트를 한 번 더 실행합니다.",

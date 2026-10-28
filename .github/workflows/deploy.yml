@@ -1,37 +1,56 @@
-name: Deploy selected website
+name: Production deploy
+
 on:
   workflow_dispatch:
     inputs:
       site:
-        description: Website to deploy
+        description: Website to deploy from main
         type: choice
         required: true
         options: [typeshade, typenn, typecv]
+
 permissions:
   contents: read
+
 concurrency:
   group: deploy-${{ inputs.site }}
   cancel-in-progress: false
+
 jobs:
-  deploy:
-    if: github.ref == 'refs/heads/main'
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      site: ${{ steps.target.outputs.site }}
+      environment: ${{ steps.target.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: target
+        name: Validate production target
+        shell: bash
+        env:
+          SITE: ${{ inputs.site }}
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          TARGET="$(node scripts/deploy-preview-config.mjs validate-site "$SITE" "$REF")"
+          node -e 'const x = JSON.parse(process.argv[1]); console.log(`site=${x.site}\nenvironment=${x.environment}`)' "$TARGET" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    environment: ${{ inputs.site }}-production
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Initialize source
-        env:
-          SITE: ${{ inputs.site }}
-        run: |
-          if [ "$SITE" = typeshade ]; then
-            git submodule update --init apps/typeshade/vendor/shader-dsl
-          else
-            git submodule update --init "sources/$SITE"
-          fi
+          submodules: true
+          persist-credentials: false
       - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -40,14 +59,200 @@ jobs:
         with:
           bun-version: 1.4.3
       - run: pnpm install --frozen-lockfile
-      - if: inputs.site != 'typeshade'
-        run: pnpm prepare:source ${{ inputs.site }}
-      - run: pnpm check:${{ inputs.site }}
-      - run: pnpm build:${{ inputs.site }}
+      - name: Prepare selected source
+        if: needs.validate.outputs.site != 'typeshade'
+        env:
+          SITE: ${{ needs.validate.outputs.site }}
+        run: pnpm prepare:source "$SITE"
+      - name: Check selected site
+        env:
+          SITE: ${{ needs.validate.outputs.site }}
+        run: pnpm run "check:$SITE"
+      - name: Build selected site
+        env:
+          SITE: ${{ needs.validate.outputs.site }}
+        run: pnpm run "build:$SITE"
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:ui apps/${{ inputs.site }}/dist
-      - name: Deploy existing Worker and domain
-        working-directory: apps/${{ inputs.site }}
+      - name: Test built site
+        env:
+          SITE: ${{ needs.validate.outputs.site }}
+        run: pnpm run test:ui "apps/$SITE/dist"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ needs.validate.outputs.site }}
+          path: apps/${{ needs.validate.outputs.site }}/dist
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    needs: [validate, build]
+    if: needs.build.result == 'success' && vars.WEBSITE_OPERATIONS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: ${{ needs.validate.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.validate.outputs.site }}
+          path: apps/${{ needs.validate.outputs.site }}/dist
+      - name: Capture current production versions
+        working-directory: apps/${{ needs.validate.outputs.site }}
+        env:
+          SITE: ${{ needs.validate.outputs.site }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is not configured for this production environment. No migration or deployment was run."
+            exit 1
+          fi
+          CONFIGS=(wrangler.jsonc)
+          if [ "$SITE" = typeshade ]; then CONFIGS+=(wrangler.gallery.jsonc); fi
+          for CONFIG in "${CONFIGS[@]}"; do
+            KEY="${CONFIG//./_}"
+            FILE="$RUNNER_TEMP/${SITE}-${KEY}-previous.json"
+            pnpm exec wrangler deployments list --json --config "$CONFIG" > "$FILE"
+            REPORT="$(node ../../scripts/deploy-worker-report.mjs previous "$FILE" "$CONFIG")"
+            printf '%s' "$REPORT" > "$RUNNER_TEMP/${SITE}-${KEY}-report.json"
+          done
+      - name: Require TypeCV production credentials
+        if: needs.validate.outputs.site == 'typecv'
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: pnpm exec wrangler deploy
+          RECORDS_READ_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is required to provision TypeCV production bindings."
+            exit 1
+          fi
+          if [ -z "$RECORDS_READ_TOKEN" ]; then
+            echo "::error::RECORDS_READ_TOKEN is required to deploy the TypeCV run-record collector."
+            exit 1
+          fi
+      - name: Ensure TypeCV KV and R2 resources
+        if: needs.validate.outputs.site == 'typecv'
+        working-directory: apps/typecv
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RECORDS_READ_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+          node scripts/ensure-run-records.mjs
+          node scripts/ensure-samples-bucket.mjs
+          node scripts/ensure-record-files-bucket.mjs
+          node ../../scripts/deploy-preview-config.mjs validate-typecv-config wrangler.jsonc
+      - name: Apply D1 migrations
+        if: needs.validate.outputs.site == 'typeshade'
+        working-directory: apps/typeshade
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          pnpm exec wrangler d1 migrations apply typeshade --remote --config wrangler.jsonc
+          echo "D1 migrations applied before Worker deploy. Rolling back Worker versions does not reverse database migrations." >> "$GITHUB_STEP_SUMMARY"
+      - name: Deploy and smoke-check TypeShade site, then gallery
+        if: needs.validate.outputs.site == 'typeshade'
+        working-directory: apps/typeshade
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          SITE: ${{ needs.validate.outputs.site }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          deploy_one() {
+            local config="$1" url="$2" label="$3"
+            local key report log version rollback current status
+            key="${config//./_}"
+            report="$RUNNER_TEMP/${SITE}-${key}-report.json"
+            log="$RUNNER_TEMP/${SITE}-${key}-deploy.log"
+            version="$(node -e 'const r=require(process.argv[1]); console.log(r.ids.join(", ") || "none")' "$report")"
+            rollback="$(node -e 'const r=require(process.argv[1]); console.log(r.rollback ?? "unavailable: no previous deployment")' "$report")"
+            pnpm exec wrangler deploy --config "$config" 2>&1 | tee "$log"
+            current="$(node ../../scripts/deploy-worker-report.mjs version-id "$log")"
+            {
+              echo "## ${label} production deploy"
+              echo "Previous version(s): ${version}"
+              echo "New version: ${current}"
+              echo "Rollback command: \`${rollback}\`"
+            } >> "$GITHUB_STEP_SUMMARY"
+            status=""
+            for attempt in {1..12}; do
+              status="$(curl --location --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 20 "$url" || true)"
+              if [ "$status" = 200 ]; then
+                echo "HTTP smoke passed for ${url} (${status})." >> "$GITHUB_STEP_SUMMARY"
+                return 0
+              fi
+              sleep 5
+            done
+            echo "::error::HTTP smoke failed for ${url}; the deployed version is ${current}. Roll back with: ${rollback}"
+            echo "HTTP smoke failed for ${url}; inspect the deployment and use the rollback command above if needed." >> "$GITHUB_STEP_SUMMARY"
+            return 1
+          }
+          deploy_one wrangler.jsonc https://typeshade.dev/ "TypeShade"
+          deploy_one wrangler.gallery.jsonc https://gallery.typeshade.dev/ "TypeShade gallery"
+      - name: Deploy and smoke-check TypeNN or TypeCV
+        if: needs.validate.outputs.site != 'typeshade'
+        working-directory: apps/${{ needs.validate.outputs.site }}
+        env:
+          SITE: ${{ needs.validate.outputs.site }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$SITE" in
+            typenn) URL="https://nn.typeshade.dev/" ;;
+            typecv) URL="https://cv.typeshade.dev/" ;;
+            *) echo "::error::Unsupported static site '$SITE'."; exit 2 ;;
+          esac
+          CONFIG=wrangler.jsonc
+          REPORT="$RUNNER_TEMP/${SITE}-wrangler_jsonc-report.json"
+          LOG="$RUNNER_TEMP/${SITE}-wrangler_jsonc-deploy.log"
+          PREVIOUS="$(node -e 'const r=require(process.argv[1]); console.log(r.ids.join(", ") || "none")' "$REPORT")"
+          ROLLBACK="$(node -e 'const r=require(process.argv[1]); console.log(r.rollback ?? "unavailable: no previous deployment")' "$REPORT")"
+          pnpm exec wrangler deploy --config "$CONFIG" 2>&1 | tee "$LOG"
+          CURRENT="$(node ../../scripts/deploy-worker-report.mjs version-id "$LOG")"
+          {
+            echo "## ${SITE} production deploy"
+            echo "Previous version(s): ${PREVIOUS}"
+            echo "New version: ${CURRENT}"
+            echo "Rollback command: \`${ROLLBACK}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+          STATUS=""
+          for attempt in {1..12}; do
+            STATUS="$(curl --location --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 20 "$URL" || true)"
+            if [ "$STATUS" = 200 ]; then
+              echo "HTTP smoke passed for ${URL} (${STATUS})." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::HTTP smoke failed for ${URL}; the deployed version is ${CURRENT}. Roll back with: ${ROLLBACK}"
+          echo "HTTP smoke failed for ${URL}; inspect the deployment and use the rollback command above if needed." >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+  deployment-disabled:
+    needs: [validate, build]
+    if: needs.build.result == 'success' && vars.WEBSITE_OPERATIONS_ENABLED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain the production gate
+        env:
+          SITE: ${{ needs.validate.outputs.site }}
+        run: |
+          echo "::notice::${SITE} was built and tested, but production operations are disabled. Set WEBSITE_OPERATIONS_ENABLED=true after cutover readiness is confirmed."
+          echo "${SITE} build and checks passed. Production was not changed because WEBSITE_OPERATIONS_ENABLED is not true." >> "$GITHUB_STEP_SUMMARY"

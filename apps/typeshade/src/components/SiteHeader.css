@@ -1,21 +1,7 @@
-/* Header: a 64px white bar with the mark and the name, the page links, and the tools as Ant
-   icon buttons. Under 64rem the links live in a panel behind a menu button (a details
-   element). The bar needs about 1004px in English and 892px in Korean to lay out at full
-   size, and nothing in it shrinks or wraps, so it appears at the same 64rem the documentation
-   grid opens at. */
+/* Header menus and interaction states; layout utilities live on the component. */
 .site-header {
   border-block-end: 1px solid var(--color-line-1);
   background: var(--color-ground);
-}
-.site-header-in {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ui-space-4);
-  block-size: var(--nav-height);
-  max-inline-size: var(--container);
-  margin-inline: auto;
-  padding-inline: var(--gutter-x);
 }
 .site-name {
   display: inline-flex;
@@ -32,17 +18,6 @@
   flex: none;
   border-radius: var(--radius-sm);
 }
-.site-bar {
-  display: none;
-  align-items: center;
-  gap: var(--ui-space-6);
-}
-.site-nav {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-space-6);
-  font-size: var(--text-ui);
-}
 .site-nav a {
   color: var(--color-text-2);
   text-decoration: none;
@@ -51,18 +26,20 @@
   flex-shrink: 0;
   transition: color var(--motion);
 }
+.site-nav a[aria-current='page'],
+.site-screen nav a[aria-current='page'] {
+  color: var(--color-text-1);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
 .site-nav a:hover {
   color: var(--color-accent);
 }
 .site-nav a:active {
   color: var(--color-primary-active);
-}
-.site-tools {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-space-1);
-  padding-inline-start: 16px;
-  border-inline-start: 1px solid var(--color-line-1);
 }
 .icon {
   inline-size: 16px;
@@ -172,7 +149,7 @@
   border: 0;
   border-radius: var(--radius);
   background: var(--fill-4);
-  color: var(--color-text-3);
+  color: var(--color-text-2);
   font-family: inherit;
   font-size: var(--text-ui);
   cursor: pointer;
@@ -201,11 +178,6 @@
 }
 /* Under 64rem the magnifier sits beside the menu button instead of behind it, so search stays
    one tap away whether or not the panel is open. */
-.site-mobile-tools {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-space-1);
-}
 .site-search-phone {
   display: inline-flex;
   align-items: center;
@@ -329,6 +301,10 @@
   font-weight: 500;
   text-decoration: none;
 }
+.site-screen-group + .site-screen-group {
+  margin-block-start: 12px;
+  border-block-start: 1px solid var(--color-line-2);
+}
 .site-screen-row {
   display: flex;
   align-items: center;
@@ -350,18 +326,6 @@
   color: var(--color-accent);
   text-decoration: none;
 }
-/* The whole phone row goes, box included. Leaving the empty box in the flow gave
-   `justify-content: space-between` a third item to space, which held the tools 243px short of
-   the gutter at 1440 and moved the nav's left edge with the viewport. */
-@media (min-width: 64rem) {
-  .site-bar {
-    display: flex;
-  }
-  .site-mobile-tools {
-    display: none;
-  }
-}
-
 @media (forced-colors: active) {
   .site-menu-bar {
     background: CanvasText;

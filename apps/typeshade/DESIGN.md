@@ -38,10 +38,10 @@ colors:
 typography:
   display:
     fontFamily: "'IBM Plex Sans Variable', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(2rem, 1.4rem + 2.4vw, 3rem)"
+    fontSize: "clamp(2.5rem, 5.4vw, 5rem)"
     fontWeight: 600
-    lineHeight: 1.15
-    letterSpacing: "-0.02em"
+    lineHeight: 1.08
+    letterSpacing: "-0.055em"
   h1:
     fontSize: "2.375rem"
     fontWeight: 600
@@ -171,18 +171,18 @@ enforces the parts that can be checked mechanically and runs at the start of eve
 
 ## Voice
 
-- Say what the tool does. The front page states what; a linked page explains how or why.
-- The second sentence a reader meets carries a number.
-- Short sentences. One idea per sentence. Plain verbs: "emits", "runs", "checks".
-- Numbers come from the build (`src/lib/examples.ts`). A number that is not measured is not on the page.
-- Do not praise the page or the tool. Words like "honest", "measured" and "proven" go. <!-- ok -->
-- Do not write "X, not Y", "X, never Y", or "rather than". State X. <!-- ok -->
-- No em dashes. Use a comma, a colon or a new sentence.
-- No all-caps emphasis in prose or comments.
-- No lists of three for rhythm. Use the number of items there are.
-- Headings are short nouns in sentence case: Quick start, Motivation, Checks. A heading is
-  never a slogan and never a full sentence.
-- Comments in code say why in one or two lines. They do not cite design documents.
+[Website content](../../docs/content-style.md) governs writing and translation. English is the
+source. Draft it using the owner's Blend2D, React, Vue, MapLibre and Mapbox references, then
+translate it into Korean with the same meaning and tone.
+
+Introduce the product and what developers can do with it. Use task headings and direct
+instructions where useful. Keep explanations connected and tied to examples. A heading can
+be a noun, question or action; it does not have to fit a fixed sentence pattern or display
+line count. Keep technical limitations and measured claims accurate. Numbers that describe
+the compiler come from `src/lib/examples.ts`.
+
+The copy and style scripts check specific patterns and consistency. Editorial review still
+judges each passage in context. Comments in code explain implementation decisions briefly.
 
 ## The system
 
@@ -244,19 +244,18 @@ and ensures built home, playground and API routes exclude unrelated CSS.
   default; prose in a document column is 16px at 1.5; code is 13px at 1.6; the small label a
   menu group, a footer legal line or a tag carries is 12px at 1.6667. Headings run 38, 30, 24,
   20 and 16px, each at weight 600. The front page's own headline is the one size outside the
-  ramp: it scales from 32px to 48px and lands at 52px past 90rem.
+  ramp: it scales from 40px to 80px inside the home introduction template.
 - Weight is 400 or 600. 500 appears in code (the mono face's second weight) and in the
   phone panel's links. Korean pushes a 500 label to 600, because Plex Sans KR ships two weights.
-- Negative tracking sits on the largest sizes alone: -0.02em on the front headline and h1,
-  -0.01em on h2. Korean relaxes both and keeps a 1.8 line height with `word-break: keep-all`.
+- Document headings use -0.02em tracking on h1 and -0.01em on h2. The home headline
+  uses -0.055em, relaxed to -0.045em in Korean. Korean prose keeps a 1.8 line height
+  with `word-break: keep-all`.
 - Running text in a document stops at 700px. Its longest line on the introduction is 99
   characters of English at 16px and 73 of Korean. The measure was 620px until the shell grew
   to 1600px, when a page with 300px of grey on each side of a 1920 screen read as cramped. The
   column around the text is wider: 676px at a 1280 viewport, 836px at 1440 and 996px from
-  1600, where the shell's cap holds it. A front page section's heading is
-  capped at 24ch and its paragraph at 62ch; the hero's lede is capped at 52ch, the sentence
-  under a construct card's name at 62ch, and the sentence in a row of the front page's map of
-  what carries over from TypeScript at the 700px text measure.
+  1600, where the shell's cap holds it. Home section headings stop at 18ch, their introductions
+  at 36ch, and the hero description at 44ch. Topic body text stops at 60ch.
 - No uppercase labels, no tracked "eyebrow" lines above headings, no single-word labels <!-- ok -->
   under blocks, no "a · b · c" metadata strings. <!-- ok -->
 
@@ -325,7 +324,7 @@ The site is flat until something is a card. A card at rest is a 1px `#f0f0f0` bo
 container's white, with no shadow. Three shadows exist, all Ant's:
 
 - **Elevation** (`0 6px 16px 0 rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12), 0 9px 28px 8px rgb(0 0 0 / 0.05)`):
-  the showcase card on the front page, a hovered tile, the dropdown panels, the search dialog
+  an interactive showcase card, a hovered tile, the dropdown panels, the search dialog
   and the skip link. On hover the border goes transparent as the shadow arrives, so the tile
   gains depth without gaining weight.
 - **Secondary** (`0 1px 2px 0 rgb(0 0 0 / 0.03), 0 1px 6px -1px rgb(0 0 0 / 0.02), 0 2px 4px 0 rgb(0 0 0 / 0.02)`):
@@ -360,19 +359,19 @@ element is fully round except the two-axis pad's dot.
   out at: it needs about 1004px in English and 892px in Korean, and no item in it shrinks or
   wraps. It is the width the documentation grid opens its sidebar at, so the two chrome
   layouts change together.
-- The shell stops at 1600px. The header, the footer, the front page, the documentation grid,
+- The shell stops at 1600px. The header, the footer, the documentation grid,
   the examples gallery and the Playground all take that measure, so every page has one left
   edge and one right edge. Under 1600 the shell is the viewport, held off it by the gutter
   alone: 16px, 24px from 40rem. Above it the shell is centred and the margin grows: 160px at
   1920, 480px at 2560. Two measures work inside that shell. Running text stops at 700px. A
   block that shows one thing stops at the wide measure, 1040px: a figure, a
   pair of figures, a table, the builtin table, a code frame the document itself carries, and
-  the front page's source beside its output, which takes two of that measure side by side. A
-  grid of cards takes the whole column, and answers a wider column with more cards, each at
-  its own size.
-- The front page is a sequence of sections across the shell, separated by space with no rule
-  between them: 64px, 80px from 40rem. Its hero is a two-column grid from 64rem, 5fr text and
-  7fr stage, 48px apart; under that the columns stack with the text first.
+  a code comparison. A grid of cards takes the whole column and adapts its column count
+  to the available width.
+- The front page uses a narrower 1280px measure inside the site shell. Its introductory
+  heading and actions form two columns from 64rem. Topic sections use a one-third heading
+  column and two-thirds content column, with hairline separators and 40px to 56px vertical
+  padding. Narrow screens stack each heading above its content.
 - The documentation grid is one column under 64rem, `240px / 1fr` from 64rem with a 48px gap,
   and `240px / 1fr / 220px` from 80rem, where the outline joins on the right. The document
   column is what that leaves: 676px at a 1280 viewport, 836px at 1440, then 996px at 1600 and
@@ -386,12 +385,10 @@ element is fully round except the two-axis pad's dot.
   on the tool's own content edge, 15px in from the region, so they line up with the file name
   in the toolbar under them, and the heading keeps the 40px a documentation page's h1 has under
   the header, 32px under 64rem.
-- Breakpoints are 40rem, 48rem, 64rem and 80rem, with two one-off queries: 90rem for the
-  headline's last step, and 45rem where a table stops being a table and becomes a stack of
-  rows.
-- The one thing that should stand out is a rendered shader. Everything else is quiet. The
-  front page runs one: the showcase card. Its nine tiles are stills, because a first visit
-  pays for every canvas that compiles and animates on it.
+- Breakpoints are 40rem, 48rem, 64rem and 80rem, plus 45rem where a table becomes
+  a stack of rows.
+- The home uses build-time shader stills. Runtime rendering belongs on example and
+  Playground pages, where the reader chooses to run or edit a program.
 - Every canvas in a figure has a still image underneath it, captured at build time
   (`bun run capture:stills`), so the page never shows an empty frame. The still goes the
   moment a backend takes the canvas, since it is the fallback for a browser with no GPU API,
@@ -473,7 +470,7 @@ cards takes the column. A third measure needs a reason.
   and its 0.04 hover fill; it keeps the mono face and tabular figures at the row's 14px,
   because the digits name a release. An open panel is an 8px card with 4px of padding, the
   elevation shadow, and 6px rows; the current choice is the primary over its wash at weight 600.
-- **The showcase card.** The front page's live editor, `<LiveShader variant="hero">`: an 8px
+- **The showcase card.** The optional split live editor, `<LiveShader variant="hero">`: an 8px
   card with the elevation shadow, a 56px head bar carrying the file name as an active tab (a
   2px inset accent underline) with Edit and Reset as 24px buttons on the right, then a body
   split into the code pane on the left and the canvas on the right from 48rem, the controls
@@ -617,17 +614,14 @@ The front page answers "what is it" in about 350 words, the length of comparable
 front pages (htmx, esbuild, wgpu, TypeGPU are 250 to 350). Everything that explains how or
 why lives on its own page.
 
-- `/`: a two-column hero, the headline and a one-sentence lede on the left over two large
-  buttons (Open the Playground, filled; Quick start, the default face), and on the right the
-  showcase card, where `first.shade.ts` sits beside the picture it draws and the reader edits
-  it in place. Then one section per idea, each a heading, a sentence and its evidence: one
-  file and two targets, with `hello.shade.ts` beside the WGSL and the GLSL ES 3.00 it emits;
-  nine of the repository's examples as tiles, each a card with that example's build-time still
-  as its cover, the example's name under it, and the whole card a link to the page that runs
-  it; what carries over from TypeScript, as a list whose left
-  column is the TypeScript in a code chip and whose right column is what it becomes; the
-  gradient pass drawn by each backend as two cards; and the install command with the two
-  buttons again.
+- `/`: an editorial home at a 1280px measure. `HomeIntro` owns the headline and action
+  layout; `HomeSection` gives each topic the same heading/content columns, spacing and
+  separators. The hero introduces the language with two actions and a link to its rationale.
+  A compact strip names the authoring language and output targets. Three language concepts
+  lead into a native disclosure containing the complete source and generated-code tabs.
+  Verification uses small build-time stills, followed by three example previews and the
+  install command. The home ships no shader runtime. Both locales share these templates.
+  Primary navigation stays beside the brand, with search and preferences at the far edge.
 - `/guide/…`: the documentation, on the layout every documentation site uses (VitePress,
   Docusaurus): a sidebar on the left with six groups, the document in the middle, and on a
   wide screen an outline of the page on the right. Under 64rem the sidebar is a bar under the
@@ -665,8 +659,7 @@ why lives on its own page.
     Worker fills (`docs/cloudflare.md`) keeps the card an `fn()` example's page once had, laid
     out the way ShaderToy lays one out: one card split down the middle, the shader running
     over its build-time still on the left and its text on the right, and nothing else in
-    either pane. The card is the showcase card the front page's hero already is
-    (`.live-card`). Its right pane carries its own Ant tab bar over one of four texts, the
+    either pane. The card uses the shared `.live-card` structure. Its right pane carries its own Ant tab bar over one of four texts, the
     source file first and then every target the compiler emits, the WGSL and the two GLSL ES
     3.00 stages it baked into `examples/__emit-goldens__/` at the pinned commit; it opens on
     the line the shader starts at, since several of those files begin with a banner comment. A
@@ -734,8 +727,9 @@ group to the footer. Documentation carries 20 links and runs them down two
 columns 32px apart, and the three groups spread to the shell's two edges: 120px between one
 group and the next at a 768 viewport and 396px from 1440 up in English, 148px and 424px in
 Korean, with 64px as the floor. The space that grows is the space between groups, so the wider
-gap tells a reader where a group ends. Headings are single nouns or short noun phrases: Motivation, Verification, Quick
-start.
+gap tells a reader where a group ends. Navigation labels name destinations. Page and section
+headings follow the shared content guide: use a topic, task or reader question that fits the
+content, without imposing a noun-only pattern.
 
 ## Versions
 
@@ -967,7 +961,7 @@ Putting one on a page:
   copy and comes from the dictionary; the page prints the field's own name in code beside it.
   A prop for a field the module does not declare fails the build.
 - `variant` picks the shape. The default, `figure`, is the column a guide page shows: code,
-  then canvas, then controls. `variant="hero"` is the front page's showcase card, one elevated
+  then canvas, then controls. `variant="hero"` is an optional split showcase, one elevated
   card with the file name as an active tab in a 56px head bar, the code pane and the canvas
   side by side from 48rem, and the controls under both.
 - `compact` limits a figure's result and controls to 90% of the available width, capped at
@@ -1019,7 +1013,7 @@ A still is captured for every drawable `.shade.ts` example, not for the live blo
 build-only route that draws all of them at the tile aspect, `scripts/capture-stills.ts`
 photographs it, and `astro.config.mjs` removes the route from `dist/`, so it is never served.
 Each file lands in `public/stills/<id>.webp` beside a committed sha256, and the build asserts
-the hashes. The gallery and the front page's nine tiles show those stills as covers.
+the hashes. The gallery and the home page's three previews use those stills.
 
 The build refuses a sample whose emitted GLSL reads the uniform block and declares none. The
 compiler dropped that declaration for a module built by the TypeScript front end until the pin
@@ -1088,13 +1082,11 @@ reaches both the packed uniform bytes and the rendered frame.
 
 ## Korean prose
 
-`.claude/skills/readable-korean/SKILL.md` governs Korean wording and register. Use neutral,
-Wikipedia-like explanations with familiar terms and clear sentences. Published explanatory
-prose uses `~이다` and `~한다`. Headings name their content with ordinary labels such as
-활용, 예제 and 주의사항. Keep established English names or technical explanations when
-English improves recognition or precision. Preserve technical meaning and give the reader
-adequate context. Include quantities when they explain the subject; Korean explanatory prose
-has no mandatory position for a number. Update existing copy when it is part of the task.
+Translate the reviewed English according to [Website content](../../docs/content-style.md).
+Keep its explanation, tone, examples and calls to action. Use natural Korean word order and
+polite endings; retain established API and technical names. The local
+`.claude/skills/readable-korean/SKILL.md` provides translation guidance. Do not independently
+rewrite the Korean into an encyclopedic or promotional voice.
 
 ## Languages
 

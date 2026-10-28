@@ -28,7 +28,8 @@ const shade = (id: string): Destination => {
     throw new Error(`[links] no '.shade.ts' example called '${id}' at ${facts.pinnedCommit}`);
   return { label: example.file, href: at(`examples/${example.file}`) };
 };
-const siteRepo = 'https://github.com/typeshade/typeshade.github.io';
+const siteRepo = 'https://github.com/typeshade/web';
+const appFile = (file: string): string => `${siteRepo}/blob/main/apps/typeshade/${file}`;
 
 export const links = {
   home: { label: 'TypeShade', href: '/' },
@@ -98,6 +99,10 @@ export const links = {
   fromGlslFunctions: { label: 'Functions', href: '/guide/language/from-glsl/functions/' },
   languageBuiltins: { label: 'Builtin functions', href: '/guide/language/builtins/' },
   legacyAuthoring: { label: 'Compiler authoring guide', href: '/guide/authoring/' },
+  authoringCapabilities: {
+    label: 'Capabilities and extensions',
+    href: '/guide/authoring/capabilities-extensions/',
+  },
   internals: { label: 'Compiler internals', href: '/guide/internals/' },
   internalsGlslShader: {
     label: 'Migrating a GLSL shader',
@@ -293,6 +298,9 @@ export const links = {
   shadeBitfieldBands: shade('bitfield-bands'),
   shadeRayClass: shade('ray-class'),
   shadeDefaultArgs: shade('default-args'),
+  shadeOptionalValues: shade('optional-values'),
+  shadeOptionalFields: shade('optional-fields'),
+  shadeNullValues: shade('null-values'),
   shadeReferenceParameters: shade('reference-parameters'),
   shadeAtomicHistogram: shade('atomic-histogram'),
   shadeOrbitInout: shade('orbit-inout'),
@@ -379,27 +387,27 @@ function dictionaryLine(locale: Locale, key: string): number {
 }
 export function editCopy(locale: Locale, key?: string): string {
   const at = key === undefined ? '' : `#L${dictionaryLine(locale, key)}`;
-  return `${siteRepo}/blob/main/src/i18n/${locale}.ts${at}`;
+  return `${appFile(`src/i18n/${locale}.ts`)}${at}`;
 }
 export function editPrecisionGuide(locale: Locale): string {
-  return `${siteRepo}/blob/main/src/i18n/precision-guide-${locale}.ts`;
+  return appFile(`src/i18n/precision-guide-${locale}.ts`);
 }
 
 export function editGuide(sourceLine: number): string {
   return `${links.guideSource.href}#L${sourceLine}`;
 }
 export function editGuideTranslation(locale: Locale, id: string): string {
-  return `${siteRepo}/blob/main/${translationDir(locale)}/${id}.md`;
+  return appFile(`${translationDir(locale)}/${id}.md`);
 }
 
-export function navLinks(locale: Locale): readonly Destination[] {
+export function navLinks(locale: Locale): readonly (Destination & { group: 'learn' | 'build' })[] {
   const labels = copyFor(locale).docs.labels.nav;
   return [
-    { label: labels.docs, href: localePath(locale, links.quickStart.href) },
-    { label: labels.playground, href: localePath(locale, links.playground.href) },
-    { label: labels.language, href: localePath(locale, links.guide.href) },
-    { label: labels.reference, href: localePath(locale, links.reference.href) },
-    { label: labels.examples, href: localePath(locale, links.examples.href) },
+    { label: labels.docs, href: localePath(locale, links.quickStart.href), group: 'learn' },
+    { label: labels.language, href: localePath(locale, links.guide.href), group: 'learn' },
+    { label: labels.reference, href: localePath(locale, links.reference.href), group: 'learn' },
+    { label: labels.playground, href: localePath(locale, links.playground.href), group: 'build' },
+    { label: labels.examples, href: localePath(locale, links.examples.href), group: 'build' },
   ];
 }
 

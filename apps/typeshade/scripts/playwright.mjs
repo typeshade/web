@@ -16,7 +16,11 @@ export async function launchChromium() {
   }
   // A network that reaches the outside through a proxy needs the browser told: it reads no
   // HTTPS_PROXY of its own. Loopback is where dist/ is served from, so it skips the proxy.
-  const proxy = process.env.PLAYWRIGHT_PROXY || process.env.HTTPS_PROXY || process.env.https_proxy;
+  const proxySetting = process.env.PLAYWRIGHT_PROXY;
+  const proxy =
+    proxySetting === 'none'
+      ? undefined
+      : proxySetting || process.env.HTTPS_PROXY || process.env.https_proxy;
   return chromium.launch({
     executablePath: process.env.PLAYWRIGHT_CHROMIUM || undefined,
     proxy: proxy ? { server: proxy, bypass: '127.0.0.1,localhost,::1' } : undefined,

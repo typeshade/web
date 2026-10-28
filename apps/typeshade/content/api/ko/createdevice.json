@@ -1,10 +1,10 @@
 {
   "slug": "createdevice",
-  "source": "0c28fd1865c68382130cec33fe583d6f803a1d4056900fa0c5984bf2ae6b7e79",
+  "source": "6932fdf839662d4fa82abec8197e811ed347938dd4fe5c1f2255c75eb5edca83",
   "texts": {
     "summary": "호스트의 커널 호출을 맡을 소유자를 엽니다. prefer에서 처음 열리는 tier나 호스트가 이미 가진 GPUDevice, 또는 프로그램 런타임의 디바이스 위에 엽니다.",
     "description": "디바이스의 `array()`는 그 호출이 받는 `Resident` 배열을 만듭니다. `fuse()`는 본문의 호출을 그 디바이스에서 계획 하나로 실행하고, `dispose()`는 디바이스가 만든 것을 해제합니다. 한 컨텍스트 안의 두 디바이스는 서로 독립적입니다. 프로세스 전체에 하나뿐인 `configure()`, `resident()`, `fuse()`는 이전처럼 기본 소유자를 다룹니다.",
-    "parameters.options": "`prefer`, `device`, `runtime` 가운데 하나와 `poolBytes`, `fp64Flavor`, `timeBudgetMs`이다. 마지막 옵션은 긴 커널의 청크 하나가 쓸 수 있는 시간이다(변경 0074). `fp64Flavor`를 생략하면 `'auto'`이며, 별도의 어댑터를 요청하지 않고 이 디바이스의 식별 정보로 결정합니다.",
+    "parameters.options": "`prefer`, `device`, `runtime` 가운데 하나입니다. 인스턴스별 WebGPU `limits`와 `features`를 받습니다. `poolBytes`, `fp64Flavor`, 그리고 긴 커널의 청크 하나가 쓸 수 있는 시간인 `timeBudgetMs`를 받습니다(변경 0074). `fp64Flavor`를 생략하면 `'auto'`이며, 별도의 어댑터를 요청하지 않고 이 디바이스의 식별 정보로 결정합니다.",
     "returns": "디바이스입니다.",
     "exceptions.TypeError": "옵션이 맞지 않으면 `TypeError`가 발생하며, 지원하지 않는 구현 방식도 여기에 들어갑니다. `timeBudgetMs`가 1부터 60000까지의 유한한 수가 아니면 `RangeError`가 발생합니다. `prefer`의 어떤 tier도 열리지 않으면 tier마다 이유를 밝힌 `Error`가 발생합니다."
   }

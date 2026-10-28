@@ -4,7 +4,7 @@
   "texts": {
     "summary": "타입이 지정된 u32 열거형입니다. 멤버가 Node<'u32'> 리터럴인 이름-값 맵과, 원래의 값 맵을 함께 담습니다.",
     "description": "빠짐없는 정수 디스패치에는 [`matchEnum`](/api/matchenum/)과 함께 사용합니다. 분기 객체는 모든 멤버를 다뤄야 하고, 빠진 키나 모르는 키는 `tsc` 오류가 됩니다. 그래서 잊은 case가 `switch`의 default로 흘러가지 않고 컴파일 시점에 잡힙니다.",
-    "members.members": "타입이 지정된 멤버 리터럴입니다. `Kind.members.Fill`은 그 멤버의 값을 담은 `Node<'u32'>`이입니다.",
+    "members.members": "타입이 지정된 멤버 리터럴입니다. `Kind.members.Fill`은 그 멤버의 값을 담은 `Node<'u32'>`입니다.",
     "members.values": "원래의 이름-값 맵으로, [`matchEnum`](/api/matchenum/)이 디스패치 기준으로 삼는 정수 case 라벨입니다."
   }
 }

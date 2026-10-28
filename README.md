@@ -10,6 +10,13 @@ and Bun 1.4.3 are used by CI. Each website builds and deploys independently.
 | `apps/typecv`    | cv.typeshade.dev | library and documentation pinned at `sources/typecv`  |
 | `packages/ui`    | shared           | `@typeshade/site-ui`, linked with `workspace:*`       |
 
+## Content and agent handoff
+
+[AGENTS.md](AGENTS.md) records the owner's cross-site instructions.
+[Content style](docs/content-style.md) defines the English-first writing and Korean translation
+workflow. [Content review](docs/content-review.md) tracks the current all-site audit and its
+verification. Read these before changing page or UI text.
+
 ## Development
 
 ```sh
@@ -35,6 +42,7 @@ app's prebuild hook after its source library has been built.
 Edit `packages/ui` and use its CSS, Astro or React subpath exports. No tarball
 copying or npm publishing is needed. The app-specific GPU, learning and editor
 logic stays in the app. See [UI architecture](packages/ui/README.md).
+For page structure and locale data, see [Editing site pages](docs/page-templates.md).
 
 Run `pnpm dev:ui` for the component workbench at http://localhost:4324/.
 `pnpm check:ui && pnpm build:ui && pnpm test:controls && pnpm test:patterns` verifies control states,
@@ -44,16 +52,31 @@ See [the UI audit and adoption plan](docs/ui-audit.md) for adoption scope and ap
 
 ## CI and deployment
 
+See [the repository transition](docs/repository-migration.md) for source reconciliation,
+library cleanup, operational switches and the production cutover sequence.
+
 `Website checks` selects apps from changed paths. A change to an app or its source
 pin checks that app. Shared UI, lockfile, workspace, submodule configuration or
 pipeline changes check all apps in parallel. Dependency downloads are cached.
 Build outputs are separate artifacts. Root documentation alone does not rebuild
 sites. Selection rules have unit tests (`pnpm test:scope`).
 
-Deployments are manual per app, from `main`, using `Deploy selected website`.
-Configure the existing `CLOUDFLARE_API_TOKEN` for the selected production
-environment. Existing Worker names, domains, R2/D1 bindings and routes are retained.
-No deployment is performed by opening or merging the migration PR.
+Production deployments are manual per app, from `main`, using `Production deploy`.
+Configure `CLOUDFLARE_API_TOKEN` for the selected `<site>-production` environment;
+TypeCV also requires `RECORDS_READ_TOKEN`. Existing Worker names, domains and storage
+are retained. Production operations stay off until `WEBSITE_OPERATIONS_ENABLED=true`.
+No production deployment is performed by opening or merging the migration PR.
+
+`WEBSITE_PREVIEWS_ENABLED=true` separately enables isolated same-repository PR previews. Before
+enabling it, configure the repository variable `CLOUDFLARE_PREVIEW_ACCOUNT_ID` with a 32-character
+hexadecimal ID for the Cloudflare account that owns preview Workers, and make `CLOUDFLARE_API_TOKEN`
+available with access to that account. Preview Workers are named `<site>-site-pr-<number>` and
+always use this preview account, independent of the production Wrangler account and Worker name;
+there is no production-account fallback. They serve static assets without production storage, so
+they do not validate TypeShade's live gallery/sharing endpoints or TypeCV's sample and record
+endpoints. Closed PRs remove their isolated preview Workers. Production deployment records previous
+versions and checks the deployed host; its summary includes Worker rollback commands, not database
+rollback.
 
 Before making this repository the production owner, verify a selected deployment
 and disable that site's old repository deployment workflow to avoid competing

@@ -75,7 +75,7 @@ export const operationLessons = {
   textureDimensions: {
     meaning: 'Texture dimensions describe the extent of an image, not its colour.',
     use: 'Use them to turn texel offsets into normalized coordinate offsets.',
-    try: 'Compare the resource shape or selected location with the returned count or stored value.',
+    try: "Each component of the returned vector gives the texel count along one axis. A cube's face count is not part of that size vector.",
     caution:
       'Array layer counts and sample counts are separate queries. A cube query returns the size of one face.',
   },
@@ -83,7 +83,7 @@ export const operationLessons = {
     meaning:
       'A texture array contains independently addressable image layers. This query returns their count.',
     use: 'Use it to bound a layer selector or iterate over an image array.',
-    try: 'Compare the resource shape or selected location with the returned count or stored value.',
+    try: 'The result is the array layer count. For a cube array, it counts cubes, not individual faces.',
     caution:
       'The texture must be an array texture. The highest valid layer index is one less than the count.',
   },
@@ -91,7 +91,7 @@ export const operationLessons = {
     meaning:
       'Multisampling stores several coverage samples in each texel. This query returns that sample count.',
     use: 'Use it when resolving a multisampled image by reading its individual samples.',
-    try: 'Compare the resource shape or selected location with the returned count or stored value.',
+    try: 'Textures can have different width and height but return the same sample count.',
     caution:
       'This query requires a multisampled texture. Sample indices start at zero. The compiler has no GLSL ES multisample form.',
   },
@@ -99,14 +99,14 @@ export const operationLessons = {
     meaning:
       'A runtime-sized storage array gets its usable element count from the bound buffer range.',
     use: 'Use the count for bounds checks in compute kernels.',
-    try: 'Compare the resource shape or selected location with the returned count or stored value.',
+    try: 'With a fixed element stride, a larger bound buffer range contains more usable elements.',
     caution:
       'Query the storage array itself or a trailing array field. Buffer padding and element stride affect the count; a byte count is not an element count.',
   },
   textureStore: {
     meaning: 'A texture store replaces the value of one integer-addressed texel.',
     use: 'Use it to write a compute result into an image.',
-    try: 'Compare the resource shape or selected location with the returned count or stored value.',
+    try: 'Only the selected texel changes to the input value. The call returns no value; the display shows the texel before and after the store.',
     caution:
       'Use a writable storage texture and a value matching its format. This model shows separate writes; overlapping writes need an explicit race-free design.',
   },
@@ -531,35 +531,35 @@ export const operationLessons = {
   any: {
     meaning: 'Any is true when at least one tested component or element passes.',
     use: 'Use it for detecting whether a condition occurs anywhere.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'The result is true if any component is true. It is false only when every component is false.',
     caution:
       'A per-component comparison creates a boolean vector; any reduces it to a single boolean.',
   },
   all: {
     meaning: 'All is true when every tested component or element passes.',
     use: 'Use it for checking whether every value is valid.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'The result is true only when every component is true. One false component makes it false.',
     caution:
       'A per-component comparison creates a boolean vector; all reduces it to a single boolean.',
   },
   none: {
     meaning: 'None is true when no array element passes the test.',
     use: 'Use it for rejecting a set containing any invalid value.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'The example tests whether each value is negative. The result is true only when the array contains no negative values.',
     caution:
       'This operation takes a fixed-size array and predicate. It is the negation of any, not of all.',
   },
   sum: {
     meaning: 'A sum reduces an array of numbers or vectors by addition.',
     use: 'Use it for accumulating weights or contributions.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'Positive values add to the sum and negative values reduce it. Equal and opposite values cancel.',
     caution:
       'Floating-point addition depends on rounding and evaluation order. The example uses small exact values.',
   },
   zip: {
     meaning: 'Zip combines corresponding elements from two equal-length arrays.',
     use: 'Use it for pairing samples with weights or computing pairwise products.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'Each output element multiplies the two input elements at the same index. A zero in either input makes that product zero.',
     caution:
       'Both arrays must have the same fixed length. The combining function decides the output element type.',
   },
@@ -567,7 +567,7 @@ export const operationLessons = {
     meaning:
       'Selection chooses the false or true value from a condition, component by component when the condition is a vector.',
     use: 'Use it for choosing colours or values from a mask.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'A false condition selects the first value; a true condition selects the second. With a vector condition, each component can select a different value.',
     caution:
       'The condition is the last argument. Do not rely on selection to guard an invalid memory access or undefined expression.',
   },
@@ -575,7 +575,7 @@ export const operationLessons = {
     meaning:
       'A seeded hash produces a noise-like scalar from its input. Repeated seeds in a mathematical model give repeated outputs.',
     use: 'Use it for visual noise where cross-device equality is unnecessary.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'The display shows the fractional part of a sine hash for different seeds. These are illustrative CPU calculations.',
     caution:
       'This compiler uses a sine hash whose GPU result varies by driver. The shown numbers are illustrative CPU calculations, not reproducible GPU random values or cryptographic randomness.',
   },
@@ -583,35 +583,35 @@ export const operationLessons = {
     meaning:
       'Half-precision quantization rounds a value to a binary16-representable value and returns it as f32.',
     use: 'Use it for previewing precision loss before using half-precision storage.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'Values between representable binary16 numbers round to the nearest one. A value already representable stays unchanged.',
     caution:
       'Range and precision shrink. Overflow, subnormal handling, and halfway rounding need target-specific care; the examples avoid these cases.',
   },
   bitcast: {
     meaning: 'A bitcast reinterprets the same bits as a different type without numeric conversion.',
     use: 'Use it for inspecting floating-point encoding or decoding packed data.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: "The display shows the same bit pattern as an unsigned integer in base 16. This differs from converting the input's numeric value to an integer.",
     caution:
       'The examples use finite normal floats and zero. NaN and subnormal bit patterns are not portable storage encodings in this compiler.',
   },
   bool: {
     meaning: 'A numeric-to-boolean conversion tests whether a scalar is nonzero.',
     use: 'Use it for turning numeric flags into conditions.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'Zero converts to false; negative and positive values convert to true. A fractional value is true whenever it is nonzero.',
     caution:
       'Use scalar input. This is a nonzero test, not rounding or a comparison with a midpoint.',
   },
   f32: {
     meaning: 'A single-precision conversion rounds a number to a representable binary32 value.',
     use: 'Use it for matching the precision used by ordinary shader arithmetic.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'Adjacent large integers can round to the same binary32 value. Fractional inputs also round to a representable value.',
     caution:
       'Large adjacent integers may become indistinguishable. Casting does not restore precision already lost.',
   },
   i32: {
     meaning: 'A signed integer conversion removes the fractional part toward zero.',
     use: 'Use it for building integer indices from in-range numeric values.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'Positive and negative inputs both lose their fractional part toward zero. Zero stays zero.',
     caution:
       'The examples stay in range. Out-of-range literals are compile errors in this compiler; keep runtime values in range for portable shader code.',
   },
@@ -619,7 +619,7 @@ export const operationLessons = {
     meaning:
       'An unsigned integer conversion removes the fractional part toward zero for nonnegative in-range values.',
     use: 'Use it for building unsigned counts and indices.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'A nonnegative input loses its fractional part. The examples stay within the range of an unsigned integer.',
     caution:
       'The examples stay nonnegative and in range. Out-of-range literals are compile errors; avoid negative or overflowing runtime inputs.',
   },
@@ -627,21 +627,21 @@ export const operationLessons = {
     meaning:
       'Widening an f32 preserves its value in a representation with more precision for later arithmetic.',
     use: 'Use it for reducing additional rounding during sensitive calculations.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'Widening to f64 cannot recover precision lost when the value was first converted to f32. Exactly representable values stay unchanged.',
     caution:
       'Widening cannot recover lost input digits. This compiler emulates f64 in software; it is not a request for native hardware double precision.',
   },
   array: {
     meaning: 'An array groups a fixed number of values of one element type.',
     use: 'Use it for storing a short kernel, lookup table, or set of samples.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'The listed elements fill the array in input order. With no arguments, the constructor fills each element with zero.',
     caution:
       "The constructor count must match the fixed length. A zero constructor fills with the element type's zero, not an identity matrix or an arbitrary default.",
   },
   fill: {
     meaning: 'Fill constructs a fixed-size array by repeating one value.',
     use: 'Use it for initializing a short array to a known value.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'A scalar fills every element with that scalar. A vector fills every element with that vector.',
     caution:
       'Specify the element type and length. It creates a value, not a storage-buffer allocation or a host-to-GPU upload.',
   },
@@ -649,7 +649,7 @@ export const operationLessons = {
     meaning:
       'A uniform declaration describes data supplied by the host and shared by shader invocations during a draw or dispatch.',
     use: 'Use it for passing camera settings, dimensions, and other small parameters.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'The shader reads the parameter value supplied by the host. Declaring a uniform does not upload the value.',
     caution:
       'The declaration does not upload data. The host must allocate, bind, and populate a buffer with the reflected layout. Shaders cannot write a uniform binding.',
   },
@@ -657,7 +657,7 @@ export const operationLessons = {
     meaning:
       'A storage declaration describes a host-bound buffer that shader invocations can index.',
     use: 'Use it for processing large arrays and writing compute results.',
-    try: 'Compare the input and result in each case. Look for the boundary where behaviour changes.',
+    try: 'A read returns the selected element. A write changes only the selected location and leaves the other elements unchanged.',
     caution:
       'Read-write access must be explicit. The declaration allocates nothing; the host supplies the buffer. Shared writes need ownership, atomics, or suitable synchronization.',
   },

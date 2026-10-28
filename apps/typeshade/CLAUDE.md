@@ -1,5 +1,6 @@
 # Working in this repository with Claude Code
 
+Read the workspace `../../AGENTS.md` and `../../docs/content-review.md` first.
 Read `DESIGN.md` for the writing and design rules and `.claude/skills/typeshade-site/SKILL.md`
 for the maintenance workflow. This file adds what keeps the copy true to the compiler it
 documents.
@@ -12,38 +13,22 @@ it has: code, comments, commit messages and pull request titles and bodies in En
 Korean pages and the Korean dictionary in Korean as `.claude/skills/typeshade-site/SKILL.md`
 writes them.
 
-## Korean published content
+## Published content and translation
 
-Load `.claude/skills/readable-korean/SKILL.md` before writing or reviewing Korean page copy,
-translations, headings or labels. It records the owner's preference for neutral, readable,
-Wikipedia-like explanations, polite formal endings such as `~입니다` and `~합니다`, established
-terminology and English when it improves clarity. The current preference for polite formal
-endings supersedes the earlier plain explanatory register. Keep technical facts, source parity
-and localization wiring intact.
+The owner's current direction applies to every published surface of TypeShade, TypeNN,
+TypeCV and the shared UI. Follow `../../docs/content-style.md`: write and review English first
+using Blend2D, React, Vue, MapLibre and Mapbox as references, then translate into Korean with
+the same meaning and tone. Use `.claude/skills/readable-korean/SKILL.md` for translation.
 
-## Writing and configuration management
+Earlier instructions for encyclopedic Korean, noun-only headings and fixed sentence word
+counts are superseded. Useful task headings, direct instructions and reader questions are
+allowed. Preserve code, facts, conditions, links and stable anchors. A style checker passing
+does not establish that the writing is good.
 
-Every reply to the owner and every task follows two disciplines from aircraft maintenance
-practice. The writing follows the principles of ASD-STE100, Simplified Technical English. The
-work follows the configuration management functions of SAE EIA-649 and ISO 10007. Both are
-local conventions, and they claim no compliance or certification. The site's pages also follow
-`DESIGN.md` (Voice), which states the same principles for page copy.
+The current all-site review uses Luna subagents at the owner's request. Assign disjoint files
+and record actual review and verification in `../../docs/content-review.md`.
 
-**Writing.**
-
-- Keep descriptive text and procedures apart. Write a procedure as numbered steps in the
-  imperative, with one action in each step.
-- Give each sentence one topic. Keep a step to 20 words and a descriptive sentence to 25. Give
-  each paragraph one topic.
-- Use one term for one thing. Use the exact identifier of each file, page, check and command.
-- Use the active voice when the actor is known. Do not invent an actor.
-- Put a warning before the step it applies to. Name an action that cannot be undone (a merge,
-  a force push, a deletion) before it is done.
-- Keep facts, inferences, proposals, decisions and observed results apart. Label each one when
-  the difference matters.
-- A reply in Korean applies these principles in Korean: short sentences, one topic in each, one
-  action in each step, the same term for the same thing. ASD-STE100's dictionary is English and
-  governs only English text.
+## Configuration management
 
 **Configuration management.**
 

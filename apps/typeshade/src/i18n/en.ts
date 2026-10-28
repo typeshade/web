@@ -91,8 +91,8 @@ export const en = {
   },
 
   meta: {
-    title: 'TypeShade: typed shaders in TypeScript for WebGPU and WebGL2',
-    description: `Start a file with "use typeshade" and emit WGSL for WebGPU and ${glsl} for WebGL2. The same source runs on the CPU in f64, so its output can be checked.`,
+    title: 'TypeShade | A shader language for the web',
+    description: `Write shaders using TypeScript syntax. TypeShade compiles to WGSL for WebGPU and ${glsl} for WebGL2, with GPU types, editor support and Vite integration.`,
     ogAlt: 'TypeShade: one shader source for WebGPU and WebGL2, with a rendered metaballs shader.',
   },
 
@@ -237,7 +237,7 @@ export const en = {
       h1: 'Compiler API reference',
       intro: `Every export of the typeshade package, generated from the compiler at commit ${facts.pinnedCommit}. One page per function, type, interface and class.`,
       audience:
-        'This is the surface a host application and the [`fn()`](apiFn) builder call. A shader author writes the [language reference](reference) instead.',
+        'This API is for host applications and the [`fn()`](apiFn) builder. Shader authors can use the [language reference](reference).',
       reference: 'Reference',
       breadcrumbs: 'Breadcrumbs',
       // The title names the export, its kind and its category, and grows a suffix only as
@@ -285,7 +285,7 @@ export const en = {
       note: `The signature, the description and the examples come from the compiler's own source at commit ${facts.pinnedCommit}.`,
       // The note over a page whose JSDoc text is translated (content/api/<locale>/), which only a
       // translated locale shows; English keeps it so every dictionary has the same keys.
-      translatedNote: `The description is translated from the JSDoc in the compiler's own source at commit ${facts.pinnedCommit}; the signature and the example code are as the source has them.`,
+      translatedNote: `Descriptions are translated from the reviewed compiler documentation at commit ${facts.pinnedCommit}. Signatures and example code follow the source; descriptions include editorial corrections where needed.`,
       syntax: 'Syntax',
       parameters: 'Parameters',
       returnValue: 'Return value',
@@ -433,9 +433,9 @@ export const en = {
       title: 'TypeShade language reference for shader authors',
       description: `Every name a \`"use typeshade"\` file can write, ${facts.languageEntries} of them: types, attributes, builtin values, functions, constants and \`Math\` members.`,
       h1: 'Language reference',
-      intro: `The language a file that starts with \`"use typeshade"\` is written in. ${facts.languageEntries} names, read from the compiler's own language service at commit ${facts.pinnedCommit}, which is the table the editor answers a hover from.`,
+      intro: `The language reference for files that start with \`"use typeshade"\`. It lists ${facts.languageEntries} names from the compiler's language service at commit ${facts.pinnedCommit}, the same table the editor uses for hover information.`,
       audience:
-        'This is the reference for shader authors. The surface a host application and the [`fn()`](apiFn) builder call is the [compiler API reference](api).',
+        'This reference is for shader authors. Host applications and the [`fn()`](apiFn) builder use the [compiler API reference](api).',
       reference: 'Reference',
       breadcrumbs: 'Breadcrumbs',
       note: `The signature, the sentence and any message are the compiler's own text at commit ${facts.pinnedCommit}.`,
@@ -452,7 +452,7 @@ export const en = {
         `The \`…\` line stands for ${n} more members, the swizzles. A swizzle reads two to four components as a new vector of the same element type. The components come in any order and may repeat, and their letters come from one set, \`xyzw\` or \`rgba\`.`,
       readingP: `An entry holds the declaration the editor loads for that name, the compiler's sentence about it, and for a builtin function the WGSL and the ${glsl} text each backend writes. The [builtin table](languageBuiltins) is the scanning view over the same calls, four columns wide.`,
       sourceP:
-        'Every entry on these pages is read from the compiler at the pinned commit, and none of it is typed here.',
+        'Names, declarations and descriptions come from the compiler language-service tables at the pinned commit. Builtin output spellings and stage rules are read from compiler code. The site supplies the groupings and explanations around these entries.',
       entries: (n: number) => `${n} names`,
       signature: 'Signature',
       emits: 'Emits',
@@ -739,7 +739,7 @@ export const en = {
         MISSING_DIRECTIVE:
           'A file compiled as TypeShade that has no `"use typeshade"` directive at all.',
         TYPE_MISMATCH:
-          'Two types that do not fit where they meet (an operator, a condition, a declaration, a return or an argument), or a constant the compiler folds that WGSL refuses: a shift amount past 31, a divisor of 0, clamp bounds that cross, an f32 past its range or a builtin call outside its domain, such as `pow(-2., 2.)`.',
+          'Two types that do not fit where they meet (an operator, a condition, a declaration, a return or an argument), a read of an optional value (`T | undefined`, `T | null` or `T | null | undefined`) that no test narrowed (Rule 7.10), or a constant the compiler folds that WGSL refuses: a shift amount past 31, a divisor of 0, clamp bounds that cross, an f32 past its range or a builtin call outside its domain, such as `pow(-2., 2.)`.',
         UNKNOWN_FN: 'A call to a function the file neither declares nor imports.',
         CONST_ASSIGN:
           'An assignment to a name that cannot change, such as a `const` or a read-only resource.',
@@ -919,8 +919,8 @@ export const en = {
     description: `Write a "use typeshade" file in the browser, compile it to WGSL and ${glsl}, run it on WebGPU or WebGL2, and read the diagnostics and the reflection.`,
     h1: 'Playground',
     intro:
-      'Write a TypeShade TypeScript file, compile it in your browser, and inspect the generated WGSL and diagnostics.',
-    help: 'Author TypeShade in a Monaco editor and compile it here.',
+      'Try TypeShade in your browser. Choose an example or write your own shader, then inspect the generated code and rendering results.',
+    help: 'Edit your shader in the Monaco editor.',
     run: 'Compile',
     reset: 'Reset example',
     editor: 'TypeShade source',
@@ -940,7 +940,7 @@ export const en = {
     loading: 'Loading editor…',
     clean: 'No diagnostics.',
     noOutput: 'No WGSL output.',
-    directive: 'A file compiles once it starts with the "use typeshade" directive.',
+    directive: 'Add "use typeshade" as the first statement in a shader file.',
     unavailable: 'The editor did not load. Check the connection and reload the page.',
     starting: 'Starting the language service…',
     serviceFailed: 'The language service stopped. Reload the page.',
@@ -1337,101 +1337,60 @@ export const en = {
   },
 
   front: {
-    title: 'TypeShade, a shader language you write in TypeScript',
     searchTitle: 'TypeShade',
-    lede: `TypeShade is a language of its own, with TypeScript's syntax, types and editor. A file that starts with \`"use typeshade"\` emits WGSL for WebGPU and ${glsl} for WebGL2. ${facts.shadeRenderable} of the ${facts.shadeExamples} examples in the repository emit both from one file.`,
-    playground: 'Playground',
-    quickStart: 'Quick Start',
-    stageAria: 'A shader running beside the file that draws it',
-    first: {
-      title: 'Warped bands',
-      caption:
-        'The file on the left, drawn on the right. Edit a line or move a control and the picture follows.',
-      warp: 'how much the bands bend',
-      ink: 'first colour',
-      paper: 'second colour',
+    hero: 'A shader language for the web',
+    lede: `TypeShade lets you write shaders using TypeScript syntax. Compile your code to WGSL for WebGPU or ${glsl} for WebGL2, and use it in your application.`,
+    playground: 'Try it online',
+    quickStart: 'Get started',
+    why: 'Why TypeShade?',
+    source: 'Source language',
+    language: {
+      h: 'Write shaders with TypeScript',
+      p: 'Use functions, classes and modules to organize your shaders. TypeShade adds the types and declarations you need to work with GPU data and shader stages.',
+      more: 'Learn the language',
+      rows: [
+        {
+          title: 'GPU types',
+          code: 'f32, vec3, mat4',
+          body: 'Work with scalar, vector and matrix values. Define structured data with classes and type aliases.',
+        },
+        {
+          title: 'Shader stages',
+          code: '@vertex / @fragment / @compute',
+          body: 'Declare vertex, fragment and compute entry points with decorators. Use uniform and storage declarations to access data from your application.',
+        },
+        {
+          title: 'Vite integration',
+          code: 'import { fs } from "./scene.shade.ts"',
+          body: 'Import shader files into your application and call their exported functions. The runtime sets up the device and pipelines for compute and fragment entry points.',
+        },
+      ],
     },
     targets: {
-      h: 'One file, two targets',
-      p: 'The compiler lowers `hello.shade.ts` to one intermediate representation and emits both targets from it. The file imports nothing, so it is the whole program; the pane beside it holds the WGSL and the GLSL ES 3.00 fragment a host hands to WebGPU or WebGL2, one tab each.',
+      h: 'Compile to WGSL and GLSL',
+      p: 'Use the generated code in your own WebGPU or WebGL2 renderer. Compare the source and compiled output below. Supported features vary by target.',
+      summary: 'View source and compiled output',
       source: 'hello.shade.ts',
       wgsl: 'WGSL',
       glsl: `${glsl} fragment`,
     },
-    gallery: {
-      h: 'More shaders',
-      p: `${facts.shadeExamples} examples ship with the compiler, from cartographic passes to compute kernels. Each tile is the frame its shader drew at build time, and opens the page that runs it.`,
-      all: 'All examples',
-      /** What a canvas of one example says under it, by what drew the frame. The front page's
-       *  tiles are stills and carry none of this; the example's own page runs the shader. */
-      tile: (title: string) => ({
-        neutral: `${title}, drawn at build time.`,
-        webgpu: `${title}, running on WebGPU.`,
-        webgl2: `${title}, running on WebGL2.`,
-        none: `${title}, drawn at build time; this browser has no WebGPU or WebGL2.`,
-        reduced: `${title}, one frame, since this system asks for less motion.`,
-      }),
-    },
-    map: {
-      h: 'What carries over from TypeScript',
-      p: 'GPU code has three things: resources, value layouts and entry points. TypeShade gives each a place TypeScript already has, and keeps the rest of the language where it fits the GPU. The full rules are in the [language guide](guide).',
-      rows: [
-        [
-          '"use typeshade"',
-          'The directive is the language boundary',
-          "It is the first statement of the file, where a JavaScript directive goes. A file without it does not compile as a shader; with it, everything under it is checked as TypeShade and lowered to the compiler's intermediate representation.",
-        ],
-        [
-          'f32, vec3, mat4, sin(x)',
-          'GPU types and builtins are globals',
-          '`f32`, `vec3`, `mat4` and the builtins such as `sin` and `vec4(...)` need no import, and `Math.sin` and `Math.PI` are aliases of the same operations. The checker applies the shader rules to them in the editor, before any code is emitted.',
-        ],
-        [
-          'class VsIn { @location(0) uv: vec2 }',
-          'A type or a class is a value layout',
-          'Plain data is a `type` alias; a `class` carries per-field metadata such as `@location` and `@builtin`, and its fields lay out the struct both targets receive.',
-        ],
-        [
-          'new Circle(center, 0.3).coverage(p)',
-          'A class is a TypeScript class',
-          'Fields, a constructor and `new`, methods and static functions, `extends` with `super` and `abstract`, generic classes and functions, and the mixin pattern all compile. A method lowers to a function that takes the struct first, and a generic is compiled once per set of type arguments. The [gallery](examples) has a file for each of them.',
-        ],
-        [
-          'declare const u: uniform<Camera>',
-          'declare names a resource the host fills',
-          '`uniform<T>` reads a uniform block, and `storage<T, "read_write">` is a storage buffer the shader writes. There is no initializer: the host owns the slot, in the order the file declares them, and [`reflect()`](apiReflect) reports its layout.',
-        ],
-        [
-          '@fragment export function fs(v: VsOut): vec4',
-          'A decorated export is an entry point',
-          '`@vertex`, `@fragment` and `@compute([64, 1, 1])` name the stage; a function without one is a helper. Stage inputs are explicit parameters, a `@builtin("vertex_index")` or a `@location`. There is no hidden global.',
-        ],
-        [
-          'await scale({ k, xs, ys }, 4)',
-          'A host file imports the module and calls it',
-          "Through the `typeshade/vite` plugin, a host file imports a `.shade.ts` and calls what it exports. A helper runs on the CPU, a `@compute` entry runs on WebGPU or the WebGL2 compute tier where supported, and a full-screen `@fragment` entry draws into a canvas as `fs(canvas, bindings)`. The bindings object is typed from the module, so a binding the call leaves out is a type error on the host's line.",
-        ],
-      ],
-    },
     oracle: {
-      h: 'Checked against the CPU',
-      p: "The same module runs on the CPU in f64, and [the test suite](checks) checks the compiler's algebra against it. Every emit is compiled on Tint and linked on WebGL2 on each push. Below, the gradient pass drawn by each backend from the same file.",
-      webgpu: {
-        neutral: 'The gradient pass, drawn at build time from the emitted WGSL.',
-        webgpu: 'The gradient pass, drawn by WebGPU from the emitted WGSL.',
-        webgl2: 'The gradient pass, drawn by WebGL2; this browser has no WebGPU.',
-        none: 'The gradient pass, drawn at build time; this browser has no WebGPU or WebGL2.',
-      },
-      webgl2: {
-        neutral: `The gradient pass, drawn at build time from the emitted ${glsl}.`,
-        webgpu: `The gradient pass, drawn by WebGL2 from the emitted ${glsl}.`,
-        webgl2: `The gradient pass, drawn by WebGL2 from the emitted ${glsl}.`,
-        none: 'The gradient pass, drawn at build time; this browser has no WebGL2.',
-      },
+      h: 'Compiler testing',
+      p: 'TypeShade tests shader calculations on the CPU, compiles generated WGSL with Tint, and compiles and links GLSL in WebGL2.',
+      more: 'How TypeShade is tested',
+      caption:
+        'The same gradient shader rendered with WebGPU and WebGL2. Images captured when the site was built.',
+    },
+    gallery: {
+      h: 'Explore shader examples',
+      p: 'Open an example to view its source, edit the code and run it in the Playground.',
+      all: 'Browse examples',
     },
     install: {
-      h: 'Install',
-      p: `Install the repository with npm through its Git URL. Import the package as \`typeshade\`; [Quick Start](quickStart) covers installation and the first shader. The ${facts.nextVersion} registry release is not published yet.`,
+      h: 'Get started with TypeShade',
+      p: 'Install TypeShade from Git with npm, then follow the quick start to compile and run your first shader.',
+      note: `Version ${facts.nextVersion} has not been published to npm yet.`,
+      more: 'Read the quick start',
     },
   },
   quickStart: {
@@ -1439,36 +1398,39 @@ export const en = {
       hostH: 'Connect it to the host application',
       boundaryH: 'The TypeShade / host boundary',
       nextLearnH: 'What to learn next',
-      p0: 'A file that starts with `"use typeshade"` is a shader file, and it compiles with the shader files it imports as one program. The example below is the TypeShade authoring surface.',
+      p0: 'A file starting with `"use typeshade"` contains shader source. It compiles together with the shader files it imports.',
       boundaryP:
-        'TypeShade source is authored with TypeScript syntax, but a file marked with `"use typeshade"` follows the shader language rules. TypeScript types and syntax form the authoring surface; TypeShade GPU types, resources and shader-stage rules define the shader semantics.',
+        'Write the shader and the application that runs it in separate files. Add `"use typeshade"` to the shader file, which defines GPU types, resources and entry points.',
       boundaryBullets: [
-        '`"use typeshade"` declares the language boundary.',
-        'GPU entry inputs are explicit parameters such as `@builtin(...)`, not hidden globals.',
-        'Resource types such as `uniform<T>` and `storage<T>` express GPU resource semantics.',
+        '`"use typeshade"` marks a shader file.',
+        'Parameters marked with `@builtin(...)` receive the values the GPU supplies to an entry point.',
+        'Declare GPU resources with `uniform<T>` and `storage<T>`.',
       ],
       hostP0:
-        'A host uses the file one of three ways. It compiles the file and passes the shader source to its own WebGPU or WebGL2 code, or it imports the file and calls what the file exports. An engine that draws its own frames loads the compiled program into the program runtime instead, the third way, which [WebGPU and WebGL2](conceptsWebgpu) describes.',
+        'You can use a shader from your application by passing its compiled code to WebGPU or WebGL2, or by importing it with Vite and calling its functions. For loading compiled programs into the runtime, see [WebGPU and WebGL2](conceptsWebgpu).',
       compileH: 'Compiling the file',
-      hostWgslLabel: 'Where the host consumes WGSL',
+      hostWgslLabel: 'Passing WGSL to WebGPU',
       hostP1:
-        'This way works today. Compile the file, then let the host application pass the generated WGSL or GLSL ES 3.00 source to WebGPU or WebGL2.',
+        "Compile the shader file, then pass the generated WGSL or GLSL ES 3.00 code to the application's WebGPU or WebGL2 code.",
       hostP2:
-        'TypeShade owns the language semantics and shader emission. The host owns runtime objects and their lifetimes, including the device, pipeline, bind groups, buffers, textures and command encoders.',
+        'With this approach, the application creates and manages the device, pipeline, bind groups, buffers, textures and command encoders. TypeShade generates the shader code.',
       importH: 'Importing the file',
-      importP: `The Vite plugin supports the Git-installed source package. A host file imports a \`.shade.ts\` and calls what it exports, and TypeShade's runtime creates the device and the pipelines those calls need. A helper runs on the CPU. A \`@compute\` entry is \`await entry(bindings, workgroups)\`: it runs on WebGPU or WebGL2 where supported and reads back what it wrote. A full-screen \`@fragment\` entry draws into a canvas as \`entry(canvas, bindings)\`, on WebGPU, then WebGL2, then the CPU.`,
+      importP:
+        'Configure the Vite plugin to import `.shade.ts` files. Exported helper functions run on the CPU. Call a `@compute` entry with `await entry(bindings, workgroups)` to run it on supported WebGPU or WebGL2 environments and read back its output. Call a full-screen `@fragment` entry with `entry(canvas, bindings)`. It selects an available backend in WebGPU, WebGL2, CPU order; the runtime creates the required device and pipelines. The setup below uses the source package installed from Git.',
       setupP:
         'After installation, add the Vite plugin and the host `tsconfig.json` settings below. The scripts run Vite and the installed CLI through `tsx`. The `prepare` script writes the host views that `tsc` reads. Add `*.shade.typeshade.ts` to `.gitignore`.',
       viteLabel: 'The Vite plugin, vite.config.ts',
-      tsconfigLabel: 'Two lines of the host tsconfig.json',
+      tsconfigLabel: 'Host configuration, tsconfig.json',
       packageLabel: 'Development scripts, package.json',
       toolingLabel: 'Vite development dependency',
       devLabel: 'Start the development server',
       drawP:
-        'A host file then draws `hello.shade.ts`, the file at the top of this page, with one call. A vertex entry cannot be called from host code yet, so the view declares `vs` as `never`, and `fs` fills the whole canvas in red.',
+        'Import `hello.shade.ts` from the top of this page and call `fs` to fill the canvas with red. Vertex entry points cannot be called directly from host code yet, so the generated type for `vs` is `never`.',
       drawLabel: 'Drawing hello.shade.ts from a host file, app.ts',
-      untilP: `[WebGPU and WebGL2](conceptsWebgpu) describes the ownership boundaries of the compiler, host calls and program runtime.`,
-      nextLearnP: 'Now connect familiar TypeScript concepts to their TypeShade GPU meaning.',
+      untilP:
+        'See [WebGPU and WebGL2](conceptsWebgpu) for more about the application and runtime responsibilities in each approach.',
+      nextLearnP:
+        'Continue with the language guide to learn about types, functions, control flow and GPU resources.',
       nextLinks: nextLinks([
         { linkKey: 'languageTypes', label: 'Types: value shapes and GPU structs' },
         { linkKey: 'languageFunctions', label: 'Functions: helpers and entry points' },
@@ -1477,9 +1439,9 @@ export const en = {
         { linkKey: 'languageResources', label: 'Resources: uniform and storage' },
         { linkKey: 'languageStages', label: 'Shader stages: compute, vertex and fragment' },
       ]),
-      nextLearnAllLink: 'Read the full Language Guide',
+      nextLearnAllLink: 'Language guide',
       nextEditorP:
-        'The [VS Code extension](editor) shows diagnostics and the WGSL a file compiles to while you type.',
+        'The [VS Code extension](editor) shows error messages and compiled WGSL while editing.',
     },
     title: 'TypeShade Quick Start: install and write your first shader',
     description:
@@ -1487,13 +1449,13 @@ export const en = {
     h1: 'Quick Start',
     runLabel: 'Run the compiler, terminal',
     installH: 'Install',
-    p0: 'Start with a TypeScript file whose first statement is `"use typeshade"`. That directive crosses the boundary into the TypeShade shader language; the example below is a complete first shader, written with a class and stage-decorated functions.',
-    p1: `A host compiles a file with one call. Save the gradient pass below as \`${quickStartFile.shader.name}\`, ${quickStartFile.shader.lines} lines with a uniform block, a vertex stage and a fragment stage, and compile it from a host file of ${quickStartFile.host.lines} lines that calls [\`compile()\`](apiCompile) and prints the WGSL:`,
-    p2: 'Running it prints WGSL for both stages. Here is the fragment entry point:',
-    p3: `The ${glsl} stage for the same function, and the uniform layout [\`reflect()\`](apiReflect) recovers for it, are on the [examples page](examples). The [language guide](guide) covers the rest of the surface.`,
+    p0: 'Create a shader file and add `"use typeshade"` as its first statement. The example below uses classes for return types and decorators to define vertex and fragment entry points.',
+    p1: `Save the following shader as \`${quickStartFile.shader.name}\`. It defines uniforms and vertex and fragment functions. Next, create the host file shown below to call [\`compile()\`](apiCompile) and print the generated WGSL.`,
+    p2: 'Run the command to compile both shader stages. The fragment entry point is shown below:',
+    p3: `The [examples page](examples) shows the ${glsl} code for the same function and the uniform layout reported by [\`reflect()\`](apiReflect). The [language guide](guide) explains the syntax and usage.`,
     live: {
       h: 'Live example',
-      p: '`sin` turns the x coordinate into a wave, and `time` scrolls it. That is the whole file below, and it runs here: edit a line and the canvas follows on the next keystroke.',
+      p: 'This shader uses `sin` to draw stripes and `time` to animate them. Try changing the code or adjusting the controls to see how the result changes.',
       title: 'Sine stripes',
       caption: 'A sine wave across the canvas, mixed between two colours.',
       anchor:
@@ -1515,69 +1477,67 @@ export const en = {
 
   motivation: {
     use: {
-      title: 'What is TypeShade? A shader language in TypeScript',
+      title: 'Introduction | TypeShade',
       description:
-        'Learn TypeShade as a shader language: start from TypeScript concepts, cross the use typeshade boundary, and compile to host-ready GPU code.',
-      h1: 'A shader language that starts in TypeScript',
+        'Learn how TypeShade uses TypeScript syntax to define GPU types, shader functions and resources, and compiles them for WebGPU and WebGL2.',
+      h1: 'Introduction',
       sections: [
         [
-          'What does TypeShade change?',
-          'TypeShade is not a runtime that executes ordinary TypeScript on the GPU. It starts from familiar TypeScript syntax and tooling, then interprets the file as a separate shader language with its own types and semantics.',
+          'What is TypeShade?',
+          'TypeShade is a shader language and compiler for WebGPU and WebGL2. It uses TypeScript syntax to define shader functions, GPU data types and resources. You can use the generated WGSL or GLSL in an existing renderer, or run your shaders with the TypeShade runtime.',
+          'what-does-typeshade-change',
         ],
         [
-          '`use typeshade` is the language boundary',
-          'The file-level `"use typeshade"` directive declares a TypeShade program. Once present, the compiler applies TypeShade shader semantics instead of treating the file as ordinary application code. Understanding this line is the first step to understanding the language.',
+          'Writing a shader',
+          'Start a shader file with `"use typeshade"`. This tells the compiler to apply TypeShade\'s shader types and compilation rules. Define your functions and resources in this file, and import other shader modules as needed.',
+          'use-typeshade-is-the-language-boundary',
         ],
         [
-          'What stays familiar from TypeScript?',
-          'Functions, type annotations, modules, expressions and control flow form the familiar authoring surface. That does not mean every TypeScript feature is available unchanged. TypeShade deliberately constrains features that do not map cleanly to the GPU execution model and reports those constraints statically.',
+          'Using TypeScript syntax',
+          'If you know TypeScript, you can use familiar function declarations, type annotations, imports, conditionals and loops. TypeShade supports the constructs that can be compiled to shader code. Some TypeScript and JavaScript features are unavailable in shaders.',
+          'what-stays-familiar-from-typescript',
         ],
         [
-          'Where does TypeScript end and TypeShade begin?',
-          'TypeScript describes general-purpose program types and execution. TypeShade additionally describes GPU values, vectors and matrices, resources, entry points, target capabilities and shader-specific restrictions. A familiar `function` or `if` still has to make sense for the target GPU program.',
+          'Working with GPU data',
+          "Use TypeShade's numeric, vector and matrix types to describe GPU data. Declare resources to access the buffers and textures your application provides. Shader code, including `function` declarations and `if` statements, must follow the rules of the target GPU language.",
+          'where-does-typescript-end-and-typeshade-begin',
         ],
         [
-          'What does the compiler produce?',
-          'TypeShade source is lowered to one intermediate representation and then emitted as host-consumable shader source. The current targets are WGSL for WebGPU and GLSL ES 3.00 for WebGL2. A host hands that source to its own WebGPU or WebGL2 code, or loads the compiled program into the program runtime, `typeshade/runtime`.',
+          'Running your shaders',
+          'Compile your shader to WGSL for WebGPU or GLSL ES 3.00 for WebGL2. Available features depend on the target. You can pass the generated code to your own renderer, or load a compiled program with `typeshade/runtime`.',
+          'what-does-the-compiler-produce',
         ],
         [
-          'Where should you go next?',
-          'Start with Quick start and make one real `"use typeshade"` file. Then use the Language guide to learn types, values and expressions, functions, control flow and GPU semantics. Move to Verification and the API reference once you know the authoring model.',
+          'Getting started',
+          'Follow the quick start to install TypeShade and run a `"use typeshade"` file. Continue with the language guide to learn the syntax, or use the API reference to look up individual functions. The verification page explains how the compiler is tested.',
+          'where-should-you-go-next',
         ],
       ],
-      familiarH: 'Your TypeScript knowledge is the starting point',
+      familiarH: 'TypeScript and TypeShade',
       familiarP:
-        'TypeShade keeps familiar language concepts, then makes the GPU-specific differences explicit instead of hiding them in generated shader strings.',
+        'TypeShade uses TypeScript syntax, but the code runs as a shader. This changes the types you can use and how functions, modules and control flow are compiled.',
       rows: [
-        [
-          'Functions',
-          'Declarations and calls',
-          'Shader functions and entry-point rules are added.',
-        ],
-        [
-          'Types',
-          'Annotations and inference',
-          'GPU-native values plus vector and matrix types are added.',
-        ],
+        ['Functions', 'Declarations and calls', 'Decorators mark shader entry points.'],
+        ['Types', 'Annotations and inference', 'GPU scalar, vector and matrix types are used.'],
         [
           'Modules',
           'import / export',
-          'A shader file and the shader files it imports compile as one program.',
+          'A shader file compiles together with the shader files it imports.',
         ],
         [
           'Control flow',
           'if / for and related syntax',
-          'The program must satisfy GPU execution and target constraints.',
+          'Conditionals and loops must be supported by the execution target.',
         ],
         [
           'Execution',
           'JavaScript runtime',
-          'The host executes generated code through WebGPU or WebGL2.',
+          'The application runs compiled shaders with WebGPU or WebGL2.',
         ],
       ],
-      furtherH: 'Keep the TypeScript and JavaScript references nearby',
+      furtherH: 'Learning TypeScript and JavaScript',
       furtherP:
-        'TypeShade documentation focuses on what is different. When a TypeScript or JavaScript concept is new to you, use the language references below as the background layer.',
+        'New to TypeScript or JavaScript? The TypeScript Handbook covers types and functions. The MDN JavaScript Guide explains expressions, control flow and modules.',
       further: [
         [
           'TypeScript Handbook — Everyday Types',
@@ -1595,39 +1555,39 @@ export const en = {
           'The JavaScript background for expressions, control flow, functions and modules',
         ],
       ],
-      columns: ['Concept', 'Familiar from TypeScript', 'What TypeShade adds'],
+      columns: ['Concept', 'TypeScript', 'TypeShade'],
     },
-    title: 'Why TypeShade for TypeScript shader development',
+    title: 'Why TypeShade? | TypeShade',
     description:
-      'TypeShade brings TypeScript syntax and editor tools to GPU programs. Learn how shared shader source, multiple targets and CPU checks fit your project.',
+      'Write TypeScript shaders for WebGPU and WebGL2. Learn which language features TypeShade supports, how it compiles shaders, and where target limits apply.',
     h1: 'Why TypeShade',
     intro:
-      'TypeShade keeps shader logic in a typed source file and compiles it for supported GPU targets. It brings TypeScript authoring tools, shared shader source and output verification into the same workflow.',
+      'TypeShade brings TypeScript syntax and tooling to shader development. You can organize shaders into modules, compile them for WebGPU and WebGL2, and use them with your own renderer or the TypeShade runtime.',
     sections: [
       {
         id: 'typescript-tooling',
-        h: 'TypeScript tooling',
-        p: 'Functions, classes, type annotations and imports provide a familiar way to organize shader code. A file starts with `"use typeshade"`, which marks the boundary where shader types and execution rules apply. The [editor extension](editor) adds completions, shader diagnostics and navigation. The [TypeScript mapping](languageFromTypescript) explains how each supported construct compiles.',
+        h: 'Use TypeScript tools',
+        p: 'Write shader functions, classes and imports in files starting with `"use typeshade"`. The [editor extension](editor) provides completion, diagnostics and code navigation while you work. See the [TypeScript mapping](languageFromTypescript) for supported syntax and the code it generates.',
       },
       {
         id: 'shared-source',
-        h: 'Shared shader source',
-        p: `WebGPU consumes WGSL, while WebGL2 consumes ${glsl}. Maintaining separate implementations means applying each change in each language. TypeShade lowers a shader program to a shared intermediate representation and emits the supported targets from it. A change to a helper function reaches each emitted version through the same compilation. The [target guide](conceptsWgsl) explains where their capabilities differ.`,
+        h: 'Target WebGPU and WebGL2',
+        p: `WebGPU uses WGSL, and WebGL2 uses ${glsl}. TypeShade generates both from your shader source, so changes to a shared function are included in each output when you recompile. Some features are available on only one target. See the [target guide](conceptsWgsl) for details.`,
       },
       {
         id: 'host-integration',
-        h: 'Host integration',
-        p: 'The compiler exposes shader source and reflection metadata for a host to inspect and consume. An application can use the output with its own renderer. The Vite plugin also lets a host import shader modules and call their entries through `typeshade/runtime`. The [WebGPU and WebGL2 guide](conceptsWebgpu) describes these integration paths and the resources the host provides.',
+        h: 'Integrate with your application',
+        p: 'Use the generated shader code and resource layout information with your own renderer. With Vite, you can also import shader files and call their functions from application code. To load compiled programs directly, use `typeshade/runtime`. The [WebGPU and WebGL2 guide](conceptsWebgpu) covers each approach.',
       },
       {
         id: 'verification',
-        h: 'A reference for verification',
-        p: 'The CPU oracle evaluates the same intermediate representation in double precision. It supplies a reference for checking GPU results. Compiler checks also include target compilation, output snapshots and differential tests. Floating-point results can differ between execution targets. [Verification](checks) describes the checks and their scope.',
+        h: 'Test shader calculations',
+        p: 'The CPU oracle evaluates shader operations in double precision, providing reference values for tests. Other tests compile the generated code and compare it with stored output. Floating-point results can differ between CPU and GPU execution. Read [Verification](checks) for the tests and their limits.',
       },
       {
         id: 'constraints',
-        h: 'GPU constraints',
-        p: 'A shader must follow resource, stage and target rules. Some constructs emit WGSL alone, and WebGL2 compute uses supported lowering paths with capability limits. TypeShade adds a compiler step and its own language rules. The [language guide](guide) and [target guide](conceptsWgsl) describe those constraints. Existing WGSL or GLSL may already cover a project that needs a single target or specific target features.',
+        h: 'Check target support',
+        p: 'Before adding TypeShade to your build, check that it supports the features your shaders need. Some features compile to WGSL only, and WebGL2 compute has limits on supported operations and resources. The [language guide](guide) and [target guide](conceptsWgsl) describe these limits.',
       },
       {
         id: 'project-status',
@@ -1637,7 +1597,7 @@ export const en = {
     ],
     nextH: 'Next steps',
     nextP:
-      'Open the [Playground](playground) to edit a shader and inspect its output. Follow the [quick start](quickStart) to use it in a project, or browse the [examples](examples) for complete programs.',
+      'Try an [example](examples) in the [Playground](playground), or follow the [quick start](quickStart) to set up a project.',
   },
 
   benchmarks: {
@@ -1743,7 +1703,7 @@ export const en = {
     description:
       'Run TypeShade performance experiments on your device and contribute results to guide compiler improvements.',
     intro:
-      'Measure how workloads behave on your device. These experiments help guide compiler work, including private kernel input projection.',
+      'Measure how workloads behave on your device. Results can inform compiler work, including reducing uploads when a kernel reads only some fields.',
     runH: 'Unified benchmark',
     resultsH: 'Performance report',
     sharingH: 'Contribute results',
@@ -1823,19 +1783,19 @@ export const en = {
   checks: {
     title: 'How TypeShade is checked: oracle, compile gate, goldens',
     description:
-      "What TypeShade's CI runs on every push: a CPU oracle in f64, a compile gate on Tint and a real WebGL2 context, and golden files for every emit.",
+      'Learn how TypeShade tests shader calculations, validates generated WGSL and GLSL, and checks for changes in compiler output.',
     h1: 'Verification',
     ciH: 'On every push',
     intro:
-      "The repository's CI runs these on every push and pull request, in [the CI workflow](ciGates):",
+      "These are the main checks defined in the compiler repository's [CI workflow](ciGates). They run on pushes to main; pull requests that change only documentation skip the GPU checks.",
     items: [
-      `The same module compiles to a CPU function that runs in f64 arithmetic. In its default mode only its equality tests round to f32 first, so they agree with the GPU; an f32 mode that rounds after every operation is opt-in. The test suite checks that function against known answers and against a second CPU backend, generated JavaScript, which must match it bit for bit. It says nothing about what rounding does on a driver, and no GPU output is compared against it in this repository. Where WGSL fixes a result and ${glsl} does not, the oracle follows WGSL (Rule 11.5). [src/core/oracle.ts](oracle)`,
-      `The compile gate emits every registered example, hands each WGSL emit to Tint inside headless Chromium, and compiles and links both ${glsl} stages of every renderable example on a real WebGL2 context. It also hands each compiler a shader that cannot compile: if either accepts that non-program, the gate fails and the verdicts on the examples do not count. [scripts/compile-gate.ts](compileGate)`,
-      'Golden files hold the emitted bytes of every example, so any change in a backend surfaces as a diff in review. [emit-goldens.test.ts](goldens)',
+      `The CPU oracle evaluates shader operations in f64. Its default mode rounds values to f32 before equality comparisons; an optional f32 mode rounds each operation. Tests compare results with known answers and a separate JavaScript backend. The f64 results alone cannot validate GPU driver rounding. Where WGSL defines a result and ${glsl} does not, the oracle follows WGSL (Rule 11.5). See [src/core/oracle.ts](oracle).`,
+      `The compile check passes WGSL generated from registered examples to Tint in Chromium. It compiles and links the ${glsl} vertex and fragment code for renderable examples in WebGL2. Invalid shaders are included to verify that the checking tools detect errors. See [scripts/compile-gate.ts](compileGate).`,
+      'Golden files store expected compiler output. Tests compare new output byte for byte with these files and fail when it changes. Intentional changes update the expected files for review alongside the code. [emit-goldens.test.ts](goldens)',
     ],
     pairH: 'The same pass on both backends',
     pairIntro:
-      'The gradient pass from the front page, drawn once by each backend. No pixel comparison between the two is committed yet.',
+      'Compare the gradient shader rendered with WebGPU and WebGL2. This example is a visual comparison; it does not test for matching pixels.',
     gpuFrame: {
       neutral: 'Drawn on WebGPU at build time, from the compiled WGSL.',
       webgpu: 'Drawn here on WebGPU, from the compiled WGSL.',
@@ -1850,7 +1810,7 @@ export const en = {
     },
     authorTime: {
       h: 'At author time',
-      p: 'The uniform block is declared once, and every field read is typed against that declaration. Misspell one and the editor says so, before a string reaches a GPU, and the compiler refuses the file with the same code.',
+      p: 'The example below tries to read a field that is missing from the uniform block. The language service and compiler report the same error code at the same location. This behavior is checked when the site is built.',
       caption: `The wrong read on line ${err.wrongLine}, the diagnostic it produces, and the ${std} layout [\`reflect()\`](apiReflect) recovers for the block it reads from: ${err.layout.size} bytes over ${err.layout.fields.length} fields. The gap after the first field is alignment.`,
     },
   },
@@ -2447,7 +2407,7 @@ export const en = {
      *  a translation writes its own against the same keys. */
     shade: {
       h: 'Written as TypeScript source',
-      p: `Each example is a TypeScript file that opens with \`"use typeshade"\`, compiled by \`compile()\` from the file's own bytes. Each one is there for one part of the language, and they are grouped here that way. ${facts.shadeRenderable} have a ${glsl} form and the others emit WGSL alone. The ones the page can draw carry a picture.`,
+      p: `Explore examples grouped by language feature. Each shader starts with \`"use typeshade"\` and is compiled with \`compile()\`. Open an example to view the source and generated code. ${facts.shadeRenderable} examples support ${glsl} as well as WGSL; the others generate WGSL only. Renderable examples include a preview.`,
       groups: {
         cartographic: 'Cartographic',
         screen: 'Screen space',
@@ -2622,7 +2582,7 @@ export const en = {
         'Examples explain TypeShade syntax, GPU types, resources, shader stages and execution rules.',
       h1: 'TypeShade language guide',
       intro:
-        'TypeShade uses TypeScript syntax for shader source. This guide explains what the compiler accepts and what the GPU runs.',
+        'Learn how to write TypeShade shaders using TypeScript syntax. This guide introduces types, functions, resources and shader stages with examples you can compile and run.',
       boundaryH: '1. What is `use typeshade`?',
       boundaryP:
         '`"use typeshade"` marks a TypeShade shader file. The compiler applies TypeShade rules for GPU types, resources, stages and builtin inputs.',
@@ -2739,6 +2699,7 @@ export const en = {
           'A getter and a setter each lower to a function of their own, and a class has one constructor, as in TypeScript.',
           '`new` builds a value inside a function body, and a module constant takes an object literal.',
           'Prefer a type alias when no field needs a decorator.',
+          'A value may be absent as `T | undefined`, `T | null` or `T | null | undefined` in function-scope locals, parameters, results, class fields and fixed-array elements (Rules 7.10 and 8.8). Strict tests distinguish null and undefined; `!= null` excludes both. Bindings, module/static data, entry IO and kernel interfaces refuse these types. Exported helpers using them have no host value (Rule 8.21).',
         ],
         mapping: '5. Concept mapping',
         mappingRows: [
@@ -2771,7 +2732,7 @@ export const en = {
           'Here <code>value</code> is the input parameter, <code>f32</code> is the GPU type of both the input and result, and <code>return</code> produces the value for the caller.',
         params: '2. Parameters and return types',
         paramsP:
-          'A parameter is an input to the function and the return type describes the shape of its result. Reassigning a value parameter changes a local copy for that invocation and leaves the caller’s value unchanged. This applies to helpers, methods and stage inputs. Types tell the compiler which values and operations are valid.',
+          'A parameter is an input to the function and the return type describes the shape of its result. Reassigning a value parameter changes a local copy for that invocation and leaves the caller’s value unchanged. This applies to helpers, methods and stage inputs. Types tell the compiler which values and operations are valid. Helpers accept nullable parameters and results, including generic functions and function-typed callbacks. `value?: T | null` admits both absent states. Nullable values remain outside entry IO and kernel interfaces.',
         paramsTable: [
           ['Part', 'Role'],
           ['`a`, `b`', 'GPU input values.'],
@@ -2846,14 +2807,14 @@ export const en = {
         branch: '2. Branching',
         branchP:
           'Use if/else to express calculation paths. Inside a branch, keep values and resources within the TypeShade GPU model.',
-        branchValueP: `A value chosen by a condition is written \`c ? a : b\`. WGSL has no \`?:\` operator. For a scalar or a vector, the WGSL emit is \`select(b, a, c)\`, with the false value first and the condition last. WGSL evaluates both values, so put an expensive arm in an \`if\`. ${glsl} keeps \`?:\`. A struct or an array is chosen through a variable and an \`if\` on both targets.`,
+        branchValueP: `A value chosen by a condition is written \`c ? a : b\`. WGSL has no \`?:\` operator. For a scalar or a vector, the WGSL emit is \`select(b, a, c)\`, with the false value first and the condition last. WGSL evaluates both values. An arm that calls a function of the file, reads a texture or holds eight or more operations is lowered to a variable and an \`if\` by the compiler, so only the arm taken runs (Rule 7.2); a cheap arm stays \`select\`. ${glsl} keeps \`?:\` for the cheap arm and takes the same \`if\` for the costly one. A struct or an array is chosen through a variable and an \`if\` on both targets.`,
         loop: '3. Loops',
         loopP:
           "Write a for loop, a while loop, or for...of over an array. A for loop may count to a value known only at run time, such as a uniform field or the length of an array. An array's map, forEach, some, every, reduce, fill, findIndex, findLastIndex, indexOf, lastIndexOf and includes compile too, each to a counted loop, and map takes an array with a fixed length.",
         // A kernel function (compiler change 0013): the loop the compiler may run on the GPU.
         kernel: '4. A loop that runs as a kernel',
         kernelP:
-          "An exported function that is not an entry point and takes an array with no size, `array<T>`, or a 2D storage texture, `texture_storage_2d<F, A>`, is a kernel function (Rule 8.22). A sampled texture alone makes none, so an exported helper that reads one stays a helper. The array or the texture is the caller's, read and written in place. Each `for` at the top of its body is a loop the compiler may run on the GPU, one invocation per iteration, and a host file awaits the function like any import. No `@compute`, binding or `global_invocation_id` is written. `@workgroup_size([128])` before the function sets the workgroup of its loops on WebGPU, which is 64 without it. A loop that reduces always runs in workgroups of 256, so the attribute on a function with such a loop is refused (`TS8077`).",
+          "An exported function that is not an entry point and takes an array with no size, `array<T>`, or a 2D storage texture, `texture_storage_2d<F, A>`, is a kernel function (Rule 8.22). A sampled texture alone makes none, so an exported helper that reads one stays a helper. The array or the texture is the caller's, read and written in place. Each `for` at the top of its body is a loop the compiler may run on the GPU, one invocation per iteration, and a host file awaits the function like any import. No `@compute`, binding or `global_invocation_id` is written. `@workgroup_size([128])` before the function sets the workgroup of its loops on WebGPU, which is 64 without it. A loop that reduces always runs in workgroups of 256, so the attribute on a function with such a loop is refused (`TS8077`). The last workgroup of a dispatch holds the lanes past the loop's last iteration, and none of them returns early: a workgroup wholly past the end returns as one, and in the workgroup that holds the last iteration such a lane runs that iteration again with every write masked, so every lane of a workgroup runs the same control flow, the form that completed on a D3D12 device where an early return hung. Where that lane would read what another lane writes, it skips the iteration under the same flag. The results do not change on any tier.",
         kernelRulesP:
           "The compiler runs a loop on the GPU when it proves that no iteration touches what another one does. The loop is a counted `for`, or a `for...of`, that steps by a constant and that nothing returns from or breaks out of. Each write lands on a name declared inside the loop, on an outer array or a texture at an index made from the loop's own, on an integer array the loop combines into at any index, on a variable the loop combines with `+=`, `*=`, `min`, `max`, `&`, `|` or `^`, which the GPU and the CPU fold in one tree order, on an array the loop only appends to with `push`, or on a `Map` or a `Set` the loop adds to. The loop reads an array it writes only where it writes it. It never reads a variable it combines, an array it appends to or a `Map` or a `Set` it adds to. It calls no function that writes a module variable or a binding, and has no barrier, no workgroup memory and no `console` call.",
         kernelLayoutP:
@@ -3305,6 +3266,10 @@ export const en = {
             name: 'Default argument',
             p: 'Every parameter stays, and the argument left out is written at the call. [default-args](shadeDefaultArgs)',
           },
+          optionalValue: {
+            name: 'Optional value',
+            p: 'Function results may be `T | undefined`, `T | null` or `T | null | undefined` (Rule 7.10). Inference preserves the absent states of returned values, including callbacks and local functions. A bare return or fall-through supplies null for a null-only result and undefined when admitted. Strict tests distinguish states; `??` evaluates its fallback only for an absent value. An un-narrowed read is `TS8003`. [Nullable values](shadeNullValues)',
+          },
           overloads: {
             name: 'Overload signature',
             p: 'The signatures are skipped and the implementation is lowered once.',
@@ -3400,7 +3365,7 @@ export const en = {
           },
           ternaryScalar: {
             name: 'Ternary on a scalar',
-            p: `WGSL has no \`?:\` operator, so the ternary becomes \`select\`: the false value first, the condition last. WGSL evaluates both values. ${glsl} keeps the ternary.`,
+            p: `WGSL has no \`?:\` operator, so the ternary becomes \`select\`: the false value first, the condition last. WGSL evaluates both values, so an arm that calls a function of the file, reads a texture or holds eight or more operations is hoisted into a slot and an \`if\` instead, and only the arm taken runs. ${glsl} keeps the ternary for the cheap arm.`,
           },
           ternaryStruct: {
             name: 'Ternary on a struct',
@@ -3457,7 +3422,7 @@ export const en = {
           },
           optionalMember: {
             name: 'Optional field',
-            p: 'A struct field is always there in the memory the host fills.',
+            p: 'A field `radius?: f32 | null` admits null and undefined; omitting it supplies undefined (Rule 8.8). Constructors, methods, accessors, private/protected/readonly fields and generic classes support nullable payloads. An uninitialized null-only class field starts null; one admitting undefined starts undefined. A null-only local must be assigned before reading. Static data, bindings and entry IO refuse optional storage. [Nullable values](shadeNullValues)',
           },
           stringValue: {
             name: 'String value',
@@ -3510,7 +3475,7 @@ export const en = {
         description:
           'The WGSL surface construct by construct, with the TypeShade spelling of each one: scalars, vectors, textures, address spaces, stage attributes and statements.',
         h1: 'WGSL in TypeShade',
-        intro: `A reader who already writes WGSL needs one thing from this site, which is the TypeShade spelling of the construct in front of them. This page reads in that direction: a WGSL form on the left, what to write in a \`"use typeshade"\` file on the right, and a note where the two do not line up. [WGSL vs ${glsl}](conceptsWgsl) compiles one shader to both targets and lists where they differ.`,
+        intro: `If you already write WGSL, this page shows how to express each construct in TypeShade. The left column shows the WGSL form; the right shows what to write in a \`"use typeshade"\` file. Notes explain where the two differ. [WGSL vs ${glsl}](conceptsWgsl) compiles one shader for both targets and describes their differences.`,
         readingH: 'How to read a row',
         readingP: `The right column is source text the compiler at commit ${facts.pinnedCommit} accepts, and the left column is the WGSL that same compiler writes for it. Both are measured when this page is built, so a spelling the compiler stops writing arrives here at the next pin as a changed row.`,
         colWgsl: 'WGSL',
@@ -3616,7 +3581,7 @@ export const en = {
           'statements.switch':
             'Each case ends with `break`, which a WGSL case does without and the lowering drops. A case whose end is reachable would run on into the next case in TypeScript, so it is refused (`TS8017`). The last case needs no `break`. A label is an integer constant that may appear once. Two labels stacked over one body are one case with two selectors, `case 0, 1:` on WGSL.',
           'statements.select':
-            'WGSL has no ternary, so a scalar or vector conditional becomes `select`, whose first argument is the arm the condition does not choose. A conditional on a struct or an array is hoisted into a slot and an `if`, since neither target has an operator for that.',
+            'WGSL has no ternary, so a scalar or vector conditional becomes `select`, whose first argument is the arm the condition does not choose. A conditional on a struct or an array is hoisted into a slot and an `if`, since neither target has an operator for that, and so is one whose arm is costly: a call of a function of the file, a texture read, or eight or more operations, so the arm not taken does not run.',
           'statements.call': 'A function called for what it does, with its result dropped.',
           'statements.phony':
             'A value-returning builtin dropped the same way takes the phony assignment, because Tint reads every such builtin as `@must_use`.',

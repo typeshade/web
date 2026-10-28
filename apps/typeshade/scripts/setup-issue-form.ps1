@@ -1,6 +1,6 @@
 # Sets up the issue dialog on typeshade.dev (docs/cloudflare.md, Issues): the label its issues
-# carry in both repositories, and the Worker's secrets. Run it from a checkout of
-# typeshade.github.io, after `gh auth login` and `bunx wrangler login`:
+# carry in the compiler and web repositories, and the Worker's secrets. Run it from a checkout of
+# `apps/typeshade` in the web workspace, after `gh auth login` and `bunx wrangler login`:
 #
 #   ./scripts/setup-issue-form.ps1 -AppId 123456 -KeyFile ~/Downloads/app.private-key.pem
 #
@@ -43,7 +43,7 @@ foreach ($name in $secrets.Keys) {
   if (-not $secrets[$name]) { throw "$name is empty" }
 }
 
-foreach ($repo in 'typeshade/typeshade', 'typeshade/typeshade.github.io') {
+foreach ($repo in 'typeshade/typeshade', 'typeshade/web') {
   gh label create 'site form' --repo $repo --color 1677ff --force `
     --description 'Filed through the issue dialog on typeshade.dev'
   if ($LASTEXITCODE -ne 0) { throw "gh label create failed on $repo" }

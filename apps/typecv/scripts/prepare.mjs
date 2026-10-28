@@ -1,102 +1,151 @@
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { build } from 'esbuild';
-import { execFileSync } from 'node:child_process';
-import { filesWithExtension, markdownFiles } from './docs.mjs';
+import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { build } from "esbuild";
+import { execFileSync } from "node:child_process";
+import { filesWithExtension, markdownFiles } from "./docs.mjs";
 
-const website = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const root = path.resolve(website, '../../sources/typecv');
-const out = path.join(website, 'public/runtime');
+const website = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
+const root = path.resolve(website, "../../sources/typecv");
+const out = path.join(website, "public/runtime");
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
-await cp(path.join(root, 'dist/gpu.js'), path.join(out, 'gpu.js'));
-await cp(path.join(root, 'dist/gpu'), path.join(out, 'gpu'), { recursive: true });
-await cp(path.join(root, 'LICENSE'), path.join(out, 'LICENSE-TypeCV'));
-await cp(path.join(root, 'node_modules/typeshade/LICENSE'), path.join(out, 'LICENSE-TypeShade'));
+await cp(path.join(root, "dist/gpu.js"), path.join(out, "gpu.js"));
+await cp(path.join(root, "dist/gpu"), path.join(out, "gpu"), {
+  recursive: true,
+});
+// Multi-video matching loads TypeCV's internal entry and its relative/lazy chunks.
+await cp(path.join(root, "dist/internal"), path.join(out, "internal"), {
+  recursive: true,
+});
+await mkdir(path.join(out, "vocabulary"), { recursive: true });
+await cp(
+  path.join(root, "src/gpu/vocabulary/rootsift-32-v1.bin"),
+  path.join(out, "vocabulary/rootsift-32-v1.bin"),
+);
+await cp(path.join(root, "LICENSE"), path.join(out, "LICENSE-TypeCV"));
+await cp(
+  path.join(root, "node_modules/typeshade/LICENSE"),
+  path.join(out, "LICENSE-TypeShade"),
+);
 await build({
-  entryPoints: [path.join(root, 'dist/index.js')],
-  outfile: path.join(out, 'core.js'),
+  entryPoints: [path.join(root, "dist/index.js")],
+  outfile: path.join(out, "core.js"),
   bundle: true,
-  format: 'esm',
-  platform: 'browser',
+  format: "esm",
+  platform: "browser",
   minify: true,
-  legalComments: 'eof',
+  legalComments: "eof",
 });
 await build({
-  entryPoints: [path.join(website, 'playground.mjs')],
-  outfile: path.join(out, 'playground.js'),
+  entryPoints: [path.join(website, "playground.mjs")],
+  outfile: path.join(out, "playground.js"),
   bundle: true,
-  format: 'esm',
-  platform: 'browser',
-  external: ['/runtime/*'],
+  format: "esm",
+  platform: "browser",
+  external: ["/runtime/*"],
 });
-const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
-const docFiles = await markdownFiles(path.join(root, 'docs'));
-for (const file of await filesWithExtension(path.join(root, 'docs'), '.json')) {
+const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+  cwd: root,
+  encoding: "utf8",
+}).trim();
+const commit = execFileSync("git", ["rev-parse", "HEAD"], {
+  cwd: website,
+  encoding: "utf8",
+}).trim();
+const rootPackage = JSON.parse(
+  await readFile(path.join(root, "package.json"), "utf8"),
+);
+const typeshade =
+  /\/archive\/([0-9a-f]{7,40})\.tar\.gz$/.exec(
+    rootPackage.devDependencies?.typeshade ??
+      rootPackage.dependencies?.typeshade ??
+      "",
+  )?.[1] ?? null;
+const docFiles = await markdownFiles(path.join(root, "docs"));
+for (const file of await filesWithExtension(path.join(root, "docs"), ".json")) {
   const destination = path.join(
     website,
-    'public/docs',
-    path.relative(path.join(root, 'docs'), file),
+    "public/docs",
+    path.relative(path.join(root, "docs"), file),
   );
   await mkdir(path.dirname(destination), { recursive: true });
   await cp(file, destination);
 }
 const routes = [
-  '/',
-  '/ko/',
-  '/playground/',
-  '/ko/playground/',
-  '/lab/',
-  '/ko/lab/',
-  '/404.html',
+  "/",
+  "/ko/",
+  "/playground/",
+  "/ko/playground/",
+  "/lab/",
+  "/ko/lab/",
+  "/lab/probe/",
+  "/ko/lab/probe/",
+  "/lab/check/",
+  "/ko/lab/check/",
+  "/404.html",
   ...docFiles.flatMap((file) => {
     const rel = path
-      .relative(path.join(root, 'docs'), file)
-      .replaceAll(path.sep, '/')
-      .replace(/\/README\.md$/, '')
-      .replace(/\.md$/, '');
-    const route = rel === 'README' ? '/docs/' : `/docs/${rel}/`;
-    return route === '/404.html' ? [route] : [route, `/ko${route}`];
+      .relative(path.join(root, "docs"), file)
+      .replaceAll(path.sep, "/")
+      .replace(/\/README\.md$/, "")
+      .replace(/\.md$/, "");
+    const route = rel === "README" ? "/docs/" : `/docs/${rel}/`;
+    return route === "/404.html" ? [route] : [route, `/ko${route}`];
   }),
 ];
 await writeFile(
-  path.join(website, 'public/version.json'),
+  path.join(website, "public/version.json"),
   JSON.stringify(
     {
-      project: 'TypeCV',
-      repository: 'https://github.com/typeshade/typecv',
+      project: "TypeCV",
+      repository: "https://github.com/typeshade/web",
+      sourceRepository: "https://github.com/typeshade/typecv",
       commit,
-      runtime: 'TypeShade compiled GPU bundle',
+      sourceCommit,
+      runtime: "TypeShade compiled GPU bundle",
       routes,
     },
     null,
     2,
-  ) + '\n',
+  ) + "\n",
 );
 await writeFile(
-  path.join(website, 'public/robots.txt'),
-  'User-agent: *\nAllow: /\nSitemap: https://cv.typeshade.dev/sitemap.xml\n',
+  path.join(website, "public/robots.txt"),
+  "User-agent: *\nAllow: /\nSitemap: https://cv.typeshade.dev/sitemap.xml\n",
 );
 await writeFile(
-  path.join(website, 'public/sitemap.xml'),
+  path.join(website, "public/sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes
-    .filter((route) => route !== '/404.html')
+    .filter((route) => route !== "/404.html")
     .map((route) => `<url><loc>https://cv.typeshade.dev${route}</loc></url>`)
-    .join('')}</urlset>\n`,
+    .join("")}</urlset>\n`,
 );
 await writeFile(
-  path.join(out, 'version.json'),
+  path.join(out, "version.json"),
   JSON.stringify(
-    { project: 'TypeCV', commit, runtime: 'TypeShade compiled GPU bundle', localProcessing: true },
+    {
+      project: "TypeCV",
+      repository: "https://github.com/typeshade/typecv",
+      commit: sourceCommit,
+      runtime: "TypeShade compiled GPU bundle",
+      typeshade,
+      localProcessing: true,
+    },
     null,
     2,
-  ) + '\n',
+  ) + "\n",
 );
-const record = path.join(root, 'docs/experiments/pyramid-8134952/typecv-gpu-resident-model.json');
+const record = path.join(
+  root,
+  "docs/experiments/pyramid-8134952/typecv-gpu-resident-model.json",
+);
 try {
-  await cp(record, path.join(out, 'pyramid-model.json'));
+  await cp(record, path.join(out, "pyramid-model.json"));
 } catch {
   /* optional recorded reconstruction */
 }
-console.log(`Prepared TypeCV browser runtime from ${commit.slice(0, 7)}`);
+console.log(`Prepared TypeCV browser runtime from ${sourceCommit.slice(0, 7)}`);

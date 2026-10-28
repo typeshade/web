@@ -3,10 +3,10 @@
   "source": "aef09676aa7f9c26813941f080e40640527c8ba6d1ebd90e3b78254b20d78d5e",
   "texts": {
     "summary": "드로 호출로 그릴 도형 데이터입니다. 매니페스트가 배치하는 버텍스 버퍼에서 count개의 버텍스를 instances번 그립니다.",
-    "description": "타입 배열은 드로마다 업로드됩니다. `Resident`는 처음 쓸 때 업로드되고, 이후에는 그 상태 그대로 바인딩된다(변경 0053). `GPUBuffer`는 그대로 바인딩됩니다.",
+    "description": "타입 배열은 드로마다 업로드됩니다. `Resident`는 처음 쓸 때 업로드되고, 이후에는 그 상태 그대로 바인딩됩니다(변경 0053). `GPUBuffer`는 그대로 바인딩됩니다.",
     "members.count": "버텍스 수, 또는 `indices`가 주어졌을 때는 인덱스 수입니다.",
     "members.instances": "인스턴스 수입니다. 생략하면 1입니다.",
-    "members.vertices": "버텍스 버퍼이입니다. 매니페스트의 버텍스 진입점이 읽는 대로 배치된다(`@location` 입력의 값이 간격 없이 촘촘히 배치된 상태). 타입 배열이면 드로마다 업로드됩니다. `Float32Array`, `Int32Array` 또는 `Uint32Array`의 `Resident`이면 한 번만 업로드됩니다. 호스트의 `GPUBuffer`를 쓸 수도 있습니다. `@location` 입력이 없는 버텍스 진입점에서는 이 항목을 생략합니다. 예를 들어 `vertex_index`에서 그리는 전체 화면 삼각형이 여기에 해당합니다.\n탈출구(Rule 11.17)입니다. 호스트의 `GPUBuffer`를, WebGL2에서는 `WebGLBuffer`를 그 상태 그대로 바인딩합니다.",
-    "members.indices": "인덱스 버퍼이입니다. `Uint16Array` 또는 `Uint32Array`이면 드로마다 업로드됩니다. `Uint32Array`의 `Resident`이면 한 번만 업로드되며, 그 형식은 `uint32`이입니다. `{ buffer, format }`이면 호스트의 `GPUBuffer`를 그 상태 그대로 바인딩합니다.\n탈출구(Rule 11.17)입니다. 호스트의 `GPUBuffer`를, WebGL2에서는 `WebGLBuffer`를 `{ buffer, format }`의 `buffer`로 넘깁니다."
+    "members.vertices": "버텍스 버퍼입니다. 매니페스트의 버텍스 진입점이 읽는 대로 배치됩니다(`@location` 입력의 값이 간격 없이 촘촘히 배치된 상태). 타입 배열이면 드로마다 업로드됩니다. `Float32Array`, `Int32Array` 또는 `Uint32Array`의 `Resident`이면 한 번만 업로드됩니다. 호스트의 `GPUBuffer`를 쓸 수도 있습니다. `@location` 입력이 없는 버텍스 진입점에서는 이 항목을 생략합니다. 예를 들어 `vertex_index`에서 그리는 전체 화면 삼각형이 여기에 해당합니다.\n탈출구(Rule 11.17)입니다. 호스트의 `GPUBuffer`를, WebGL2에서는 `WebGLBuffer`를 그 상태 그대로 바인딩합니다.",
+    "members.indices": "인덱스 버퍼입니다. `Uint16Array` 또는 `Uint32Array`이면 드로마다 업로드됩니다. `Uint32Array`의 `Resident`이면 한 번만 업로드되며, 그 형식은 `uint32`입니다. `{ buffer, format }`이면 호스트의 `GPUBuffer`를 그 상태 그대로 바인딩합니다.\n탈출구(Rule 11.17)입니다. 호스트의 `GPUBuffer`를, WebGL2에서는 `WebGLBuffer`를 `{ buffer, format }`의 `buffer`로 넘깁니다."
   }
 }

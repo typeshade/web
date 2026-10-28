@@ -44,7 +44,7 @@ const fragment = emitGlslModule(m, 'fragment', { floatPrecision: 'mediump' })
 
 옵션은 float 정밀도 선언 줄만 변경합니다. 헤더의 다른 두 정밀도 선언은 컴파일 결과에 필요하므로 설정과 무관하게 highp로 유지합니다.
 
-그중 하나는 `precision highp int;`이입니다. GLSL ES 3.00은 int의 기본 정밀도를 버텍스 셰이더에서는 highp로, 프래그먼트 셰이더에서는 mediump로 정의합니다. TypeShade는 두 스테이지 모두 highp를 명시합니다. 데이터 텍스처를 통해 스토리지를 읽는 인덱스 계산과 비트캐스트의 정수 부분은 정수의 전체 범위가 필요합니다.
+그중 하나는 `precision highp int;`입니다. GLSL ES 3.00은 int의 기본 정밀도를 버텍스 셰이더에서는 highp로, 프래그먼트 셰이더에서는 mediump로 정의합니다. TypeShade는 두 스테이지 모두 highp를 명시합니다. 데이터 텍스처를 통해 스토리지를 읽는 인덱스 계산과 비트캐스트의 정수 부분은 정수의 전체 범위가 필요합니다.
 
 다른 하나는 샘플러 선언입니다. GLSL ES 3.00은 `sampler2D`와 `samplerCube`에만 기본 정밀도를 정의합니다. 따라서 `sampler2DArray`, `usampler2D`, `isampler2DArray`를 선언하는 모듈은 사용하는 타입마다 `precision highp <type>;` 선언이 필요합니다. `precision highp float;`로는 이를 대신할 수 없습니다. 이 선언이 없으면 컴파일할 수 없으므로 한정자를 유지합니다. `sampler2DArray`를 샘플링하는 프래그먼트 스테이지를 mediump로 생성한 헤더는 다음과 같습니다.
 

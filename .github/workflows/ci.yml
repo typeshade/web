@@ -22,6 +22,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:styles
+      - run: pnpm test:code
+      - run: node --test scripts/deploy-preview-config.test.mjs scripts/deploy-worker-report.test.mjs
       - run: pnpm check:ui
       - run: pnpm build:ui
       - run: pnpm exec playwright install --with-deps chromium
@@ -100,21 +102,79 @@ jobs:
       - if: matrix.site == 'typecv'
         run: pnpm --filter typecv-site test:links
       - if: matrix.site == 'typenn'
-        run: pnpm --filter typenn-site test:datasets && pnpm --filter typenn-site test:graph
+        run: pnpm --filter typenn-site test:datasets && pnpm --filter typenn-site test:graph && pnpm --filter typenn-site test:keras
       - if: matrix.site == 'typeshade'
         working-directory: apps/typeshade
         run: |
           bun scripts/check-reference-notes.ts --dist
           bun run check:benchmark-catalog
           bun run check:regression-catalog
-          bun test scripts/playground-diagnostics.test.ts scripts/playground-host-default.test.ts scripts/compiler-authoring.test.ts scripts/compute-runtime.test.ts scripts/render-runtime.test.ts scripts/benchmarks.test.ts scripts/reference-notes.test.ts
+          bun test scripts/playground-diagnostics.test.ts scripts/playground-host-default.test.ts scripts/compiler-authoring.test.ts scripts/compute-runtime.test.ts scripts/render-runtime.test.ts scripts/benchmarks.test.ts scripts/reference-notes.test.ts scripts/editorial-source.test.ts
           bun run qa:seo
           bun run qa:worker-routes
           bun run qa:openseo
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:ui apps/${{ matrix.site }}/dist
+      - if: matrix.site == 'typeshade'
+        name: Install the TypeShade test browser
+        run: pnpm --filter typeshade-site exec playwright install --with-deps chromium
+      - if: matrix.site == 'typeshade'
+        run: pnpm --filter typeshade-site check:null-values
       - uses: actions/upload-artifact@v4
         with:
           name: site-${{ matrix.site }}
           path: apps/${{ matrix.site }}/dist
           retention-days: 7
+
+  typecv-website:
+    name: TypeCV website tests (${{ matrix.shard }}/4)
+    needs: [scope, site]
+    if: contains(fromJSON(needs.scope.outputs.sites), 'typecv')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - run: git submodule update --init sources/typecv
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prepare:source typecv
+      - uses: actions/download-artifact@v4
+        with:
+          name: site-typecv
+          path: apps/typecv/dist
+      - run: pnpm exec playwright install --with-deps chromium
+      # Some migrated helpers use the pinned library's Playwright; app tests resolve their
+      # own locked version. Install both browser revisions instead of relying on a warm cache.
+      - run: pnpm --filter typecv-site exec playwright install --with-deps chromium
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Run migrated website tests
+        working-directory: apps/typecv
+        env:
+          SHARD: ${{ matrix.shard }}
+          CI: 'true'
+        run: node --test --test-concurrency=1 --test-shard="$SHARD/4" *.test.mjs *.test.ts
+
+  typecv-record-analysis:
+    needs: scope
+    if: contains(fromJSON(needs.scope.outputs.sites), 'typecv')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: apps/typecv/scripts/requirements-record-analysis.txt
+      - run: python -m pip install -r apps/typecv/scripts/requirements-record-analysis.txt
+      - name: Test migrated record analysis tools
+        working-directory: apps/typecv/scripts
+        run: python -m unittest discover -s record_analysis/tests -t .

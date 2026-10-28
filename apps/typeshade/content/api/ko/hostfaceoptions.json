@@ -1,13 +1,13 @@
 {
   "slug": "hostfaceoptions",
-  "source": "f93d3a52c6c295d10cf3d62fd124bda94fafa6d1337e253c91b57e71af2e6b2b",
+  "source": "4e4900aaf79f6dd0b7577222f1dd665c5b130e5a878452c6b53fc1d323a23f6f",
   "texts": {
     "summary": "hostFace를 부르는 방법입니다.",
     "members.fileName": "셰이더 모듈의 경로입니다. 진단에 실리고, 생성된 파일 안에도 적힙니다.",
     "members.runtime": "생성 모듈이 런타임을 가져올 지정자입니다. 기본값은 `typeshade/runtime/internal`이고, 테스트는 이를 소스 파일로 돌립니다. 번들러 없이 생성 모듈을 실행하는 도구(change 0062)는 번들러처럼 `typeshade/runtime/internal`을 패키지에 든 복사본에 대응시킵니다. 이 지정자는 생성 모듈이 가져오는 것이지, 호스트가 가져올 API가 아닙니다.",
-    "members.console": "`'gpu'`이면 GPU 진입점이 도달하는 `console.*` 호출을 하나하나 `_console` 버퍼에 기록한다(change 0014). 런타임은 디스패치나 그리기가 끝난 뒤 이 버퍼를 디코딩해 호스트의 콘솔에 냅니다. Vite 플러그인은 `vite dev`에서 이 값을 설정하며, 프로덕션 빌드는 아무것도 기록하지 않습니다.",
-    "members.ir": "프로그램의 이식 가능한 IR을 매니페스트, 곧 기본 export에 넣습니다. 그러면 로드 시점의 생성기(`typeshade/emit`)가 이를 다시 생성할 수 있다(change 0025).",
-    "members.fuse": "각 커널 함수의 호스트 인터페이스에 그 반복이 하향 변환하는 과정의 분석 결과와, 그 분석 결과가 가리키는 하향 변환된 모듈을 이식 가능한 IR로 적습니다. `typeshade/fuse`의 계획기는 이것으로 그 함수 호출들의 체인을 합친다(change 0058). 이 옵션이 없으면 호스트 인터페이스는 예전 그대로입니다.",
+    "members.console": "`'gpu'`이면 GPU 진입점이 도달하는 `console.*` 호출을 하나하나 `_console` 버퍼에 기록합니다(change 0014). 런타임은 디스패치나 그리기가 끝난 뒤 이 버퍼를 디코딩해 호스트의 콘솔에 냅니다. Vite 플러그인은 `vite dev`에서 이 값을 설정하며, 프로덕션 빌드는 아무것도 기록하지 않습니다.",
+    "members.ir": "프로그램의 이식 가능한 IR을 매니페스트, 곧 기본 export에 넣습니다. 그러면 로드 시점의 생성기(`typeshade/emit`)가 이를 다시 생성할 수 있습니다(change 0025).",
+    "members.fuse": "각 커널 함수의 호스트 인터페이스에 그 반복이 하향 변환하는 과정의 분석 결과와, 그 분석 결과가 가리키는 하향 변환된 모듈을 이식 가능한 IR로 적습니다. `typeshade/fuse`의 계획기는 이것으로 그 함수 호출들의 체인을 합칩니다(change 0058). 이 옵션은 기본값으로 켜져 있으며(change 0085), `false`는 생성 크기를 줄이기 위해 이 분석 결과를 생략합니다. 일반 입력 투영(input projection)은 이와 독립적으로 유지됩니다.",
     "members.readDocument": "모듈이 가져오는 셰이더 파일(Rule 3.9)과 패키지의 `package.json`을 읽습니다. 모듈과 그 모듈이 가져오는 파일은 하나의 프로그램이고, 그 호스트 인터페이스는 모듈 자신의 export와 다시 내보내는 export입니다. Vite 플러그인은 디스크에서 읽습니다.",
     "members.resolveImport": "`fromFile`에 쓰인 지정자가 가리키는 파일입니다. 기본값은 `compile()`이 쓰는 규칙입니다."
   }

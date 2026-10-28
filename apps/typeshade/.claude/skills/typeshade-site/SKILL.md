@@ -58,35 +58,21 @@ If a change would give the site a shape none of those references has, it is wron
 reference first. If a page can show something, it shows it; it never sends the reader to a
 Markdown file on GitHub for it (the authoring guide is rendered from the vendored file).
 
-## Voice (English)
+## Writing and translation
 
-Plain sentences by the maintainer to other developers. No em dashes, no "X, not Y"
-contrasts, no "rather than", no uppercase for emphasis, no self-praise words, no headings
-with a colon. Headings are single nouns or short noun phrases. Every number on the site comes
-from `facts` in `src/lib/examples.ts`; a number that is not measured is not on the page.
-`scripts/check-style.mjs` enforces the patterns and runs at the start of every build.
+The current owner direction is recorded in the workspace `AGENTS.md` and
+`docs/content-style.md`. It supersedes earlier noun-only headings, encyclopedic Korean prose
+and arbitrary sentence patterns in this skill. Review every published site surface.
 
-## Korean writing
+Write and review English first using the official Blend2D, React, Vue, MapLibre and Mapbox
+sites as communication references. Explain the product and useful tasks with concrete APIs
+and examples. Direct instructions, reader questions and action headings are allowed when they
+fit the content. Preserve support conditions and the evidence for quantitative claims.
 
-Load `../readable-korean/SKILL.md` for Korean wording, register and terminology. The owner's
-2026-10-23 preference governs official published pages: neutral Wikipedia-like explanations,
-clear sentences, polite formal endings such as `~입니다` and `~합니다`, and terms readers
-actually use. Published explanations and procedures use consistent polite formal endings.
-
-Prefer familiar Korean technical terms. Keep established English terms, API names and
-technical explanations in English when that is clearer. Explain unfamiliar concepts briefly
-and keep the reader's context accessible. Distinguish an intentional English passage or
-quotation from an incomplete translation. Preserve the source's technical conditions,
-code, numbers and links.
-
-Use concise headings such as 활용, 예제 and 주의사항 when they describe the content. Review
-the actual paragraph before choosing a label. The glossary supports consistent terminology;
-an awkward prescribed rendering is a wording decision to review, not a reason to force it
-into the page. Do not invent Korean terms or change endings solely to satisfy a heuristic.
-
-Translation checks continue to protect factual and source parity. Review a style heuristic
-against this writing policy before treating its result as an editorial decision. This policy
-update does not request a bulk rewrite of published text.
+Translate that English into Korean with the same meaning, tone and calls to action. Use natural
+Korean grammar and established terms; do not independently invent a Korean slogan or rewrite
+an English tutorial as an encyclopedia entry. `../readable-korean/SKILL.md` supplies the
+translation procedure. Automated parity checks support review; they do not judge naturalness.
 
 ## The Korean guide
 

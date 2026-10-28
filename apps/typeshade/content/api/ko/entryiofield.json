@@ -2,12 +2,12 @@
   "slug": "entryiofield",
   "source": "0d06c33d1267c9d41ca56c19c933d8b3590372086970a289b52ca67d9ef9dff8",
   "texts": {
-    "summary": "진입점 스테이지 인터페이스의 필드 하나입니다. @location(n) varying, 버텍스 속성 또는 프래그먼트 드로우 버퍼이거나, @builtin(name) 슬롯이입니다.",
+    "summary": "진입점 스테이지 인터페이스의 필드 하나입니다. @location(n) varying, 버텍스 속성 또는 프래그먼트 드로우 버퍼이거나, @builtin(name) 슬롯입니다.",
     "description": "진입점이 이 필드를 구조체 매개변수나 구조체 반환의 멤버로 적었다면, 이 필드는 그 구조체에서 펼쳐진 것으로 보고됩니다. 자세한 내용은 [`EntryIo`](/api/entryio/)에서 설명합니다.",
-    "members.name": "필드 자신의 식별자입니다. 매개변수의 이름이거나, 펼쳐진 구조체 필드의 이름입니다. 구조체가 아닌 단순 반환 값이면 `_ret`이입니다. 이 이름은 GLSL 백엔드가 그 출력에 붙이는 이름입니다.",
-    "members.emitted": "생성된 텍스트에 쓰인 필드 이름이다(규칙 11.10).",
-    "members.type": "DSL 타입 키이다([`typeKey`](/api/typekey/)가 돌려주는 문자열). `StructLayout.fields[].type`과 `VertexAttr.type`이 쓰는 것과 같은 표기입니다.",
-    "members.location": "선언된 `@location(n)`이입니다. `@builtin` 필드와 속성 표시가 없는 필드에는 이 값이 없습니다. 이 둘은 `builtin`의 설정 여부로 구별합니다.",
-    "members.builtin": "선언된 `@builtin(name)`이입니다. 이름은 WGSL 자체의 용어(`position`, `vertex_index`, …)로 적습니다. 빌트인은 location과 함께 보고됩니다. varying을 비교하면서 빌트인은 제외하는 소비자는 이 필드로 거릅니다. 빌트인은 varying이 아니기 때문입니다. 이렇게 거르면 `position`이 빌트인이라서 제외되었다고 보고할 수 있습니다."
+    "members.name": "필드 자신의 식별자입니다. 매개변수의 이름이거나, 펼쳐진 구조체 필드의 이름입니다. 구조체가 아닌 단순 반환 값이면 `_ret`입니다. 이 이름은 GLSL 백엔드가 그 출력에 붙이는 이름입니다.",
+    "members.emitted": "필드 이름입니다(규칙 11.10).",
+    "members.type": "DSL 타입 키입니다([`typeKey`](/api/typekey/)가 돌려주는 문자열). `StructLayout.fields[].type`과 `VertexAttr.type`이 쓰는 것과 같은 표기입니다.",
+    "members.location": "선언된 `@location(n)`입니다. `@builtin` 필드와 속성 표시가 없는 필드에는 이 값이 없습니다. 이 둘은 `builtin`의 설정 여부로 구별합니다.",
+    "members.builtin": "선언된 `@builtin(name)`입니다. 이름은 WGSL 자체의 용어(`position`, `vertex_index`, …)로 적습니다. 빌트인은 location과 함께 보고됩니다. varying을 비교하면서 빌트인은 제외하는 소비자는 이 필드로 거릅니다. 빌트인은 varying이 아니기 때문입니다. 이렇게 거르면 `position`이 빌트인이라서 제외되었다고 보고할 수 있습니다."
   }
 }

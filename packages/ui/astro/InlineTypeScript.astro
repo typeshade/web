@@ -1,0 +1,13 @@
+---
+import "../styles/code-highlight.css";
+import { highlightTypeScriptInline } from "../code/highlight.mjs";
+
+interface Props {
+  code: string;
+}
+
+const { code } = Astro.props;
+const highlighted = await highlightTypeScriptInline(code);
+---
+
+{highlighted ? <Fragment set:html={highlighted} /> : <code>{code}</code>}

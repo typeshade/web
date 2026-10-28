@@ -25,6 +25,7 @@ import type { Locale } from "../lab/types";
 import KernelGraph from "./KernelGraph";
 import { LineChart } from "./lab/LineChart";
 import { TryModel } from "./lab/TryModel";
+import { datasetLicense, datasetTitle, taskTitle } from "../lab/copy";
 export default function Lab({ locale }: { locale: Locale }) {
   const {
     datasets,
@@ -104,8 +105,12 @@ export default function Lab({ locale }: { locale: Locale }) {
                     onClick={() => selectDataset(d.id)}
                     disabled={running || graphBusy !== null}
                   >
-                    <span className="lab-card-title">{d.title}</span>
-                    <span className="lab-card-task">{d.task}</span>
+                    <span className="lab-card-title">
+                      {datasetTitle(d.id, d.title, locale)}
+                    </span>
+                    <span className="lab-card-task">
+                      {taskTitle(d.task, locale)}
+                    </span>
                   </button>
                   {m && (
                     <dl className="lab-facts">
@@ -123,7 +128,7 @@ export default function Lab({ locale }: { locale: Locale }) {
                         </>
                       )}
                       <dt>{words.license}</dt>
-                      <dd>{m.license}</dd>
+                      <dd>{datasetLicense(d.id, m.license, locale)}</dd>
                       <dt>{words.citation}</dt>
                       <dd>{m.citation}</dd>
                       <dt>{words.source}</dt>
@@ -490,7 +495,10 @@ export default function Lab({ locale }: { locale: Locale }) {
           ) : (
             <div className="lab-try-empty">
               <p className="lab-note">
-                {words.noModel.replace("{dataset}", info?.title ?? selected)}
+                {words.noModel.replace(
+                  "{dataset}",
+                  datasetTitle(info?.id ?? selected, info?.title ?? selected, locale),
+                )}
               </p>
               <div className="lab-run-bar">
                 <Button

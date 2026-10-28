@@ -32,7 +32,7 @@ for (const d of diagnostics) {
 rim.shade.ts:5:3 TS8005 Cannot assign to "edge" — it is declared with const.
 ```
 
-호스트 호출의 코드가 붙은 오류는 모두 `TypeShadeError`이입니다. 고정된 카탈로그의 `code`와 세부 내용을 조합한 `message`를 포함합니다. 카탈로그에 해결 방법이 있으면 `hint`도 포함합니다. `ValidationError`와 `UnsupportedFeatureError`는 하위 클래스이므로, `instanceof TypeShadeError`로 이 오류들을 함께 처리할 수 있습니다.
+호스트 호출의 코드가 붙은 오류는 모두 `TypeShadeError`입니다. 고정된 카탈로그의 `code`와 세부 내용을 조합한 `message`를 포함합니다. 카탈로그에 해결 방법이 있으면 `hint`도 포함합니다. `ValidationError`와 `UnsupportedFeatureError`는 하위 클래스이므로, `instanceof TypeShadeError`로 이 오류들을 함께 처리할 수 있습니다.
 
 ```ts
 import { TypeShadeError, emitGlslModule } from 'typeshade'

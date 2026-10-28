@@ -10,7 +10,7 @@ const { locale } = Astro.props;
 const c = copyFor(locale).benchmarks;
 const headings = [{ depth: 2, slug: 'run', text: c.runH }, { depth: 2, slug: 'results', text: c.resultsH }, { depth: 2, slug: 'sharing', text: c.sharingH }];
 ---
-<Docs locale={locale} path={links.benchmarks.href} title={c.title} description={c.description} headings={headings} editHref="https://github.com/typeshade/typeshade.github.io/blob/main/src/components/pages/BenchmarksPage.astro">
+<Docs locale={locale} path={links.benchmarks.href} title={c.title} description={c.description} headings={headings} editHref="https://github.com/typeshade/web/blob/main/apps/typeshade/src/components/pages/BenchmarksPage.astro">
   <h1>{c.h1}</h1>
   <p>{c.intro}</p>
   <div data-benchmarks>

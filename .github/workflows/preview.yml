@@ -1,0 +1,190 @@
+name: Pull request previews
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      vars.WEBSITE_PREVIEWS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [typeshade, typenn, typecv]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: pnpm install --frozen-lockfile
+      - name: Prepare selected source
+        if: matrix.site != 'typeshade'
+        env:
+          SITE: ${{ matrix.site }}
+        run: pnpm prepare:source "$SITE"
+      - name: Check site
+        env:
+          SITE: ${{ matrix.site }}
+        run: pnpm run "check:$SITE"
+      - name: Build site
+        env:
+          SITE: ${{ matrix.site }}
+        run: pnpm run "build:$SITE"
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Test built site
+        env:
+          SITE: ${{ matrix.site }}
+        run: pnpm run test:ui "apps/$SITE/dist"
+      - name: Upload an isolated preview version
+        working-directory: apps/${{ matrix.site }}
+        env:
+          SITE: ${{ matrix.site }}
+          PR: ${{ github.event.pull_request.number }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_PREVIEW_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::notice::CLOUDFLARE_API_TOKEN is not configured; the PR preview was not uploaded."
+            echo "${SITE} preview skipped: CLOUDFLARE_API_TOKEN is not configured." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [[ ! "$CLOUDFLARE_ACCOUNT_ID" =~ ^[0-9a-fA-F]{32}$ ]]; then
+            echo "::error::Repository variable CLOUDFLARE_PREVIEW_ACCOUNT_ID must be a 32-character hexadecimal preview account ID."
+            exit 1
+          fi
+
+          CONFIG=".wrangler-preview-pr-${PR}.json"
+          cleanup() {
+            node ../../scripts/deploy-preview-config.mjs remove "$SITE" "$PR"
+          }
+          trap cleanup EXIT
+          node ../../scripts/deploy-preview-config.mjs create "$SITE" "$PR"
+          LOG="$RUNNER_TEMP/wrangler-preview-${SITE}-${PR}.log"
+          # `versions upload` requires an existing Worker. Initialize this PR-only Worker with
+          # no custom routes and no production storage bindings, then upload its preview version.
+          pnpm exec wrangler deploy --config "$CONFIG" \
+            --message "Initialize isolated PR #${PR} preview (${SITE})"
+          pnpm exec wrangler versions upload --config "$CONFIG" \
+            --preview-alias "pr-${PR}" --message "Pull request #${PR} (${SITE})" \
+            2>&1 | tee "$LOG"
+          URL="$(grep -Eo 'https://[^[:space:]]+workers\.dev[^[:space:]]*' "$LOG" | tail -n 1 || true)"
+          if [ -z "$URL" ]; then
+            echo "::error::The upload completed without a workers.dev preview URL in Wrangler output."
+            exit 1
+          fi
+          {
+            echo "## ${SITE} preview"
+            echo "$URL"
+            if [ "$SITE" = typeshade ]; then
+              echo "The preview serves the built static site only. Worker endpoints requiring D1/R2, including live gallery data, are unavailable; no production database or bucket is bound."
+            elif [ "$SITE" = typecv ]; then
+              echo "The preview serves the built static site only. TypeCV /api/ and /sample/ Worker routes are intentionally unavailable; no production KV or R2 binding is attached."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  preview-disabled:
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      vars.WEBSITE_PREVIEWS_ENABLED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain the preview gate
+        run: |
+          echo "::notice::PR previews are disabled. Set WEBSITE_PREVIEWS_ENABLED=true after preview credentials and isolated Worker behavior are verified."
+          echo "PR preview skipped because WEBSITE_PREVIEWS_ENABLED is not true." >> "$GITHUB_STEP_SUMMARY"
+
+  fork-skip:
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain the preview skip
+        run: |
+          echo "::notice::This pull request comes from a fork. Cloudflare preview credentials are not exposed to fork code, so no preview was uploaded."
+          echo "Preview skipped for this fork pull request; no Cloudflare credentials were exposed." >> "$GITHUB_STEP_SUMMARY"
+
+  cleanup:
+    if: >-
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [typeshade, typenn, typecv]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Delete isolated preview Worker
+        working-directory: apps/${{ matrix.site }}
+        env:
+          SITE: ${{ matrix.site }}
+          PR: ${{ github.event.pull_request.number }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_PREVIEW_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is not configured; removal of the isolated preview Worker could not be verified."
+            echo "${SITE} preview cleanup failed: restore the credential and remove the PR Worker." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if [[ ! "$CLOUDFLARE_ACCOUNT_ID" =~ ^[0-9a-fA-F]{32}$ ]]; then
+            echo "::error::Repository variable CLOUDFLARE_PREVIEW_ACCOUNT_ID must be a 32-character hexadecimal preview account ID for cleanup."
+            exit 1
+          fi
+          CONFIG=".wrangler-preview-pr-${PR}.json"
+          cleanup() {
+            node ../../scripts/deploy-preview-config.mjs remove "$SITE" "$PR"
+          }
+          trap cleanup EXIT
+          node ../../scripts/deploy-preview-config.mjs create "$SITE" "$PR"
+          LOG="$RUNNER_TEMP/wrangler-delete-${SITE}-${PR}.log"
+          if pnpm exec wrangler delete --config "$CONFIG" --force 2>&1 | tee "$LOG"; then
+            echo "Deleted isolated ${SITE} preview Worker for PR #${PR}." >> "$GITHUB_STEP_SUMMARY"
+          elif grep -qiE 'not found|does not exist|not exist' "$LOG"; then
+            echo "No isolated ${SITE} preview Worker existed for PR #${PR}." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::Failed to delete isolated ${SITE} preview Worker for PR #${PR}."
+            exit 1
+          fi

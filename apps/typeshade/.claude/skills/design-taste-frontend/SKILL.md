@@ -5,6 +5,16 @@ description: Anti-slop frontend skill for landing pages, portfolios, and redesig
 
 # tasteskill: Anti-Slop Frontend Skill
 
+## Repository writing policy
+
+For this repository, read the root `AGENTS.md` and `docs/content-style.md` before applying
+this general design skill. The owner requires English developer documentation modeled on
+Blend2D, React, Vue, MapLibre and Mapbox, followed by faithful Korean translation. Do not
+invent paired slogans or rewrite copy into noun-only headings. The word-count and line-count
+targets below are layout heuristics, not editorial requirements: preserve useful explanations
+and verify wrapping at the supported viewport sizes. These repository instructions take
+precedence over conflicting generic advice below.
+
 > Landing pages, portfolios, and redesigns. Not dashboards, not data tables, not multi-step product UI.
 > Every rule below is **contextual**. None of it fires automatically. First read the brief, then pull only what fits.
 

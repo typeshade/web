@@ -1,6 +1,6 @@
 # Puts the Cloudflare Access application of the gallery's review page on the gallery's Worker
 # (docs/cloudflare.md, Reviewing the gallery). Create the Access application first, then run
-# this from a checkout of typeshade.github.io, after `bunx wrangler login`:
+# this from `apps/typeshade` in the web workspace, after `bunx wrangler login`:
 #
 #   ./scripts/setup-gallery-review.ps1
 #

@@ -1,0 +1,221 @@
+---
+import HomeHero from "@typeshade/site-ui/astro/HomeHero";
+import HomeSection from "@typeshade/site-ui/astro/HomeSection";
+import StepGrid from "@typeshade/site-ui/astro/StepGrid";
+import Eyebrow from "@typeshade/site-ui/astro/Eyebrow";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
+import "../styles/home.css";
+import HomeSurface from "@typeshade/site-ui/astro/HomeSurface";
+import LinkButton from "@typeshade/site-ui/astro/LinkButton";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import { Code } from "astro/components";
+const { locale } = Astro.props as { locale: "en" | "ko" };
+const ko = locale === "ko";
+const intro = ko
+  ? "TypeCV는 GPU 가속을 지원하는 TypeScript 컴퓨터 비전 라이브러리입니다. 기하 비전과 희소 3D 복원에 사용할 수 있습니다."
+  : "TypeCV is a TypeScript library for computer vision with GPU acceleration. Use it for geometric vision and sparse 3D reconstruction.";
+const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\nconst device = await ShadeDevice.open();\nconst result = await verifyImagePairGpu(device, first, second, matches);\nawait device.dispose();`;
+const t = ko
+  ? {
+      title: "TypeShade로 실행하는 컴퓨터 비전",
+      headingLines: [
+        "TypeScript와 TypeShade로",
+        "컴퓨터 비전 도구를 만드세요.",
+      ],
+      run: "영상으로 SfM 실행 ↗",
+      guide: "가이드 읽기",
+      note: "TypeScript 라이브러리 · TypeShade GPU 연산",
+      panel: "GPU 대응점 검증",
+      caption:
+        "이 예제는 TypeShade WebGPU 연산으로 이미지 대응점을 검증합니다.",
+      eyebrow1: "01 / 연산",
+      section1: "컴퓨터 비전 기반 연산",
+      intro1:
+        "이미지 쌍 검증, 자세 추정, 삼각측량과 번들 조정을 단독으로 사용하거나 희소 복원 과정에 조합할 수 있습니다.",
+      cards: [
+        [
+          "gpu-initialization",
+          "대응점 검증",
+          "렌즈 역변환, H/E 합의와 상대 자세",
+        ],
+        ["gpu-geometry", "기하 복원", "P3P/PnP RANSAC, 삼각측량과 필터링"],
+        ["incremental-sfm", "장면 최적화", "Schur/PCG 번들 조정"],
+      ],
+      scope: "02 / 개발 범위",
+      section2: "현재 제공하는 기하 비전 API",
+      body2:
+        "TypeCV는 현재 기하 비전과 희소 3D 복원을 위한 CPU 참조 API와 TypeShade GPU 연산을 제공합니다. GPU FAST/BRIEF 특징 추출과 매칭은 SfM 실험실에서 실험적으로 사용할 수 있습니다. 이미지 처리, 광류와 학습 기반 비전 연동은 향후 구현할 계획입니다.",
+      features: "GPU 특징 연산 설명 →",
+      roadmap: "로드맵 보기 →",
+      experiment: "기록된 실험",
+      views: "8 / 8 시점",
+      landmarks: "1,723 희소 랜드마크",
+      calibration: "가정한 보정값 · 정답 데이터 없음",
+      inspect: "실험 기록 보기 ↗",
+      action: "로컬 영상으로 복원을 실행하세요",
+      actionBody:
+        "로컬 영상이나 준비된 프레임 묶음을 선택하세요. 브라우저에서 최대 8개 프레임을 추출한 뒤 실험적인 TypeShade GPU 특징 매칭과 증분 SfM을 실행합니다. 영상은 브라우저 밖으로 전송되지 않습니다.",
+      openLab: "SfM 실험실 열기 ↗",
+    }
+  : {
+      title: "Computer vision, powered by TypeShade",
+      headingLines: [
+        "Build computer vision tools",
+        "with TypeShade and TypeScript.",
+      ],
+      run: "Run SfM on a video ↗",
+      guide: "Read the guide",
+      note: "TypeScript library · TypeShade GPU operators",
+      panel: "GPU PAIR VERIFICATION",
+      caption:
+        "This example verifies image correspondences with a TypeShade WebGPU operator.",
+      eyebrow1: "01 / OPERATORS",
+      section1: "Computer vision foundations",
+      intro1:
+        "Use pair verification, pose estimation, triangulation and bundle adjustment independently or as part of sparse reconstruction.",
+      cards: [
+        [
+          "gpu-initialization",
+          "Verify correspondence",
+          "Radial inversion, H/E consensus and relative pose",
+        ],
+        [
+          "gpu-geometry",
+          "Recover geometry",
+          "P3P/PnP RANSAC, triangulation and filtering",
+        ],
+        ["incremental-sfm", "Refine a scene", "Schur/PCG bundle adjustment"],
+      ],
+      scope: "02 / SCOPE",
+      section2: "Build on the current geometry APIs",
+      body2:
+        "TypeCV currently provides CPU reference APIs and TypeShade GPU operators for geometric vision and sparse 3D reconstruction. GPU FAST/BRIEF feature extraction and matching are available experimentally in the SfM lab. Image processing, optical flow and learned-vision integration remain planned.",
+      features: "Read about GPU features →",
+      roadmap: "Explore the roadmap →",
+      experiment: "RECORDED EXPERIMENT",
+      views: "8 / 8 views",
+      landmarks: "1,723 sparse landmarks",
+      calibration: "Assumed calibration · no ground truth",
+      inspect: "Inspect the experiment ↗",
+      action: "Run a reconstruction on local video",
+      actionBody:
+        "Choose a local video or prepared frame bundle. The browser samples up to eight frames, then runs experimental TypeShade GPU feature matching and incremental SfM. The video stays in your browser.",
+      openLab: "Open the SfM lab ↗",
+    };
+const cards = t.cards.map(([slug, title, detail], i) => ({
+  href: `${ko ? "/ko" : ""}/docs/${slug}/`,
+  number: `0${i + 1}`,
+  title,
+  detail,
+}));
+---
+
+<SiteLayout locale={locale} active="home" title={t.title} description={intro}>
+  <HomeSurface class="cv-home">
+    <div class="home-content home-main">
+      <HomeHero>
+        <div class="home-copy">
+          <Eyebrow>TYPECV / COMPUTER VISION</Eyebrow>
+          <h1>
+            {t.headingLines[0]}
+            <br />
+            {t.headingLines[1]}
+          </h1>
+          <p class="lead">{intro}</p>
+          <div class="action-row">
+            <LinkButton
+              variant="primary"
+              size="default"
+              href={ko ? "/ko/lab/" : "/lab/"}
+            >
+              {t.run}
+            </LinkButton>
+            <LinkButton
+              variant="secondary"
+              size="default"
+              href={ko ? "/ko/docs/" : "/docs/"}
+            >
+              {t.guide}
+            </LinkButton>
+          </div>
+          <p class="home-note">{t.note}</p>
+        </div>
+        <div class="home-code">
+          <div class="code-frame">
+            <div class="panel-heading">
+              <span class="live-dot"></span>
+              {t.panel}
+              <span class="mono">pair.ts</span>
+            </div>
+            <Code code={sample} lang="ts" />
+            <div class="pipeline">
+              <span>{ko ? "픽셀" : "pixels"}</span>
+              <span>→</span>
+              <span>H / E</span>
+              <span>→</span>
+              <span>R, t</span>
+            </div>
+          </div>
+          {!ko && <p class="home-note">{t.caption}</p>}
+        </div>
+      </HomeHero>
+      <HomeSection>
+        <div class="section-intro">
+          <Eyebrow>{t.eyebrow1}</Eyebrow>
+          <h2>{t.section1}</h2>
+          <p>{t.intro1}</p>
+        </div>
+        <StepGrid>
+          {cards.map((card) => (
+            <a href={card.href}>
+              <span>{card.number}</span>
+              <strong>{card.title}</strong>
+              <small>{card.detail}</small>
+            </a>
+          ))}
+        </StepGrid>
+      </HomeSection>
+      <HomeSection layout="split">
+        <div>
+          <Eyebrow>{t.scope}</Eyebrow>
+          <h2>{t.section2}</h2>
+          <p>{t.body2}</p>
+          <TextLink
+            href={ko ? "/ko/docs/gpu-features/" : "/docs/gpu-features/"}
+          >
+            {t.features}
+          </TextLink>{" "}
+          <TextLink href={ko ? "/ko/docs/roadmap/" : "/docs/roadmap/"}>
+            {t.roadmap}
+          </TextLink>
+        </div>
+        <div class="experiment-summary">
+          <Eyebrow>{t.experiment}</Eyebrow>
+          <strong>{t.views}</strong>
+          <span>{t.landmarks}</span>
+          <small>{t.calibration}</small>
+          <a
+            href={
+              ko
+                ? "/ko/docs/experiments/pyramid-8134952/"
+                : "/docs/experiments/pyramid-8134952/"
+            }
+          >
+            {t.inspect}
+          </a>
+        </div>
+      </HomeSection>
+      <HomeSection layout="action">
+        <h2>{t.action}</h2>
+        <p>{t.actionBody}</p>
+        <LinkButton
+          variant="primary"
+          size="default"
+          href={ko ? "/ko/lab/" : "/lab/"}
+        >
+          {t.openLab}
+        </LinkButton>
+      </HomeSection>
+    </div>
+  </HomeSurface>
+</SiteLayout>

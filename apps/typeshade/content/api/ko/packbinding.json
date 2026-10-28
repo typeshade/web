@@ -4,9 +4,9 @@
   "texts": {
     "summary": "리소스 슬롯 하나입니다. name, space, group, binding, access, type은 packModule()이 항상 제공한 필드이고, 나머지는 스키마 1에서 추가되었습니다.",
     "members.name": "호스트가 바인딩할 때 쓰는, 작성한 이름입니다.",
-    "members.emitted": "생성된 텍스트가 이 바인딩을 선언한 이름이다(규칙 11.10).",
-    "members.emittedGlsl": "GLSL 표기입니다. `emitted`와 다를 때만 있다(제안 0070, D3).",
-    "members.type": "`typeKey`가 만드는 표기이다: `vec4<f32>`, `array<f32>`, `texture_2d<f32>`.",
+    "members.emitted": "생성된 텍스트에서 이 바인딩을 선언하는 이름입니다(규칙 11.10).",
+    "members.emittedGlsl": "GLSL 표기입니다. `emitted`와 다를 때만 있습니다(제안 0070, D3).",
+    "members.type": "`typeKey`가 만드는 표기입니다: `vec4<f32>`, `array<f32>`, `texture_2d<f32>`.",
     "members.stages": "이 리소스에 닿는 진입점이 속한 스테이지입니다. 바인드 그룹 레이아웃의 visibility가 이를 지정합니다.",
     "members.layout": "버퍼의 바이트 레이아웃이며, `rule`을 따릅니다. 핸들에는 이 필드가 없습니다.",
     "members.noLayout": "버퍼에 호스트 레이아웃이 없는 이유입니다. `bool`이거나, 유니폼 안의 두 행짜리 행렬입니다.",

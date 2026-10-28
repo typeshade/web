@@ -8,6 +8,6 @@
     "parameters.layout": "유니폼 버퍼에는 `'std140'`, 스토리지 버퍼에는 `'std430'`을 씁니다.",
     "parameters.structs": "중첩된 구조체 타입 필드가 이름으로 참조할 수 있는 구조체들입니다. 기본값은 `struct` 자체만 담는 맵입니다.",
     "returns": "[`StructLayout`](/api/structlayout/)을 반환합니다.",
-    "exceptions.Error": "필드 타입에 바이트 레이아웃이 없는 경우(텍스처 또는 샘플러), 중첩된 구조체가 `structs`에 없는 경우, 또는 `mat2` 필드를 `'std140'`으로 계산하는 경우에 던진다([`LayoutKind`](/api/layoutkind/) 참조)."
+    "exceptions.Error": "필드 타입에 바이트 레이아웃이 없는 경우(텍스처 또는 샘플러), 중첩된 구조체가 `structs`에 없는 경우, 또는 `mat2` 필드를 `'std140'`으로 계산하는 경우에 던집니다([`LayoutKind`](/api/layoutkind/) 참조)."
   }
 }

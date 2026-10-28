@@ -174,25 +174,89 @@ try {
     exact: true,
   });
   await optimizer.focus();
+  await page.evaluate(() => {
+    window.__optimizerPopupMotionFinished = false;
+    const onAnimationEnd = (event) => {
+      if (
+        event.target.matches?.(".ant-select-dropdown") &&
+        /antSlide(?:Up|Down)In$/.test(event.animationName)
+      ) {
+        document.removeEventListener("animationend", onAnimationEnd, true);
+        window.__optimizerPopupMotionFinished = true;
+      }
+    };
+    document.addEventListener("animationend", onAnimationEnd, true);
+  });
   await page.keyboard.press("ArrowDown");
+  // rc-select schedules a post-open reset to the selected option. Wait for
+  // Ant's actual popup animation completion before moving the active option,
+  // so a delayed frame cannot hide the entrance state from the test.
+  await page.waitForFunction(() => window.__optimizerPopupMotionFinished);
   await page.waitForFunction(
-    () =>
-      document.querySelector('.ui-select input[aria-expanded="true"]') &&
-      document.querySelector(".ant-select-item-option-active"),
+    () => {
+      const input = document.querySelector(
+        '.ui-select input[aria-expanded="true"]',
+      );
+      const activeId = input?.getAttribute("aria-activedescendant");
+      const active = document.querySelector(
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option",
+      );
+      return (
+        input === document.activeElement &&
+        activeId === `${input?.getAttribute("aria-controls")}_0` &&
+        active?.textContent.trim() === "Adam"
+      );
+    },
   );
   await page.keyboard.press("ArrowDown");
   await page.waitForFunction(
-    () =>
-      document.querySelector(".ant-select-item-option-active")?.textContent ===
-      "SGD",
+    () => {
+      const input = document.querySelector(
+        '.ui-select input[aria-expanded="true"]',
+      );
+      const activeId = input?.getAttribute("aria-activedescendant");
+      const options = document.querySelectorAll(
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option",
+      );
+      return (
+        input === document.activeElement &&
+        activeId === `${input?.getAttribute("aria-controls")}_1` &&
+        options[1]?.textContent.trim() === "SGD"
+      );
+    },
+  );
+  assert.ok(
+    await optimizer.evaluate((input) => input === document.activeElement),
+    "The Optimizer control retains focus while navigating its options",
   );
   await page.keyboard.press("Enter");
-  // Keyboard dispatch can finish before React commits the selected value.
-  await page.waitForFunction(
-    () =>
-      document.querySelector('[data-testid="form-result"]')?.textContent
-        .includes("Optimizer: sgd"),
-  );
+  try {
+    // Keyboard dispatch can finish before React commits the selected value.
+    await page.waitForFunction(
+      () =>
+        document.querySelector('[data-testid="form-result"]')?.textContent
+          .includes("Optimizer: sgd"),
+    );
+  } catch (error) {
+    const state = await page.evaluate(() => {
+      const input = document.querySelector(".ui-select input[role=combobox]");
+      const option = document.querySelector(
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-active",
+      );
+      return {
+        focused: input === document.activeElement,
+        expanded: input?.getAttribute("aria-expanded"),
+        activeOption: option?.textContent.trim(),
+        value: document.querySelector(".ui-select .ant-select-selection-item")
+          ?.textContent,
+        result: document.querySelector('[data-testid="form-result"]')
+          ?.textContent,
+      };
+    });
+    throw new Error(
+      `Optimizer keyboard selection did not commit; control state: ${JSON.stringify(state)}. ${error}`,
+    );
+  }
   assert.match(
     await page.getByTestId("form-result").textContent(),
     /Optimizer: sgd/,

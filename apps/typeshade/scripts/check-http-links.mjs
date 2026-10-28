@@ -4,11 +4,14 @@
 //
 // Usage: node scripts/check-http-links.mjs [dist-dir]
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const dist = process.argv[2] ?? 'dist';
 const TIMEOUT_MS = 15000;
 const CONCURRENCY = 4;
+const appRoot = fileURLToPath(new URL('../', import.meta.url));
+const webRoot = resolve(appRoot, '../..');
 // The sandboxed-session signature, so a proxy refusal is never reported as a site defect.
 const PROXY_MARKERS = ['access is not enabled for this session', 'agentproxy'];
 
@@ -42,15 +45,23 @@ for (const file of files) {
 const urls = [...found.keys()].sort();
 console.log(`${urls.length} unique off-site URLs in ${dist}/`);
 
-// A link into this repository's own files on main (the edit links) resolves once the branch
-// merges; the file's presence in the working tree is the check, so a file this branch adds
-// never fails the build before it lands, and a link to a file that does not exist still does.
-const OWN_FILES = 'https://github.com/typeshade/typeshade.github.io/blob/main/';
+// A link into this repository's own files on main resolves against the web workspace. App links
+// use the app's source tree; a few shared links, such as the root deploy workflow, use the root.
+const OWN_FILES = [
+  {
+    prefix: 'https://github.com/typeshade/web/blob/main/apps/typeshade/',
+    root: appRoot,
+    strip: 'apps/typeshade/',
+  },
+  { prefix: 'https://github.com/typeshade/web/blob/main/', root: webRoot, strip: '' },
+];
 
 async function probe(url) {
-  if (url.startsWith(OWN_FILES)) {
-    const file = decodeURIComponent(url.slice(OWN_FILES.length).split('#')[0]);
-    return existsSync(file)
+  const own = OWN_FILES.find(({ prefix }) => url.startsWith(prefix));
+  if (own) {
+    const file = resolve(own.root, decodeURIComponent(url.slice(own.prefix.length).split('#')[0]));
+    const inside = relative(own.root, file).split(sep)[0] !== '..';
+    return inside && existsSync(file)
       ? { verdict: 'ok', status: 200 }
       : { verdict: 'BROKEN', status: 404, note: 'no such file in this repository' };
   }

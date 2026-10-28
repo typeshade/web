@@ -1,0 +1,113 @@
+---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
+import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import InlineTypeScript from "@typeshade/site-ui/astro/InlineTypeScript";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import CodeBlock from "../CodeBlock.astro";
+import { apiLifecycle } from "../../content/code-examples";
+import { apiPageCopy } from "../../content/api-page";
+import type { Locale } from "../../content/locale";
+import "../../styles/docs.css";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const copy = apiPageCopy[locale];
+const home = locale === "ko" ? "/ko/" : "/";
+const sourceLink = "https://github.com/typeshade/typenn/tree/main/src";
+---
+
+<SiteLayout
+  locale={locale}
+  active="api"
+  title={copy.title}
+  description={copy.description}
+>
+  <ReadingSurface class="nn-docs">
+    <article class="docs-article">
+      <Breadcrumbs aria-label="Breadcrumb">
+        <a href={home}>TypeNN</a>
+        <span>/</span>
+        <span>{copy.crumb}</span>
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">{copy.eyebrow}</Fragment>
+        <Fragment slot="title">{copy.heading}</Fragment>
+        <Fragment slot="description">{copy.intro}</Fragment>
+      </PageHeading>
+      <section class="doc-section">
+        <h2>{copy.lifecycle.heading}</h2>
+        <CodeBlock
+          title={copy.lifecycle.codeTitle}
+          file="device.ts"
+          code={apiLifecycle}
+        />
+        <ul class="api-list">
+          {copy.lifecycle.items.map((item) => (
+            <li>
+              <InlineTypeScript code={item.code} />
+              <span>{item.description}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.operations.heading}</h2>
+        <div class="api-columns">
+          {copy.operations.cards.map((card) => (
+            <div>
+              <h3>{card.heading}</h3>
+              <p>
+                {card.parts.map((part) =>
+                  part.kind === "break" ? (
+                    <br />
+                  ) : part.kind === "inline" ? (
+                    <InlineTypeScript code={part.value ?? ""} />
+                  ) : part.kind === "code" ? (
+                    <code>{part.value}</code>
+                  ) : (
+                    part.value
+                  ),
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.modules.heading}</h2>
+        <ul class="api-list">
+          {copy.modules.items.map((item) => (
+            <li>
+              {item.parts.map((part) =>
+                part.kind === "code" ? <code>{part.value}</code> : part.value,
+              )}
+              <span>
+                {typeof item.description === "string"
+                  ? item.description
+                  : item.description.map((part) =>
+                      part.kind === "code" ? (
+                        <code>{part.value}</code>
+                      ) : (
+                        part.value
+                      ),
+                    )}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p class="fine-print">
+          {copy.modules.note.map((part) =>
+            part.kind === "code" ? <code>{part.value}</code> : part.value,
+          )}
+        </p>
+        <p>
+          <TextLink href={sourceLink}>{copy.modules.sourceLink}</TextLink>
+        </p>
+      </section>
+    </article>
+  </ReadingSurface>
+</SiteLayout>

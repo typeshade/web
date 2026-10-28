@@ -1,0 +1,81 @@
+---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import LinkItem from "@typeshade/site-ui/astro/LinkItem";
+import LinkList from "@typeshade/site-ui/astro/LinkList";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
+import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import LinkButton from "@typeshade/site-ui/astro/LinkButton";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import CodeBlock from "../CodeBlock.astro";
+import { mnistModel } from "../../content/code-examples";
+import { examplesPageCopy } from "../../content/examples-page";
+import type { Locale } from "../../content/locale";
+import "../../styles/docs.css";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const copy = examplesPageCopy[locale];
+const home = locale === "ko" ? "/ko/" : "/";
+const playground = locale === "ko" ? "/ko/playground/" : "/playground/";
+---
+
+<SiteLayout
+  locale={locale}
+  active="examples"
+  title={copy.title}
+  description={copy.description}
+>
+  <ReadingSurface class="nn-docs">
+    <article class="docs-article">
+      <Breadcrumbs aria-label="Breadcrumb">
+        <a href={home}>TypeNN</a>
+        <span>/</span>
+        <span>{copy.crumb}</span>
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">{copy.eyebrow}</Fragment>
+        <Fragment slot="title">{copy.heading}</Fragment>
+        <Fragment slot="description">{copy.intro}</Fragment>
+      </PageHeading>
+      <section class="doc-section">
+        <h2>{copy.mnist.heading}</h2>
+        <p>{copy.mnist.description}</p>
+        <CodeBlock
+          title={copy.mnist.codeTitle}
+          file={copy.mnist.file}
+          code={mnistModel}
+        />
+        <p>
+          <TextLink href="https://github.com/typeshade/typenn/tree/main/examples/mnist">
+            {copy.mnist.sourceLabel}
+          </TextLink>
+        </p>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.operations.heading}</h2>
+        <p>{copy.operations.description}</p>
+        <LinkButton variant="primary" size="default" href={playground}>
+          {copy.operations.button + " "}
+          <span aria-hidden="true">→</span>
+        </LinkButton>
+      </section>
+      <section class="doc-section">
+        <h2>{copy.more.heading}</h2>
+        <LinkList class="link-list">
+          {copy.more.links.map((link) => (
+            <LinkItem href={link.href}>
+              <span>
+                <strong>{link.title}</strong>
+                <small>{link.description}</small>
+              </span>
+              <b>↗</b>
+            </LinkItem>
+          ))}
+        </LinkList>
+      </section>
+    </article>
+  </ReadingSurface>
+</SiteLayout>

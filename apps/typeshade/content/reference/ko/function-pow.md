@@ -1,7 +1,7 @@
 ---
 entry: function/pow
 sources: definition 2a9fd974f58f, exponent-curve 834fc48b6109, undefined-inputs 32e82b36e5c3, integer-exponents ebbbf953f4f6, accuracy 2225d454fb02, common-uses 5ef6084cb5bf, in-typeshade 7d3ceb5ae028, specifications f2a07aa3ee6f
-rules: 1.3 fcW4P8W5BFQ0loGi6vlLvaa1Is6dCmpQ_g9tbwMsfHM=, 7.2 onO98E-yRQ3RftA44lVmgPmSW7ZkCd7rYrJGgFS8EI4=
+rules: 1.3 fcW4P8W5BFQ0loGi6vlLvaa1Is6dCmpQ_g9tbwMsfHM=, 7.2 xGq0Nofxm1Jtgfkv9PIlY9amCnZ_OI5RVn_kbDUFg2U=
 ---
 
 ## 정의 {#definition}
@@ -26,7 +26,7 @@ rules: 1.3 fcW4P8W5BFQ0loGi6vlLvaa1Is6dCmpQ_g9tbwMsfHM=, 7.2 onO98E-yRQ3RftA44lV
 
 $0$과 $1$ 사이에서 `pow`는 입력에 비례하는 직선을 곡선으로 바꿉니다. 지수가 $1$보다 크면 곡선의 중간 부분이 직선 아래에 놓이고, $1$보다 작으면 위에 놓입니다. 모든 $k > 0$에서 $0^k = 0$, $1^k = 1$이므로 양 끝점은 변하지 않습니다. 셰이더에서는 이 성질로 $0$과 $1$ 사이의 값을 조절합니다.
 
-캔버스 아래 슬라이더는 지수를 조절합니다. 펼쳐서 확인할 수 있는 예제 코드는 TypeShade로 작성되어 있습니다. `uv`는 캔버스에서 $0$부터 $1$까지 변하는 좌표이고, `u.k`는 슬라이더가 설정하는 유니폼 값입니다. WGSL({{entry spelling.wgsl}})과 GLSL({{entry spelling.glsl}})에서 함수 이름은 모두 `pow`이입니다. 소스 언어의 대응 관계는 [GLSL에서 옮겨 오기](languageFromGlsl)에 정리되어 있습니다.
+캔버스 아래 슬라이더는 지수를 조절합니다. 펼쳐서 확인할 수 있는 예제 코드는 TypeShade로 작성되어 있습니다. `uv`는 캔버스에서 $0$부터 $1$까지 변하는 좌표이고, `u.k`는 슬라이더가 설정하는 유니폼 값입니다. WGSL({{entry spelling.wgsl}})과 GLSL({{entry spelling.glsl}})에서 함수 이름은 모두 `pow`입니다. 소스 언어의 대응 관계는 [GLSL에서 옮겨 오기](languageFromGlsl)에 정리되어 있습니다.
 
 <!-- live: reference-pow-curve
 title: 영과 일 사이의 pow(x, k) 곡선
@@ -105,7 +105,7 @@ TypeShade에서 `pow(x, 2)`를 컴파일한 WGSL은 {{compile int-literal}}, GLS
 
 구현은 다른 계산 방법으로 `pow`의 정확도를 높이거나 극단적인 입력을 더 넓게 처리할 수 있다([부동소수점 정확도](specWgslFloatAccuracy)). 이 경우에도 WGSL이 정한 `pow`의 정확도 기준은 위 식에서 정한 기준입니다.
 
-{{fact glslTarget}}에서는 정밀도 한정자도 표현 범위와 정밀도를 제한합니다. `mediump`가 보장해야 하는 범위는 $-2^{14}$부터 $2^{14}$까지이며, 상대 정밀도는 $2^{-10}$이입니다. $10^5$는 이 범위 밖이므로 `mediump`에서 `pow(10.0, 5.0)`는 오버플로가 발생할 수 있습니다. TypeShade가 생성하는 GLSL의 선언은 [정밀도 옵션](guideGlslFloatPrecision)이 `mediump`로 설정되지 않은 경우 {{compile glsl-precision}}입니다.
+{{fact glslTarget}}에서는 정밀도 한정자도 표현 범위와 정밀도를 제한합니다. `mediump`가 보장해야 하는 범위는 $-2^{14}$부터 $2^{14}$까지이며, 상대 정밀도는 $2^{-10}$입니다. $10^5$는 이 범위 밖이므로 `mediump`에서 `pow(10.0, 5.0)`는 오버플로가 발생할 수 있습니다. TypeShade가 생성하는 GLSL의 선언은 [정밀도 옵션](guideGlslFloatPrecision)이 `mediump`로 설정되지 않은 경우 {{compile glsl-precision}}입니다.
 
 $x \ge 0$에서 `sqrt(x)`는 $x^{1/2}$이고, `exp2(y)`는 $2^y$입니다. 두 함수에는 각각 별도의 정확도 규칙이 있습니다. `sqrt`는 {{accuracy sqrt}}이고 `exp2`는 위에서 설명한 오차 한계를 따릅니다.
 
@@ -123,10 +123,10 @@ $x \ge 0$에서 `sqrt(x)`는 $x^{1/2}$이고, `exp2(y)`는 $2^y$입니다. 두 �
 <!-- live: reference-pow-specular
 title: 구 위의 스페큘러 하이라이트
 caption: 광원 하나가 비추는 구. Blinn-Phong 하이라이트는 코사인을 shininess만큼 거듭제곱한 값입니다.
-anchor: 흰 점은 `highlight`이입니다. 법선 `n`과 `halfway` 사이 각도의 코사인을 `shininess`만큼 거듭제곱한 값입니다. $1$에 가까운 코사인은 $1$ 근처에 머물고, 이보다 작은 코사인은 $0$에 가까워집니다.
+anchor: 흰 점은 `highlight`입니다. 법선 `n`과 `halfway` 사이 각도의 코사인을 `shininess`만큼 거듭제곱한 값입니다. $1$에 가까운 코사인은 $1$ 근처에 머물고, 이보다 작은 코사인은 $0$에 가까워집니다.
 exercise: `shininess`가 조절 범위의 최솟값에서 최댓값으로 증가하면 하이라이트가 넓게 퍼진 빛에서 작은 점으로 줄어듭니다.
 exercise: `ball` 줄의 `diffuse`를 `pow(diffuse, 0.5)`로 바꾸면 음영의 경계가 어두운 쪽으로 이동합니다. 지수가 $1$보다 작으면 $0$과 $1$ 사이의 값이 커지기 때문입니다.
-exercise: `ball` 줄의 오른쪽을 `pow(…, vec3(1. / 2.2))`로 감싸면 구가 더 밝아집니다. 이 연산이 감마 인코딩입니다. 밑이 `vec3`이므로 스칼라 지수 `1. / 2.2`를 사용하면 컴파일러가 거부한다(아래 TypeShade에서).
+exercise: `ball` 줄의 오른쪽을 `pow(…, vec3(1. / 2.2))`로 감싸면 구가 더 밝아집니다. 이 연산이 감마 인코딩입니다. 밑이 `vec3`이므로 스칼라 지수 `1. / 2.2`를 사용하면 컴파일러가 거부합니다(아래 TypeShade에서).
 control light: 광원 위치
 control shininess: 지수
 -->

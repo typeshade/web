@@ -36,6 +36,7 @@ import { CODES, diagnose } from '../../vendor/shader-dsl/src/dev.ts';
 import { emitModule } from '../../vendor/shader-dsl/src/core/backends/wgsl.ts';
 import { emitGlslStages } from '../../vendor/shader-dsl/src/core/backends/glsl.ts';
 import { referenceProse } from './api.ts';
+import { editorialSourceText } from './editorial-source.ts';
 
 const ROOT = 'vendor/shader-dsl';
 const TS_FILE = 'src/compiler/ts/codes.ts';
@@ -497,10 +498,20 @@ function printable(code: RawCode): RawCode {
   // examples already print it (src/scripts/live-shader-compile.ts).
   const prose = (text: string): string =>
     referenceProse(text).replace(/\bshader-dsl\b/g, 'typeshade');
+  // The registry's old source-file fragment has no target. Keep the compiler's diagnostic
+  // intact; the documentation hint links to the corresponding published guide instead.
+  const hint = code.code === 'SD0030'
+    ? editorialSourceText(
+        code.hint ?? '',
+        'AUTHORING.md#capabilities--extensions',
+        '[Capabilities and extensions](authoringCapabilities)',
+        'SD0030 documentation hint',
+      )
+    : code.hint;
   return {
     ...code,
     docs: code.docs.map(prose).filter((p) => p.length > 0),
-    hint: code.hint ? prose(code.hint) : '',
+    hint: hint ? prose(hint) : '',
   };
 }
 
@@ -676,17 +687,22 @@ export function main(@location(0) uv: vec2): vec4 {
   },
   TS8003: {
     trigger: `"use typeshade"
-
+function gain(value: f32 | null | undefined): f32 {
+  return value * 2.
+}
 @fragment
 export function main(@location(0) uv: vec2): vec4 {
-  return vec4(uv + vec3(0.5, 0.5, 0.5), 1.)
+  return vec4(uv, gain(null), 1.)
 }
 `,
     fix: `"use typeshade"
-
+function gain(value: f32 | null | undefined): f32 {
+  if (value == null) { return 0. }
+  return value * 2.
+}
 @fragment
 export function main(@location(0) uv: vec2): vec4 {
-  return vec4(vec3(uv, 0.) + vec3(0.5, 0.5, 0.5), 1.)
+  return vec4(uv, gain(null), 1.)
 }
 `,
   },
@@ -1023,24 +1039,24 @@ export function main(@location(0) uv: vec2): vec4 {
   TS8020: {
     trigger: `"use typeshade"
 
-function shade(x?: f32): f32 {
-  return 0.5
+function shade(x?: f32, y: f32): f32 {
+  return (x ?? 0.5) * y
 }
 
 @fragment
 export function main(@location(0) uv: vec2): vec4 {
-  return vec4(uv, shade(uv.x), 1.)
+  return vec4(uv, shade(uv.x, uv.y), 1.)
 }
 `,
     fix: `"use typeshade"
 
-function shade(x: f32 = 0.5): f32 {
-  return x
+function shade(y: f32, x?: f32): f32 {
+  return (x ?? 0.5) * y
 }
 
 @fragment
 export function main(@location(0) uv: vec2): vec4 {
-  return vec4(uv, shade(uv.x), 1.)
+  return vec4(uv, shade(uv.y, uv.x), 1.)
 }
 `,
   },

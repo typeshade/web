@@ -1,0 +1,36 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<section
+  aria-labelledby="front-title"
+  class="front-hero grid gap-7 py-12 sm:py-16 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-end lg:gap-14 lg:py-24"
+>
+  <h1
+    id="front-title"
+    class="m-0 text-[clamp(2.5rem,5.4vw,5rem)] font-semibold leading-[1.08] tracking-[-0.055em]"
+  >
+    {title}
+  </h1>
+  <div class="max-inline-[44ch] lg:pbe-1">
+    <div class="text-[17px] leading-[1.7] text-text-2">
+      <slot />
+    </div>
+    <div class="mbs-7 flex flex-wrap gap-3">
+      <slot name="actions" />
+    </div>
+    <div class="mbs-5 text-ui">
+      <slot name="more" />
+    </div>
+  </div>
+</section>
+
+<style>
+  h1:lang(ko) {
+    letter-spacing: -0.045em;
+    line-height: 1.15;
+  }
+</style>

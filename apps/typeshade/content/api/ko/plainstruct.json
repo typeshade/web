@@ -3,9 +3,9 @@
   "source": "90e323eba489628d45a1a25d779111ccad5bb487b28b94fdcc3a9f51f32b6655",
   "texts": {
     "summary": "structDecl이 돌려주는 핸들입니다. 스테이지의 IO 경계가 아닌 용도로 선언한 구조체를 나타냅니다. 예를 들어 스토리지 버퍼 요소 타입(storageBuffer와 함께 쓴다)이나 다른 구조체 안에 중첩된 구조체가 여기에 해당합니다.",
-    "description": "필드는 `@location`이나 `@builtin` 속성이 없는 평범한 `ShaderType`이입니다. 이 속성을 가진 짝은 [`IoStruct`](/api/iostruct-interface/)입니다. 형태는 `IoStruct`와 같다(`.decl`, `.type`, `.of`, `.var`, `.construct`). 여기에 위치 인자로 필드를 읽는 `.get(node, field)`가 더 있습니다.",
+    "description": "필드는 `@location`이나 `@builtin` 속성이 없는 평범한 `ShaderType`입니다. 이 속성을 가진 짝은 [`IoStruct`](/api/iostruct-interface/)입니다. 형태는 `IoStruct`와 같습니다(`.decl`, `.type`, `.of`, `.var`, `.construct`). 여기에 위치 인자로 필드를 읽는 `.get(node, field)`가 더 있습니다.",
     "members.decl": "구조체 선언입니다. `module({ structs })`에 넘깁니다.",
-    "members.type": "구조체의 `ShaderType`이입니다. 이름을 리터럴로 담으므로, 이 핸들로 만든 모든 값은 [`typeKey`](/api/typekey/)가 만드는 정확한 `struct:${N}` 키를 가집니다.",
+    "members.type": "구조체의 `ShaderType`입니다. 이름을 리터럴로 담으므로, 이 핸들로 만든 모든 값은 [`typeKey`](/api/typekey/)가 만드는 정확한 `struct:${N}` 키를 가집니다.",
     "members.of": "원시 노드로 들고 있는 구조체 값을 타입이 지정된 필드로 접근합니다. 예: `Seg.of(someNode).p0`. 스토리지 버퍼 요소에는 이 접근이 필요하지 않습니다. `buf.at(i)`가 이미 이 프록시를 돌려주기 때문입니다. 이 뷰의 쓰기 권한은 기반을 따릅니다. 변경 가능한 기반이면 `Node` 필드를, 읽기 전용 기반이면 `ReadonlyNode` 필드를 줍니다. `.$`는 원시 구조체 값이며, 구조체를 받는 함수에 넘길 수 있습니다.",
     "members.get": "위치 인자 방식의 필드 접근입니다. `Seg.get(node, 'p0')`는 `Seg.of(node).p0`와 같은 읽기입니다. 잘못된 필드 이름은 `tsc` 오류가 됩니다. `const g = Seg.get`처럼 축약 이름 하나로 여러 필드를 읽는 호출 지점에 알맞습니다. 읽기 접근자이며 `ReadonlyNode`를 반환합니다.",
     "members.var": "이 구조체의 `var`를 선언하고, `IoStruct.var`와 같은 방식으로 타입이 지정된 변경 가능한 필드 프록시를 반환합니다.",

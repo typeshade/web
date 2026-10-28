@@ -26,7 +26,7 @@ export function ringMask(uv: vec2, radius: f32): f32 {
 `compile()`은 이 소스를 읽어 모듈과 출력을 반환합니다.
 
 - `wgsl`은 WebGPU가 받는 셰이딩 언어인 WGSL입니다.
-- `glsl`은 `{ vertex, fragment }`이입니다. 버텍스 진입점과 프래그먼트 진입점이 있는 모듈에서
+- `glsl`은 `{ vertex, fragment }`입니다. 버텍스 진입점과 프래그먼트 진입점이 있는 모듈에서
   WebGL2용 GLSL ES 3.00 소스를 담습니다.
 - `module`은 컴파일된 모듈입니다. 패키지의 다른 호출은 이 모듈을 읽습니다.
 - `diagnostics`는 모든 오류와 경고를 코드, 줄, 열과 함께 나열합니다.
@@ -92,7 +92,7 @@ import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typ
   JSON Schema와, 값을 작성자가 쓴 셰이더 타입으로 보여 주는 포매터도 있습니다. 편집기의 디버그
   어댑터와 Playground의 단계 실행 패널이 모두 이 경로를 바탕으로 만들어졌습니다.
   `docs/debugging.md`를 참고합니다.
-- `typeshade/core/ir`은 IR 빌더이다. 소스를 컴파일하지 않고 코드로 모듈을 조립하는 엔진이나
+- `typeshade/core/ir`은 IR 빌더입니다. 소스를 컴파일하지 않고 코드로 모듈을 조립하는 엔진이나
   도구가 씁니다. 1.0 전까지는 안정성을 약속하지 않으며, 이 가이드는 IR 빌더를 쓰지 않습니다.
   사용법은 [`docs/ir-builder.md`](docs/ir-builder.md)에 있습니다.
 

@@ -1,13 +1,8 @@
 ---
 import './SiteHeader.css';
 import NavLink from '@typeshade/site-ui/astro/NavLink';
-// The bar at the top of every page: the mark and the name; Guide and Examples; then search,
-// the language menu, the dark-mode switch and GitHub as icons. Under 64rem the nav, the version
-// and language menus and the dark-mode switch sit in a panel behind a menu button, but the
-// magnifier stays in the bar so search is one tap either way. Every menu (version, language,
-// the phone panel) is a details element; the script below keeps only one open at a
-// time and closes them on Escape and an outside click. The bar is out of the search index, so
-// a hit is a hit in the page's own text.
+// Primary destinations sit beside the brand; search and preferences sit at the far edge.
+// Native disclosures keep the same destinations available on narrow screens.
 import { MARK } from '../lib/mark.ts';
 import { links, navLinks } from '../lib/links.ts';
 import { facts } from '../lib/examples.ts';
@@ -23,73 +18,191 @@ const { locale, path, switchTarget } = Astro.props;
 const t = copyFor(locale);
 // The menu lists every language, the current one first and not as a link, the way VitePress
 // and the MDN language menu mark the page you are on.
-const languages = locales.map((l) => ({ locale: l, href: switchTarget?.[l] ?? localePath(l, path), label: copyFor(l).name, current: l === locale }));
+const languages = locales.map((l) => ({
+  locale: l,
+  href: switchTarget?.[l] ?? localePath(l, path),
+  label: copyFor(l).name,
+  current: l === locale,
+}));
 const others = languages.filter((l) => !l.current);
 const ordered = [...languages.filter((l) => l.current), ...others];
+const navigation = navLinks(locale);
+const groups = ['learn', 'build'] as const;
+const currentHref = localePath(locale, path);
+const activeLink =
+  [...navigation]
+    .sort((a, b) => b.href.length - a.href.length)
+    .find((link) => currentHref.startsWith(link.href)) ??
+  (path.startsWith('/guide/') || path.startsWith('/api/') ? navigation[0] : undefined);
 ---
 
 <header class="site-header" data-pagefind-ignore>
-  <div class="site-header-in">
-    <a class="site-name" href={localePath(locale, '/')}>
+  <div class="site-header-in flex h-(--nav-height) max-inline-(--container) items-center gap-6 mx-auto px-(--gutter-x) min-[72rem]:gap-10">
+    <a class="site-name shrink-0" href={localePath(locale, '/')}>
       <img src={MARK.src} alt="" width="28" height="28" />
       TypeShade
     </a>
 
-    <div class="site-bar">
-      <nav class="site-nav" aria-label={t.nav.primary}>
-        {navLinks(locale).map((l) => <NavLink href={l.href} active={path === l.href}>{l.label}</NavLink>)}
+    <div class="site-bar hidden min-w-0 flex-1 items-center justify-between gap-6 min-[64rem]:flex">
+      <nav class="site-nav flex shrink-0 items-center gap-5" aria-label={t.nav.primary}>
+        {groups.map((group) => (
+          <div
+            class:list={[
+              'site-nav-group flex items-center gap-5',
+              group === 'build' && 'border-s border-line-1 ps-5',
+            ]}
+          >
+            {navigation
+              .filter((link) => link.group === group)
+              .map((link) => (
+                <NavLink href={link.href} active={link === activeLink}>
+                  {link.label}
+                </NavLink>
+              ))}
+          </div>
+        ))}
       </nav>
-      <div class="site-tools">
+      <div class="site-tools ms-auto flex shrink-0 items-center gap-1 border-s border-line-1 ps-4">
         <button class="site-search" type="button" aria-label={t.nav.search} data-search-open>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" /><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="m16.2 16.2 4 4" /></svg>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              d="m16.2 16.2 4 4"
+            />
+          </svg>
           <span class="site-search-label">{t.nav.search}</span>
         </button>
         <details class="site-menu-drop site-version">
           <summary aria-label={`${t.nav.version} v${facts.mirrorVersion}`}>
             <span>v{facts.mirrorVersion}</span>
-            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m6 9 6 6 6-6"
+              />
+            </svg>
           </summary>
           <ul class="site-drop-list">
-            <li><span class="site-drop-note">{t.nav.prerelease}</span></li>
-            <li><a href={links.releases.href}>{t.nav.releases}</a></li>
-            <li><a href={links.changelog.href}>{t.nav.changelog}</a></li>
-            <li><a href={links.commit.href}>{t.nav.commit} {facts.pinnedCommit}</a></li>
+            <li>
+              <span class="site-drop-note">{t.nav.prerelease}</span>
+            </li>
+            <li>
+              <a href={links.releases.href}>{t.nav.releases}</a>
+            </li>
+            <li>
+              <a href={links.changelog.href}>{t.nav.changelog}</a>
+            </li>
+            <li>
+              <a href={links.commit.href}>
+                {t.nav.commit} {facts.pinnedCommit}
+              </a>
+            </li>
           </ul>
         </details>
         <details class="site-menu-drop site-lang">
           <summary aria-label={t.nav.languages}>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm7.93 9h-3.02a15.7 15.7 0 0 0-1.3-5.36A8.03 8.03 0 0 1 19.93 11ZM12 4.07c.9 1.2 1.9 3.5 2.2 6.93H9.8c.3-3.43 1.3-5.73 2.2-6.93ZM4.07 13h3.02c.14 1.98.6 3.8 1.3 5.36A8.03 8.03 0 0 1 4.07 13Zm3.02-2H4.07a8.03 8.03 0 0 1 4.32-5.36A15.7 15.7 0 0 0 7.09 11ZM12 19.93c-.9-1.2-1.9-3.5-2.2-6.93h4.4c-.3 3.43-1.3 5.73-2.2 6.93Zm3.61-1.57c.7-1.56 1.16-3.38 1.3-5.36h3.02a8.03 8.03 0 0 1-4.32 5.36Z" /></svg>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                fill="currentColor"
+                d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm7.93 9h-3.02a15.7 15.7 0 0 0-1.3-5.36A8.03 8.03 0 0 1 19.93 11ZM12 4.07c.9 1.2 1.9 3.5 2.2 6.93H9.8c.3-3.43 1.3-5.73 2.2-6.93ZM4.07 13h3.02c.14 1.98.6 3.8 1.3 5.36A8.03 8.03 0 0 1 4.07 13Zm3.02-2H4.07a8.03 8.03 0 0 1 4.32-5.36A15.7 15.7 0 0 0 7.09 11ZM12 19.93c-.9-1.2-1.9-3.5-2.2-6.93h4.4c-.3 3.43-1.3 5.73-2.2 6.93Zm3.61-1.57c.7-1.56 1.16-3.38 1.3-5.36h3.02a8.03 8.03 0 0 1-4.32 5.36Z"
+              />
+            </svg>
             <span class="site-lang-current">{t.name}</span>
-            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" /></svg>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m6 9 6 6 6-6"
+              />
+            </svg>
           </summary>
           <ul class="site-drop-list">
             {ordered.map((l) => (
               <li>
                 {l.current ? (
                   <span class="site-drop-current" aria-current="true" lang={l.locale}>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4 10-10" /></svg>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m5 13 4 4 10-10"
+                      />
+                    </svg>
                     {l.label}
                   </span>
                 ) : (
-                  <a href={l.href} hreflang={l.locale} lang={l.locale}>{l.label}</a>
+                  <a href={l.href} hreflang={l.locale} lang={l.locale}>
+                    {l.label}
+                  </a>
                 )}
               </li>
             ))}
           </ul>
         </details>
-        <button class="site-theme" type="button" aria-label={t.nav.theme} aria-pressed="false" data-theme-toggle>
-          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" /></svg>
-          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" /></svg>
+        <button
+          class="site-theme"
+          type="button"
+          aria-label={t.nav.theme}
+          aria-pressed="false"
+          data-theme-toggle
+        >
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"
+            />
+            <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+          </svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linejoin="round"
+              d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"
+            />
+          </svg>
         </button>
         <a class="site-social" href={links.mirror.href} aria-label={t.nav.github}>
-          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" /></svg>
+          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path
+              fill="currentColor"
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+            />
+          </svg>
         </a>
       </div>
     </div>
 
-    <div class="site-mobile-tools">
+    <div class="site-mobile-tools ms-auto flex items-center gap-1 min-[64rem]:hidden">
       <button class="site-search-phone" type="button" aria-label={t.nav.search} data-search-open>
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" /><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="m16.2 16.2 4 4" /></svg>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            d="m16.2 16.2 4 4"
+          />
+        </svg>
       </button>
       <details class="site-menu">
         <summary aria-label={t.nav.menu}>
@@ -99,7 +212,17 @@ const ordered = [...languages.filter((l) => l.current), ...others];
         </summary>
         <div class="site-screen">
           <nav aria-label={t.nav.menu}>
-            {navLinks(locale).map((l) => <NavLink href={l.href} active={path === l.href}>{l.label}</NavLink>)}
+            {groups.map((group) => (
+              <div class="site-screen-group">
+                {navigation
+                  .filter((link) => link.group === group)
+                  .map((link) => (
+                    <NavLink href={link.href} active={link === activeLink}>
+                      {link.label}
+                    </NavLink>
+                  ))}
+              </div>
+            ))}
             <a href={links.mirror.href}>{t.nav.github}</a>
           </nav>
           <div class="site-screen-row">
@@ -108,18 +231,49 @@ const ordered = [...languages.filter((l) => l.current), ...others];
               v{facts.mirrorVersion}
               <a href={links.releases.href}>{t.nav.releases}</a>
               <a href={links.changelog.href}>{t.nav.changelog}</a>
-              <a href={links.commit.href} aria-label={`${t.nav.commit} ${facts.pinnedCommit}`}>{facts.pinnedCommit}</a>
+              <a href={links.commit.href} aria-label={`${t.nav.commit} ${facts.pinnedCommit}`}>
+                {facts.pinnedCommit}
+              </a>
             </span>
           </div>
           <div class="site-screen-row">
             <span>{t.nav.languages}</span>
-            <span class="site-screen-langs">{others.map((l) => <a href={l.href} hreflang={l.locale} lang={l.locale}>{l.label}</a>)}</span>
+            <span class="site-screen-langs">
+              {others.map((l) => (
+                <a href={l.href} hreflang={l.locale} lang={l.locale}>
+                  {l.label}
+                </a>
+              ))}
+            </span>
           </div>
           <div class="site-screen-row">
             <span>{t.nav.theme}</span>
-            <button class="site-theme" type="button" aria-label={t.nav.theme} aria-pressed="false" data-theme-toggle>
-              <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" /></svg>
-              <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" /></svg>
+            <button
+              class="site-theme"
+              type="button"
+              aria-label={t.nav.theme}
+              aria-pressed="false"
+              data-theme-toggle
+            >
+              <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"
+                />
+                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+              </svg>
+              <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                  d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"
+                />
+              </svg>
             </button>
           </div>
         </div>
@@ -128,31 +282,34 @@ const ordered = [...languages.filter((l) => l.current), ...others];
   </div>
 </header>
 
-    <script is:inline>
-      function themeIsDark() {
-        return document.documentElement.dataset.theme
-          ? document.documentElement.dataset.theme === 'dark'
-          : matchMedia('(prefers-color-scheme: dark)').matches;
-      }
-      function syncThemeButtons() {
-        const dark = themeIsDark();
-        for (const b of document.querySelectorAll('[data-theme-toggle]')) {
-          b.setAttribute('aria-pressed', dark ? 'true' : 'false');
-        }
-      }
+<script is:inline>
+  function themeIsDark() {
+    return document.documentElement.dataset.theme
+      ? document.documentElement.dataset.theme === 'dark'
+      : matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function syncThemeButtons() {
+    const dark = themeIsDark();
+    for (const b of document.querySelectorAll('[data-theme-toggle]')) {
+      b.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    }
+  }
+  syncThemeButtons();
+  for (const b of document.querySelectorAll('[data-theme-toggle]'))
+    b.addEventListener('click', () => {
+      const next = themeIsDark() ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch {}
       syncThemeButtons();
-      for (const b of document.querySelectorAll('[data-theme-toggle]')) b.addEventListener('click', () => {
-        const next = themeIsDark() ? 'light' : 'dark';
-        document.documentElement.dataset.theme = next;
-        try { localStorage.setItem('theme', next); } catch {}
-        syncThemeButtons();
-      });
-      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        if (!document.documentElement.dataset.theme) syncThemeButtons();
-      });
-    </script>
-    <script>
-      import { bindDisclosureMenus } from '@typeshade/site-ui/dom/menus';
-      const menus = [...document.querySelectorAll<HTMLDetailsElement>('.site-menu-drop, .site-menu')];
-      bindDisclosureMenus(menus, document.querySelector<HTMLDetailsElement>('.site-menu') ?? undefined);
-    </script>
+    });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (!document.documentElement.dataset.theme) syncThemeButtons();
+  });
+</script>
+<script>
+  import { bindDisclosureMenus } from '@typeshade/site-ui/dom/menus';
+  const menus = [...document.querySelectorAll<HTMLDetailsElement>('.site-menu-drop, .site-menu')];
+  bindDisclosureMenus(menus, document.querySelector<HTMLDetailsElement>('.site-menu') ?? undefined);
+</script>

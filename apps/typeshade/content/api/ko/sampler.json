@@ -2,8 +2,8 @@
   "slug": "sampler",
   "source": "81396cf22f7191e4ce2b9656ad7af17fd327b93a49117d02ef20d9be6ca68a09",
   "texts": {
-    "summary": "런타임이 이름으로 바인딩하는 샘플러이입니다.",
+    "summary": "런타임이 이름으로 바인딩하는 샘플러입니다.",
     "description": "`sampler`는 `GPUSampler` 자체입니다.",
-    "members.sampler": "탈출구(Rule 11.17)입니다. 이 샘플러가 가진 `GPUSampler` 또는 `WebGLSampler`이입니다."
+    "members.sampler": "탈출구(Rule 11.17)입니다. 이 샘플러가 가진 `GPUSampler` 또는 `WebGLSampler`입니다."
   }
 }

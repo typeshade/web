@@ -1,0 +1,479 @@
+{
+  "format": "typecv-remote-videos-v1",
+  "bucket": "typecv-samples",
+  "license": "https://www.pexels.com/license/",
+  "checked": "2026-10-20",
+  "videos": [
+    {
+      "id": "pyramid-dense",
+      "title": "Pyramid video",
+      "creator": "Blanka OG",
+      "page": "https://www.pexels.com/video/drone-footage-of-a-pyramid-8134952/",
+      "file": "https://videos.pexels.com/video-files/8134952/8134952-uhd_3840_2160_24fps.mp4",
+      "duration": 23.606917,
+      "description": {
+        "en": "Drone footage over a pyramid, two frames per second. Blanka OG, Pexels.",
+        "ko": "피라미드 위를 나는 드론 영상, 초당 2프레임. Blanka OG, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 68501042,
+        "sha256": "c79321c99c8ba1898e858a8270292a51868f8c3ebef7c489b763e1ff111e5200",
+        "videoId": "9f3839906a8d9243",
+        "width": 3840,
+        "height": 2160,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "canyon",
+      "title": "Desert canyon video",
+      "creator": "Florian Delée",
+      "page": "https://www.pexels.com/video/aerial-view-of-rugged-desert-canyon-28916956/",
+      "file": "https://videos.pexels.com/video-files/28916956/12515767_3840_2160_60fps.mp4",
+      "duration": 26.8268,
+      "description": {
+        "en": "Drone footage over a rugged desert canyon. Florian Delée, Pexels.",
+        "ko": "사막 협곡 위를 나는 드론 영상. Florian Delée, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 217991610,
+        "sha256": "73382f1ff25fee064d753c385359b120e5f82fe114bd690d575f0160afef87f8",
+        "videoId": "d6275c157e321c70",
+        "width": 3840,
+        "height": 2160,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "bridge-rocks",
+      "title": "Bridge and rock formations video",
+      "creator": "cottonbro studio",
+      "page": "https://www.pexels.com/video/a-drone-footage-of-a-bridge-and-a-rock-formations-9904227/",
+      "file": "https://videos.pexels.com/video-files/9904227/9904227-uhd_3840_2160_30fps.mp4",
+      "duration": 19.1191,
+      "description": {
+        "en": "Drone footage over a bridge and rock formations. cottonbro studio, Pexels.",
+        "ko": "다리와 암석 지형 위를 나는 드론 영상. cottonbro studio, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 59873575,
+        "sha256": "90b979680e725be81eb6dc0b95804a218c397cdf9c0adc34015892f1ed7c6c09",
+        "videoId": "abdafbabf62bc71b",
+        "width": 3840,
+        "height": 2160,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "desert-arch",
+      "title": "Desert arch video",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/stunning-aerial-view-of-natural-desert-arch-34493773/",
+      "file": "https://videos.pexels.com/video-files/34493773/14615418_1920_1080_60fps.mp4",
+      "duration": 11.66165,
+      "description": {
+        "en": "Drone footage around a natural desert arch. EJ Merl, Pexels.",
+        "ko": "천연 사막 아치 주변을 나는 드론 영상. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 17638677,
+        "sha256": "0dff1d739135401a0548e9cb3dbad7e52d7e21c227ad0470794ffa5c5e6e45f9",
+        "videoId": "650b7274fa2ae1ab",
+        "width": 1920,
+        "height": 1080,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "water-tower",
+      "title": "Water tower video",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-drone-footage-of-midwest-water-tower-33341651/",
+      "file": "https://videos.pexels.com/video-files/33341651/14197361_2560_1440_60fps.mp4",
+      "duration": 21.4214,
+      "description": {
+        "en": "Drone footage around a water tower. EJ Merl, Pexels.",
+        "ko": "급수탑 주변을 나는 드론 영상. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 55845314,
+        "sha256": "8ad73ea2b235dc860a4243de9f9cfbbdbb47a0522b220d9bdf57b6ebe65fb42b",
+        "videoId": "1e84be33bb6851ba",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "devils-slide",
+      "title": "Devil's Slide video",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-view-of-stunning-devils-slide-rock-formation-32591292/",
+      "file": "https://videos.pexels.com/video-files/32591292/13898486_3840_2160_60fps.mp4",
+      "duration": 17.966667,
+      "description": {
+        "en": "Drone footage over the Devil's Slide rock formation. EJ Merl, Pexels.",
+        "ko": "데블스 슬라이드 암석 지형 위를 나는 드론 영상. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 143077505,
+        "sha256": "9d782f17bf5dd911423b593e8d5a4b67069018796e43222d9965f2fdbc8319d2",
+        "videoId": "e8608a55b3aca42a",
+        "width": 3840,
+        "height": 2160,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "colorado-rock",
+      "title": "Colorado rock formation video",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-view-of-southwest-colorado-rock-formation-32332986/",
+      "file": "https://videos.pexels.com/video-files/32332986/13792946_3840_2160_30fps.mp4",
+      "duration": 29.7297,
+      "description": {
+        "en": "Drone footage over a rock formation in southwest Colorado. EJ Merl, Pexels.",
+        "ko": "콜로라도 남서부 암석 지형 위를 나는 드론 영상. EJ Merl, Pexels."
+      },
+      "set": "chimney-rock",
+      "group": "B",
+      "source": {
+        "file": "source.mp4",
+        "bytes": 81392514,
+        "sha256": "1d30fe34f14cc0d429b3fc04a76c5f34e67f1ed6e962b321f0c4843626f8a3a8",
+        "videoId": "0e9df5abcc8d1450",
+        "width": 3840,
+        "height": 2160,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "desert-monument",
+      "title": "Desert rock formation video",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-view-of-monumental-desert-rock-formation-32292001/",
+      "file": "https://videos.pexels.com/video-files/32292001/13770737_3840_2160_60fps.mp4",
+      "duration": 19.5,
+      "description": {
+        "en": "Drone footage over a monumental desert rock formation. EJ Merl, Pexels.",
+        "ko": "거대한 사막 암석 지형 위를 나는 드론 영상. EJ Merl, Pexels."
+      },
+      "set": "chimney-rock",
+      "group": "A",
+      "source": {
+        "file": "source.mp4",
+        "bytes": 76744596,
+        "sha256": "41e3f8fea413fa9f8a945f2952976b17fd7fcdb9b42684eeef57cf0facec6e6a",
+        "videoId": "c68b30c87d721199",
+        "width": 3840,
+        "height": 2160,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32291999",
+      "title": "Chimney Rock video A1",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/majestic-drone-view-of-chimney-rock-formation-32291999/",
+      "file": "https://videos.pexels.com/video-files/32291999/13770742_2560_1440_60fps.mp4",
+      "duration": 26.583333,
+      "set": "chimney-rock",
+      "group": "A",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group A, video 1. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 A, 1번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 35327517,
+        "sha256": "a886675ec2ec6161e1bf1bfe408d5aec6bf3c4619b43963c6820f445100a9882",
+        "videoId": "ebf93c2c8d64ad1e",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32292000",
+      "title": "Chimney Rock video A2",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/stunning-drone-footage-of-desert-rock-formation-32292000/",
+      "file": "https://videos.pexels.com/video-files/32292000/13770720_2560_1440_60fps.mp4",
+      "duration": 15.933333,
+      "set": "chimney-rock",
+      "group": "A",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group A, video 2. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 A, 2번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 19823416,
+        "sha256": "cd20ad4d4fc1b20ab71343471087466c0ec70750cd17c03dba0b50046aaf6da7",
+        "videoId": "8d4931ceb564d46a",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32292002",
+      "title": "Chimney Rock video A4",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/drone-footage-of-chimney-rock-formation-32292002/",
+      "file": "https://videos.pexels.com/video-files/32292002/13770730_2560_1440_60fps.mp4",
+      "duration": 25.533333,
+      "set": "chimney-rock",
+      "group": "A",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group A, video 4. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 A, 4번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 36014598,
+        "sha256": "49014fafd95d911af3bee53229ca6d04c9799f906803e4336e34bd65fc6f7268",
+        "videoId": "db2be5bd4da79cbb",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332978",
+      "title": "Chimney Rock video B1",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/stunning-aerial-view-of-chimney-rock-formation-32332978/",
+      "file": "https://videos.pexels.com/video-files/32332978/13792915_2560_1440_30fps.mp4",
+      "duration": 20.02,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 1. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 1번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 24224089,
+        "sha256": "c5480fd286a7b03adf6f8f42fc744da7cc24e9401552f555640ad7b4c6d5ff67",
+        "videoId": "9101aef9af504eeb",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332979",
+      "title": "Chimney Rock video B2",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-view-of-majestic-rock-formation-in-colorado-32332979/",
+      "file": "https://videos.pexels.com/video-files/32332979/13792933_2560_1440_30fps.mp4",
+      "duration": 15.015,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 2. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 2번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 10809314,
+        "sha256": "de0975912aeaccbc9eba8b4f51315564277e521929f03e81f31a93389ba87b26",
+        "videoId": "61133095aeed5898",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332980",
+      "title": "Chimney Rock video B3",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-view-of-southwest-colorado-rock-formations-32332980/",
+      "file": "https://videos.pexels.com/video-files/32332980/13792921_2560_1440_30fps.mp4",
+      "duration": 15.015,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 3. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 3번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 13004160,
+        "sha256": "a963b0d7f50cc74346e08f59eaed4bf3dbe64e11358b0c287c44618633a98a92",
+        "videoId": "5de99f07a09523e8",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332981",
+      "title": "Chimney Rock video B4",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-drone-footage-of-dramatic-rock-formation-32332981/",
+      "file": "https://videos.pexels.com/video-files/32332981/13792927_2560_1440_30fps.mp4",
+      "duration": 20.02,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 4. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 4번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 17168721,
+        "sha256": "bc1adf27fa36a902940f9c2df30e7d2501e9510da2e834a9b0567abf2ad80d1c",
+        "videoId": "06c4662657c6f59d",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332982",
+      "title": "Chimney Rock video B5",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/drone-footage-of-chimney-rock-in-colorado-desert-32332982/",
+      "file": "https://videos.pexels.com/video-files/32332982/13792951_2560_1440_30fps.mp4",
+      "duration": 34.2342,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 5. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 5번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 38420854,
+        "sha256": "0eb67896f11b38267ef41b38a4dd3961e9a0ef2373732e4eb874a4422397d7f8",
+        "videoId": "e1b7e361d62a7376",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332983",
+      "title": "Chimney Rock video B6",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-view-of-rugged-rock-formations-in-colorado-32332983/",
+      "file": "https://videos.pexels.com/video-files/32332983/13792797_2560_1440_30fps.mp4",
+      "duration": 10.3103,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 6. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 6번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 11696735,
+        "sha256": "ad50d91682c3cee457731832b8cd2bd5690a9eed94038529703a1d8ce690ae7d",
+        "videoId": "6ebc54a3c22f4bd7",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332984",
+      "title": "Chimney Rock video B7",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-view-of-monumental-rock-formation-in-colorado-32332984/",
+      "file": "https://videos.pexels.com/video-files/32332984/13792803_2560_1440_30fps.mp4",
+      "duration": 10.8108,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 7. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 7번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 11007934,
+        "sha256": "01cd9ced28bc922c044c1f7dedea731fe750110cd9315e7a7abb887de745c6ee",
+        "videoId": "8c8ab64ed2a4e8e7",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332985",
+      "title": "Chimney Rock video B8",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/drone-footage-of-rocky-desert-landscape-32332985/",
+      "file": "https://videos.pexels.com/video-files/32332985/13792939_2560_1440_30fps.mp4",
+      "duration": 22.022,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 8. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 8번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 24465542,
+        "sha256": "551cd6f2e249365ccaae29b053e85ca44710d036d2a939a7d6aff24a772e9ab2",
+        "videoId": "9f6bd1a1869f2014",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332987",
+      "title": "Chimney Rock video B10",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/aerial-view-of-majestic-colorado-rock-formations-32332987/",
+      "file": "https://videos.pexels.com/video-files/32332987/13792779_2560_1440_30fps.mp4",
+      "duration": 10.777433,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 10. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 10번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 12387270,
+        "sha256": "4264470190c1cc7c8ff865b3517c34af12528f433942b868add8510819a73e78",
+        "videoId": "c995f72b87248b5e",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    },
+    {
+      "id": "chimney-rock-32332988",
+      "title": "Chimney Rock video B11",
+      "creator": "EJ Merl",
+      "page": "https://www.pexels.com/video/stunning-aerial-view-of-southwest-colorado-rock-formations-32332988/",
+      "file": "https://videos.pexels.com/video-files/32332988/13792773_2560_1440_30fps.mp4",
+      "duration": 19.3193,
+      "set": "chimney-rock",
+      "group": "B",
+      "description": {
+        "en": "Drone footage over Chimney Rock, Colorado, group B, video 11. EJ Merl, Pexels.",
+        "ko": "콜로라도 침니 록 위를 나는 드론 영상, 그룹 B, 11번. EJ Merl, Pexels."
+      },
+      "source": {
+        "file": "source.mp4",
+        "bytes": 22750956,
+        "sha256": "74659599575c982fd6149000400efb2d8dd4cf315efef1ec81be9beda1eb8f9d",
+        "videoId": "8df0c8bebbff3dce",
+        "width": 2560,
+        "height": 1440,
+        "codec": "h264"
+      }
+    }
+  ]
+}

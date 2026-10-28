@@ -11,6 +11,25 @@ let busy = false,
   current,
   displayRows;
 
+function displayReason(reason) {
+  if (lang !== 'ko') return reason;
+  return (
+    {
+      'Insufficient invertible correspondences': '역변환 가능한 대응점이 부족합니다.',
+      'Could not find a valid two-view geometry': '유효한 두 시점 기하를 찾지 못했습니다.',
+      'Cheirality failed: low parallax, planar scene, or invalid matching':
+        '양의 깊이 조건을 만족하지 못했습니다. 시차가 작거나 장면이 평면이거나 대응점이 잘못되었을 수 있습니다.',
+      'Low parallax: insufficient baseline for stable reconstruction':
+        '안정적인 복원에 필요한 카메라 이동 거리가 부족합니다.',
+      'Insufficient reliable points after parallax and reprojection filtering':
+        '시차와 재투영 오차 검사 후 남은 신뢰할 수 있는 점이 부족합니다.',
+      'GPU two-view numerical refinement or median selection failed':
+        'GPU 두 시점 수치 개선 또는 중앙값 선택에 실패했습니다.',
+      'GPU two-view recovery failed': 'GPU 두 시점 복원에 실패했습니다.',
+    }[reason] ?? reason
+  );
+}
+
 function configuration() {
   const values = new FormData(form);
   const result = {
@@ -25,7 +44,7 @@ function configuration() {
     ![0, 0.12, 0.5].includes(result.noise) ||
     ![0, 20, 30].includes(result.outliers)
   )
-    throw new RangeError('Unsupported demonstration settings');
+    throw new RangeError(lang === 'ko' ? '지원하지 않는 데모 설정입니다.' : 'Unsupported demonstration settings');
   return result;
 }
 
@@ -155,6 +174,15 @@ async function verify() {
           backend: pair.execution.backend,
           dispatches: pair.execution.report.dispatches,
           computeSubmissions: pair.execution.report.submissions,
+          // The scheduling words the chunked model generation reads: one after every fourth
+          // batch of a search, whose work the GPU decides (TypeShade change 0075).
+          controlWords: pair.execution.report.groups
+            .flatMap((group) => group.calls)
+            .filter((call) => call === 'snapshotPairModelBudget').length,
+          // The batches of model generation submitted, one `planPairModelBatch` each.
+          modelBatches: pair.execution.report.groups
+            .flatMap((group) => group.calls)
+            .filter((call) => call === 'planPairModelBatch').length,
           applicationReadbackBytes: pair.execution.applicationReadbackBytes,
           cpuStages: pair.execution.cpuStages,
         }
@@ -193,7 +221,7 @@ async function verify() {
           null,
           2,
         )
-      : pair.reason;
+    : displayReason(pair.reason);
     document.querySelector('#execution').textContent = JSON.stringify(
       { ...details, elapsedMs: +elapsed.toFixed(2) },
       null,
@@ -202,7 +230,7 @@ async function verify() {
     results.hidden = false;
     status.textContent = geometry
       ? `${details.backend} · ${accepted.size} / ${config.count} · ${elapsed.toFixed(1)} ms`
-      : pair.reason;
+      : displayReason(pair.reason);
     status.dataset.state = geometry ? 'success' : 'rejected';
     latest = {
       ...details,
@@ -212,7 +240,7 @@ async function verify() {
       errorPx: geometry?.meanReprojectionErrorPx,
       acceptedClean,
       cleanCount,
-      reason: pair.reason,
+      reason: displayReason(pair.reason),
     };
     return latest;
   } catch (error) {

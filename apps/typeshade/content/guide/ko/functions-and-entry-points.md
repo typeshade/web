@@ -30,7 +30,7 @@ export function distToSegment(p: vec2, a: vec2, b: vec2): f32 {
 
 ### 반환 타입
 
-반환 타입을 생략하면 TypeScript가 본문에서 추론합니다. 모든 `return`의 값은 이 타입과 일치해야 하며, 일치하지 않으면 컴파일 오류가 발생합니다. 값을 반환하지 않는 본문의 타입은 `void`이입니다.
+반환 타입을 생략하면 TypeScript가 본문에서 추론합니다. 모든 `return`의 값은 이 타입과 일치해야 하며, 일치하지 않으면 컴파일 오류가 발생합니다. 값을 반환하지 않는 본문의 타입은 `void`입니다.
 
 ```ts
 "use typeshade";
