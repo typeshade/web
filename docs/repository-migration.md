@@ -18,6 +18,14 @@ Library documentation and examples remain with their implementation. The web rep
 reviewed, pinned source revisions through submodules; it does not maintain a second editable
 library implementation. Updating a source pin is a reviewed change with app validation.
 
+Research tools are classified by what they measure or produce, not by whether they run a
+browser. TypeCV retains global-descriptor training, observation expansion, focal-direction,
+RGB rotation/structure benchmarks and the vanishing-point probe, with local helpers and
+frozen fixtures where they formerly imported website code. Lab-specific decoder, keyframe,
+KLT, ORB and phase-preparation tools move with the web app; their analyzer and command docs
+move with them. The cleanup PR does not change library implementation files under `src/`.
+
+
 ## Source reconciliation
 
 The original working directories have uncommitted changes. They remain untouched. Cleanup
@@ -147,3 +155,19 @@ checks passed. The follow-up CI result must be checked before cutover. Original 
 unchanged on 2026-10-28. No production workflow was dispatched, no production credentials
 were changed and no repository was archived. A successful build or a prepared workflow is
 not a completed production migration.
+
+### CI follow-up
+
+At `5294af4`, all three site jobs, Python record analysis, and three of the four TypeCV website
+shards passed in run `40658001545`; the remaining website shard was still running at handoff
+preparation. The shared-controls job hit a keyboard synchronization failure. Its test now waits
+for the focused control's visible active option, and the final version passed three consecutive
+local runs without changing the Select component.
+
+TypeCV cleanup run `40655044289` passed both Node digest comparisons and GPU shards 1 and 2.
+Shard 3 exposed a removed observation-expansion benchmark dependency. Commits `9977fca` and
+`d8b4df6` restore library benchmarks and their local helpers/fixtures; the failing RGB GPU case
+then passed, along with eight evaluation tests. The final cleanup revision is `d8b4df6`.
+Its new complete CI result remains to be checked; no failed or interrupted run is counted as
+success. The app utility moves passed syntax/help checks and bounded keyframe/decoder fixtures;
+long research benchmarks were not rerun merely to verify their file ownership.

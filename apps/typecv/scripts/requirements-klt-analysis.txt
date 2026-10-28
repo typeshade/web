@@ -1,0 +1,3 @@
+# OpenCV geometry analysis for scripts/analyze-klt-agreement.py
+opencv-python-headless==5.0.0.93
+numpy==2.3.5

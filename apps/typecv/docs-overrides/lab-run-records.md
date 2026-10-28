@@ -374,7 +374,8 @@ always runs the scalar kernel.
 Configuration: the standard benchmark (cold pass, one run per row) and the 12-photo COLMAP
 south-building sample, on this branch (`perf/guided-tiled-2`, built from main `9d36984`),
 headless Chromium with SwiftShader, on a shared 4-core container with no physical GPU. The load
-average was 10 to 14. Run on 2026-10-20 with `scripts/measure-orb.mjs`. The stage
+average was 10 to 14. Run on 2026-10-20 from the app with
+`cd apps/typecv && pnpm build && node scripts/measure-orb.mjs`. The stage
 `guidedMatches` includes the guide's short RANSAC (`verifyImagePairGpu`) and both match
 directions, as in the table above.
 

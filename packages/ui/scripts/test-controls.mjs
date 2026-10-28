@@ -176,23 +176,66 @@ try {
   await optimizer.focus();
   await page.keyboard.press("ArrowDown");
   await page.waitForFunction(
-    () =>
-      document.querySelector('.ui-select input[aria-expanded="true"]') &&
-      document.querySelector(".ant-select-item-option-active"),
+    () => {
+      const input = document.querySelector(
+        '.ui-select input[aria-expanded="true"]',
+      );
+      const active = document.querySelector(
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-active",
+      );
+      return (
+        input === document.activeElement && active?.textContent.trim() === "Adam"
+      );
+    },
   );
   await page.keyboard.press("ArrowDown");
   await page.waitForFunction(
-    () =>
-      document.querySelector(".ant-select-item-option-active")?.textContent ===
-      "SGD",
+    () => {
+      const input = document.querySelector(
+        '.ui-select input[aria-expanded="true"]',
+      );
+      const option = document.querySelector(
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-active",
+      );
+      return (
+        input === document.activeElement &&
+        option?.classList.contains("ant-select-item-option-active") &&
+        option.textContent.trim() === "SGD"
+      );
+    },
+  );
+  assert.ok(
+    await optimizer.evaluate((input) => input === document.activeElement),
+    "The Optimizer control retains focus while navigating its options",
   );
   await page.keyboard.press("Enter");
-  // Keyboard dispatch can finish before React commits the selected value.
-  await page.waitForFunction(
-    () =>
-      document.querySelector('[data-testid="form-result"]')?.textContent
-        .includes("Optimizer: sgd"),
-  );
+  try {
+    // Keyboard dispatch can finish before React commits the selected value.
+    await page.waitForFunction(
+      () =>
+        document.querySelector('[data-testid="form-result"]')?.textContent
+          .includes("Optimizer: sgd"),
+    );
+  } catch (error) {
+    const state = await page.evaluate(() => {
+      const input = document.querySelector(".ui-select input[role=combobox]");
+      const option = document.querySelector(
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option-active",
+      );
+      return {
+        focused: input === document.activeElement,
+        expanded: input?.getAttribute("aria-expanded"),
+        activeOption: option?.textContent.trim(),
+        value: document.querySelector(".ui-select .ant-select-selection-item")
+          ?.textContent,
+        result: document.querySelector('[data-testid="form-result"]')
+          ?.textContent,
+      };
+    });
+    throw new Error(
+      `Optimizer keyboard selection did not commit; control state: ${JSON.stringify(state)}. ${error}`,
+    );
+  }
   assert.match(
     await page.getByTestId("form-result").textContent(),
     /Optimizer: sgd/,
