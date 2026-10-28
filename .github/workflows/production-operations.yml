@@ -1,0 +1,56 @@
+name: Production operations switch
+
+on:
+  workflow_dispatch:
+    inputs:
+      enabled:
+        description: Enable production operations after cutover readiness is confirmed
+        type: boolean
+        required: true
+        default: false
+      readiness_run_id:
+        description: Successful readiness workflow run ID (required when enabling)
+        type: string
+        required: false
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: production-setup
+  cancel-in-progress: false
+
+jobs:
+  switch:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Test the operations switch before checking cutover conditions
+        run: node --test .github/scripts/production-operations.test.mjs
+      - id: validate
+        name: Verify cutover conditions
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+          ENABLED: ${{ inputs.enabled }}
+          READINESS_RUN_ID: ${{ inputs.readiness_run_id }}
+        run: node .github/scripts/production-operations.mjs validate
+      - name: Set production operations switch
+        if: steps.validate.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DEPLOYMENT_ADMIN_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref }}
+          ENABLED: ${{ inputs.enabled }}
+          READINESS_VALIDATED: ${{ steps.validate.outputs.ready }}
+        run: node .github/scripts/production-operations.mjs switch
