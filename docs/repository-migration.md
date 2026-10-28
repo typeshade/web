@@ -1,6 +1,6 @@
 # Repository and deployment transition
 
-This is the handoff for moving the websites out of the library repositories. Source migration
+This tracks execution of the website move out of the library repositories. Source migration
 and draft cleanup changes are in progress. No production cutover, repository archival, DNS
 change or remote data migration has been performed by this work.
 
@@ -67,6 +67,35 @@ metadata returned HTTP 403 with the current integration; this does **not** estab
 repository or organization secret exists. Cloud-environment credential readiness also does not
 establish that GitHub Actions has access to the same credential.
 
+On 2026-10-28, the executor rechecked the live configuration and attempted the next setup step:
+
+- The three upstream `main` revisions still match the source reconciliation table.
+- `web` still has zero deployment environments. Creating `typecv-production` with custom
+  branch restrictions returned HTTP 403 (`Resource not accessible by integration`); a
+  subsequent read confirmed that no environment was created. Listing Actions variables and
+  secret metadata also returned 403. Environment administration and Actions secrets/variables
+  access must be granted to the GitHub connection before the executor can finish that setup.
+  Do not paste credential values into chat or infer Actions readiness from local Cloudflare access.
+- Created and verified the `site form` label in `typeshade/web`.
+- Cloudflare Worker binding metadata and `wrangler secret list` show no GitHub App/token
+  binding on `typeshade-site`, and no `RECORDS_READ_TOKEN` on `typecv-site`. The existing gallery
+  has its two Access secret bindings. The site issue-form credential and record-reader secret
+  are concrete remaining setup items, not verified existing credentials. Secret values were
+  neither retrieved nor printed.
+- TypeShade's remote D1 migration list reports no migrations to apply at this revision.
+- The old publishers remain active. No workflow was in progress in the three old repositories
+  at the observation time; recheck immediately before cutover.
+
+Current production versions were captured read-only for rollback planning; refresh this table
+immediately before deployment because the old publishers are still enabled:
+
+| Worker | Version receiving 100% of traffic on 2026-10-28 |
+| --- | --- |
+| `typecv-site` | `544aaef3-ef81-4698-99a3-aec1ff66f252` |
+| `typenn-site` | `13007611-4c73-42df-a0a7-6966f1bda338` |
+| `typeshade-site` | `91b566fc-5958-41c1-ba74-998dfe3a6e12` |
+| `typeshade-gallery` | `cc89df04-8125-49a3-a7a0-701156296123` |
+
 The old `typeshade.github.io` root and introduction URL returned HTTP 404, while
 `typeshade.dev` returned HTTP 200. No new redirect has been configured. Existing Pages/domain
 ownership settings must be checked separately if the old GitHub Pages address is to be served.
@@ -85,6 +114,9 @@ ownership settings must be checked separately if the old GitHub Pages address is
    the web repository, verify its runtime installation credentials, and create the `site form`
    label before deploying that change. Updating source links alone does not grant App access.
 3. Merge the web changes and required predecessor PRs with operational switches still off.
+   The stack is web PRs **#1 → #2 → #3 → #4 → #5 → #6 → #7**; each targets the previous
+   branch, and all were still open drafts during the 2026-10-28 check. Preserve ancestry
+   through the stack and verify the next PR's base/diff after each merge.
    `WEBSITE_OPERATIONS_ENABLED` is the explicit repository switch for production operations;
    `WEBSITE_PREVIEWS_ENABLED` separately controls isolated static previews. Preview creation
    and deletion use the fixed `CLOUDFLARE_PREVIEW_ACCOUNT_ID` repository variable; keep its
@@ -168,6 +200,19 @@ TypeCV cleanup run `40655044289` passed both Node digest comparisons and GPU sha
 Shard 3 exposed a removed observation-expansion benchmark dependency. Commits `9977fca` and
 `d8b4df6` restore library benchmarks and their local helpers/fixtures; the failing RGB GPU case
 then passed, along with eight evaluation tests. The final cleanup revision is `d8b4df6`.
-Its new complete CI result remains to be checked; no failed or interrupted run is counted as
+Its complete CI run `40659388503` at `d8b4df6` passed: Node 22/24 checks and digest comparisons,
+all three GPU shards, and the aggregate WebGPU check. No failed or interrupted run is counted as
 success. The app utility moves passed syntax/help checks and bounded keyframe/decoder fixtures;
 long research benchmarks were not rerun merely to verify their file ownership.
+
+Web run `40660009787` at `14a1f6c` passed all three site jobs, Python analysis and website
+shards 1, 3 and 4. Shard 2 passed 100/101 tests, including the real multi-video dense run
+(8 views, 12,725 points) and record/export comparison. Its remaining failure was the desktop
+analysis-column width in `upstream-site.test.mjs`; the stylesheet still used equal columns
+instead of giving the 3D card the intended larger share. The shared-controls keyboard
+selection also failed again, so the earlier local passes did not establish its CI stability.
+The stylesheet now gives the 3D card the larger share. The control harness waits for the
+combobox's `aria-activedescendant` to identify the keyboard target before Enter, rather than
+using only its visual active class. The old harness reproduced the CI failure under pinned
+Chromium 1194, and the revised harness passed six consecutive full local runs. Final remote
+CI must still confirm both fixes before treating the web migration as verified.
