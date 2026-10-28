@@ -8,20 +8,20 @@ import SfmLab from "./SfmLab";
 const { locale } = Astro.props as { locale: "en" | "ko" };
 const ko = locale === "ko";
 const description = ko
-  ? "영상, 사진 또는 준비된 샘플로 브라우저에서 실험적인 GPU 특징 매칭과 희소 복원을 실행하세요. 다중 영상과 Dense 복원 기능도 시험할 수 있습니다."
-  : "Run experimental GPU feature matching and sparse reconstruction in your browser with video, photos, or a prepared sample. The lab also offers multi-video and dense reconstruction options.";
+  ? "영상이나 준비된 샘플로 브라우저에서 실험적인 GPU 특징 매칭과 희소 복원을 실행하세요. 다중 영상과 Dense 복원 기능도 시험할 수 있습니다."
+  : "Run experimental GPU feature matching and sparse reconstruction in your browser with a video or a prepared sample. The lab also offers multi-video and dense reconstruction options.";
 const text = ko
   ? {
       title: "SfM 실험실",
       heading: "영상에서 장면 복원하기",
-      body: "영상, 사진 또는 준비된 샘플을 선택하세요. TypeCV는 브라우저에서 실험적인 GPU 특징 매칭과 희소 복원을 실행하며, 다중 영상과 Dense 복원 기능도 제공합니다. 결과는 입력 영상과 보정 가정에 따라 달라집니다.",
+      body: "영상이나 준비된 샘플을 선택하세요. TypeCV는 브라우저에서 실험적인 GPU 특징 매칭과 희소 복원을 실행하며, 다중 영상과 Dense 복원 기능도 제공합니다. 결과는 입력 영상과 보정 가정에 따라 달라집니다.",
       probe: "삼각측량 진단 실행 ↗",
       probeHelp: "실행 중 GPU 장치가 멈춘 경우 진단 프로브로 문제를 살펴보세요.",
     }
   : {
       title: "SfM lab",
       heading: "Reconstruct a scene from video",
-      body: "Choose a video, photos, or a prepared sample. TypeCV runs experimental GPU feature matching and sparse reconstruction in your browser, with multi-video and dense reconstruction options. Results depend on the input and calibration assumptions.",
+      body: "Choose a video or a prepared sample. TypeCV runs experimental GPU feature matching and sparse reconstruction in your browser, with multi-video and dense reconstruction options. Results depend on the input and calibration assumptions.",
       probe: "Run the triangulation diagnostic ↗",
       probeHelp: "If a GPU device was lost during a run, use the diagnostic probe to investigate.",
     };
@@ -40,7 +40,7 @@ const text = ko
         <h1>{text.heading}</h1>
         <p>{text.body}</p>
         <p class="lab-probe-link">
-          <a href={ko ? "/ko/lab/probe/" : "/lab/probe/"}>{text.probe}</a>
+          <a href={ko ? "/ko/lab/probe/" : "/lab/probe/"}>{text.probe}</a>{" "}
           <span>{text.probeHelp}</span>
         </p>
       </header>

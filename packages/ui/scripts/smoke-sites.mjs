@@ -90,6 +90,55 @@ try {
             await page.locator('a[href="#main"]').count(),
             "Skip link exists",
           );
+          if (root.includes("typecv") && route.endsWith("/lab/")) {
+            await page.waitForFunction(
+              () => !document.querySelector("astro-island[ssr]"),
+            );
+            const layout = await page.evaluate(() => {
+              const stage = document.querySelector(".sfm-stage")
+                .getBoundingClientRect();
+              const empty = document
+                .querySelector(".sfm-stage .sfm-empty-state")
+                .getBoundingClientRect();
+              const cards = [...document.querySelectorAll(".sfm-pipeline li")];
+              return {
+                emptyFillsStage:
+                  Math.abs(empty.width - stage.width) < 2 &&
+                  Math.abs(empty.height - stage.height) < 2,
+                rows: new Set(cards.map((card) =>
+                  Math.round(card.getBoundingClientRect().top))).size,
+                readableCounts: cards.length === 4 && cards.every((card) => {
+                  const label = card.querySelector("strong").getBoundingClientRect();
+                  const count = card.querySelector("span").getBoundingClientRect();
+                  return count.top >= label.bottom - 1;
+                }),
+              };
+            });
+            assert.ok(
+              layout.emptyFillsStage,
+              `${route} empty-state overlay fills the video stage`,
+            );
+            assert.equal(
+              layout.rows, width > 600 ? 1 : 2,
+              `${route} pipeline adapts at ${width}px`,
+            );
+            assert.ok(
+              layout.readableCounts,
+              `${route} pipeline labels and counts remain separate`,
+            );
+            const contrast = await new AxeBuilder({ page })
+              .include(".sfm-live-grid")
+              .withRules(["color-contrast"])
+              .analyze();
+            assert.deepEqual(
+              contrast.violations.map((v) => ({
+                id: v.id,
+                targets: v.nodes.map((n) => n.target),
+              })),
+              [],
+              `${route} media-panel text contrast at ${width}px`,
+            );
+          }
         }
         if (
           route.endsWith("/lab/") &&

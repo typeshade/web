@@ -29,3 +29,29 @@ The public UI browser test passes against the current build after restoring the 
 Focused browser revalidation cleared the CSS import failures. The frame-navigation browser test passes 1/1 with assertions for camera selection, desktop alignment, and mobile layout. The app gives both desktop video/map headers a shared minimum height to align their viewports. The GPU-preparation browser test passes 2/2 on the final canonical build, covering current graph generation/canvas identity, mobile overflow, stop interaction, node selection, edge updates, texture reuse, cancellation, errors and readiness. The active lab workspace styles now live in the route-owned stylesheet and use shared theme tokens, including the drawer portals; unrelated document, home and global reset rules were removed. The shared UI browser smoke passes with no axe violations across English/Korean desktop/mobile routes, focal editing, theme persistence, and browser error checks. TypeCV CSS ownership passed all four routes.
 
 The canonical `apps/typecv/dist` output contains the latest successful 131-page build; the temporary `dist-new` directory was removed. Migration baseline commit `cdb5eda` was pushed to PR 7; the final focused CSS and browser-test follow-ups are ready for review. No real Cloudflare namespace, secret, bucket, production deployment, or other external resource was changed during validation.
+
+## Visual verification during cutover preparation
+
+On 2026-10-28, inspection of the built desktop lab found additional omissions from the
+stylesheet extraction: the empty-video text inherited the page color on a dark stage, pipeline
+labels and counts ran together, and several timeline/overlay/diagnostic controls lacked their
+source styles. Restored the relevant rules from pinned TypeCV `715fd1b` to `sfm-lab.css`,
+including responsive rules. Existing shared theme aliases, the 0.8fr/1fr desktop columns,
+46px header alignment and 44×24px focal switch remain. Generic legacy buttons are scoped
+under `.lab-main`; no rules were added to `global.css`.
+
+A comparison of component class tokens and pinned source selectors also checked multi-video
+rows, result information, record consent/details, placement and viewer diagnostics. This is
+an ownership check, not proof that every dynamic state was visually inspected. Desktop English
+and mobile Korean initial-state screenshots were inspected after restoration. The lab page's
+English description and Korean translation now describe video/prepared-sample input, matching
+the actual input picker, and preserve a space after the diagnostic link.
+
+Added built-page regression checks for empty-state bounds, pipeline labels/counts and column
+layout, and media-panel text contrast at 1440/390px in both locales. The old build failed the
+empty-state assertion; the restored build passes the complete shared site smoke and axe
+checks. The 131-page build and all four stylesheet-ownership routes pass. Focused final-CSS
+frame-navigation (1/1, 93.3s) and GPU-preparation (2/2, 31.9s) checks pass. A preceding partial
+upstream browser run passed public CPU/WebGPU, desktop panel geometry and mobile checks,
+but was stopped during Dense processing to rebuild these styles; it is not a full suite pass.
+The final remote CI revision is tracked in PR #7.

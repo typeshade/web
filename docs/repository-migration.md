@@ -79,12 +79,15 @@ On 2026-10-28, the executor rechecked the live configuration and attempted the n
 - Created and verified the `site form` label in `typeshade/web`.
 - Cloudflare Worker binding metadata and `wrangler secret list` show no GitHub App/token
   binding on `typeshade-site`, and no `RECORDS_READ_TOKEN` on `typecv-site`. The existing gallery
-  has its two Access secret bindings. The site issue-form credential and record-reader secret
-  are concrete remaining setup items, not verified existing credentials. Secret values were
-  neither retrieved nor printed.
+  has its two Access secret bindings. TypeShade's live `/data/issues/` returns `open: false`:
+  its existing GitHub-link fallback remains available. Enabling the inline form additionally
+  requires GitHub credentials/access and both Turnstile keys; those are not verified existing
+  credentials. TypeCV's record-reader secret remains required by the new production workflow.
+  Its live `/api/config/` returns `files: true`. Secret values were neither retrieved nor printed.
 - TypeShade's remote D1 migration list reports no migrations to apply at this revision.
 - The old publishers remain active. No workflow was in progress in the three old repositories
   at the observation time; recheck immediately before cutover.
+- Curl GET checks returned HTTP 200 for all three English/Korean entry pages and the gallery.
 
 Current production versions were captured read-only for rollback planning; refresh this table
 immediately before deployment because the old publishers are still enabled:
@@ -110,9 +113,10 @@ ownership settings must be checked separately if the old GitHub Pages address is
    Cloudflare token access to the existing Workers and required storage. TypeCV record-reader
    credentials and TypeShade issue-form GitHub App access need their own verification. The
    migrated issue form targets `typeshade/web` for site reports and `typeshade/typeshade` for
-   compiler reports: grant the existing App installation the intended Issues permission in
-   the web repository, verify its runtime installation credentials, and create the `site form`
-   label before deploying that change. Updating source links alone does not grant App access.
+   compiler reports. Preserve the current GitHub-link fallback, or, when enabling the inline
+   form, grant the App installation the intended Issues permission in the web repository and
+   verify its runtime credentials and Turnstile key pair. The `site form` label was created
+   during execution. Updating source links alone does not grant App access.
 3. Merge the web changes and required predecessor PRs with operational switches still off.
    The stack is web PRs **#1 → #2 → #3 → #4 → #5 → #6 → #7**; each targets the previous
    branch, and all were still open drafts during the 2026-10-28 check. Preserve ancestry
@@ -220,3 +224,15 @@ before opening, waits for it with a bounded Playwright wait, then checks the key
 and committed value. This tests keyboard operation after the popup is ready; it does not fix
 rc-select's behavior for immediate input during its opening transition. Final remote CI must
 still confirm both fixes before treating the web migration as verified.
+
+Visual inspection subsequently found additional missing route styles: the video empty state
+was dark text on a dark stage, and pipeline labels/counts ran together. Restored the pinned
+source's active lab rules for empty states, pipeline/timeline controls, multi-video inputs,
+viewer overlays/diagnostics, placement controls and responsive layouts in the lab stylesheet.
+The global stylesheet remains unchanged. New built-page checks verify the empty-state bounds,
+pipeline row/count layout and media-panel text contrast in both locales at desktop/mobile
+widths; they failed on the old build at the empty-state bounds assertion. The earlier partial
+upstream browser run passed its public UI/width checks but was stopped during Dense processing
+to rebuild these styles, so it is not a complete suite pass.
+The restored 131-page build passes the new EN/KO desktop/mobile smoke and contrast checks,
+all stylesheet-ownership checks, frame navigation (1/1) and GPU preparation (2/2).
