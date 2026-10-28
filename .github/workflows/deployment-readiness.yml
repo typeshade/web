@@ -1,0 +1,66 @@
+name: Deployment readiness
+
+on:
+  workflow_dispatch:
+    inputs:
+      require_operations_disabled:
+        description: Require production operations to remain disabled during migration
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  configuration:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      environments_ready: ${{ steps.audit.outputs.environments_ready }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Check the readiness validator
+        run: node --test .github/scripts/deployment-readiness.test.mjs
+      - id: audit
+        name: Check switches and existing environment restrictions
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REQUIRE_DISABLED: ${{ inputs.require_operations_disabled }}
+          OPERATIONS_ENABLED: ${{ vars.WEBSITE_OPERATIONS_ENABLED }}
+          PREVIEWS_ENABLED: ${{ vars.WEBSITE_PREVIEWS_ENABLED }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RECORDS_READ_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+        run: node .github/scripts/deployment-readiness.mjs configuration
+
+  credentials:
+    needs: configuration
+    if: needs.configuration.outputs.environments_ready == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [typecv, typenn, typeshade]
+    # The first job must confirm these environments already exist and restrict
+    # deployment to main. This job must never create unprotected environments.
+    environment: ${{ matrix.site }}-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify effective credentials with read-only Cloudflare requests
+        env:
+          SITE: ${{ matrix.site }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RECORDS_READ_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+        run: node .github/scripts/deployment-readiness.mjs credentials
