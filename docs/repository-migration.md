@@ -1,8 +1,49 @@
 # Repository and deployment transition
 
-This tracks execution of the website move out of the library repositories. Source migration
-and draft cleanup changes are in progress. No production cutover, repository archival, DNS
-change or remote data migration has been performed by this work.
+This tracks execution of the website move out of the library repositories. The web PR stack
+has been merged; library cleanup changes remain open until production cutover is verified.
+No production cutover, repository archival, DNS change or remote data migration has been
+performed by this work.
+
+## Current execution status (2026-10-28)
+
+- Web PRs #1 through #7 were merged into `main` in order using merge commits, after the owner
+  authorized the CI/CD transition. The final stack merge is `f7d4584`. At that commit, the
+  application/source tree matches `9d12c05`, whose complete ten-job CI run `40671210525` passed.
+  The only additional files are the read-only readiness workflow/helper/tests from PR #8.
+  The post-merge website CI run is separate; do not describe a queued/running check as a pass.
+- Readiness run [40688434326](https://github.com/typeshade/web/actions/runs/40688434326)
+  ran inside GitHub Actions. It confirmed that production operations and previews are disabled,
+  the Cloudflare credential is available at repository/organization scope, and the TypeCV
+  record-reader credential is not available there. All three production environments are missing.
+  The check failed on these prerequisites and skipped the environment-scoped credential jobs.
+  Cloudflare write permissions have not been verified from Actions.
+- The managed executor replaces outbound GitHub authentication with its connected app identity.
+  Explicitly invalid authentication also returned the same authenticated user/app in a diagnostic.
+  Adding a runtime PAT or reinstalling the GitHub app did not grant environment/secret/variable
+  administration. Do not repeat those steps, paste tokens into chat, put tokens in workflow
+  dispatch inputs, or infer GitHub Actions credentials from executor variables.
+- `setup-production.yml` provides a manual, `main`-only setup path inside GitHub Actions.
+  It requires one repository Actions secret, `DEPLOYMENT_ADMIN_TOKEN`, with access to
+  `typeshade/web` and Administration, Environments, Secrets and Variables read/write permissions.
+  Register this credential through GitHub's secret-entry UI; the chat executor cannot write it.
+  Use a fresh credential if an earlier one was disclosed, and revoke/remove the temporary
+  credential after the administrative work is complete.
+- Setup creates missing production environments, restricts them to the `main` branch, preserves
+  existing supported protection rules and credentials, and generates a missing TypeCV
+  record-reader secret directly into the environment. It keeps both operations switches false,
+  verifies the written configuration, and does not run Cloudflare writes or deployment.
+  Incompatible existing restrictions stop setup for review rather than being deleted.
+- Closing PR #7 triggered preview cleanup despite previews never having been configured.
+  Run `40689556465` failed on the absent preview account before any Worker deletion.
+  Cleanup now reports that it was not attempted when previews are disabled and no account is
+  configured. A retained account still permits cleanup after uploads are disabled; keep that
+  account setting until existing PR Workers are removed.
+
+Next: run setup after the admin secret is registered, rerun Deployment readiness, and verify
+the remaining Cloudflare/storage prerequisites. Only then stop the old publishers, refresh
+rollback IDs and enable the new production operations. Library cleanup PRs remain unmerged.
+Historical observations below describe their original check time, not the latest merge state.
 
 ## Ownership
 
