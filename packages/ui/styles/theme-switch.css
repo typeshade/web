@@ -1,0 +1,6 @@
+.ui-theme-switch.ant-switch {
+  background: #8c8c8c;
+}
+.ui-theme-switch.ant-switch.ant-switch-checked {
+  background: var(--ui-accent);
+}

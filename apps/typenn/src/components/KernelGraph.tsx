@@ -1,3 +1,4 @@
+import "../styles/graph.css";
 import {
   useCallback,
   useEffect,

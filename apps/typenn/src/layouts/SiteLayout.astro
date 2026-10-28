@@ -3,6 +3,8 @@ import SiteHeader from "@typeshade/site-ui/astro/SiteHeader";
 import SkipLink from "@typeshade/site-ui/astro/SkipLink";
 import ThemeControl from "../components/ThemeControl";
 import "../styles/global.css";
+import "../styles/shell.css";
+import SiteFooter from "@typeshade/site-ui/astro/SiteFooter";
 
 type Locale = "en" | "ko";
 type PageKey =
@@ -230,26 +232,22 @@ const sidebarGroups = ko
         <slot />
       </main>
     </div>
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <span>
-          {ko
-            ? "TypeNN은 TypeScript로 Tensor 그래프를 정의하고 TypeShade는 커널을 컴파일하고 실행합니다."
-            : "TypeNN defines Tensor graphs in TypeScript. TypeShade compiles and runs the kernels."}
-        </span>
-        <div>
-          <a href="https://github.com/typeshade/typenn">
-            {ko ? "TypeNN 저장소" : "TypeNN repository"}
-          </a>
-          <a href="https://github.com/typeshade/typenn/tree/site/website-source/website">
-            {ko ? "사이트 소스" : "Website source"}
-          </a>
-          <a href="https://typeshade.dev">TypeShade</a>
-          <a href="https://github.com/typeshade/typenn/blob/main/TODO.md">
-            TODO
-          </a>
-        </div>
+    <SiteFooter>
+      <span>
+        {ko
+          ? "TypeNN은 TypeScript로 Tensor 그래프를 정의하고 TypeShade는 커널을 컴파일하고 실행합니다."
+          : "TypeNN defines Tensor graphs in TypeScript. TypeShade compiles and runs the kernels."}
+      </span>
+      <div>
+        <a href="https://github.com/typeshade/typenn">
+          {ko ? "TypeNN 저장소" : "TypeNN repository"}
+        </a>
+        <a href="https://github.com/typeshade/typenn/tree/site/website-source/website">
+          {ko ? "사이트 소스" : "Website source"}
+        </a>
+        <a href="https://typeshade.dev">TypeShade</a>
+        <a href="https://github.com/typeshade/typenn/blob/main/TODO.md">TODO</a>
       </div>
-    </footer>
+    </SiteFooter>
   </body>
 </html>

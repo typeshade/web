@@ -225,14 +225,16 @@ any rule left in `global.css` that matches the same element whatever its specifi
 scoped style is unlayered too, and its attribute outranks the global rule. Check the computed
 style, not only that the class is on the element.
 
-`global.css` holds the `@theme` tokens, the fonts, the base element rules, the dark-mode
-redefinitions, the chrome every page shares (the header, the footer, the docs grid, the
-sidebar, the outline, the pager, the buttons, the alert, the figure, the tabs, the tile cover
-and its Empty mark), the reference's shared vocabulary (`api-list`, `api-index` and the other
-classes the /api/ pages and the language reference both draw), and the rules for markup the
-site does not author: Expressive Code's frames, Pagefind's dialog and the Markdown the loaders
-render under `.doc`. `bun run check:style` fails the build on a selector there that names any
-other class, and says where it belongs.
+`global.css` assembles reset, tokens, fonts, theme, base element rules and base
+accessibility. Shared components import their own CSS. Header, footer and search
+styles live beside those components; `Docs.astro` imports its grid and Markdown
+prose styles. Expressive Code, figures, tabs and API reference vocabulary are
+imported by their consumers. Responsive and forced-color rules stay with their
+owner. Shared component styles should use their root class as a boundary.
+
+`bun run check:style` rejects feature classes in `src/styles/`. At the repository
+root, `pnpm test:styles apps/typeshade/dist` also checks the global import graph
+and ensures built home, playground and API routes exclude unrelated CSS.
 
 ## Type
 
@@ -1152,8 +1154,8 @@ language, and every page declares its alternates with `hreflang`. A host per lan
 ## Things the build checks
 
 - `scripts/check-style.mjs`: the voice rules above, over `src/`, `scripts/`, the English of the
-  reference notes and the two Markdown files, and that a selector in `global.css` names only a
-  shared class (Styling).
+  reference notes and the two Markdown files, and that global stylesheets contain only base layout/accessibility
+  classes (Styling).
 - `src/lib/math.mjs`: a formula Temml cannot read stops the build, with the formula in the
   message (Type, Formulas).
 - `src/lib/examples.ts`: every number, and that the pinned compiler still matches the copy.

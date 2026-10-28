@@ -107,3 +107,35 @@ editor tests load its pinned Monaco CDN dependency, as the live editor does.
   claim of whole-site accessibility certification or hardware GPU verification.
 - Publishing, production cutover and merging the stacked migration PRs remain
   separate repository operations; this change adds no deployment trigger.
+
+## CSS ownership and editor responsibilities
+
+The earlier stylesheet split preserved the global dependency graph. This change
+moves imports to actual consumers: product home/reading surfaces, site headers
+and footers, documentation layouts, TypeNN graph/training/matrix views, TypeCV
+pair/reconstruction views, and TypeShade search, figures, code and reference
+components. Breakpoint and forced-color rules move with their owner. Global
+entries now assemble only reset, tokens, theme, fonts and base accessibility.
+
+The duplicated TypeNN/TypeCV home styles are shared behind `.ui-home`; editorial
+primitives are scoped to `.ui-reading`. Product documentation is scoped to
+`.nn-docs`/`.cv-docs`. TypeCV's unused TypeNN documentation selectors are removed.
+Kernel graph palette variables belong to `.kg-panel`, rather than the root.
+Control/composition CSS is imported by the shared components; theme-only islands
+use `react/theme` to keep the controls out of their dependency graph.
+
+TypeShade's playground now separates source coordinate mapping, editor providers,
+Monaco loading/theme, emission, reflection rendering, console rendering, sharing
+and contracts. Providers retrieve the current document/client when invoked, and
+source-coordinate state belongs to each mounted playground. Domain execution,
+GPU/CPU rendering and workspace orchestration remain app-owned. The remaining
+orchestrator is still substantial; this is not a claim that all large application
+modules have been fully decomposed.
+
+`test:styles` checks both allowed global layers and emitted route styles. A home
+page must not load graph, pair, reconstruction or documentation selectors; docs
+must not load the home or unrelated playground styles. The editor boundary tests
+cover inserted-prelude mapping, independent editor instances, clearing mapping
+when a program changes, and provider state after a file rename/client reconnect.
+Browser smoke coverage includes EN/KO documentation/API routes in addition to
+home, lab and playground. No production deployment is part of this change.

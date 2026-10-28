@@ -6,7 +6,8 @@ React or Ant Design; these are optional peers supplied by interactive apps.
 
 - `styles/tokens.css`: palette, spacing, radius, typography and motion primitives.
 - `styles/product-theme.css`: TypeCV/TypeNN fonts, color scheme and Tailwind role mappings.
-- `styles/product-shell.css`: TypeCV/TypeNN navigation and documentation shell.
+- `styles/product-{header,footer,frame,sidebar}.css`: TypeCV/TypeNN shell owners.
+- `astro/ReadingSurface` and `astro/HomeSurface`: scoped editorial and home layouts.
 - `astro/`: native HTML primitives and the product header, composed with slots.
 - `react/`: document-theme subscription and Ant Design integration for islands.
 - `styles/semantics.css`: surface, text, action, danger, focus and control roles.
@@ -14,11 +15,13 @@ React or Ant Design; these are optional peers supplied by interactive apps.
 - `react/controls.tsx`: Button, IconButton, Link, Field, Input, TextArea, NumberInput,
   Select and Checkbox. Numeric and choice interaction is backed by Ant Design.
 
-Import tokens, semantics, the site's theme adapter, controls and compositions in
-that order. A site adapter overrides roles, not individual component internals.
+Import tokens, semantics and the site's theme adapter in that order globally.
+A site adapter overrides roles, not individual component internals.
 Wrap React controls in ThemeProvider so the Ant controls read the same semantic
-roles as native Astro/React actions. The CSS exports are explicit; importing a
-component does not inject global CSS.
+roles as native Astro/React actions. Components import their own control,
+composition or shell stylesheet. Use `react/theme` for theme-only islands so
+their dependency graph does not include all interactive controls. CSS exports
+remain available for markup that explicitly implements the shared contracts.
 
 ```tsx
 import { Field, NumberInput, Button } from '@typeshade/site-ui/react';
@@ -46,7 +49,16 @@ decisions, removed CSS and app ownership boundaries.
 Edit source here and verify all apps with the root build/check commands. No npm
 release or tarball synchronization is needed. Keep domain execution, datasets,
 translated copy and routing in the apps. New component styles belong with their
-components; existing global files retain their deliberate cascade order.
+components. Global entries contain only reset, tokens, theme, fonts and base
+accessibility. Put responsive and forced-color rules beside the styles they
+override. Do not import route styles from the global entry or a shared barrel.
+Use `HomeSurface` around product landing content and `ReadingSurface` around
+product documentation/playground page chrome; their selectors are limited to
+those roots. Product-specific document and feature layouts stay in the apps.
+
+Run `pnpm test:styles apps/typenn/dist apps/typecv/dist apps/typeshade/dist` to
+check global import boundaries and route-specific CSS in built HTML. CI runs
+this after each site's build.
 
 Run `pnpm test:ui apps/typeshade/dist apps/typenn/dist apps/typecv/dist` after
 building. Set `UI_CHROMIUM` to use a custom browser executable or `UI_SCREENSHOTS`

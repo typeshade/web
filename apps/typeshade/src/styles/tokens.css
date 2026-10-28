@@ -1,13 +1,6 @@
-/* typeshade.dev's global styles: the tokens, the fonts, the base rules, dark mode, the chrome
-   every page shares, and the rules for markup the site does not author (Expressive Code,
-   Pagefind, the Markdown under .doc). A page or a component styles itself with Tailwind
-   utilities on these tokens in its own markup, and its scoped <style> for what utilities say
-   badly; `bun run check:style` fails on a page's class here (DESIGN.md, Styling).
-   Ant Design v5's design language as plain CSS custom properties: its blue (var(--ui-blue-6)), its
-   neutral text and border scale, 6px radii on controls and 8px on cards and code frames, its
-   three-layer elevation, 14px interface text with 16px prose, and its button, card, list,
-   menu and table shapes. No React and no antd package: the tokens below are the whole
-   system. Light follows the system, or the switch in the header. */
+/* TypeShade theme values and Tailwind mappings. Component styles import these
+   values through the global base layers; their selectors live with their owners.
+   Shared palette, spacing and radius primitives come from packages/ui. */
 
 /* A `hover:` utility applies wherever the pointer is, the way every `:hover` rule in this
    file does. Tailwind's own variant waits for `(hover: hover)`, which would drop a hover

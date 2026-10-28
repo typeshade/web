@@ -1,0 +1,50 @@
+---
+import './SearchDialog.css';
+import {copyFor, type Locale} from '../i18n/index.ts';
+interface Props {locale: Locale}
+const {locale} = Astro.props;
+const t = copyFor(locale);
+---
+    <dialog class="search-dialog" aria-label={t.nav.search} data-pagefind-ignore>
+      <div class="search-dialog-bar">
+        <button class="search-dialog-close" type="button" aria-label={t.nav.close} data-search-close>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+      <div id="search"></div>
+      <p class="search-note" hidden>{t.nav.searchUnavailable}</p>
+    </dialog>
+    <script is:inline define:vars={{ translations: t.nav.searchUi }}>
+      const dialog = document.querySelector('.search-dialog')
+      const note = dialog.querySelector('.search-note')
+      let started = false
+      const asset = (tag, attrs) => new Promise((resolve, reject) => {
+        const el = Object.assign(document.createElement(tag), attrs)
+        el.addEventListener('load', resolve)
+        el.addEventListener('error', reject)
+        document.head.append(el)
+      })
+      async function mount() {
+        if (started) return
+        started = true
+        try {
+          await asset('link', { rel: 'stylesheet', href: '/pagefind/pagefind-ui.css' })
+          await asset('script', { src: '/pagefind/pagefind-ui.js' })
+          new PagefindUI({ element: '#search', showSubResults: true, showImages: false, translations })
+        } catch {
+          note.hidden = false
+        }
+      }
+      async function openSearch() {
+        for (const d of document.querySelectorAll('details[open]')) d.open = false
+        if (!dialog.open) dialog.showModal()
+        await mount()
+        dialog.querySelector('input')?.focus()
+      }
+      for (const b of document.querySelectorAll('[data-search-open]')) b.addEventListener('click', openSearch)
+      dialog.querySelector('[data-search-close]')?.addEventListener('click', () => dialog.close())
+      dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close() })
+      addEventListener('keydown', (e) => {
+        if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); openSearch() }
+      })
+    </script>

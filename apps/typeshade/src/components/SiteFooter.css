@@ -88,3 +88,7 @@
     justify-content: space-between;
   }
 }
+
+:lang(ko) .site-map {
+  line-height: 1.65;
+}

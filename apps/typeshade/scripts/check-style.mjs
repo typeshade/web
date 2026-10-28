@@ -64,60 +64,10 @@ for (const file of files) {
   });
 }
 
-// global.css holds the tokens, the fonts, the base element rules, dark mode, the chrome every
-// page shares and the rules for markup the site does not author (Expressive Code's frames,
-// Pagefind's dialog, the Markdown the loaders render). A page's or a component's own styling
-// is Tailwind utilities on its markup, or that component's scoped <style> (DESIGN.md,
-// Styling). So every class a selector in global.css names has to be one of these roots, or
-// start with one and a hyphen.
-const GLOBAL_CLASS_ROOTS = {
-  chrome: [
-    'site',
-    'docs',
-    'doc',
-    'skip',
-    'wrap',
-    'wide',
-    'visually-hidden',
-    'icon',
-    'chevron',
-    'depth',
-    'header-anchor',
-    'search',
-    'guide-note',
-  ],
-  shared: [
-    'ui',
-    'button',
-    'alert',
-    'figure',
-    'tabs',
-    'tile-cover',
-    'no-still',
-    'diagnostic',
-    // The reference's vocabulary, drawn by the /api/ pages and the language reference alike.
-    'api-crumbs',
-    'api-kind',
-    'api-summary',
-    'api-list',
-    'api-index',
-    'api-type',
-    'api-optional',
-  ],
-  // Expressive Code's output.
-  foreign: [
-    'expressive-code',
-    'ec',
-    'frame',
-    'header',
-    'title',
-    'has-title',
-    'is-terminal',
-    'code',
-    'copy',
-  ],
-};
-const roots = Object.values(GLOBAL_CLASS_ROOTS).flat();
+// Global layers contain base layout/accessibility utilities only. Component CSS is
+// imported by its owner outside src/styles; the repository's test:styles command
+// also checks the global import graph and the CSS emitted for each route.
+const GLOBAL_CLASSES = new Set(['wrap', 'wide-in', 'visually-hidden', 'skip']);
 const styleDirectory = path.join(root, 'src/styles');
 for (const name of readdirSync(styleDirectory).filter((name) => name.endsWith('.css'))) {
   const globalCss = path.join(styleDirectory, name);
@@ -129,9 +79,9 @@ for (const name of readdirSync(styleDirectory).filter((name) => name.endsWith('.
     if (selector.startsWith('@')) continue;
     const line = bare.slice(0, m.index + m[0].indexOf(selector)).split('\n').length;
     for (const [, className] of selector.matchAll(/\.(-?[_a-zA-Z][\w-]*)/g)) {
-      if (roots.some((r) => className === r || className.startsWith(`${r}-`))) continue;
+      if (GLOBAL_CLASSES.has(className)) continue;
       hits.push(
-        `src/styles/${name}:${line}  page or component class in shared styles: .${className} belongs on that page's or component's markup as Tailwind utilities, or in its scoped <style>. global.css holds tokens, fonts, base rules, shared chrome and rules for markup the site does not author (DESIGN.md, Styling); a class that really is shared goes into GLOBAL_CLASS_ROOTS in scripts/check-style.mjs.`,
+        `src/styles/${name}:${line}  page or component class in shared styles: .${className} belongs on that page's or component's markup as Tailwind utilities, or in its scoped <style>. Global layers contain tokens, fonts, theme and base layout/accessibility only (DESIGN.md, Styling). Import component or generated-markup styles from their owner.`,
       );
     }
   }
@@ -142,5 +92,5 @@ if (hits.length > 0) {
   process.exit(1);
 }
 console.log(
-  `check-style: ${files.length} files clean, shared stylesheets name only shared classes`,
+  `check-style: ${files.length} files clean, global stylesheets name only base layout/accessibility classes`,
 );

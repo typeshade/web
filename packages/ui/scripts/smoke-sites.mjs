@@ -27,12 +27,19 @@ try {
         "/ko/playground/",
         "/lab/",
         "/ko/lab/",
+        "/guide/",
+        "/ko/guide/",
+        "/docs/",
+        "/ko/docs/",
+        "/api/",
+        "/ko/api/",
       ]) {
         try {
           await stat(resolve(root, "." + route, "index.html"));
         } catch {
           continue;
         }
+        console.log(`Checking ${root}${route}`);
         for (const width of [1440, 390]) {
           await page.setViewportSize({ width, height: 900 });
           assert.equal((await page.goto(base + route)).status(), 200);

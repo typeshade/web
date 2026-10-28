@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import AxeBuilder from "@axe-core/playwright";
+import { checkEditorCoordinates } from "./editor-checks.mjs";
 
 export async function checkPlayground(page, base, site) {
   for (const locale of ["", "/ko"]) {
@@ -102,6 +103,7 @@ export async function checkPlayground(page, base, site) {
       assert.ok(await page.locator(`[id="${tipId}"]`).isVisible());
       await page.keyboard.press("Escape");
       assert.ok(await page.locator(`[id="${tipId}"]`).isHidden());
+      if (!locale) await checkEditorCoordinates(page);
     }
     const scope =
       site === "typecv"
@@ -128,6 +130,14 @@ export async function checkPlayground(page, base, site) {
       route.fulfill({ json: { open: true } }),
     );
     await page.goto(base + "/");
+    await page
+      .locator("[data-search-open]")
+      .filter({ visible: true })
+      .first()
+      .click();
+    await page.locator(".search-dialog input").waitFor();
+    await page.keyboard.press("Escape");
+    await page.locator(".search-dialog").waitFor({ state: "hidden" });
     const report = page
       .locator("a[data-report]")
       .filter({ visible: true })

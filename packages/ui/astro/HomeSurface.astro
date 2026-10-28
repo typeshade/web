@@ -1,0 +1,14 @@
+---
+import ReadingSurface from "./ReadingSurface.astro";
+import "../styles/product-home.css";
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={["ui-home", className]}>
+  <ReadingSurface>
+    <slot />
+  </ReadingSurface>
+</div>

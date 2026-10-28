@@ -1,4 +1,5 @@
 ---
+import './ShaderFigure.css';
 // One live example: the source a reader can edit, the canvas it draws on, and a control for
 // every uniform field the module declares. The shape is MDN's "Try it": the code, the result,
 // and the handles, with nothing between them.
@@ -263,7 +264,7 @@ const reservedNote = l.reserved(payload.reserved.map((name) => `\`${name}\``).jo
   [data-live-plot] canvas:active { cursor: grabbing }
   .live-controls :global(.live-control-value) { white-space: nowrap; text-align: end; font-variant-numeric: tabular-nums; flex-shrink: 0 }
 
-  /* .figure already sets the column and its 10px gap (src/styles/global.css), so this adds
+  /* .figure already sets the column and its 10px gap (the owning component stylesheet), so this adds
      nothing but what the block's own parts need. */
   .live-code { position: relative }
   /* The figure's parts outside the hero: no box of their own, the figure's column is the box. */

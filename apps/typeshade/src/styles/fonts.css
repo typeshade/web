@@ -74,8 +74,7 @@ math {
    character. break-word only breaks a run once it has nowhere else to wrap, so a Korean
    sentence still wraps at its eojeol boundaries and an English word only splits when it
    truly has no room to sit on its own line. */
-:lang(ko) body,
-:lang(ko) .doc {
+:lang(ko) body {
   font-family:
     'IBM Plex Sans Variable', 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic',
     'Noto Sans KR', system-ui, sans-serif;
@@ -89,21 +88,4 @@ math {
 :lang(ko) h4 {
   letter-spacing: -0.005em;
   line-height: 1.35;
-}
-:lang(ko) .figure-caption,
-:lang(ko) .site-nav,
-:lang(ko) .site-map {
-  line-height: 1.65;
-}
-/* IBM Plex Sans KR only ships 400 and 600, so a 500-weight label falls back to 400 for
-   Hangul while Latin renders true 500; land both scripts on 600 instead. */
-:lang(ko) .ui-button {
-  font-weight: 600;
-}
-/* A single-line Ant control has no room for the 1.8 line height Korean prose asks for. */
-:lang(ko) .ui-button,
-:lang(ko) .site-nav a,
-:lang(ko) .docs-group a,
-:lang(ko) .site-search {
-  line-height: 1.5;
 }

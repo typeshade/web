@@ -361,3 +361,17 @@
     display: none;
   }
 }
+
+@media (forced-colors: active) {
+  .site-menu-bar {
+    background: CanvasText;
+  }
+}
+
+:lang(ko) .site-nav {
+  line-height: 1.65;
+}
+:lang(ko) .site-nav a,
+:lang(ko) .site-search {
+  line-height: 1.5;
+}

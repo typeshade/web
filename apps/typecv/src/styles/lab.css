@@ -1,20 +1,113 @@
+.lab-preview {
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  background: #101828;
+}
+.frame-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--ui-space-3);
+  margin-top: 18px;
+}
+.frame-grid figure {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface-muted);
+}
+.frame-grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+.frame-grid figcaption {
+  padding: 7px 10px;
+  color: var(--ui-text-muted);
+  font:
+    11px "IBM Plex Mono",
+    monospace;
+}
+.viewer {
+  height: 520px;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-panel);
+  background: #0b1020;
+}
+.viewer-error {
+  display: none;
+}
+.sfm-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--ui-space-3);
+  margin: 22px 0;
+  padding: 18px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-surface-muted);
+}
+.sfm-summary .ant-statistic-title {
+  color: var(--ui-text-muted);
+}
+.viewer-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  margin-top: 28px;
+}
+.viewer-head h4 {
+  margin: 0;
+}
+.run-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--ui-space-4);
+  padding-top: 14px;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+}
+.run-details pre {
+  overflow: auto;
+  max-width: min(90vw, 700px);
+  padding: 12px;
+  background: var(--ui-surface-muted);
+}
+.sample-credit {
+  color: var(--ui-text-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.sample-credit a {
+  color: var(--ui-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+@media (max-width: 800px) {
+  .viewer {
+    height: 380px;
+  }
+}
 .lab-app {
   display: grid;
   gap: 30px;
   min-width: 0;
 }
-
 .lab-app > * {
   min-width: 0;
   max-width: 100%;
 }
-
 .lab-status {
   color: var(--ui-text-muted);
   font-size: 13px;
   line-height: 1.5;
 }
-
 .sfm-inputs {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
@@ -27,5 +120,6 @@
 .sfm-inputs .ui-button {
   inline-size: 100%;
 }
-
-.sfm-notice { margin-block-start: var(--ui-space-4); }
+.sfm-notice {
+  margin-block-start: var(--ui-space-4);
+}

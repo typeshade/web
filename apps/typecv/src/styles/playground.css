@@ -1,5 +1,65 @@
-.field-help {
+.playground-page {
+  max-width: 1180px;
+}
+.pair-canvases {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ui-space-4);
+  margin: 20px 0;
+}
+.pair-canvases figure {
+  min-width: 0;
+  margin: 0;
+}
+.pair-canvases figcaption {
+  margin-bottom: 7px;
   color: var(--ui-text-muted);
-  font-size: var(--ui-font-size-label);
-  line-height: 1.6;
+  font-size: 12px;
+}
+.pair-canvases canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface-muted);
+}
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.metrics div {
+  min-width: 140px;
+  padding: 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-control);
+}
+.metrics dt {
+  color: var(--ui-text-muted);
+  font-size: 11px;
+}
+.metrics dd {
+  margin: 5px 0 0;
+  font:
+    600 19px "IBM Plex Mono",
+    monospace;
+}
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ui-space-4);
+}
+.result-grid pre {
+  overflow: auto;
+  padding: 14px;
+  color: #d6e4ff;
+  background: var(--ui-code-bg);
+  border-radius: var(--ui-radius-control);
+}
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: end;
 }

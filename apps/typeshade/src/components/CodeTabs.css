@@ -1,0 +1,18 @@
+/* The tab head needs the script, so it stays out of the page
+   until the script has run; with no script every panel is in the flow and they stack, which
+   is also what the search index reads. */
+.tabs-panel {
+  flex: 1 1 auto;
+  min-block-size: 0;
+}
+.tabs-panel > .expressive-code {
+  block-size: 100%;
+}
+.tabs-head.ui-tablist {
+  display: none;
+  gap: var(--ui-space-4);
+  border-block-end: 1px solid var(--color-line-1);
+}
+[data-front-tabs][data-ready] .tabs-head.ui-tablist {
+  display: flex;
+}

@@ -1,6 +1,14 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
-type Props = HTMLAttributes<'a'>;
-const { href = '#main', class: className = 'skip-link', ...attributes } = Astro.props;
+import "../styles/skip-link.css";
+import type { HTMLAttributes } from "astro/types";
+type Props = HTMLAttributes<"a">;
+const {
+  href = "#main",
+  class: className = "skip-link",
+  ...attributes
+} = Astro.props;
 ---
-<a {...attributes} class={className} href={href}><slot /></a>
+
+<a {...attributes} class={className} href={href}>
+  <slot />
+</a>

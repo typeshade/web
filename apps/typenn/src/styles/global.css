@@ -4,15 +4,4 @@
 @import "@typeshade/site-ui/semantics.css";
 @import "./tokens.css";
 @import "./base.css";
-@import "./motion.css";
-@import "./shell.css";
-@import "./home.css";
-@import "./docs.css";
-@import "./playground.css";
-@import "./responsive.css";
-@import "./training.css";
-@import "./graph.css";
-
-@import "@typeshade/site-ui/controls.css";
-
-@import "@typeshade/site-ui/compositions.css";
+@import "@typeshade/site-ui/motion.css";

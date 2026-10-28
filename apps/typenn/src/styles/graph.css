@@ -1,3 +1,25 @@
+.kg-panel {
+  --kg-0: #0072b2;
+  --kg-1: #d55e00;
+  --kg-2: #009e73;
+  --kg-3: #cc79a7;
+  --kg-4: #b07b00;
+  --kg-5: #3d8fd1;
+  --kg-6: #6f4fa0;
+  --kg-7: #5d6b00;
+}
+
+:root[data-theme="dark"] .kg-panel {
+  --kg-0: #56b4e9;
+  --kg-1: #ff9f6b;
+  --kg-2: #4dd2a6;
+  --kg-3: #ec9fcb;
+  --kg-4: #f2c24f;
+  --kg-5: #8fc6f2;
+  --kg-6: #b99ae0;
+  --kg-7: #d8d46a;
+}
+
 /* Kernel graph view (src/components/KernelGraph.tsx). Colours are Okabe-Ito, tuned per theme. */
 .kg-panel {
   margin: 12px 0 0;

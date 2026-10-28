@@ -1,6 +1,27 @@
+import type {
+  PlaygroundExample,
+  EmitChoice,
+  PlaygroundCopy,
+  PlaygroundHandle,
+  Target,
+  View,
+} from './playground/contracts.ts';
+import { createSourceCoordinates } from './playground/source-coordinates.ts';
+import {
+  loadMonaco,
+  followSiteTheme,
+  defineTypeshadeThemes,
+  markerSeverity,
+} from './playground/monaco.ts';
+import { registerEditorProviders } from './playground/editor-providers.ts';
+import { hashParams, writeHash } from './playground/links.ts';
+import { programManifest, emitWgsl, emitGlsl } from './playground/emission.ts';
+import { parseArg, formatValue, el } from './playground/view-helpers.ts';
+import { CONSOLE_SHOWN, createConsoleView } from './playground/console-view.ts';
+import { renderReflection } from './playground/reflection-view.ts';
+import { bindSharing } from './playground/sharing.ts';
 import { bindTabs } from '@typeshade/site-ui/dom/tabs';
-import { controlDialog } from '@typeshade/site-ui/dom/dialog';
-import { packModule } from '../../vendor/shader-dsl/src/index.ts';
+
 // The Playground's browser half. Astro puts this module through Vite, so it can import the
 // compiler and the language service from the vendored checkout. The component's own
 // `define:vars` script is emitted inline as a classic script, which has no import at all, so
@@ -11,18 +32,14 @@ import { packModule } from '../../vendor/shader-dsl/src/index.ts';
 // do: the page's own chunk is Monaco's glue, the emitters, reflection and the CPU oracle, and
 // the compiler lives in the language worker alone. The raster worker imports `core/oracle.ts`
 // this way for the same reason.
-import { emitModule, wgslBackend } from '../../vendor/shader-dsl/src/core/backends/wgsl.ts';
+import { wgslBackend } from '../../vendor/shader-dsl/src/core/backends/wgsl.ts';
 import { hostFeaturesFor } from '../../vendor/shader-dsl/src/core/backend.ts';
-import {
-  emitGlslStages,
-  type GlslEmitOptions,
-} from '../../vendor/shader-dsl/src/core/backends/glsl.ts';
-import type { EmitOptions } from '../../vendor/shader-dsl/src/core/emit.ts';
+
 import type { ModuleDecl } from '../../vendor/shader-dsl/src/core/ir/nodes.ts';
-import type { Fp64Flavor } from '../../vendor/shader-dsl/src/core/passes/fp64-lower.ts';
+
 import { compileModule } from '../../vendor/shader-dsl/src/core/oracle.ts';
 import { type ConsoleEvent } from '../../vendor/shader-dsl/src/core/console.ts';
-import type { ConsoleTier } from '../../vendor/shader-dsl/src/core/console-print.ts';
+
 import {
   consoleBuffer,
   hasConsoleCall,
@@ -33,18 +50,12 @@ import { reflect } from '../../vendor/shader-dsl/src/core/reflect.ts';
 // The ship-time plugins live on their own subpath, the one a host imports for a release build.
 import { minify, obfuscate } from '../../vendor/shader-dsl/src/emit-prod.ts';
 import type {
-  TypeshadeCompletionItem,
   TypeshadeDiagnostic,
-  TypeshadeDocumentSymbol,
   TypeshadePosition,
-  TypeshadeRange,
 } from '../../vendor/shader-dsl/src/language-service/index.ts';
 import {
-  SEMANTIC_TOKEN_MODIFIERS,
-  SEMANTIC_TOKEN_TYPES,
   HOST_URI,
   createLanguageClient,
-  encodeSemanticTokens,
   type Analysis,
   type LanguageClient,
 } from './playground-language.ts';
@@ -54,14 +65,9 @@ import {
   type ControlProp,
   type ControlProps,
 } from '../lib/live-shader-contract.ts';
-import {
-  codeOnly,
-  FRAGMENT_PRELUDE,
-  isReserved,
-  sampleShape,
-} from '../lib/live-shader-compile-contract.ts';
+import { isReserved } from '../lib/live-shader-compile-contract.ts';
 import { runComputeOnGpu } from '../lib/compute-runner.ts';
-import { BindingsModel, type BindingsCopy } from './playground-bindings.ts';
+import { BindingsModel } from './playground-bindings.ts';
 import { installOracleTextures } from './playground-oracle-textures.ts';
 import { errorLink } from './error-links.ts';
 import { diagnosticsForDocument } from './playground-diagnostics.ts';
@@ -71,15 +77,8 @@ import { workspaceFolder, zipStored } from './workspace-folder.ts';
 // it fetches the first time host.ts is opened, and the sandboxed frame a run happens in.
 import hostTypesAsset from 'virtual:playground-host-types';
 import { startHostFrame, type HostEvent, type HostRun } from './playground-host-run.ts';
-import { provideProgram } from './report-context.ts';
-import {
-  fetchExample,
-  fetchIndex,
-  fetchShare,
-  pageLocale,
-  shortLink,
-  submitToGallery,
-} from './example-data-client.ts';
+
+import { fetchExample, fetchIndex, fetchShare, pageLocale } from './example-data-client.ts';
 import {
   GALLERY_STILL_BYTES,
   GALLERY_STILL_HEIGHT,
@@ -108,231 +107,11 @@ import {
   type RasterReply,
   type RasterRequest,
   type ReflectedEntry,
-  type ReflectedField,
 } from './playground-raster.ts';
 
 // The oracle's texture reads answer from the texels the bindings panel binds, on this thread as
 // in the raster workers, so the return values and a dispatch read the picture the GPU does.
 installOracleTextures();
-
-/** One example as the page carries it: the source from the vendored file, the words from i18n. */
-interface PlaygroundExample {
-  readonly id: string;
-  readonly source: string;
-  readonly title: string;
-  readonly description: string;
-  /** The files it imports, by their path in the examples directory, which the page carries
-   *  in its library. An example the build does not have carries none. */
-  readonly imports?: readonly string[];
-  /** The passes drawn before it each frame, in draw order (compiler change 0026). */
-  readonly passes?: readonly { readonly name: string; readonly file: string }[];
-  /** Where a source twin's uniform fields start, by field name. */
-  readonly defaults?: Readonly<Record<string, readonly number[]>>;
-  /** A host example's host.ts (compiler change 0061), which opens in the tab beside it. */
-  readonly host?: string;
-}
-
-/** What the options bar is set to. Every field is a value the compiler's emit API takes. */
-interface EmitChoice {
-  readonly level: OptLevel;
-  readonly parens: 'full' | 'minimal';
-  readonly minify: boolean;
-  /** `minify({ numbers })`: how a float literal is re-spelled. */
-  readonly numbers: boolean | 'f32';
-  readonly obfuscate: boolean;
-  /** Which primitives back the emulated-double helpers, for the emit and for reflect(). */
-  readonly fp64Flavor: Fp64Flavor;
-  readonly floatPrecision: 'highp' | 'mediump';
-  /** The backend the Result tab draws on. Not an emit option, but it rides in the link with
-   *  them, so a link shows the canvas the sender was looking at. */
-  readonly backend: 'auto' | 'webgpu' | 'webgl2' | 'cpu';
-}
-
-/** The words the component wrote into `data-copy`; they live in src/i18n. */
-interface PlaygroundCopy {
-  readonly fileName: string;
-  /** The picker's group for the examples newer than the build. */
-  readonly releaseGroup: string;
-  readonly idle: string;
-  readonly ready: string;
-  readonly errors: string;
-  readonly loading: string;
-  readonly clean: string;
-  readonly noOutput: string;
-  readonly directive: string;
-  readonly unavailable: string;
-  readonly copy: string;
-  readonly copied: string;
-  readonly share: string;
-  readonly shared: string;
-  /** Submit's dialog, which sends the file to the gallery (gallery.typeshade.dev). */
-  readonly submit: {
-    readonly cancel: string;
-    readonly close: string;
-    readonly sending: string;
-    readonly sent: string;
-    readonly already: string;
-    readonly limit: string;
-    readonly failed: string;
-  };
-  /** The error codes' index in the page's language, which a code links under. */
-  readonly errorsHref: string;
-  readonly emit: {
-    readonly title: string;
-    readonly optimization: string;
-    readonly levels: Record<OptLevel, string>;
-    readonly parens: string;
-    readonly minify: string;
-    readonly numbers: string;
-    readonly obfuscate: string;
-    readonly fp64: string;
-    readonly precision: string;
-    readonly levelNote: string;
-  };
-  readonly entryPoints: string;
-  readonly resources: string;
-  readonly inputs: string;
-  readonly outputs: string;
-  readonly returns: string;
-  readonly runCpu: string;
-  readonly running: string;
-  readonly cpuIdle: string;
-  readonly noResources: string;
-  readonly noEntryPoints: string;
-  readonly requiredFeatures: string;
-  readonly cpuFailed: string;
-  readonly canvas: string;
-  readonly draw: string;
-  readonly stop: string;
-  readonly canvasIdle: string;
-  readonly engineGpu: string;
-  readonly engineCpu: string;
-  readonly gpuIdle: string;
-  readonly gpuWebgpu: string;
-  readonly gpuWebgl2: string;
-  readonly gpuNone: string;
-  readonly gpuNeedsStages: string;
-  readonly gpuNeedsAttributes: string;
-  readonly gpuNeedsBindings: string;
-  readonly gpuNoWebgpu: string;
-  readonly gpuNoWebgl2: string;
-  readonly gpuNoGlsl: string;
-  readonly gpuNoGlslFeatures: string;
-  readonly gpuNoFeature: string;
-  readonly gpuFailed: string;
-  readonly computeNeedsWebgpu: string;
-  readonly computeRan: string;
-  readonly consoleIdle: string;
-  readonly consoleLines: string;
-  readonly consoleNone: string;
-  readonly consoleDropped: string;
-  readonly consoleMore: string;
-  readonly consoleIndex: string;
-  readonly consolePixelHint: string;
-  readonly consolePixel: string;
-  readonly consolePixelGl: string;
-  readonly consolePixelGpu: string;
-  readonly consolePixelGpuNone: string;
-  readonly consolePixelGpuFailed: string;
-  readonly consolePixelNone: string;
-  readonly consolePixelOutside: string;
-  readonly consolePixelFailed: string;
-  readonly consolePixelNoRaster: string;
-  readonly consoleNotRecorded: string;
-  readonly consoleNotRecordedFrame: string;
-  readonly consoleVertex: string;
-  readonly consoleVertexGpu: string;
-  readonly consoleVertexAt: string;
-  readonly consoleRecording: string;
-  readonly consoleFrameGpu: string;
-  readonly consoleFrameDropped: string;
-  readonly consoleFrameFailed: string;
-  readonly consoleFrameCpu: string;
-  readonly consoleFrameKept: string;
-  readonly pixelNote: string;
-  readonly pixelNoteRecording: string;
-  readonly consoleValue: string;
-  readonly bindings: BindingsCopy;
-  readonly canvasNeedsVertex: string;
-  readonly canvasFlat: string;
-  readonly canvasFlatInputs: string;
-  readonly canvasProgress: string;
-  readonly canvasDrawn: string;
-  readonly resolution: string;
-  readonly canvasTooBig: string;
-  readonly args: string;
-  readonly argsInvalid: string;
-  readonly cpuNoResources: string;
-  readonly entryCountOne: string;
-  readonly noGlsl: string;
-  readonly resultTab: string;
-  readonly starting: string;
-  readonly serviceFailed: string;
-  readonly sourceTypescript: string;
-  readonly sourceTypeshade: string;
-  /** The gallery, the file tabs and the transport, in src/i18n under `playground.workspace`. */
-  readonly workspace: {
-    readonly files: string;
-    readonly newFile: string;
-    readonly download: string;
-    readonly openInVsCode: string;
-    readonly newFileName: string;
-    readonly badName: string;
-    readonly takenName: string;
-    readonly renameHint: string;
-    readonly renameLabel: string;
-    readonly emptyName: string;
-    readonly mainNameSlash: string;
-    readonly importsRenamed: string;
-    readonly deleteFile: string;
-    readonly confirmDelete: string;
-    readonly play: string;
-    readonly pause: string;
-    readonly fullscreen: string;
-    readonly exitFullscreen: string;
-    readonly dropHint: string;
-    readonly pass: string;
-    readonly passTitle: string;
-    readonly passFailed: string;
-    readonly passTexture: string;
-    readonly passesRgba8: string;
-    readonly runHost: string;
-    readonly stopHost: string;
-    readonly hostFrame: string;
-    readonly hostConsole: string;
-    readonly hostNone: string;
-    readonly hostUnloaded: string;
-    readonly hostStopped: string;
-  };
-}
-
-/** The files the compiler emits, one per tab over the text panel. */
-type Target = 'wgsl' | 'glslVertex' | 'glslFragment';
-
-/** What the one tab strip over the result column selects: the canvas, one of the three
- *  emitted files, or the reflection. */
-type View = 'result' | Target | 'reflection' | 'console';
-
-/** What scripts/check-playground.mjs reads off the tool's element. */
-interface PlaygroundHandle {
-  /** Hold the shader clock at `seconds` on both engines, or let it run with null. */
-  freeze(seconds: number | null): void;
-  /** Stop drawing and leave the frame up, or draw again (`MountedShader.idle`). */
-  idle(on: boolean): void;
-  /** The rasteriser's RGBA at each pixel of a `width` by `height` grid, one 1-pixel tile each,
-   *  or null where the triangle does not cover it; a sentence when it cannot run at all. */
-  cpuPixels(
-    points: readonly (readonly [number, number])[],
-    width: number,
-    height: number,
-  ): Promise<(number[] | null)[] | string>;
-}
-
-declare global {
-  interface HTMLElement {
-    __playground?: PlaygroundHandle;
-  }
-}
 
 /** Whether a view is one of the three the text panel holds. */
 const isTarget = (view: View): view is Target =>
@@ -350,440 +129,6 @@ const TARGET_LANGUAGE: Readonly<Record<Target, string>> = {
 // What reflect() recovers from the compiled module, shaped for the pane. Names and types in
 // here come from the source in the editor, so every one of them reaches the page as text on a
 // node and none of it is ever written as markup.
-
-/** How the zero of a type reads in an argument field, and how what is typed back reads as a
- *  value. A vector is a comma-separated list, which is how the source spells one too. */
-const argText = (value: unknown): string =>
-  Array.isArray(value) ? value.join(', ') : String(value);
-
-function parseArg(text: string, zero: unknown): unknown {
-  const trimmed = text.trim();
-  if (typeof zero === 'boolean') {
-    if (/^(?:true|1)$/i.test(trimmed)) return true;
-    if (/^(?:false|0)$/i.test(trimmed)) return false;
-    throw new Error('not a boolean');
-  }
-  const parts = trimmed.split(',').map((part) => Number(part.trim()));
-  if (parts.length === 0 || parts.some((part) => !Number.isFinite(part)))
-    throw new Error('not a number');
-  if (Array.isArray(zero)) {
-    if (parts.length !== zero.length) throw new Error('wrong length');
-    return parts;
-  }
-  if (parts.length !== 1) throw new Error('not a single number');
-  return parts[0];
-}
-
-/** How a field reads on one line: `name: type` and the attribute that placed it, when it has one. */
-function fieldLabel(field: ReflectedField): { text: string; attr: string } {
-  const text =
-    field.name && field.type ? `${field.name}: ${field.type}` : (field.type ?? field.name ?? '');
-  if (field.builtin) return { text, attr: `@builtin(${field.builtin})` };
-  if (typeof field.location === 'number') return { text, attr: `@location(${field.location})` };
-  return { text, attr: '' };
-}
-
-/** A returned value as the pane prints it: arrays inline, everything else as JSON. */
-function formatValue(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map((v) => formatValue(v)).join(', ')}]`;
-  if (value && typeof value === 'object') {
-    return `{ ${Object.entries(value)
-      .map(([k, v]) => `${k}: ${formatValue(v)}`)
-      .join(', ')} }`;
-  }
-  return typeof value === 'number'
-    ? String(Number(value.toFixed(6)))
-    : (JSON.stringify(value) ?? String(value));
-}
-
-function el(tag: string, className?: string, text?: string): HTMLElement {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-/** One `label   value` line. */
-function ioRow(label: string, text: string, attr = '', valueClass = 'io-value'): HTMLElement {
-  const row = el('div', 'io-row');
-  row.append(el('span', 'io-label', label));
-  const value = el('span', valueClass, text);
-  if (attr) {
-    value.append(document.createTextNode('  '));
-    value.append(el('span', 'attr', attr));
-  }
-  row.append(value);
-  return row;
-}
-
-/** Monaco's one-based cursor position. */
-interface MonacoPosition {
-  readonly lineNumber: number;
-  readonly column: number;
-}
-
-/** Monaco's one-based, end-exclusive range, which a marker and a hover both take. */
-interface MonacoRange {
-  readonly startLineNumber: number;
-  readonly startColumn: number;
-  readonly endLineNumber: number;
-  readonly endColumn: number;
-}
-
-// ── The fullscreen vertex half ─────────────────────────────────────────────────────────────
-// A file that declares no `@vertex` entry is compiled behind the fullscreen triangle every
-// Book of Shaders page draws on, which is what `<LiveShader>` does on a guide page and what
-// src/lib/live-shader-compile-contract.ts fixes as the site's one rule for it. So a reader can write
-// a fragment program alone, take the `uv` the triangle hands them, and see it cover the
-// canvas, instead of reading that the canvas needs a vertex entry they did not want to write.
-//
-// The directive has to stay the first thing in the file, so the prelude goes in after it and
-// everything below moves down by its lines. The compiler answers about the composed text and
-// the editor holds the reader's, so the two line numbers differ from that point on, and the
-// four functions below are where they meet.
-
-/** The directive line as the compiler wants it: first in the file. The Playground's own
- *  sample writes a semicolon after it and the `.shade.ts` examples do not. */
-const DIRECTIVE_LINE = /^[\s\uFEFF]*(['"])use typeshade\1[ \t]*;?[ \t]*\r?\n/;
-
-/** The two top-level names the prelude brings. A file that declares one of its own would get
- *  a duplicate and stop compiling, so that file keeps what it wrote and the prelude stays
- *  out. A file that only names one of them gets the prelude and the declaration with it. */
-const PRELUDE_DECLARES =
-  /^[\t ]*(?:export[\t ]+)?(?:class|function|const|let|var|type|interface)[\t ]+(?:VsOut|fullscreen)\b/m;
-
-/** The reader's text as the compiler sees it, and where the prelude went in. A file with no
- *  directive is left alone: the page's own message about the directive is what that reader
- *  needs, and it would never appear if a directive were supplied for them. */
-function compose(source: string): {
-  readonly text: string;
-  readonly at: number;
-  readonly lines: number;
-} {
-  const directive = DIRECTIVE_LINE.exec(source);
-  const code = codeOnly(source);
-  // A file with no fragment entry has nothing for the triangle to hand a `uv` to: a compute
-  // kernel gets no vertex half it would never run.
-  if (
-    !directive ||
-    sampleShape(source) === 'module' ||
-    !/@fragment\b/.test(code) ||
-    PRELUDE_DECLARES.test(code)
-  ) {
-    return { text: source, at: 0, lines: 0 };
-  }
-  const head = source.slice(0, directive[0].length);
-  const inserted = `\n${FRAGMENT_PRELUDE}\n`;
-  return {
-    text: head + inserted + source.slice(directive[0].length),
-    at: head.split('\n').length - 1,
-    lines: inserted.split('\n').length - 1,
-  };
-}
-
-/** How many lines the prelude took, and the line it went in at. Zero while the reader's file
- *  declares its own vertex entry, which is when the two texts are the same text. */
-let preludeLines = 0;
-let preludeAt = 0;
-
-/** Whether a line of the compiled text is one of the prelude's, which the editor does not
- *  hold and the reader never wrote. */
-const inPrelude = (line: number): boolean =>
-  preludeLines > 0 && line >= preludeAt && line < preludeAt + preludeLines;
-
-/** A line of the editor's text, as the compiled text numbers it. */
-const intoDocument = (line: number): number =>
-  preludeLines > 0 && line >= preludeAt ? line + preludeLines : line;
-
-/** A line of the compiled text, back in the editor's. One of the prelude's own lands on the
- *  directive line, which is the nearest line the reader can see. */
-const outOfDocument = (line: number): number => {
-  if (preludeLines === 0 || line < preludeAt) return line;
-  return line >= preludeAt + preludeLines ? line - preludeLines : Math.max(0, preludeAt - 1);
-};
-
-// ── The one place the two coordinate systems meet ──────────────────────────────────────────
-// Monaco counts lines and columns from 1. The language service counts both from 0, the way
-// the Language Server Protocol does. Every crossing goes through these four functions, so a
-// +1 or a -1, and the prelude's own lines, live here and in no other file.
-
-const toServicePosition = (position: MonacoPosition): TypeshadePosition => ({
-  line: intoDocument(position.lineNumber - 1),
-  character: position.column - 1,
-});
-
-const toMonacoPosition = (position: TypeshadePosition): MonacoPosition => ({
-  lineNumber: outOfDocument(position.line) + 1,
-  column: position.character + 1,
-});
-
-const toMonacoRange = (range: TypeshadeRange): MonacoRange => {
-  const startLineNumber = outOfDocument(range.start.line) + 1;
-  const startColumn = range.start.character + 1;
-  const endLineNumber = outOfDocument(range.end.line) + 1;
-  const endColumn = range.end.character + 1;
-  // A zero-width range draws no squiggle, so an empty one is widened by a column.
-  const empty = endLineNumber === startLineNumber && endColumn <= startColumn;
-  return {
-    startLineNumber,
-    startColumn,
-    endLineNumber,
-    endColumn: empty ? startColumn + 1 : endColumn,
-  };
-};
-
-/** How a diagnostic's position reads in the diagnostics pane: the line and column an editor shows. */
-const toDisplayPosition = (position: TypeshadePosition): string =>
-  `${outOfDocument(position.line) + 1}:${position.character + 1}`;
-
-// ── Monaco, from the CDN ───────────────────────────────────────────────────────────────────
-// The editor is loaded the way its own samples load it, through its AMD loader. `MONACO_VS`
-// is the directory the loader knows as `vs`, with no trailing slash: the loader joins
-// `/editor/editor.main.js` onto it, and a trailing slash would make that a doubled separator
-// the CDN answers with a 400.
-const MONACO_VERSION = '0.52.2';
-const MONACO_MIN = `https://cdn.jsdelivr.net/npm/monaco-editor@${MONACO_VERSION}/min`;
-const MONACO_VS = `${MONACO_MIN}/vs`;
-
-function monacoWorkerUrl(_label: string): string {
-  // A worker script fetched straight from the CDN is cross-origin, so each worker is a small
-  // same-origin shim that names Monaco's own baseUrl and pulls the real worker in from there.
-  //
-  // Every label loads the same bootstrap. workerMain.js carries the AMD loader and reads the
-  // module to run from the message Monaco sends it, so it serves the TypeScript worker and
-  // the plain editor worker alike. Importing language/typescript/tsWorker.js directly, as
-  // this did, hands the worker an AMD module with no loader under it, and the browser reports
-  // that as the script failing to load; the CDN serves that file, so it read as a network
-  // problem and was not one.
-  //
-  // baseUrl is the directory above vs, since the paths workerMain.js resolves start with vs/.
-  const source =
-    `self.MonacoEnvironment={baseUrl:${JSON.stringify(`${MONACO_MIN}/`)}};` +
-    `importScripts(${JSON.stringify(`${MONACO_VS}/base/worker/workerMain.js`)});`;
-  return `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`;
-}
-
-function loadMonaco(): Promise<any> {
-  const w = window as any;
-  if (w.monaco) return Promise.resolve(w.monaco);
-  return new Promise((resolve, reject) => {
-    const start = (): void => {
-      const amdRequire = w.require;
-      if (typeof amdRequire !== 'function') {
-        reject(new Error('The Monaco loader ran without defining its AMD require.'));
-        return;
-      }
-      amdRequire.config({ paths: { vs: MONACO_VS } });
-      w.MonacoEnvironment = {
-        getWorkerUrl: (_moduleId: string, label: string) => monacoWorkerUrl(label),
-      };
-      amdRequire(['vs/editor/editor.main'], () => resolve(w.monaco), reject);
-    };
-    const existing = document.querySelector('script[data-monaco-loader]');
-    if (existing) {
-      if (w.require) start();
-      else existing.addEventListener('load', start, { once: true });
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = `${MONACO_VS}/loader.js`;
-    script.async = true;
-    script.dataset.monacoLoader = 'true';
-    script.addEventListener('load', start, { once: true });
-    script.addEventListener(
-      'error',
-      () => reject(new Error(`The Monaco loader did not load from ${MONACO_VS}/loader.js`)),
-      { once: true },
-    );
-    document.head.appendChild(script);
-  });
-}
-
-// ── The site's dark mode ───────────────────────────────────────────────────────────────────
-// Base.astro puts the reader's choice on `documentElement.dataset.theme` and leaves it unset
-// while the choice is the system's. Monaco keeps a theme of its own, so it is told which one
-// on load, on the toggle, and when the system setting moves under an unset choice.
-const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-function siteIsDark(): boolean {
-  const chosen = document.documentElement.dataset.theme;
-  return chosen ? chosen === 'dark' : darkQuery.matches;
-}
-
-function followSiteTheme(monaco: any, repaint: () => void): void {
-  const apply = () => {
-    monaco.editor.setTheme(siteIsDark() ? 'typeshade-dark' : 'typeshade-light');
-    repaint();
-  };
-  apply();
-  new MutationObserver(apply).observe(document.documentElement, {
-    attributeFilter: ['data-theme'],
-  });
-  darkQuery.addEventListener('change', apply);
-}
-
-function completionKind(monaco: any, kind: TypeshadeCompletionItem['kind']): number {
-  const kinds = monaco.languages.CompletionItemKind;
-  const byKind: Record<TypeshadeCompletionItem['kind'], number> = {
-    keyword: kinds.Keyword,
-    type: kinds.TypeParameter,
-    function: kinds.Function,
-    attribute: kinds.Keyword,
-    builtin: kinds.Constant,
-    variable: kinds.Variable,
-    field: kinds.Field,
-    struct: kinds.Struct,
-    resource: kinds.Variable,
-    snippet: kinds.Snippet,
-  };
-  return byKind[kind] ?? kinds.Text;
-}
-
-function symbolKind(monaco: any, kind: TypeshadeDocumentSymbol['kind']): number {
-  const kinds = monaco.languages.SymbolKind;
-  const byKind: Record<TypeshadeDocumentSymbol['kind'], number> = {
-    function: kinds.Function,
-    struct: kinds.Struct,
-    field: kinds.Field,
-    resource: kinds.Variable,
-    constant: kinds.Constant,
-    variable: kinds.Variable,
-    parameter: kinds.Variable,
-    entry: kinds.Function,
-  };
-  return byKind[kind] ?? kinds.Variable;
-}
-
-function markerSeverity(monaco: any, severity: TypeshadeDiagnostic['severity']): number {
-  const levels = monaco.MarkerSeverity;
-  return severity === 'error'
-    ? levels.Error
-    : severity === 'warning'
-      ? levels.Warning
-      : severity === 'information'
-        ? levels.Info
-        : levels.Hint;
-}
-
-/** The service's semantic tokens, coloured. Monaco matches a semantic token against a theme
- *  rule by its type followed by its modifiers, `type.gpu` for a GPU type, so a decorator, a
- *  GPU type, an entry point and a bound resource each read as what the compiler says they
- *  are. The values are Monaco's own light and dark TypeScript palette, so nothing here is a
- *  colour the editor does not already use. */
-function defineTypeshadeThemes(monaco: any): void {
-  const rules = (dark: boolean) => [
-    { token: 'decorator', foreground: dark ? 'c586c0' : 'af00db' },
-    { token: 'type', foreground: dark ? '4ec9b0' : '267f99' },
-    { token: 'type.gpu', foreground: dark ? '4ec9b0' : '267f99', fontStyle: 'bold' },
-    { token: 'struct', foreground: dark ? '4ec9b0' : '267f99' },
-    { token: 'builtin', foreground: dark ? 'dcdcaa' : '795e26' },
-    { token: 'resource', foreground: dark ? '9cdcfe' : '0070c1', fontStyle: 'italic' },
-    { token: 'function', foreground: dark ? 'dcdcaa' : '795e26' },
-    { token: 'function.entry', foreground: dark ? 'dcdcaa' : '795e26', fontStyle: 'bold' },
-    { token: 'parameter', foreground: dark ? '9cdcfe' : '001080' },
-    { token: 'variable', foreground: dark ? '9cdcfe' : '001080' },
-    { token: 'property', foreground: dark ? '9cdcfe' : '001080' },
-  ];
-  monaco.editor.defineTheme('typeshade-light', {
-    base: 'vs',
-    inherit: true,
-    rules: rules(false),
-    colors: {},
-  });
-  monaco.editor.defineTheme('typeshade-dark', {
-    base: 'vs-dark',
-    inherit: true,
-    rules: rules(true),
-    colors: {},
-  });
-}
-
-// ── The source in the URL ──────────────────────────────────────────────────────────────────
-// A link can carry the whole file in its fragment (`code=`), so the page opens it with no
-// service to hand the source back. The encoding is src/scripts/source-link.ts, which a live
-// example's link to the Playground writes too. Share stores that fragment with the Worker and
-// copies a short link (/s/<id>, worker/index.ts), which opens the page at `#share=<id>`: the
-// page fetches the fragment by its id, so the address stays short whatever the file's size.
-// Where there is no Worker, Share copies the long link.
-
-const hashParams = (): URLSearchParams =>
-  new URLSearchParams(window.location.hash.replace(/^#/, ''));
-
-/** The fragment: what to open, and the options to open it under. Only a setting that differs
- *  from the default is written, so a link to an untouched Playground stays short. */
-function writeHash(key: string, value: string, choice?: EmitChoice, more: string[] = []): void {
-  const parts = [`${key}=${value}`, ...more];
-  if (choice) {
-    if (choice.level !== 'O2') parts.push(`opt=${choice.level}`);
-    if (choice.parens !== 'full') parts.push(`parens=${choice.parens}`);
-    if (choice.minify) parts.push('minify=1');
-    if (choice.numbers !== true)
-      parts.push(`numbers=${choice.numbers === 'f32' ? 'f32' : 'false'}`);
-    if (choice.obfuscate) parts.push('obfuscate=1');
-    if (choice.fp64Flavor !== 'float') parts.push(`fp64=${choice.fp64Flavor}`);
-    if (choice.floatPrecision !== 'highp') parts.push(`precision=${choice.floatPrecision}`);
-    if (choice.backend !== 'auto') parts.push(`backend=${choice.backend}`);
-  }
-  const url = new URL(window.location.href);
-  url.hash = parts.join('&');
-  window.history.replaceState(null, '', url);
-}
-
-// ── The emit options ───────────────────────────────────────────────────────────────────────
-
-/** The options both backends share. `minify` and `obfuscate` are plugins, so they ride in
- *  `plugins`. `obfuscate()` is the compiler's own preset and expands to four plugins, the
- *  last of them a `minify({ numbers: 'f32' })`; the reader's own minify follows it, because
- *  the text-stage hooks run in array order and the reader's number mode is the one they
- *  chose. Running minify twice changes nothing the first run did not already do. */
-const sharedEmitOptions = (choice: EmitChoice): EmitOptions => {
-  const plugins = [
-    ...(choice.obfuscate ? obfuscate() : []),
-    ...(choice.minify ? [minify({ numbers: choice.numbers })] : []),
-  ];
-  return {
-    parens: choice.parens,
-    fp64Flavor: choice.fp64Flavor,
-    ...(plugins.length > 0 ? { plugins } : {}),
-  };
-};
-
-/** WGSL at the chosen level. `emitModuleAt` takes a level and no other options, and
- *  `emitModule` takes the options at O2, so O0 and O1 reach the compiler with the level
- *  alone. The note under the options bar says so where a reader can see it. */
-const programManifest = (module: ModuleDecl, choice: EmitChoice, console = false) =>
-  packModule(module, {
-    console,
-    emit:
-      choice.level === 'O2'
-        ? { ...sharedEmitOptions(choice), level: choice.level }
-        : { level: choice.level },
-  });
-const emitWgsl = (module: Parameters<typeof emitModule>[0], choice: EmitChoice): string =>
-  programManifest(module, choice).wgsl;
-
-/** Both GLSL stages. The GLSL backend fixes its own optimizer at a fixpoint, so it takes the
- *  options and no level. */
-const emitGlsl = (
-  module: Parameters<typeof emitGlslStages>[0],
-  choice: EmitChoice,
-  overrideValues?: Readonly<Record<string, number>>,
-): { vertex: string; fragment: string } | { failed: string } => {
-  // An override the reader moved is pinned as a hard `#define`; one left at its default keeps
-  // the `#ifndef` guard the emit writes, so an untouched module emits the bytes it always did.
-  const options: GlslEmitOptions = {
-    ...sharedEmitOptions(choice),
-    floatPrecision: choice.floatPrecision,
-    ...(overrideValues ? { overrideValues } : {}),
-  };
-  try {
-    return emitGlslStages(module, options);
-  } catch (error) {
-    // A module the GLSL backend cannot express at all, a uniform scalar among them. The
-    // reason is kept, since WebGL2 has to say why it has nothing to run.
-    return { failed: error instanceof Error ? error.message : String(error) };
-  }
-};
 
 /** The name of a file no example is behind: the Blank tile's, and a link's whose code is no
  *  example's and that names no file. */
@@ -810,6 +155,17 @@ interface DiagnosticRow {
 }
 
 function mount(root: HTMLElement): void {
+  const coordinates = createSourceCoordinates();
+  const {
+    compose,
+    inPrelude,
+    intoDocument,
+    outOfDocument,
+    toServicePosition,
+    toMonacoPosition,
+    toMonacoRange,
+    toDisplayPosition,
+  } = coordinates;
   const editorHost = root.querySelector('[data-editor]');
   const output = root.querySelector('[data-output]');
   const diagnosticsPane = root.querySelector('[data-diagnostics]');
@@ -1061,110 +417,16 @@ function mount(root: HTMLElement): void {
       if (drawable && engineIsCpu()) window.setTimeout(openPool, 0);
     }
 
-    const entryGroup = el('div', 'group');
-    entryGroup.append(el('p', 'group-title', copy.entryPoints));
-    if (entries.length === 0) {
-      entryGroup.append(el('p', 'empty', copy.noEntryPoints));
-    }
-    for (const entry of entries) {
-      const box = el('div', 'entry');
-      const head = el('div', 'entry-head');
-      head.append(el('span', 'stage', `@${entry.stage}`));
-      head.append(el('span', 'entry-name', entry.name));
-      box.append(head);
-      for (const field of entry.io?.inputs ?? []) {
-        const { text, attr } = fieldLabel(field);
-        box.append(ioRow(copy.inputs, text, attr));
+    renderReflection(reflectionPane, entries, reflection, typedArgs, copy, (name) => {
+      selectView('result');
+      const target = root.querySelector(
+        `[data-bindings] [data-binding-name="${CSS.escape(name)}"]`,
+      );
+      if (target instanceof HTMLElement) {
+        target.scrollIntoView({ block: 'nearest' });
+        target.focus({ preventScroll: true });
       }
-      for (const field of entry.io?.outputs ?? []) {
-        const { text, attr } = fieldLabel(field);
-        box.append(ioRow(copy.outputs, text, attr));
-      }
-      // The oracle used to run every entry at the zero of its type, which is how a triangle
-      // was only ever seen at its first corner and a shader dividing by a zero input returned
-      // NaN for every component. The zeros are the starting values of a form now.
-      const inputs = entry.io?.inputs ?? [];
-      if (inputs.length > 0) {
-        const row = el('div', 'io-row arg-row');
-        row.append(el('span', 'io-label', copy.args));
-        const fields = el('span', 'io-value');
-        inputs.forEach((field, index) => {
-          const zero = zeroFor(field.type);
-          const name = field.name ?? `arg${index}`;
-          const key = `${entry.name}/${name}`;
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.className = 'arg-input';
-          input.dataset.arg = key;
-          input.setAttribute('aria-label', `${entry.name} ${name}`);
-          input.value = typedArgs.get(key) ?? (zero.ok ? argText(zero.value) : '');
-          // A type the form cannot start off, a matrix or a texture among them, is left for
-          // the reader to fill in instead of guessed at.
-          input.placeholder = field.type ?? '';
-          input.addEventListener('input', () => typedArgs.set(key, input.value));
-          const label = el('span', 'arg-name', `${name}:`);
-          fields.append(label, input);
-        });
-        row.append(fields);
-        box.append(row);
-      }
-
-      const returns = ioRow(copy.returns, copy.cpuIdle, '', 'io-value empty');
-      returns.dataset.returns = entry.name;
-      box.append(returns);
-      entryGroup.append(box);
-    }
-    reflectionPane.append(entryGroup);
-
-    // Resources, and the features the module asks the device for, each only when it has any.
-    const resources = reflection
-      ? [
-          ...reflection.bindGroups.flatMap((group) =>
-            (group.entries ?? []).map((entry) => ({
-              label: `@group(${group.group ?? 0})`,
-              text: `${entry.name}: ${entry.resourceKind}`,
-            })),
-          ),
-          ...reflection.overrides.map((o) => ({ label: 'override', text: String(o.name ?? o) })),
-        ]
-      : [];
-    const resourceGroup = el('div', 'group');
-    resourceGroup.append(el('p', 'group-title', copy.resources));
-    if (resources.length === 0) resourceGroup.append(el('p', 'empty', copy.noResources));
-    else {
-      for (const r of resources) {
-        const row = ioRow(r.label, r.text);
-        // A binding is supplied in the panel under the canvas, so its row here goes there.
-        const name = r.text.split(':')[0]!.trim();
-        if (r.label !== 'override' && name !== '_fp64') {
-          const go = document.createElement('button');
-          go.type = 'button';
-          go.className = 'to-binding';
-          go.textContent = copy.bindings.title;
-          go.addEventListener('click', () => {
-            selectView('result');
-            const target = root.querySelector(
-              `[data-bindings] [data-binding-name="${CSS.escape(name)}"]`,
-            );
-            if (target instanceof HTMLElement) {
-              target.scrollIntoView({ block: 'nearest' });
-              target.focus({ preventScroll: true });
-            }
-          });
-          row.append(go);
-        }
-        resourceGroup.append(row);
-      }
-    }
-    reflectionPane.append(resourceGroup);
-
-    const features: readonly string[] = reflection?.requiredFeatures ?? [];
-    if (features.length > 0) {
-      const featureGroup = el('div', 'group');
-      featureGroup.append(el('p', 'group-title', copy.requiredFeatures));
-      for (const f of features) featureGroup.append(ioRow('', String(f)));
-      reflectionPane.append(featureGroup);
-    }
+    });
   };
 
   /** Runs every entry point on the CPU oracle and writes what each returned. */
@@ -1959,19 +1221,6 @@ function mount(root: HTMLElement): void {
     retireStill();
   };
 
-  /** The Console tab. A report is sentences that say where its lines came from, and lists of
-   *  the lines. Only the first CONSOLE_SHOWN of a list are drawn; a sentence says the rest. */
-  const CONSOLE_SHOWN = 500;
-  const shown = (v: unknown): string =>
-    typeof v === 'string' ? v : typeof v === 'number' ? String(v) : JSON.stringify(v);
-  const sentence = (text: string): HTMLParagraphElement => {
-    const p = document.createElement('p');
-    p.textContent = text;
-    return p;
-  };
-  /** The file and line a console call was written on, as `file:line` (surface §66): the file
-   *  by the name its tab has, and the line as the editor numbers it, past the prelude the file
-   *  the canvas runs is compiled with. Empty for an event with no span. */
   const sourceLine = (e: ConsoleEvent): string => {
     if (!e.span) return '';
     const path = pathOfUri(e.span.file);
@@ -1979,118 +1228,12 @@ function mount(root: HTMLElement): void {
     const line = path === '' ? outOfDocument(e.span.line) : e.span.line;
     return `${file}:${line + 1}`;
   };
-  /** One list of console lines, marked with `block` for a check to find. Each line leads with
-   *  where it ran, the way a host's printed console line does (surface §66): the tier that ran
-   *  it, the file and line of the call, then its invocation, unless `at` says otherwise. */
-  const consoleList = (
-    events: readonly ConsoleEvent[],
-    block: string,
-    tier: ConsoleTier,
-    at: (e: ConsoleEvent, index: number) => string = (e) =>
-      e.invocation ? `[${e.invocation.join(', ')}]` : '',
-  ): HTMLElement[] => {
-    if (events.length === 0) return [];
-    const list = document.createElement('ol');
-    list.dataset.consoleBlock = block;
-    const span = (className: string, text: string): HTMLSpanElement => {
-      const node = document.createElement('span');
-      node.className = className;
-      node.textContent = text;
-      return node;
-    };
-    events.slice(0, CONSOLE_SHOWN).forEach((e, index) => {
-      const li = document.createElement('li');
-      if (e.method === 'warn' || e.method === 'error') li.className = e.method;
-      const label = span('tier', tier);
-      label.dataset.tier = tier;
-      const body =
-        e.method === 'table' && e.args.length === 1 && typeof e.args[0] === 'object'
-          ? consoleTable(e.args[0], shown)
-          : document.createElement('span');
-      if (!(body instanceof HTMLTableElement)) body.textContent = e.args.map(shown).join(' ');
-      li.append(label, span('source', sourceLine(e)), span('at', at(e, index)), body);
-      list.append(li);
-    });
-    return events.length > CONSOLE_SHOWN
-      ? [list, sentence(fillNumbers(copy.consoleMore, { more: events.length - CONSOLE_SHOWN }))]
-      : [list];
-  };
-  /** How many reports the tab has shown, so a check can wait for the next one. */
-  let consolePaints = 0;
-  /** Replace the tab's contents with one report. `report` says what it is and where it ran,
-   *  and a capture adds how many lines came back and how many were dropped, for a check that
-   *  waits on one. */
-  const paintConsole = (
-    report: { readonly report: string; readonly lines?: number; readonly dropped?: number },
-    ...parts: (HTMLElement | HTMLElement[])[]
-  ): void => {
-    if (!(consolePane instanceof HTMLElement)) return;
-    consolePane.replaceChildren(...parts.flat());
-    consolePane.dataset.report = report.report;
-    consolePane.dataset.paint = String(++consolePaints);
-    if (report.lines === undefined) delete consolePane.dataset.lines;
-    else consolePane.dataset.lines = String(report.lines);
-    if (report.dropped === undefined) delete consolePane.dataset.dropped;
-    else consolePane.dataset.dropped = String(report.dropped);
-  };
-
-  /** The lines the last compute run delivered, in the order the CPU runs the invocations
-   *  (surface §66). */
-  const showConsole = (
-    events: readonly ConsoleEvent[],
-    dropped: number,
-    backend: 'webgpu' | 'cpu',
-  ): void => {
-    const name = backendName(backend);
-    if (events.length === 0 && dropped === 0) {
-      paintConsole(
-        { report: `compute/${backend}`, lines: 0, dropped: 0 },
-        sentence(fillNumbers(copy.consoleNone, { backend: name })),
-      );
-      return;
-    }
-    paintConsole(
-      { report: `compute/${backend}`, lines: events.length, dropped },
-      sentence(fillNumbers(copy.consoleLines, { lines: events.length, backend: name })),
-      consoleList(events, 'lines', backend === 'webgpu' ? 'GPU' : 'CPU'),
-      dropped > 0 ? [sentence(fillNumbers(copy.consoleDropped, { dropped }))] : [],
-    );
-  };
-
-  /** A `console.table` value as the browser's own console lays one out (changes/0019): a row per
-   *  array element or struct field, and a column per field or component when the rows are
-   *  structs or vectors, else one value column. A matrix arrives as its columns already. */
-  const consoleTable = (value: unknown, shown: (v: unknown) => string): HTMLTableElement => {
-    const rows: [string, unknown][] = Array.isArray(value)
-      ? value.map((v, i) => [String(i), v])
-      : Object.entries(value as Record<string, unknown>);
-    const columns: string[] = [];
-    for (const [, v] of rows) {
-      if (v === null || typeof v !== 'object') continue;
-      for (const k of Object.keys(v)) if (!columns.includes(k)) columns.push(k);
-    }
-    const table = document.createElement('table');
-    const cell = (tag: 'th' | 'td', text: string): HTMLTableCellElement => {
-      const c = document.createElement(tag);
-      c.textContent = text;
-      return c;
-    };
-    const head = document.createElement('tr');
-    head.append(cell('th', copy.consoleIndex));
-    for (const k of columns.length > 0 ? columns : [copy.consoleValue]) head.append(cell('th', k));
-    table.append(head);
-    for (const [key, v] of rows) {
-      const tr = document.createElement('tr');
-      tr.append(cell('th', key));
-      if (columns.length === 0) tr.append(cell('td', shown(v)));
-      else {
-        const o = (v !== null && typeof v === 'object' ? v : {}) as Record<string, unknown>;
-        for (const k of columns) tr.append(cell('td', k in o ? shown(o[k]) : ''));
-      }
-      table.append(tr);
-    }
-    return table;
-  };
+  const { sentence, consoleList, paintConsole, showConsole, consoleTable } = createConsoleView(
+    consolePane,
+    copy,
+    sourceLine,
+    backendName,
+  );
 
   // ── The console of a module that draws ─────────────────────────────────────────────────
   // Its fragment entry runs once per pixel, far too many lines to list as they come, so its
@@ -3505,8 +2648,7 @@ function mount(root: HTMLElement): void {
     version += 1;
     root.dataset.version = String(version);
     const composed = compose(model.getValue());
-    preludeAt = composed.at;
-    preludeLines = composed.lines;
+    coordinates.setPrelude(composed);
     if (preludeNote instanceof HTMLElement) preludeNote.hidden = composed.lines === 0;
     client.update(documentUri, composed.text, version);
   };
@@ -3582,119 +2724,15 @@ function mount(root: HTMLElement): void {
     writeHash('code', await encodeSource(text), currentChoice(), more);
   };
 
-  const flash = (button: HTMLButtonElement, word: string, back: string): void => {
-    button.textContent = word;
-    window.setTimeout(() => {
-      button.textContent = back;
-    }, 1400);
-  };
-
-  /** The link Share copies: the short one the Worker stores (/s/<id>, docs/cloudflare.md), or
-   *  the page's own URL, which carries the whole file, where there is no Worker to store it. */
-  const shareLink = async (): Promise<string> => {
-    await publishSource();
-    const { pathname, hash, href } = window.location;
-    const link = await shortLink(pathname, hash.replace(/^#/, ''));
-    // The address bar follows the short link, so a reload or a copy of it stays short too.
-    const id = link && /\/s\/([A-Za-z0-9_-]+)\/?$/.exec(link)?.[1];
-    if (id) writeHash('share', id);
-    return link ?? href;
-  };
-
-  share.addEventListener('click', () => {
-    // Safari keeps the click's permission to write the clipboard only for a write started in
-    // the handler, so the link goes in as a promise where the browser takes one.
-    const link = shareLink();
-    const written =
-      typeof ClipboardItem === 'function' && ClipboardItem.supports?.('text/plain') !== false
-        ? navigator.clipboard
-            .write([
-              new ClipboardItem({
-                'text/plain': link.then((text) => new Blob([text], { type: 'text/plain' })),
-              }),
-            ])
-            .catch(async () => navigator.clipboard.writeText(await link))
-        : link.then((text) => navigator.clipboard.writeText(text));
-    void written.then(() => flash(share, copy.shared, copy.share)).catch(() => {});
-  });
-
-  // Submit: the file goes to the gallery as a share with a title and a still of the canvas, and
-  // waits there for the maintainer's approval (worker/index.ts). The dialog stays open to say what happened.
-  const submitButton = root.querySelector('[data-submit]');
-  const submitDialog = root.querySelector('[data-submit-dialog]');
-  const submitForm = root.querySelector('[data-submit-form]');
-  const submitStatus = root.querySelector('[data-submit-status]');
-  const submitSend = root.querySelector('[data-submit-send]');
-  const submitCancel = root.querySelector('[data-submit-cancel]');
-  if (
-    submitButton instanceof HTMLButtonElement &&
-    submitDialog instanceof HTMLDialogElement &&
-    submitForm instanceof HTMLFormElement &&
-    submitStatus instanceof HTMLElement &&
-    submitSend instanceof HTMLButtonElement &&
-    submitCancel instanceof HTMLButtonElement
-  ) {
-    const say = (text: string): void => {
-      submitStatus.textContent = text;
-      submitStatus.hidden = !text;
-    };
-    const submitModal = controlDialog(submitDialog);
-    submitButton.addEventListener('click', () => {
-      say('');
-      submitSend.hidden = false;
-      submitSend.disabled = false;
-      submitCancel.textContent = copy.submit.cancel;
-      submitModal.open(submitButton);
-    });
-    submitCancel.addEventListener('click', () => submitModal.close());
-    submitForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const fields = new FormData(submitForm);
-      const title = String(fields.get('title') ?? '').trim();
-      if (!title) return;
-      submitSend.disabled = true;
-      say(copy.submit.sending);
-      void publishSource()
-        .then(async () =>
-          submitToGallery({
-            path: window.location.pathname,
-            fragment: window.location.hash.replace(/^#/, ''),
-            title,
-            author: String(fields.get('author') ?? '').trim(),
-            locale: pageLocale(),
-            still: await captureStill().catch(() => undefined),
-          }),
-        )
-        .then((outcome) => {
-          say(copy.submit[outcome]);
-          const done = outcome === 'sent' || outcome === 'already';
-          submitSend.hidden = done;
-          submitSend.disabled = done;
-          if (done) {
-            submitCancel.textContent = copy.submit.close;
-            submitForm.reset();
-          }
-        });
-    });
-  }
-
-  // The issue dialog (src/scripts/issue-dialog.ts) takes the program this page holds, carried
-  // in the fragment the way Share carries it. While the gallery is up, no program is open.
-  provideProgram(async () => {
-    if (root.dataset.view === 'gallery' || !model) return undefined;
-    await publishSource();
-    return {
-      page: window.location.pathname,
-      fragment: window.location.hash.replace(/^#/, ''),
-      file: fileName,
-    };
-  });
-
-  copyOutput.addEventListener('click', () => {
-    void navigator.clipboard
-      .writeText(emittedFor(activeFile)[target] ?? '')
-      .then(() => flash(copyOutput, copy.copied, copy.copy))
-      .catch(() => {});
+  const { shareLink } = bindSharing({
+    root,
+    share,
+    copyOutput,
+    copy,
+    publishSource,
+    captureStill,
+    getFileName: () => (model ? fileName : undefined),
+    getOutput: () => emittedFor(activeFile)[target] ?? '',
   });
 
   /** Which example the editor was last filled from. On a page that names the example there
@@ -5149,318 +4187,28 @@ export function wave(x: f32, t: f32): f32 {
         'semanticHighlighting.enabled': true,
       });
 
-      // ── The providers, one per service method ─────────────────────────────────────────
-      // Each asks the worker about the document at the version the editor holds and hands
-      // back what it answers; the client resolves `undefined` for an answer about a version
-      // the editor has left, and each provider turns that into nothing. Positions cross in
-      // the four helpers at the top of this file and nowhere else.
-      // Every file of the workspace is a document the service holds, so every provider
-      // answers for whichever one the editor shows. The main file's lines cross through the
-      // prelude helpers; a file beside it has no prelude, so its lines are the service's.
-      /** The document a model is, or undefined for a model that is not the workspace's. */
-      const docOf = (currentModel: any): { uri: string; main: boolean } | undefined => {
-        const uri = currentModel.uri.toString();
-        if (uri === model.uri.toString()) return { uri: documentUri, main: true };
-        const path = pathOfUri(uri);
-        return path ? { uri, main: false } : undefined;
-      };
-      const isOurs = (currentModel: any): boolean => docOf(currentModel) !== undefined;
-      const uriIn = (currentModel: any): string => docOf(currentModel)?.uri ?? documentUri;
-      const mainModel = (currentModel: any): boolean => docOf(currentModel)?.main ?? true;
-      const monacoRange = (range: TypeshadeRange, main = true) => {
-        if (!main) {
-          return new monaco.Range(
-            range.start.line + 1,
-            range.start.character + 1,
-            range.end.line + 1,
-            range.end.character + 1,
-          );
-        }
-        const r = toMonacoRange(range);
-        return new monaco.Range(r.startLineNumber, r.startColumn, r.endLineNumber, r.endColumn);
-      };
-      const here = (position: MonacoPosition, main = true) => ({
-        position: main
-          ? toServicePosition(position)
-          : { line: position.lineNumber - 1, character: position.column - 1 },
-      });
-
-      monaco.languages.registerCompletionItemProvider('typescript', {
-        triggerCharacters: ['@', '"', ':', '.'],
-        provideCompletionItems: async (currentModel: any, position: MonacoPosition) => {
-          const onHost = currentModel === hostModel;
-          if ((!onHost && !isOurs(currentModel)) || !client) return { suggestions: [] };
-          // host.ts is TypeScript, answered by its own checker in the worker.
-          const items = onHost
-            ? await client.request('hostCompletions', HOST_URI, version, {
-                text: currentModel.getValue(),
-                types: hostTypes,
-                ...here(position, false),
-              })
-            : await client.request(
-                'completions',
-                uriIn(currentModel),
-                version,
-                here(position, mainModel(currentModel)),
-              );
-          if (!items) return { suggestions: [] };
-          const word = currentModel.getWordUntilPosition(position);
-          const range = new monaco.Range(
-            position.lineNumber,
-            word.startColumn,
-            position.lineNumber,
-            word.endColumn,
-          );
-          // Monaco's word does not include a leading `@`, so an attribute offered after one
-          // has already been typed would insert it twice unless the item says otherwise.
-          const before = currentModel.getValueInRange({
-            startLineNumber: position.lineNumber,
-            startColumn: 1,
-            endLineNumber: position.lineNumber,
-            endColumn: word.startColumn,
-          });
-          return {
-            suggestions: items.map((item) => ({
-              label: item.label,
-              kind: completionKind(monaco, item.kind),
-              insertText:
-                item.insertText ??
-                (item.label.startsWith('@') && before.endsWith('@')
-                  ? item.label.slice(1)
-                  : item.label),
-              insertTextRules:
-                item.insertTextFormat === 'snippet'
-                  ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-                  : undefined,
-              detail: item.detail,
-              documentation: item.documentation ? { value: item.documentation } : undefined,
-              sortText: item.sortText,
-              filterText: item.filterText,
-              range: item.textEdit
-                ? monacoRange(item.textEdit.range, mainModel(currentModel))
-                : range,
-            })),
-          };
-        },
-      });
-
-      monaco.languages.registerHoverProvider('typescript', {
-        provideHover: async (currentModel: any, position: MonacoPosition) => {
-          const onHost = currentModel === hostModel;
-          if ((!onHost && !isOurs(currentModel)) || !client) return null;
-          const hover = onHost
-            ? await client.request('hostHover', HOST_URI, version, {
-                text: currentModel.getValue(),
-                types: hostTypes,
-                ...here(position, false),
-              })
-            : await client.request(
-                'hover',
-                uriIn(currentModel),
-                version,
-                here(position, mainModel(currentModel)),
-              );
-          if (!hover) return null;
-          return {
-            contents: [{ value: hover.contents }],
-            range: monacoRange(hover.range, !onHost && mainModel(currentModel)),
-          };
-        },
-      });
-
-      // A location in a workspace file lands on that file's model, and the opener below
-      // brings its tab up. One inside the prelude is dropped, since the editor does not hold
-      // those lines, and so is one outside the workspace.
-      const ownLocations = (
-        locations: readonly { uri: string; range: TypeshadeRange }[] | undefined,
-      ) =>
-        (locations ?? []).flatMap((location) => {
-          const path = pathOfUri(location.uri);
-          if (path === undefined) return [];
-          if (path === '') {
-            if (inPrelude(location.range.start.line)) return [];
-            return [{ uri: model.uri, range: monacoRange(location.range) }];
-          }
-          const file = extras.get(path);
-          return file ? [{ uri: file.model.uri, range: monacoRange(location.range, false) }] : [];
-        });
-      // Go to definition into another file: the standalone editor opens nothing on its own,
-      // so the page switches the tab and puts the cursor where the definition is.
-      monaco.editor.registerEditorOpener?.({
-        openCodeEditor: (_source: any, resource: any, selectionOrPosition: any) => {
-          const path = pathOfUri(resource.toString());
-          if (path === undefined) return false;
-          showFile(path);
-          if (selectionOrPosition) {
-            if ('startLineNumber' in selectionOrPosition) {
-              editor.setSelection(selectionOrPosition);
-              editor.revealRangeInCenter(selectionOrPosition);
-            } else {
-              editor.setPosition(selectionOrPosition);
-              editor.revealPositionInCenter(selectionOrPosition);
-            }
-          }
-          editor.focus();
-          return true;
-        },
-      });
-
-      monaco.languages.registerDefinitionProvider('typescript', {
-        provideDefinition: async (currentModel: any, position: MonacoPosition) => {
-          if (!isOurs(currentModel) || !client) return null;
-          return ownLocations(
-            await client.request(
-              'definition',
-              uriIn(currentModel),
-              version,
-              here(position, mainModel(currentModel)),
-            ),
-          );
-        },
-      });
-
-      monaco.languages.registerReferenceProvider('typescript', {
-        provideReferences: async (
-          currentModel: any,
-          position: MonacoPosition,
-          context: { includeDeclaration: boolean },
-        ) => {
-          if (!isOurs(currentModel) || !client) return null;
-          return ownLocations(
-            await client.request('references', uriIn(currentModel), version, {
-              ...here(position, mainModel(currentModel)),
-              includeDeclaration: context.includeDeclaration,
-            }),
-          );
-        },
-      });
-
-      const toDocumentSymbol = (symbol: TypeshadeDocumentSymbol, main = true): any => ({
-        name: symbol.name,
-        detail: symbol.detail ?? '',
-        kind: symbolKind(monaco, symbol.kind),
-        tags: [],
-        range: monacoRange(symbol.range, main),
-        selectionRange: monacoRange(symbol.selectionRange, main),
-        children: symbol.children?.map((child) => toDocumentSymbol(child, main)),
-      });
-      monaco.languages.registerDocumentSymbolProvider('typescript', {
-        provideDocumentSymbols: async (currentModel: any) => {
-          if (!isOurs(currentModel) || !client) return null;
-          const symbols = await client.request('symbols', uriIn(currentModel), version, {});
-          const main = mainModel(currentModel);
-          return symbols ? symbols.map((symbol) => toDocumentSymbol(symbol, main)) : null;
-        },
-      });
-
-      monaco.languages.registerSignatureHelpProvider('typescript', {
-        signatureHelpTriggerCharacters: ['(', ','],
-        signatureHelpRetriggerCharacters: [','],
-        provideSignatureHelp: async (currentModel: any, position: MonacoPosition) => {
-          if (!isOurs(currentModel) || !client) return null;
-          const help = await client.request(
-            'signatureHelp',
-            uriIn(currentModel),
-            version,
-            here(position, mainModel(currentModel)),
-          );
-          if (!help) return null;
-          return {
-            value: {
-              signatures: help.signatures.map((signature) => ({
-                label: signature.label,
-                documentation: signature.documentation
-                  ? { value: signature.documentation }
-                  : undefined,
-                parameters: signature.parameters.map((parameter) => ({
-                  label: parameter.label,
-                  documentation: parameter.documentation
-                    ? { value: parameter.documentation }
-                    : undefined,
-                })),
-              })),
-              activeSignature: help.activeSignature,
-              activeParameter: help.activeParameter,
-            },
-            dispose: () => {},
-          };
-        },
-      });
-
-      monaco.languages.registerRenameProvider('typescript', {
-        resolveRenameLocation: async (currentModel: any, position: MonacoPosition) => {
-          if (!isOurs(currentModel) || !client) return null;
-          const prepared = await client.request(
-            'prepareRename',
-            uriIn(currentModel),
-            version,
-            here(position, mainModel(currentModel)),
-          );
-          return prepared
-            ? {
-                range: monacoRange(prepared.range, mainModel(currentModel)),
-                text: prepared.placeholder,
+      registerEditorProviders(
+        monaco,
+        () => ({ model, documentUri, version, hostModel, hostTypes, client }),
+        pathOfUri,
+        coordinates,
+        {
+          modelForPath: (path) => extras.get(path)?.model,
+          openFile: (path, selection) => {
+            showFile(path);
+            if (selection) {
+              if ('startLineNumber' in selection) {
+                editor.setSelection(selection);
+                editor.revealRangeInCenter(selection);
+              } else {
+                editor.setPosition(selection);
+                editor.revealPositionInCenter(selection);
               }
-            : null;
-        },
-        provideRenameEdits: async (
-          currentModel: any,
-          position: MonacoPosition,
-          newName: string,
-        ) => {
-          if (!isOurs(currentModel) || !client) return null;
-          const edits = await client.request('rename', uriIn(currentModel), version, {
-            ...here(position, mainModel(currentModel)),
-            newName,
-          });
-          if (!edits) return null;
-          // A name the prelude also declares would be renamed in there too, and the editor
-          // holds none of those lines, so the edit has nowhere to land. The rename is
-          // refused whole instead of applied to half the occurrences. So is one that reaches
-          // a file outside the workspace.
-          if ((edits[documentUri] ?? []).some((edit) => inPrelude(edit.range.start.line)))
-            return null;
-          const out: { resource: any; textEdit: any; versionId: undefined }[] = [];
-          for (const [uri, list] of Object.entries(edits)) {
-            const path = pathOfUri(uri);
-            if (path === undefined) return null;
-            const target = path === '' ? model : extras.get(path)?.model;
-            if (!target) return null;
-            for (const edit of list) {
-              out.push({
-                resource: target.uri,
-                textEdit: { range: monacoRange(edit.range, path === ''), text: edit.newText },
-                versionId: undefined,
-              });
             }
-          }
-          return { edits: out };
+            editor.focus();
+          },
         },
-      });
-
-      // The colouring: the compiler's own classification of every token, delta-encoded the way
-      // Monaco takes it. Monaco asks again after each edit and keeps the last tokens it was
-      // given until then, so an answer dropped for being stale costs nothing but a moment.
-      monaco.languages.registerDocumentSemanticTokensProvider('typescript', {
-        getLegend: () => ({
-          tokenTypes: [...SEMANTIC_TOKEN_TYPES],
-          tokenModifiers: [...SEMANTIC_TOKEN_MODIFIERS],
-        }),
-        provideDocumentSemanticTokens: async (currentModel: any) => {
-          if (!isOurs(currentModel) || !client) return null;
-          const tokens = await client.request('semanticTokens', uriIn(currentModel), version, {});
-          if (!tokens) return null;
-          if (!mainModel(currentModel)) return { data: encodeSemanticTokens(tokens) };
-          // The compiler classified the composed text, so the prelude's tokens come back
-          // too. They are dropped and the rest move up, since the encoding is a delta over
-          // the lines the editor actually holds.
-          const own = tokens
-            .filter((token) => !inPrelude(token.line))
-            .map((token) => ({ ...token, line: outOfDocument(token.line) }));
-          return { data: encodeSemanticTokens(own) };
-        },
-        releaseDocumentSemanticTokens: () => {},
-      });
+      );
 
       // The files beside it first, then the document: the worker holds each from the moment
       // its model exists, so the first analysis reads the imports the tabs show.
@@ -5490,7 +4238,9 @@ export function wave(x: f32, t: f32): f32 {
           else drawOnCpu();
         });
       }
-      bindTabs(tabs, (index, focus) => selectView((tabs[index].dataset.target ?? 'result') as View, focus));
+      bindTabs(tabs, (index, focus) =>
+        selectView((tabs[index].dataset.target ?? 'result') as View, focus),
+      );
       reset.addEventListener('click', () => {
         if (openedExample === '' && linkedOpening) reopenLinked();
         else if (openedExample === '' && blankSource) openBlank();

@@ -1,20 +1,8 @@
 @import 'tailwindcss';
 @import '@typeshade/site-ui/tokens.css';
-@import "@typeshade/site-ui/semantics.css";
+@import '@typeshade/site-ui/semantics.css';
 @import './tokens.css';
 @import './ui-theme.css';
 @import './fonts.css';
 @import './base.css';
-@import './header.css';
-@import './search.css';
-@import './docs-layout.css';
-@import './controls.css';
-@import './prose.css';
-@import './figures.css';
-@import './footer.css';
-@import './reference.css';
 @import './accessibility.css';
-
-@import '@typeshade/site-ui/controls.css';
-
-@import "@typeshade/site-ui/compositions.css";

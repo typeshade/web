@@ -1,4 +1,8 @@
 ---
+import '../DocAlert.css';
+import '../CodeTabs.css';
+import '../GalleryTile.css';
+import '../ShaderFigure.css';
 import Alert from '@typeshade/site-ui/astro/Alert';
 import LinkButton from '@typeshade/site-ui/astro/LinkButton';
 // The front page: a two-column hero in Ant Design's grammar. The headline, the sentence and
@@ -267,3 +271,16 @@ const quickStart = localePath(locale, links.quickStart.href);
   // The tabs over the emitted targets, shared with every per-example page.
   import '../../scripts/target-tabs.ts';
 </script>
+
+<style>
+.button-icon {
+  inline-size: 12px;
+  block-size: 12px;
+  fill: currentColor;
+  transition: transform var(--motion);
+}
+.ui-button:hover .button-icon {
+  transform: translateX(2px);
+}
+
+</style>
