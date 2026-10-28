@@ -1,5 +1,11 @@
 # All-site content review
 
+Current deployment and repository ownership are recorded in
+[repository-migration.md](repository-migration.md). The owner subsequently authorized the
+CI/CD cutover; PR #7 and its predecessors are merged, and all three sites are deployed from
+this repository. Branch, draft and authorization statements below describe the earlier review
+phase, not the current operational state.
+
 ## Owner request
 
 Review every published surface of TypeShade, TypeNN, TypeCV and the shared UI. Establish English

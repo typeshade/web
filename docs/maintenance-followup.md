@@ -1,5 +1,11 @@
 # Template and rendering follow-up
 
+Current deployment and repository ownership are recorded in
+[repository-migration.md](repository-migration.md). The owner subsequently authorized the
+CI/CD cutover; PR #7 and its predecessors are merged, and all three sites are deployed from
+this repository. Branch, draft and authorization statements below describe the earlier review
+phase, not the current operational state.
+
 The owner asked to continue after the all-site content review. The next slice addresses
 remaining duplicated page markup and the code-rendering gaps found during integration.
 Baseline: `c62f78e`, branch `fix/typeshade-home-navigation`, draft PR #7.

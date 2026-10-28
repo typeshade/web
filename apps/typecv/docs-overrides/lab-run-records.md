@@ -2,6 +2,12 @@
 
 # Lab run records
 
+This guide covers the collector and the measurements that use it. The current Worker and
+operational scripts are owned by `typeshade/web` under `apps/typecv/`, with production workflows
+under `.github/workflows/`. Implementation paths in the historical measurements refer to the
+TypeCV source revision measured at the time; use the current paths in Setup and Reading the records
+for present-day operations. Run the commands below from the web repository root.
+
 The SfM lab at `/lab/` can send the measurement of one run to the site's collector,
 so that runs on hardware the maintainers do not own can be compared. Sending is a
 choice the visitor makes with the consent checkbox. Nothing is sent without it. With
@@ -1082,29 +1088,29 @@ button. There is no separate record-only or files-only opt-in.
 
 ## Setup
 
-In the web repository, the TypeCV deploy workflow (`.github/workflows/deploy.yml`) runs
-`apps/typecv/scripts/ensure-run-records.mjs` before `wrangler deploy`. It reuses the
-`typecv-records` KV namespace when it exists and creates it only when a successful, valid
-namespace listing confirms it is absent. If listing fails or returns invalid data, setup stops
-without creating a replacement. The script writes the namespace ID into the deploy config and
-stores `RECORDS_READ_TOKEN` as a Worker secret. The deploy token (`CLOUDFLARE_API_TOKEN`) needs
-**Workers KV Storage: Edit**. A missing read token, list failure, or setup error stops deployment;
-the protected collector routes are not deployed in a partially configured state.
+TypeCV production deployment is owned by `typeshade/web/.github/workflows/deploy.yml`, gated by
+`WEBSITE_OPERATIONS_ENABLED` and the `typecv-production` environment. The workflow validates
+`CLOUDFLARE_API_TOKEN` and `RECORDS_READ_TOKEN` before provisioning or deploying; either missing
+secret stops the deployment. In `apps/typecv/`, `scripts/ensure-run-records.mjs` binds the existing
+`typecv-records` KV namespace and stores the required read token as a Worker secret.
+`CLOUDFLARE_API_TOKEN` needs **Workers KV Storage: Edit**. The script refuses to replace a
+namespace if listing fails, and any namespace or secret setup failure stops deployment.
 
-The result files need the private R2 bucket `typecv-records`. The deploy runs
-`apps/typecv/scripts/ensure-record-files-bucket.mjs`, which checks the `RECORD_FILES` binding.
-The token needs **Workers R2 Storage: Edit**, as it does for `typecv-samples`. If the R2 bucket
-cannot be listed or created, the script removes that binding for the deployment and reports that
-result-file uploads will be unavailable; the lab disables the corresponding checkbox. The bucket
-is separate from public `typecv-samples` and has no public access.
+The same deployment runs `apps/typecv/scripts/ensure-samples-bucket.mjs` and
+`apps/typecv/scripts/ensure-record-files-bucket.mjs` for the public `typecv-samples` bucket and
+private `typecv-records` bucket, then validates that both bindings are present before deploying.
+Each helper can remove its binding if R2 access is unavailable, but the production workflow then
+fails validation and does not deploy. The token needs **Workers R2 Storage: Edit** for both
+buckets. The private result-file bucket is separate from the public sample bucket and has no public
+access.
 
 ## Reading the records
 
 The **Export TypeCV lab run records** workflow (`.github/workflows/typecv-lab-records.yml`) can
-be run from the Actions tab when the repository enables website operations. It reads the KV
-namespace with `CLOUDFLARE_API_TOKEN` using `apps/typecv/scripts/export-run-records.mjs` and needs
-no read token. It prints one summary line per record to the job log, prints failed runs in full by
-default (`print: all` prints every record), and uploads JSON files as the `lab-records` artifact
+be run from Actions when `WEBSITE_OPERATIONS_ENABLED` is true on `main`. It reads the KV namespace
+with the `typecv-production` environment's `CLOUDFLARE_API_TOKEN` using
+`apps/typecv/scripts/export-run-records.mjs` and needs no read token. It prints one summary line per record to the job log, prints failed runs in
+full by default (`print: all` prints every record), and uploads JSON files as the `lab-records` artifact
 for 14 days. The summary line of a v4 or later record
 shows `longest chunk <ms>/<budget> ms`, and a v6 record with timestamps adds `gpu <ms> ms`. A v5 record with the dense MVS adds
 `dense <status>, <points> points`, and `print: failures` also prints a run whose dense
@@ -1120,14 +1126,14 @@ The inputs are `limit` (newest
 records, default 50) and `print` (`failures`, `all` or `none`). The input `record` exports the
 records of the ids it names, separated by commas, instead of the newest (`--record` of the
 script). For each hardware-check record of the export, the workflow runs
-`scripts/compare-hardware-check.mjs` and writes its table to the job summary. A failing row does
+`apps/typecv/scripts/compare-hardware-check.mjs` and writes its table to the job summary. A failing row does
 not fail the export.
 
-`scripts/compare-hardware-check.mjs` compares one hardware-check record with its baselines and
+`apps/typecv/scripts/compare-hardware-check.mjs` compares one hardware-check record with its baselines and
 prints one Markdown table:
 
 ```sh
-node scripts/compare-hardware-check.mjs --record lab-records/<id>.json \
+node apps/typecv/scripts/compare-hardware-check.mjs --record lab-records/<id>.json \
   --against lab-records/<earlier id>.json \
   --benchmark lab-records/<cold id>.json --benchmark lab-records/<warm id>.json
 ```
@@ -1140,7 +1146,7 @@ node scripts/compare-hardware-check.mjs --record lab-records/<id>.json \
   device must have the same digest. This is the gate of a change that must not change a result.
   A record of another device is reported and not compared.
 - The input and the CPU tier's answer are compared with Node's digests
-  (`tests/digests/hardware-check.json`, or `--baseline`). A difference warns: it comes from the
+  (`apps/typecv/tests/digests/hardware-check.json`, or `--baseline`). A difference warns: it comes from the
   browser's JavaScript engine or from another commit, not from the device.
 - `--benchmark` adds the run records of the standard benchmark. A failed run fails, and on the
   same device its flavor is compared with the check's.
