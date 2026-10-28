@@ -7,7 +7,10 @@ been performed. The current status below supersedes the dated observations later
 ## Current execution status (2026-10-28)
 
 Production operations are enabled; previews remain disabled. The seven old publishing workflows
-are disabled and had no active runs when the guarded activation passed. Do not re-run setup to
+were disabled with no active runs before activation. After cleanup merges, GitHub reports all
+seven as `deleted`; a second read at 14:29 UTC confirmed no active runs. The operations guard
+accepts this explicit deleted state while still checking paths and every active run status.
+Missing or unreadable workflow metadata is not treated as deletion. Do not re-run setup to
 inspect configuration: setup deliberately disables operations. Use the read-only readiness workflow.
 
 The first complete production rollout uses web `40e3eabd0e707857126589b41ee150b852a1cec8`:
