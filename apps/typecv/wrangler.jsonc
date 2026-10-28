@@ -1,5 +1,5 @@
-// Public static website, matching TypeNN's Workers Assets deployment model.
-// No login, runtime credentials, storage binding or Worker application is required.
+// TypeCV's browser lab stores run/probe receipts and remote sample videos in Cloudflare.
+// scripts/ensure-*.mjs reconciles the optional KV/R2 bindings before deployment.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "typecv-site",
@@ -8,8 +8,18 @@
   "workers_dev": false,
   "preview_urls": false,
   "routes": [{ "pattern": "cv.typeshade.dev", "custom_domain": true }],
+  "main": "worker.mjs",
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/sample/*"],
   },
+  "kv_namespaces": [
+    { "binding": "RECORDS", "id": "REPLACE_WITH_RECORDS_KV_ID" },
+  ],
+  "r2_buckets": [
+    { "binding": "SAMPLES", "bucket_name": "typecv-samples" },
+    { "binding": "RECORD_FILES", "bucket_name": "typecv-records" },
+  ],
 }

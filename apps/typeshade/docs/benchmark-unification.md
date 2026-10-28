@@ -7,7 +7,7 @@ check, with one run control, progress indicator, result ID and reporting flow. S
 was `13786f8cfab945084b6b5dac891adce1466248bc`. The initial compiler pin was
 `94203d3cab6433065bbe111c3b93f66a4058828e`.
 
-The original implementation is tracked in [PR #217](https://github.com/typeshade/typeshade.github.io/pull/217).
+The original implementation is tracked in [PR #217](https://github.com/typeshade/web/pull/217).
 
 ## Scope
 

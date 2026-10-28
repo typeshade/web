@@ -1,0 +1,60 @@
+name: Publish TypeCV lab video samples
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: Sample ids to publish, comma-separated (empty for all)
+        type: string
+        default: ''
+      parts:
+        description: What to upload
+        type: choice
+        options: [all, videos-only, thumbnails-only]
+        default: all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-typecv
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && vars.WEBSITE_OPERATIONS_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: typecv-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Make sure the samples bucket exists
+        working-directory: apps/typecv
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          BUCKETS="$(pnpm exec wrangler r2 bucket list)"
+          if ! printf '%s\n' "$BUCKETS" | grep -Eq '^name:[[:space:]]*typecv-samples[[:space:]]*$'; then
+            pnpm exec wrangler r2 bucket create typecv-samples
+          fi
+      - name: Upload original videos and display thumbnails
+        working-directory: apps/typecv
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ONLY: ${{ inputs.only }}
+          PARTS: ${{ inputs.parts }}
+        run: |
+          args=()
+          if [ -n "$ONLY" ]; then args+=(--only "$ONLY"); fi
+          if [ "$PARTS" = videos-only ] || [ "$PARTS" = thumbnails-only ]; then args+=("--$PARTS"); fi
+          node scripts/lab-remote-samples.mjs publish "${args[@]}"

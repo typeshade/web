@@ -1,0 +1,54 @@
+---
+import Eyebrow from "@typeshade/site-ui/astro/Eyebrow";
+import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import TriangulationProbe from "./TriangulationProbe";
+import "../styles/lab-page.css";
+import "../styles/sfm-lab.css";
+
+const { locale } = Astro.props as { locale: "en" | "ko" };
+const ko = locale === "ko";
+const text = ko
+  ? {
+      title: "삼각측량 프로브",
+      description:
+        "장치를 잃은 실험의 삼각측량 작업을 브라우저에서 실행하고 멈추는 트랙을 찾습니다.",
+      body: "COLMAP south-building 샘플의 삼각측량 작업 하나를 실행합니다. 트랙은 1672개이고, 각 트랙의 관측은 두 개입니다. 작업의 세 변형을 각각 새 WebGPU 장치에서 실행합니다. 전체 작업이 장치를 잃으면 트랙을 나누어 멈추는 트랙을 찾습니다. 프로브는 아무것도 전송하지 않습니다. 결과는 JSON으로 보여 주며 복사하거나 내려받을 수 있습니다.",
+      options: "SfM 실험실과 같이",
+      lab: "SfM 실험실",
+      rest: "제출을 나누려면 ?bounded=1을, 에뮬레이션 배정밀도 방식을 고정하려면 ?fp64=float 또는 ?fp64=integer를 사용하세요.",
+      eyebrow: "TYPECV / SFM LAB / PROBE",
+    }
+  : {
+      title: "Triangulation probe",
+      description:
+        "Run a lost lab run’s triangulation job in the browser and find the track that hangs.",
+      body: "The probe runs one triangulation job of the COLMAP south-building sample: 1672 tracks of two observations each. It runs three variants of the job, each on a new WebGPU device. When the full job loses the device, the probe divides the tracks to find the track whose work hangs. The probe sends nothing. It shows the result as JSON for you to copy or download.",
+      options: "As in the",
+      lab: "SfM lab",
+      rest: "add ?bounded=1 for fenced submissions, or ?fp64=float or ?fp64=integer to force an emulated-double flavor.",
+      eyebrow: "TYPECV / SFM LAB / PROBE",
+    };
+---
+
+<SiteLayout
+  locale={locale}
+  active="lab"
+  title={text.title}
+  description={text.description}
+>
+  <ReadingSurface>
+    <div class="lab-main">
+      <header class="lab-header">
+        <Eyebrow>{text.eyebrow}</Eyebrow>
+        <h1>{text.title}</h1>
+        <p>{text.body}</p>
+        <p>
+          {text.options} <a href={ko ? "/ko/lab/" : "/lab/"}>{text.lab}</a>;{" "}
+          {text.rest}
+        </p>
+      </header>
+      <TriangulationProbe client:load locale={locale} />
+    </div>
+  </ReadingSurface>
+</SiteLayout>

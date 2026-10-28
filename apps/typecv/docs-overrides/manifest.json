@@ -1,11 +1,11 @@
 {
-  "sourceRevision": "e40c878809370719faef7dac3e34b80a92c4ce3d",
+  "sourceRevision": "715fd1b694508014315e1a505aa2c970051a7f3a",
   "overrides": {
     "sfm-quickstart.md": {
-      "sha256": "56c7b170a54bd7e798bf644d7e3a02216b21098fe7cc3793940e1efe633b576d"
+      "sha256": "1c78c7e96a991dbf8500890cf87bd61c38119021f8da74dcbc9cec819ecf03bc"
     },
-    "gpu-sfm.md": {
-      "sha256": "8c693e4863cd77ae6731ee5638e4fea24c046317ac2449c7110bb1bf2dd9ebf8"
+    "lab-run-records.md": {
+      "sha256": "7b82f49b86e5f9f4e0ae52e5ad4f15b94dbb73a6f37c1baabd7dfea3767e63be"
     }
   }
 }

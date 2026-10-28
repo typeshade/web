@@ -174,6 +174,15 @@ async function verify() {
           backend: pair.execution.backend,
           dispatches: pair.execution.report.dispatches,
           computeSubmissions: pair.execution.report.submissions,
+          // The scheduling words the chunked model generation reads: one after every fourth
+          // batch of a search, whose work the GPU decides (TypeShade change 0075).
+          controlWords: pair.execution.report.groups
+            .flatMap((group) => group.calls)
+            .filter((call) => call === 'snapshotPairModelBudget').length,
+          // The batches of model generation submitted, one `planPairModelBatch` each.
+          modelBatches: pair.execution.report.groups
+            .flatMap((group) => group.calls)
+            .filter((call) => call === 'planPairModelBatch').length,
           applicationReadbackBytes: pair.execution.applicationReadbackBytes,
           cpuStages: pair.execution.cpuStages,
         }

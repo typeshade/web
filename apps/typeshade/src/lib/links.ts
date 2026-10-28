@@ -28,7 +28,8 @@ const shade = (id: string): Destination => {
     throw new Error(`[links] no '.shade.ts' example called '${id}' at ${facts.pinnedCommit}`);
   return { label: example.file, href: at(`examples/${example.file}`) };
 };
-const siteRepo = 'https://github.com/typeshade/typeshade.github.io';
+const siteRepo = 'https://github.com/typeshade/web';
+const appFile = (file: string): string => `${siteRepo}/blob/main/apps/typeshade/${file}`;
 
 export const links = {
   home: { label: 'TypeShade', href: '/' },
@@ -297,6 +298,9 @@ export const links = {
   shadeBitfieldBands: shade('bitfield-bands'),
   shadeRayClass: shade('ray-class'),
   shadeDefaultArgs: shade('default-args'),
+  shadeOptionalValues: shade('optional-values'),
+  shadeOptionalFields: shade('optional-fields'),
+  shadeNullValues: shade('null-values'),
   shadeReferenceParameters: shade('reference-parameters'),
   shadeAtomicHistogram: shade('atomic-histogram'),
   shadeOrbitInout: shade('orbit-inout'),
@@ -383,17 +387,17 @@ function dictionaryLine(locale: Locale, key: string): number {
 }
 export function editCopy(locale: Locale, key?: string): string {
   const at = key === undefined ? '' : `#L${dictionaryLine(locale, key)}`;
-  return `${siteRepo}/blob/main/src/i18n/${locale}.ts${at}`;
+  return `${appFile(`src/i18n/${locale}.ts`)}${at}`;
 }
 export function editPrecisionGuide(locale: Locale): string {
-  return `${siteRepo}/blob/main/src/i18n/precision-guide-${locale}.ts`;
+  return appFile(`src/i18n/precision-guide-${locale}.ts`);
 }
 
 export function editGuide(sourceLine: number): string {
   return `${links.guideSource.href}#L${sourceLine}`;
 }
 export function editGuideTranslation(locale: Locale, id: string): string {
-  return `${siteRepo}/blob/main/${translationDir(locale)}/${id}.md`;
+  return appFile(`${translationDir(locale)}/${id}.md`);
 }
 
 export function navLinks(locale: Locale): readonly (Destination & { group: 'learn' | 'build' })[] {

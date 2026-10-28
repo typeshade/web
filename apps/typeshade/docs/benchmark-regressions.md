@@ -8,13 +8,13 @@ compiler and runtime changes affect the same application. Site baseline is
 `94203d3cab6433065bbe111c3b93f66a4058828e`. The compiler-pin follow-up below records its
 subsequent update.
 
-Implementation is tracked in [PR #216](https://github.com/typeshade/typeshade.github.io/pull/216).
+Implementation is tracked in [PR #216](https://github.com/typeshade/web/pull/216).
 It merged as `13786f8` and deployed on 2026-10-22 UTC. The unified instrument in PR #217
 supersedes the separate controls described here; see [benchmark-unification.md](benchmark-unification.md).
 
 ## Compiler-pin follow-up
 
-[PR #218](https://github.com/typeshade/typeshade.github.io/pull/218) pins the documentation
+[PR #218](https://github.com/typeshade/web/pull/218) pins the documentation
 compiler at `c5fd951c81ca6efe62c7dadf91b1e27ac07daa52` for compute-entry constants and the
 complete host example. The regression catalog must advance with that pin. The assistant
 regenerated it with `bun@1.4.3 scripts/regression-catalog.ts --new`, then reproduced it with
@@ -46,6 +46,16 @@ uses that source-specific capability, including for retained catalogs of the sam
 Historical catalogs without capability data keep their original contract. Regression tests
 accept both projected builds and reject incorrect input sizes, while preserving the earlier
 full-input baseline. The real browser checks the measured bytes against the generated catalog.
+
+### Nullable compiler adoption
+
+On 2026-10-27 UTC, PR #240 advances the documentation pin to `3e1e8420`
+for nullable values and optional implicit returns. The active comparison now uses
+`a21f7024` and `3e1e8420`. Bun 1.4.3 regenerated and reproduced
+both builds with the existing workload and instrument. Earlier catalogs remain retained.
+The candidate runtime artifact is `976d6bef3b47408808bdb674e3f93098565076d1f0d317a705506a5f2865e1f0`
+(505,394 bytes). The comparison records compiler identity; it makes no native-GPU
+performance claim for nullable values.
 
 ## Scope
 

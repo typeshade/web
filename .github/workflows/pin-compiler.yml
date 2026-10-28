@@ -1,0 +1,146 @@
+name: pin-compiler
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [compiler-updated]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: pin-compiler
+  cancel-in-progress: false
+
+jobs:
+  pin:
+    if: github.ref == 'refs/heads/main' && vars.WEBSITE_OPERATIONS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BRANCH: pin/compiler
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: Point the TypeShade submodule at compiler main
+        id: bump
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          SUBMODULE=apps/typeshade/vendor/shader-dsl
+          git fetch --quiet origin main
+          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')" ]; then
+            git fetch --quiet origin "$BRANCH"
+            git switch --quiet -C "$BRANCH" FETCH_HEAD
+            git submodule update --quiet -- "$SUBMODULE"
+            # Preserve review fixes while incorporating new main work. A conflict stops for
+            # human resolution instead of dropping existing changes.
+            git rebase origin/main
+            git submodule update --quiet -- "$SUBMODULE"
+            echo "open=true" >> "$GITHUB_OUTPUT"
+          else
+            git switch --quiet -C "$BRANCH"
+            echo "open=false" >> "$GITHUB_OUTPUT"
+          fi
+          base=$(git rev-parse "origin/main:$SUBMODULE")
+          old=$(git -C "$SUBMODULE" rev-parse HEAD)
+          git -C "$SUBMODULE" fetch --quiet origin main
+          new=$(git -C "$SUBMODULE" rev-parse FETCH_HEAD)
+          if [ "$old" = "$new" ]; then
+            echo "The TypeShade compiler pin is current ($old); nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git -C "$SUBMODULE" checkout --quiet "$new"
+          {
+            echo "changed=true"
+            echo "base=$base"
+            echo "new=$new"
+            echo "short=${new:0:7}"
+          } >> "$GITHUB_OUTPUT"
+      - uses: pnpm/action-setup@v4
+        if: steps.bump.outputs.changed == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.bump.outputs.changed == 'true'
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: oven-sh/setup-bun@v2
+        if: steps.bump.outputs.changed == 'true'
+        with:
+          bun-version: 1.4.3
+      - run: pnpm install --frozen-lockfile
+        if: steps.bump.outputs.changed == 'true'
+      - name: Write the pull request body
+        if: steps.bump.outputs.changed == 'true'
+        working-directory: apps/typeshade
+        env:
+          OLD: ${{ steps.bump.outputs.base }}
+          NEW: ${{ steps.bump.outputs.new }}
+        run: |
+          bun scripts/regression-catalog.ts --new
+          {
+            echo "Moves the compiler pin (\`apps/typeshade/vendor/shader-dsl\`) from \`${OLD:0:7}\` to \`${NEW:0:7}\`."
+            echo
+            echo "## Compiler commits this takes in"
+            echo
+            git -C vendor/shader-dsl log --format='- %h %s' "$OLD..$NEW"
+            echo
+            echo "## Guide translations this leaves stale"
+            echo
+            echo "Each one is shown in English until it is translated again from the pinned \`AUTHORING.md\`."
+            echo
+            stale=$(bun scripts/check-guide-translations.ts 2>&1 | sed -n 's/^  stale: \([^ ]*\) .*/- \`\1\`/p' || true)
+            echo "${stale:-None.}"
+            echo
+            echo "## API reference translations this leaves stale"
+            echo
+            echo "The CI run on this pull request fails until each entry is translated again from pinned JSDoc."
+            echo
+            api_stale=$(bun scripts/check-api-translations.ts 2>&1 | sed -n 's/^  \(content\/api\/[^ ]*\) was translated from older English.*/- \`\1\`/p' || true)
+            echo "${api_stale:-None.}"
+            echo
+            echo "## Reference notes this pin leaves stale"
+            echo
+            echo "Each section must be read against the new values and recorded with \`Read-Against: <note>\`."
+            echo
+            notes=$(bun scripts/check-reference-notes.ts --stale --markdown 2>/dev/null || true)
+            echo "${notes:-The check stopped before comparing the notes; the pull request CI explains why.}"
+            if [ -f vendor/shader-dsl/scripts/downstream-impact.ts ]; then
+              echo
+              # Run inside the TypeShade site root so the compiler's historic src/ ThenChange
+              # paths resolve against apps/typeshade/src, not against the monorepo root.
+              impact=$(bun vendor/shader-dsl/scripts/downstream-impact.ts --repo typeshade.github.io \
+                --submodule vendor/shader-dsl --old "$OLD" --new "$NEW" --base HEAD --markdown || true)
+              echo "$impact"
+            fi
+            echo
+            echo "CI on this branch checks all remaining compiler-owned copy and source references."
+          } > "$RUNNER_TEMP/body.md"
+          cat "$RUNNER_TEMP/body.md"
+      - name: Push the branch and open or refresh the pull request
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          SHORT: ${{ steps.bump.outputs.short }}
+          OPEN: ${{ steps.bump.outputs.open }}
+        run: |
+          git add apps/typeshade/vendor/shader-dsl apps/typeshade/src/lib/benchmarks/regression-catalog*.json apps/typeshade/public/benchmarks/artifacts
+          git commit --quiet -m "site: pin the compiler at $SHORT"
+          title="site: pin the compiler at $SHORT"
+          if [ "$OPEN" = "true" ]; then
+            git push --force-with-lease origin "$BRANCH"
+            gh pr edit "$BRANCH" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          else
+            git push --force-with-lease origin "$BRANCH"
+            gh pr create --head "$BRANCH" --base main --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          fi
+      - name: Dispatch validation for the bot-created pin branch
+        if: steps.bump.outputs.changed == 'true'
+        run: gh workflow run ci.yml --ref "$BRANCH"

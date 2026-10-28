@@ -1,4 +1,4 @@
-<!-- Website override of sources/typecv/docs/sfm-quickstart.md at TypeCV source revision e40c878809370719faef7dac3e34b80a92c4ce3d. Its SHA-256 is pinned in manifest.json so upstream edits cannot be hidden by this copy. -->
+<!-- Website override of sources/typecv/docs/sfm-quickstart.md at TypeCV source revision 715fd1b694508014315e1a505aa2c970051a7f3a. Its SHA-256 is pinned in manifest.json so upstream edits cannot be hidden by this copy. -->
 
 # Structure from motion in TypeCV
 
@@ -8,8 +8,8 @@ and a sparse scene. See the [project architecture](architecture.md) for the
 broader computer vision design.
 
 The incremental pipeline verifies geometry, builds conflict-safe tracks, selects
-an initial pair, registers cameras with P3P RANSAC, triangulates tracks and runs
-local/periodic global BA. Intrinsics are fixed; pinhole and radial k1/k2 cameras
+an initial pair, registers cameras with P3P RANSAC, triangulates tracks, and runs
+local BA after each registration plus global BA as the model grows. Intrinsics are fixed; pinhole and radial k1/k2 cameras
 are supported. This is an early reconstruction core. Native features, stronger
 feature-pipeline improvements, calibrated five-point estimation, broader shared
 calibration optimization and dense MVS remain open. The single-scale GPU FAST/BRIEF

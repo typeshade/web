@@ -33,6 +33,10 @@ patterns. Align conflicting local guidance with these instructions.
 
 ## Work and handoff
 
+- Read [docs/repository-migration.md](docs/repository-migration.md) for the current cross-repository
+  cleanup, upstream reconciliation and deployment transition. Preserve original dirty worktrees;
+  source removal and operational cutover are separate reviewed changes.
+
 - Read [docs/maintenance-followup.md](docs/maintenance-followup.md) for the active template
   and rendering follow-up after the editorial review.
 - Read [docs/content-review.md](docs/content-review.md) for the active scope, assignments,

@@ -98,27 +98,56 @@ try {
           await page.waitForFunction(
             () => !document.querySelector("astro-island[ssr]"),
           );
-          const wiring = await page.locator(".ui-field").evaluateAll((fields) =>
-            fields.map((field) => {
-              const label = field.querySelector("label");
-              const control = label && document.getElementById(label.htmlFor);
-              return Boolean(
-                label?.textContent &&
-                control &&
-                field.contains(control) &&
-                (control.getAttribute("aria-describedby") || "")
-                  .split(" ")
-                  .filter(Boolean)
-                  .every((id) => document.getElementById(id)),
-              );
-            }),
-          );
-          assert.ok(
-            wiring.length > 0 && wiring.every(Boolean),
-            `${route} field associations`,
-          );
+          const korean = route.startsWith("/ko/");
+          if (root.includes("typenn")) {
+            const wiring = await page.locator(".ui-field").evaluateAll((fields) =>
+              fields.map((field) => {
+                const label = field.querySelector("label");
+                const control = label && document.getElementById(label.htmlFor);
+                return Boolean(
+                  label?.textContent &&
+                  control &&
+                  field.contains(control) &&
+                  (control.getAttribute("aria-describedby") || "")
+                    .split(" ")
+                    .filter(Boolean)
+                    .every((id) => document.getElementById(id)),
+                );
+              }),
+            );
+            assert.ok(
+              wiring.length > 0 && wiring.every(Boolean),
+              `${route} field associations`,
+            );
+          } else {
+            const resolutionName = korean
+              ? "분석할 프레임의 긴 변"
+              : "Long side of an analysis frame";
+            const focalName = korean
+              ? "초점거리 / 영상 너비"
+              : "Focal length / image width";
+            await page
+              .getByRole("button", { name: korean ? "설정" : "Settings" })
+              .click();
+            const settings = page.locator(".lab-settings-drawer");
+            await settings.waitFor();
+            const advanced = settings.locator("details.lab-advanced");
+            await advanced.locator("summary").click();
+            assert.ok(
+              await settings
+                .getByRole("radiogroup", { name: resolutionName })
+                .count(),
+              `${route} analysis resolution has an accessible group name`,
+            );
+            assert.ok(
+              await settings
+                .getByRole("spinbutton", { name: focalName })
+                .count(),
+              `${route} focal length input has an accessible name`,
+            );
+          }
           const audit = await new AxeBuilder({ page })
-            .include(root.includes("typenn") ? ".lab-form" : ".sfm-inputs")
+            .include(root.includes("typenn") ? ".lab-form" : ".lab-settings-drawer")
             .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
             .analyze();
           assert.deepEqual(
@@ -130,7 +159,15 @@ try {
             `${route} form accessibility`,
           );
           if (root.includes("typecv")) {
-            const focal = page.getByRole("spinbutton");
+            const settings = page.locator(".lab-settings-drawer");
+            await settings
+              .locator("label.lab-switch")
+              .filter({ hasText: korean ? "초점거리 직접 넣기" : "Set the focal length" })
+              .getByRole("switch")
+              .click();
+            const focal = settings.getByRole("spinbutton", {
+              name: korean ? "초점거리 / 영상 너비" : "Focal length / image width",
+            });
             await focal.fill("1.5");
             await page.keyboard.press("Tab");
             assert.equal(await focal.inputValue(), "1.5");

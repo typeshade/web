@@ -15,7 +15,7 @@ The upstream correction and deployment verification are in progress.
 ## Integration
 
 Upstream PR: https://github.com/typeshade/typeshade/pull/756.
-Site PR: https://github.com/typeshade/typeshade.github.io/pull/229.
+Site PR: https://github.com/typeshade/web/pull/229.
 The correction commit is `91c2fe31de045ebf0e5f2c333ac98b95cc460280`.
 It changes comments and guide prose, with identical code ASTs in all four changed source files.
 The site will retain this exact compiler revision after its upstream merge.

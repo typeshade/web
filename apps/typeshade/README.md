@@ -49,19 +49,19 @@ The important concept to understand first is **`"use typeshade"`**. It is the bo
 
 | Path                   | Purpose                                               |
 | ---------------------- | ----------------------------------------------------- |
-| `typeshade/`           | TypeShade compiler and language implementation        |
-| `typeshade.github.io/` | Documentation site, examples, and generated reference |
-| `.github/`             | CI and repository automation                          |
+| `apps/typeshade/`      | TypeShade site, examples, and generated reference      |
+| `apps/typeshade/vendor/shader-dsl/` | Pinned compiler and language implementation |
+| `.github/`             | Workspace CI and repository automation                |
 
 The documentation site is built with Astro and served by a Cloudflare Worker, which also serves the examples the compiler has added since the last build and opens on GitHub the issues readers file on the site ([docs/cloudflare.md](docs/cloudflare.md)). The compiler is vendored as a git submodule so examples and generated API documentation can be checked against a pinned compiler revision.
 
 ## Development
 
 ```bash
-git clone --recurse-submodules https://github.com/typeshade/typeshade.github.io
-cd typeshade.github.io
-bun install
-bun run dev
+git clone --recurse-submodules https://github.com/typeshade/web
+cd web
+pnpm install
+pnpm --filter typeshade-site dev
 ```
 
 The production build verifies generated artifacts, documentation consistency, links, and SEO before deployment. See `DESIGN.md` for the site's writing and design rules and `.claude/skills/typeshade-site/SKILL.md` for the site maintenance workflow.

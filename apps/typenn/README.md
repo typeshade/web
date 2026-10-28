@@ -126,6 +126,12 @@ A `RunResult` holds `config`, `tier`, `epochs` (`trainLoss` and `test` for each 
 `samplesSeen`, `seconds`, `test`, `completed`, `kind` (`"quick"` for the Try section's short run, else `"full"`), `capped` (the run ended at `maxSteps`), `userAgent`, `typennCommit` and `finishedAt`.
 `typennCommit` comes from `src/vendor/typenn/version.json`, which `pnpm --filter typenn-site sync:typenn` writes.
 
+For an opt-in comparison of the host-batch and device-resident training paths, run
+`pnpm --filter typenn-site measure:lab -- --main /path/to/pre-migration-typenn` with the old
+checkout's library `dist/` built. The tool uses synthetic datasets and reports browser-upload bytes
+and step times. If it runs on SwiftShader, its timings are software-renderer measurements, not
+hardware GPU results.
+
 ## Project documents
 
 `PRODUCT.md` and `DESIGN.md` describe verified capabilities, current limits, the page structure,

@@ -318,3 +318,29 @@ id first, then the pull request that did the work.
   now includes an omitted array position. Playground examples remain sourced directly from
   the compiler; its diagnostic fixtures contained no blanket array-pattern refusal to replace.
   Integration and browser validation are recorded in this pin pull request.
+- 0088: pin `a21f7024` carries `T | undefined`, the optional value. The types page's boundary
+  and the from-TypeScript rows describe the positions that hold one and the ones that refuse it,
+  the TS8003 line names the un-narrowed read, the `optional-values` example joins the values
+  group, and the `optionalMember` row of the from-TypeScript table is accepted, with its copy in
+  both locales. Handled in this pin's pull request.
+- 0093: pin `a21f7024` lets a struct field, an array element and an optional parameter `x?: T`
+  hold an optional value in function scope. The TS8020 program is the required-after-optional
+  shape the compiler still refuses, the `optional-fields` example joins the values group, and
+  the types page's boundary names the positions. Handled in this pin's pull request.
+- 0096: pin `a21f7024`: the kernel-function paragraph of the control-flow page says, in both
+  locales, what the idle lanes of a dispatch's last workgroup do and that the results do not
+  change. Handled in this pin's pull request.
+- 0097: pin `a21f7024`: the ternary sentences of the control-flow page, the from-TypeScript
+  control-flow row and the WGSL mapping row say, in both locales, that a costly arm is lowered to
+  an `if` and a cheap one stays `select`. Handled in this pin's pull request.
+
+- 0098: this pin adds null-only and three-state optional values. The types, functions and
+  from-TypeScript guides describe classes, members, accessors, callbacks, generics,
+  initialization and refused boundaries in both languages. The Korean authoring section
+  follows the new source. TS8003 has a nullable-read trigger and a loose-null-check repair;
+  generated diagnostic sites and replacement pairs come from the compiler. The `null-values`
+  example joins the values group with Korean copy. `check-null-values.mjs` exercises its
+  Playground rendering and nullable diagnostics in both locales and GPU backends.
+- 0099: the optional-result guide describes bare return and fall-through. Null-only results
+  produce null; results admitting undefined produce undefined. Plain-valued bare returns
+  remain TS8021, including the error reference's existing trigger and repair.

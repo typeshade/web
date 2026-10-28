@@ -89,10 +89,11 @@ const routes = {
     "/ko/lab/": [".lab-cards", ".nn-docs", ".ui-home", ".matrix-editor"],
   },
   typecv: {
-    "/": [".ui-home", ".pair-canvases", ".sfm-inputs", ".cv-docs"],
-    "/docs/": [".cv-docs", ".pair-canvases", ".sfm-inputs", ".ui-home"],
-    "/playground/": [".pair-canvases", ".sfm-inputs", ".cv-docs", ".ui-home"],
-    "/lab/": [".sfm-inputs", ".pair-canvases", ".cv-docs", ".ui-home"],
+    "/": [".ui-home", ".pair-canvases", ".sfm-live-grid", ".cv-docs"],
+    "/docs/": [".cv-docs", ".pair-canvases", ".sfm-live-grid", ".ui-home"],
+    "/playground/": [".pair-canvases", ".sfm-live-grid", ".cv-docs", ".ui-home"],
+    // sfm-lab.css owns a few shared canvas rules used by the existing lab views.
+    "/lab/": [".sfm-live-grid", ".cv-docs", ".ui-home"],
   },
   typeshade: {
     "/": [".tabs-panel", ".docs-local", ".api-crumbs"],

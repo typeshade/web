@@ -7,7 +7,7 @@
  *  a repository itself, so the Worker writes only where this table says. */
 export const ISSUE_REPOS = {
   compiler: 'typeshade/typeshade',
-  site: 'typeshade/typeshade.github.io',
+  site: 'typeshade/web',
 } as const;
 export type IssueRepo = keyof typeof ISSUE_REPOS;
 

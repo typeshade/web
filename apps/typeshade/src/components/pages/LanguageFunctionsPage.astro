@@ -28,7 +28,7 @@ const headings = [
   <p set:html={content.anatomyNote} />
 
   <h2 id="params">{content.params}</h2>
-  <p>{content.paramsP}</p>
+  <p><Rich text={content.paramsP} locale={locale} /></p>
   <TypeShadeCode code={`function mix(a: vec4, b: vec4, amount: f32): vec4 {\n  return a + (b - a) * amount\n}`} />
   <ConceptDoc locale={locale} rows={content.paramsTable.slice(1)} columns={content.paramsTable[0]} />
   <p><Rich text={content.paramsRefP} locale={locale} /></p>

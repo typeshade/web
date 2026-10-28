@@ -11,8 +11,14 @@ hash changes; review the upstream update and override together, then update the
 manifest deliberately. An override is used only when its source exists and its
 hash matches.
 
-The source currently reviewed is TypeCV revision `e40c878`. Keep overrides
-aligned with upstream changes, and remove an override when the source has been
-corrected. The manifest's revision also pins generated upstream source links.
+The source snapshot is TypeCV revision `715fd1b`. Keep overrides aligned with
+upstream changes, and remove an override when its text would hide newer source
+material. The full-file GPU SfM override was removed when upstream added the
+time-budget and chunk-scheduling documentation; the route now renders that
+source page directly. The SfM quickstart override was checked against the new
+source and updated for its more specific bundle-adjustment schedule. The
+manifest's revision also pins generated upstream source links. The run-records
+override updates operational paths to the web repository and documents the
+current strict KV setup behavior. Its source hash is pinned in the same manifest.
 Korean documentation routes link to the corresponding English route and do not
 present these files as translated text.

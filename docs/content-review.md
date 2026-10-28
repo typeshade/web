@@ -64,7 +64,11 @@ exception details retain their original diagnostic wording beneath localized UI 
 TypeShade compiler-generated language-reference excerpts, diagnostic registry and design rules
 also retain explicitly identified English source text; their surrounding site copy is translated.
 
-## Validation
+## Validation of the editorial revision
+
+The following results describe the completed editorial revision, not the later upstream
+source reconciliation. The newer pins, imported TypeCV lab features and migration checks
+are tracked in [repository-migration.md](repository-migration.md).
 
 The editorial revision `c62f78e` also passed all five jobs in GitHub Actions run
 [40454514084](https://github.com/typeshade/web/actions/runs/40454514084): controls, scope,

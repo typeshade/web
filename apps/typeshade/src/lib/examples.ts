@@ -453,16 +453,16 @@ export const facts = {
 // asks for a copy decision. Comparing them only at the commit the copy was written at left
 // the check inert from the next pin on, which is when it has something to catch.
 const pinned = {
-  commit: '91c2fe31',
-  shadeExamples: 98,
-  shadeRenderable: 73,
+  commit: '3e1e8420',
+  shadeExamples: 101,
+  shadeRenderable: 76,
   fp64Examples: 12,
   testFiles: 420,
   builtins: 169,
   portableBuiltins: 44,
   glslAbsentBuiltins: 43,
   mathAliasBuiltins: 27,
-  constructRows: 73,
+  constructRows: 74,
   wgslBuiltinIds: 16,
   glslCapabilities: 4,
   languageEntries: 317,
@@ -475,15 +475,17 @@ const pinned = {
   errorCodesTs: 51,
   errorCodesSd: 36,
   errorCodesRetired: 2,
-  rules: 124,
-  rulesTest: 117,
+  rules: 125,
+  rulesTest: 118,
   rulesCode: 2,
   rulesPending: 0,
   rulesReview: 5,
-  rulesSurfaceSections: 48,
-  rulesAdded: 0,
+  rulesSurfaceSections: 50,
+  // This migration advances from 91c2fe31 directly to 3e1e8420, across the intermediate pin
+  // a21f7024. The displayed rule history therefore counts every change since 91c2fe31.
+  rulesAdded: 1,
   rulesRemoved: 0,
-  rulesChanged: 3,
+  rulesChanged: 11,
 };
 const drift: string[] = [];
 if (facts.shadeExamples !== pinned.shadeExamples)

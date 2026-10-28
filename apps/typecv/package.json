@@ -10,17 +10,20 @@
     "build": "astro build",
     "preview": "astro preview",
     "test:links": "node --test --test-name-pattern=\"all generated pages\" site.test.mjs",
-    "test:integration": "node --test site.test.mjs"
+    "test:integration": "node --test site.test.mjs",
+    "test:website": "node --test --test-concurrency=1 *.test.mjs *.test.ts"
   },
   "dependencies": {
     "@astrojs/react": "7.1.0",
+    "@ant-design/icons": "5.6.1",
     "@typeshade/site-ui": "workspace:*",
     "antd": "5.29.3",
     "astro": "7.4.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "three": "0.184.0",
-    "@ant-design/cssinjs": "1.24.0"
+    "@ant-design/cssinjs": "1.24.0",
+    "mediabunny": "1.61.6"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

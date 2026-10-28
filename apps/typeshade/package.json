@@ -30,6 +30,7 @@
     "qa:worker-routes": "node scripts/check-worker-routes.mjs dist",
     "qa:openseo": "bun scripts/openseo-audit.mts dist",
     "check:playground": "node scripts/check-playground.mjs",
+    "check:null-values": "node scripts/check-null-values.mjs",
     "check:live": "node scripts/check-live.mjs",
     "check:function-demos": "node scripts/check-function-demos.mjs",
     "check:mnist": "node scripts/check-mnist-browser.mjs",

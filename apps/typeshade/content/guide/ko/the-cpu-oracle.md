@@ -1,8 +1,8 @@
 ---
 id: the-cpu-oracle
-source: 8e4c544eb1f49d9fb5803aad52dd4bfd888ef03f899c7e80473c117324a95cde
-sourceLine: 1396
-rules: 8.22 Ca5h_etdlFvIPBA1NRya7g-bBPugGzboprLldGAJYDc=, 7.2 onO98E-yRQ3RftA44lVmgPmSW7ZkCd7rYrJGgFS8EI4=, 3.9 3B2rlXJXA0GupXGpH-mhQpicZan-WehN8Xf4nhFST6Q=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 8.25 XZRD1So9e-OFRi9VePXRjyCfT2_T_xaPFWQw_Uy0ZrM=, 7.6 kyzs2Ws4Mk2xUgP_v9ZM_z6jm_3zIWP2-BekxmeHpC8=, 12.7 J74H031gQ4FNHTZrIegdYr02_KKNMFFkgQLHhsuICeM=
+source: 0a224eaa9ccd465cd4aa68ea7c576d6ff52f953f985959fd180f849cee768c6d
+sourceLine: 1438
+rules: 8.22 RRSYqKRm8CRNz6jUXROYf4rHdqey9cqVKO8ceusX66E=, 7.2 xGq0Nofxm1Jtgfkv9PIlY9amCnZ_OI5RVn_kbDUFg2U=, 3.9 3B2rlXJXA0GupXGpH-mhQpicZan-WehN8Xf4nhFST6Q=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 8.25 XZRD1So9e-OFRi9VePXRjyCfT2_T_xaPFWQw_Uy0ZrM=, 7.6 kyzs2Ws4Mk2xUgP_v9ZM_z6jm_3zIWP2-BekxmeHpC8=, 12.7 TawOmv8klHJxgWPx5cItYK8gProqi2towGMRoE6fL2M=
 ---
 
 이 페이지는 같은 모듈을 CPU에서 배정밀도로 실행하고 GPU 결과와 비교하는 방법을 설명합니다.
@@ -123,6 +123,8 @@ for (let i = 0; i < gpuOut.length; i++) {
 ### CPU에서 의미가 없는 호출
 
 일부 GPU 전용 내장 함수는 CPU에서 계산할 정보가 없으므로 실행 경로가 도달하면 오류를 던집니다. 텍스처 읽기인 `textureSample`, `textureSampleLevel`, `textureLoad`와 배열·bias·grad·gather·깊이 비교 변형, `textureStore`, 크기 조회인 `textureDimensions`와 `textureNumLayers`, 미분인 `dpdx`, `dpdy`, `fwidth`와 coarse·fine 변형이 이에 해당합니다. 전체 목록은 `ORACLE_GPU_STUB_NAMES`로 내보냅니다. IR 빌더로 조립한 모듈의 raw 문(statement)도 오라클이 해석하지 않는 타깃 언어 텍스트이다([`docs/ir-builder.md`](docs/ir-builder.md)).
+
+CPU tier의 메모리에 있는 텍스처는 예외입니다. `device.texture()`는 WebGPU 디바이스가 없는 디바이스에도 텍스처를 만듭니다(변경 0077). `setBinding`으로 바인딩한 이 텍스처는 `textureLoad`와 `textureDimensions`가 읽고 `textureStore`가 쓰며, `compileModule`과 `compileModuleJs`에서 똑같이, `gpuStubs` 유무와 관계없이 동작합니다. 샘플링 읽기(`textureSample`과 그 변형)는 스텁 계약을 그대로 유지합니다. 필터링은 그 메모리의 일부가 아니기 때문입니다.
 
 `{ gpuStubs: true }`로 컴파일하면 이런 내장 함수는 대체 값을 반환합니다. 텍스처 읽기는 불투명한 검정, 미분은 영, `textureDimensions`는 1×1, `textureNumLayers`는 레이어 하나입니다. 옵션을 사용하지 않을 때의 오류에는 내장 함수와 옵션 이름이 표시됩니다. 대체 값으로도 검증할 수 있는 계산에만 사용합니다. 샘플 값과 무관한 프래그먼트 주변의 기하 계산이 그 예입니다. 단, 바인딩은 여전히 설정해야 합니다. 호출을 스텁으로 대체하기 전에 텍스처와 샘플러 변수를 읽기 때문입니다.
 
@@ -254,7 +256,7 @@ const h = height([0.5, 0.5], [1, 0.5, 2, 0.25]) // a number
 맞지 않는 인자가 있으면 매개변수 이름을 포함한 `TypeError`를 던집니다. 반환값은 새로 생성한
 값이며 호출은 동기적으로 완료됩니다.
 
-호스트가 호출할 수 있는 함수는 내보낸 헬퍼 중 진입점이나 제네릭이 아니고, 함수 인자를 받지 않으며, 바인딩이나 GPU 전용 내장 함수에 도달하지 않는 함수입니다. 나머지 내보내기는 이유와 함께 `never` 타입으로 표시되며 호출 위치에서 타입 오류가 발생합니다. 설정은 네 줄입니다. `vite.config.ts`에 플러그인 한 줄, `tsconfig.json`에 두 줄, `prepare`에 `tshc sync` 한 줄이 필요합니다. 전체 설정과 호스트 값 표는 `docs/use-typeshade-surface.md` §64에 있습니다.
+호스트가 호출할 수 있는 함수는 내보낸 헬퍼 중 진입점이나 제네릭이 아니고, 함수 인자를 받지 않으며, 바인딩이나 GPU 전용 내장 함수에 도달하지 않는 함수입니다. 나머지 내보내기는 이유와 함께 `never` 타입으로 표시되며 호출 위치에서 타입 오류가 발생합니다. 기존 Vite 프로젝트에서 `npx tshc init`을 실행하면 플러그인, 호스트 뷰, 동기화 스크립트가 설정됩니다(변경 0085). 이 명령은 관련 없는 설정과 JSONC 주석을 보존하고, 충돌이 있으면 파일을 쓰기 전에 거부합니다. 초기화를 반복해도 파일은 바뀌지 않습니다. 수동 설정과 `tshc sync`도 계속 지원됩니다. 셰이더 검사는 공용 `tshc check` 진단을 사용하며, 일반 `tsc`는 여전히 셰이더 데코레이터를 거부합니다. 설정과 호스트 값은 `docs/use-typeshade-surface.md` §64에 있습니다.
 
 ### 배열을 도는 루프
 
@@ -283,8 +285,11 @@ tier에서 실행됩니다. CPU tier의 디바이스는 텍스처를 메모리�
 같은 데이터에 커널 함수를 여러 번 부르는 호스트는 호출마다 디스패치 하나와 제출 하나를 씁니다.
 `typeshade/fuse`의 `fuse`는 본문이 하는 호출을 기록했다가 한꺼번에 실행합니다. 호출들은 제출
 하나로 실행되고, 각 호출이 바로 앞 호출이 같은 인덱스에 쓴 값을 읽으면 디스패치 하나로도
-실행됩니다. 호스트는 `fuse`를 일부러 가져오고, `vite.config.ts`의 `typeshade({ fuse: true })`는
-플러그인이 계획의 재료가 되는 사실을 기록하게 합니다. 다음 세 커널 함수는 디스패치 하나입니다.
+실행됩니다. `device.fuse()`는 등록용 import가 필요 없고, 이름으로 가져오는 `fuse`도 계속 쓸 수 있습니다. Vite 플러그인과
+`hostFace()`는 조건을 만족하는 커널의 병합 사실(fusion facts)을 기본으로 기록합니다. `fuse: false`는 생성
+크기를 줄이기 위해 이를 생략하고, `fuse: true`는 기본값을 유지합니다. 이 사실이 있어도 일반 호출은 비공개
+입력 투영(private input projection)을 계속 사용할 수 있습니다. resident 호출과 병합된 호출은 전체
+레이아웃을 유지합니다. 다음 세 커널 함수는 디스패치 하나입니다.
 
 ```ts
 "use typeshade";
@@ -339,7 +344,7 @@ const y = await out.read()
 호출이 바로 앞 호출과 떨어져 자기 디스패치로 실행되는 경우는 다음과 같습니다. 이웃을 읽는 경우
 (`t[i - 1]`, `t[i ^ 1]`), 다른 인덱스에 쓰는 경우(`out[2 * i]`), 앞 호출이 읽는 것을 쓰는 경우,
 반복 횟수가 다른 경우, 루프가 둘이거나 `continue`나 스캐터가 있는 경우입니다. 그룹이 장치가
-허용하는 것보다 많은 스토리지 버퍼를 바인딩하게 될 때, 모듈을 `fuse: true` 없이 빌드했을 때도
+허용하는 것보다 많은 스토리지 버퍼를 바인딩하게 될 때, 모듈에 병합 사실이 없을 때(`fuse: false`이거나 이전 버전으로 생성한 코드)도
 떨어집니다. WebGL2와 CPU tier는 합치지 않습니다. 배열과 결과는 어느 쪽이든 같습니다. 합치기는
 디스패치만 바꾸고 다른 것은 바꾸지 않습니다.
 

@@ -443,9 +443,15 @@ test('legacy and paired provenance, complete pairs and checked outputs are enfor
   delete older.peers[1]!.runtime;
   expect(parseAnyRecord(older).schema).toBe(2);
   expect(regressionRows(PROFILES.quick.sizes, older.digest)).toBe(older.results.length);
+  // The retained comparison still proves that order matters for distinct runtime digests.
+  expect(new Set(older.runtimes).size).toBe(2);
+  const reversed = structuredClone(older);
+  reversed.runtimes.reverse();
+  expect(() => parseAnyRecord(reversed)).toThrow();
   for (const mutate of [
     (r: any) => r.builds.reverse(),
-    (r: any) => r.runtimes.reverse(),
+    // Distinct compiler revisions can emit identical runtime artifacts. Always corrupt bytes.
+    (r: any) => (r.runtimes[0] = (r.runtimes[0][0] === '0' ? '1' : '0') + r.runtimes[0].slice(1)),
     (r: any) => (r.workload = '0'.repeat(64)),
     (r: any) => r.results.pop(),
     (r: any) => r.results[0].checkedValues--,

@@ -1,7 +1,7 @@
 ---
 id: capabilities-extensions
-source: 97b3944d6bccd62314722649758440a27f5f27a2639d318e05bc64461c568f3d
-sourceLine: 2110
+source: a858267c3b5964e4075622c21e79f81f80159fa988da160c87e9198b09e639bd
+sourceLine: 2291
 ---
 
 이 페이지는 모듈에 필요한 GPU 기능의 선언, 타깃별 요구 사항, 생성된 디바이스의 지원 여부 확인을 설명합니다. 백엔드가 코드를 생성하지 않고 fail closed 방식으로 실패하는 조건도 다룹니다.
@@ -150,7 +150,7 @@ const device = await adapter.requestDevice({
 ```
 
 `typeshade/runtime`은 WebGPU 쪽 확인을 대신 해 줍니다. 디바이스를 직접 요청하는 런타임은 자기
-프로그램에 필요한 기능을 함께 요청합니다.
+프로그램에 필요한 기능을 함께 요청합니다. 커널 호출의 소유자에는 인스턴스별 요구 사항을 `createDevice({ limits, features })`에 넘깁니다. 직접 넘겨준 디바이스는 그 요구 사항을 이미 켜 둔 상태여야 합니다. 생성자 옵션을 쓰면 서로 독립된 라이브러리가 기본 소유자의 어느 호출이 먼저 실행되는지에 의존하지 않습니다.
 
 ### 두 모듈 중 고르기
 

@@ -30,6 +30,22 @@
   background: var(--ui-surface-muted);
   border-radius: var(--ui-radius-control);
 }
+.check-note {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.check-note input {
+  width: 100%;
+  max-width: 560px;
+  padding: 8px 10px;
+  color: var(--ui-text);
+  font: inherit;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-control);
+}
 @media (max-width: 800px) {
   .lab-main {
     padding: 26px 16px 60px;

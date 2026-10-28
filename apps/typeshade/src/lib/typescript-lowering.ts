@@ -230,7 +230,15 @@ const GROUPS: Record<
     },
     {
       key: 'kindsOfFunction',
-      ids: ['topFunction', 'localFunction', 'closure', 'defaultArgs', 'overloads', 'recursion'],
+      ids: [
+        'topFunction',
+        'localFunction',
+        'closure',
+        'defaultArgs',
+        'optionalValue',
+        'overloads',
+        'recursion',
+      ],
     },
     { key: 'calls', ids: ['callStatement', 'phonyAssign', 'mathAlias'] },
   ],
@@ -382,6 +390,12 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
       ts: 'function vignette(\n  uv: vec2, strength: f32 = 0.8\n): f32 {\n  return 1. - length(uv) * strength\n}',
       after: 'export function shade(uv: vec2): f32 {\n  return vignette(uv)\n}',
       pick: ['vignette', 'shade'],
+    },
+    {
+      id: 'optionalValue',
+      ts: 'function root(x: f32): f32 | undefined {\n  if (x < 0.) {\n    return undefined\n  }\n  return sqrt(x)\n}',
+      after: 'export function rootOr(x: f32): f32 {\n  return root(x) ?? 1.\n}',
+      pick: ['root', 'rootOr'],
     },
     {
       id: 'overloads',
@@ -618,8 +632,9 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
     {
       id: 'optionalMember',
       ts: 'class Disc {\n  center: vec2\n  radius?: f32\n}',
-      after: 'export function cover(d: Disc, p: vec2): f32 {\n  return length(p - d.center)\n}',
-      refused: true,
+      after:
+        'export function cover(d: Disc, p: vec2): f32 {\n  return length(p - d.center) - (d.radius ?? 1.)\n}',
+      pick: ['cover'],
     },
     {
       id: 'stringValue',
