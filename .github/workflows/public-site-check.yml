@@ -1,4 +1,4 @@
-name: Public site HTTP check
+name: Public site HTTP diagnostics
 
 on:
   workflow_dispatch:

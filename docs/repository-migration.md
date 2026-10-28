@@ -2,8 +2,9 @@
 
 This tracks execution of the website move out of the library repositories. The web PR stack
 has been merged; library cleanup changes remain open until production cutover is verified.
-No production cutover, repository archival, DNS change or remote data migration has been
-performed by this work.
+Production cutover is in progress. TypeCV's first new Worker is serving traffic; the other
+sites still use their previous deployments. No repository archival, DNS change or remote
+data migration has been performed by this work.
 
 ## Current execution status (2026-10-28)
 
@@ -59,9 +60,26 @@ performed by this work.
   dispatching production deploy. The check receipt is `artifacts/migration/pre-cutover.json`
   in the execution workspace and contains resource metadata, not credential values.
 
-Next: pass readiness on the final operational-workflow commit, stop the old publishers, verify
-no publishing runs remain, refresh rollback IDs and enable production operations. Deploy and
-verify the three sites before merging library cleanup PRs, which currently remain unmerged.
+- Readiness run `40697109161` passed on `64a1a3e`. All seven legacy publishing workflows were
+  then disabled. Activation run `40697767637` verified no active legacy runs and enabled
+  production operations. TypeCV deploy run `40697947202` published version
+  `e3916e16-f01e-4706-9c3a-642c193818d0`, but its public HTTP check failed. External checks
+  returned 200 for EN/KO homepages and config (`files: true`), 401 for unauthenticated records,
+  and 206 with the requested 16 bytes for the published pyramid video. A real Chromium GET
+  also rendered the expected new TypeCV heading with TLS verification enabled.
+- Diagnostic run `40699538503` established that GitHub-hosted runner requests to all three
+  domains receive 403 with `cf-mitigated: challenge`, regardless of user agent. This is a
+  Cloudflare browser challenge, not proof that the new Worker failed. Operations were paused
+  using run `40699193471` while adjusting verification; legacy publishers remain disabled.
+- Deployment now separately confirms the exact uploaded version receives 100% of traffic via
+  Cloudflare's authenticated deployment API. Public HTTP checks distinguish a real 200 pass,
+  a proven Cloudflare challenge (blocked; external browser/API verification required), and
+  all other HTTP/network failures (fail). A blocked check is not reported as a health pass.
+  No bot protection, WAF rule, cookie, challenge or TLS setting is modified or bypassed.
+
+Next: rerun readiness on the final verifier commit, re-enable operations with legacy publishers
+still stopped, and complete all three deployments plus external browser/API verification.
+Library cleanup PRs remain unmerged until their replacements are verified.
 Historical observations below describe their original check time, not the latest merge state.
 
 ## Ownership

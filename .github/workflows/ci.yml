@@ -24,7 +24,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:styles
       - run: pnpm test:code
-      - run: node --test scripts/deploy-preview-config.test.mjs scripts/deploy-worker-report.test.mjs
+      - run: node --test scripts/deploy-preview-config.test.mjs scripts/deploy-worker-report.test.mjs scripts/check-production-http.test.mjs
       - run: pnpm check:ui
       - run: pnpm build:ui
       - run: pnpm exec playwright install --with-deps chromium

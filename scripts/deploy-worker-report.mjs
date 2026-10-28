@@ -43,6 +43,17 @@ export function currentVersionId(output) {
   return id;
 }
 
+export function assertCurrentVersion(value, expected) {
+  if (typeof expected !== 'string' || !/^[0-9a-f-]{16,}$/i.test(expected)) {
+    throw new Error('Expected Worker version ID is invalid');
+  }
+  const traffic = previousTraffic(value);
+  if (traffic.specs.length !== 1 || traffic.specs[0] !== `${expected}@100`) {
+    throw new Error(`Current production traffic does not route 100% to expected Worker version ${expected}`);
+  }
+  return { id: expected, percentage: 100 };
+}
+
 export function rollbackCommand(config, specs) {
   if (!specs.length) return null;
   if (!/^wrangler(?:\.[a-z]+)?\.jsonc?$/.test(config)) {
@@ -63,8 +74,11 @@ async function main() {
     console.log(JSON.stringify({ ...traffic, rollback: rollbackCommand(config, traffic.specs) }));
   } else if (command === 'version-id') {
     console.log(currentVersionId(await readFile(file, 'utf8')));
+  } else if (command === 'verify-current') {
+    const expected = process.argv[4];
+    console.log(JSON.stringify(assertCurrentVersion(await readFile(file, 'utf8'), expected)));
   } else {
-    console.error('usage: deploy-worker-report.mjs previous <deployments.json> <wrangler.jsonc> | version-id <deploy.log>');
+    console.error('usage: deploy-worker-report.mjs previous <deployments.json> <wrangler.jsonc> | version-id <deploy.log> | verify-current <deployments.json> <expected-version-id>');
     process.exitCode = 2;
   }
 }
