@@ -174,7 +174,24 @@ try {
     exact: true,
   });
   await optimizer.focus();
+  await page.evaluate(() => {
+    window.__optimizerPopupMotionFinished = false;
+    const onAnimationEnd = (event) => {
+      if (
+        event.target.matches?.(".ant-select-dropdown") &&
+        /antSlide(?:Up|Down)In$/.test(event.animationName)
+      ) {
+        document.removeEventListener("animationend", onAnimationEnd, true);
+        window.__optimizerPopupMotionFinished = true;
+      }
+    };
+    document.addEventListener("animationend", onAnimationEnd, true);
+  });
   await page.keyboard.press("ArrowDown");
+  // rc-select schedules a post-open reset to the selected option. Wait for
+  // Ant's actual popup animation completion before moving the active option,
+  // so a delayed frame cannot hide the entrance state from the test.
+  await page.waitForFunction(() => window.__optimizerPopupMotionFinished);
   await page.waitForFunction(
     () => {
       const input = document.querySelector(

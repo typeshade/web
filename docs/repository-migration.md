@@ -211,8 +211,12 @@ shards 1, 3 and 4. Shard 2 passed 100/101 tests, including the real multi-video 
 analysis-column width in `upstream-site.test.mjs`; the stylesheet still used equal columns
 instead of giving the 3D card the intended larger share. The shared-controls keyboard
 selection also failed again, so the earlier local passes did not establish its CI stability.
-The stylesheet now gives the 3D card the larger share. The control harness waits for the
-combobox's `aria-activedescendant` to identify the keyboard target before Enter, rather than
-using only its visual active class. The old harness reproduced the CI failure under pinned
-Chromium 1194, and the revised harness passed six consecutive full local runs. Final remote
-CI must still confirm both fixes before treating the web migration as verified.
+The stylesheet now gives the 3D card the larger share. Waiting for the combobox's
+`aria-activedescendant` alone still failed in run `40667101454`, despite local passes.
+The pinned rc-select implementation queues a post-open timer that resets the active option
+to the selected value; holding that timer until after ArrowDown reproduced the failure
+deterministically in Chromium 1194. The harness now registers for popup animation completion
+before opening, waits for it with a bounded Playwright wait, then checks the keyboard target
+and committed value. This tests keyboard operation after the popup is ready; it does not fix
+rc-select's behavior for immediate input during its opening transition. Final remote CI must
+still confirm both fixes before treating the web migration as verified.
