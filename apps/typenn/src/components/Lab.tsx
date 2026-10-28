@@ -1,6 +1,7 @@
 import "../styles/training.css";
 import {
   ThemeProvider,
+  TextLink,
   Button,
   Field,
   NumberInput,
@@ -337,12 +338,9 @@ export default function Lab({ locale }: { locale: Locale }) {
           <h2 id="lab-graph">{words.graphTitle}</h2>
           <p className="lab-note">
             {words.graphIntro}{" "}
-            <a
-              className="text-link"
-              href="https://github.com/typeshade/typenn#how-a-read-runs"
-            >
+            <TextLink href="https://github.com/typeshade/typenn#how-a-read-runs">
               {words.graphReadme} ↗
-            </a>
+            </TextLink>
           </p>
           <Toolbar className="lab-graph-actions" label={words.graphTitle}>
             <Button

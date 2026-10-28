@@ -1,251 +1,159 @@
-:where(.ui-home) .home-content {
-  max-width: 1320px;
-  margin: 0 auto;
-}
-:where(.ui-home) .home-intro {
-  display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(480px, 1.05fr);
-  gap: clamp(44px, 7vw, 96px);
-  align-items: center;
-  padding: 44px 0 88px;
-}
-:where(.ui-home) .home-copy {
-  max-width: 610px;
-}
-:where(.ui-home) .home-copy h1 {
-  max-width: 660px;
-  margin: 0;
-  font-size: clamp(42px, 5.5vw, 72px);
-  font-weight: 600;
-  line-height: 1.07;
-  letter-spacing: -0.052em;
-}
-:where(.ui-home) .home-copy h1 span {
-  color: var(--ui-text-muted);
-}
-:where(.ui-home) .action-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
-}
-:where(.ui-home) .release-note {
-  margin: 20px 0 0;
-  color: var(--ui-text-muted);
-  font-size: 12px;
-}
-:where(.ui-home) .home-code {
-  min-width: 0;
-}
-:where(.ui-home) .execution-result {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin-top: 10px;
-  padding: 12px 14px;
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-control);
-  color: var(--ui-text-muted);
-  background: var(--ui-surface);
-  font-size: 11px;
-}
-:where(.ui-home) .execution-result code {
-  color: var(--ui-text);
-  font-size: 11px;
-}
-:where(.ui-home) .result-dot {
-  width: 7px;
-  height: 7px;
-  display: inline-block;
-  border-radius: 50%;
-  background: var(--ui-success);
-}
-:where(.ui-home) .result-label {
-  margin-left: auto;
-}
-:where(.ui-home) .home-path,
-:where(.ui-home) .home-learning,
-:where(.ui-home) .home-status {
-  padding: 64px 0;
-  border-top: 1px solid var(--ui-border);
-}
-:where(.ui-home) .section-heading-row {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: var(--ui-space-6);
-  margin-bottom: 26px;
-}
-:where(.ui-home) .section-heading-row h2,
-:where(.ui-home) .learning-copy h2,
-:where(.ui-home) .home-status h2 {
-  max-width: 750px;
-  margin: 0;
-  font-size: clamp(27px, 3.5vw, 42px);
-  font-weight: 550;
-  line-height: 1.18;
-  letter-spacing: -0.04em;
-}
-:where(.ui-home) .path-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--ui-border);
-  border-bottom: 1px solid var(--ui-border);
-}
-:where(.ui-home) .path-strip article {
-  min-width: 0;
-  padding: 24px 28px 26px 0;
-}
-:where(.ui-home) .path-strip article + article {
-  padding-left: 28px;
-  border-left: 1px solid var(--ui-border);
-}
-:where(.ui-home) .path-index {
-  color: var(--ui-link);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 11px;
-}
-:where(.ui-home) .path-strip h3 {
-  margin: 15px 0 6px;
-  font-size: 20px;
-  font-weight: 550;
-}
-:where(.ui-home) .path-strip p {
-  max-width: 39ch;
-  min-height: 50px;
-  margin: 0 0 14px;
-  color: var(--ui-text-muted);
-  font-size: 13px;
-}
-:where(.ui-home) .path-strip code {
-  color: var(--ui-text);
-  font-size: 10px;
-}
-:where(.ui-home) .home-learning {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: 80px;
-}
-:where(.ui-home) .learning-copy > p:last-child,
-:where(.ui-home) .home-status > div > p:last-child {
-  max-width: 62ch;
-  margin: 18px 0 0;
-  color: var(--ui-text-muted);
-  font-size: 14px;
-  line-height: 1.75;
-}
-:where(.ui-home) .learning-links {
-  border-top: 1px solid var(--ui-border);
-}
-:where(.ui-home) .learning-links a {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  padding: 16px 4px;
-  border-bottom: 1px solid var(--ui-border);
-}
-:where(.ui-home) .learning-links a:hover strong {
-  color: var(--ui-link);
-}
-:where(.ui-home) .learning-links strong {
-  display: block;
-  font-size: 14px;
-  font-weight: 550;
-}
-:where(.ui-home) .learning-links small {
-  display: block;
-  margin-top: 3px;
-  color: var(--ui-text-muted);
-  font-size: 12px;
-}
-:where(.ui-home) .learning-links b {
-  color: var(--ui-link);
-  font-size: 15px;
-  font-weight: 400;
-}
-:where(.ui-home) .home-status {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: var(--ui-space-8);
-}
-:where(.ui-home) .home-status .ui-button {
-  flex: 0 0 auto;
-}
-@media (max-width: 1050px) {
-  :where(.ui-home) .home-intro {
-    grid-template-columns: minmax(0, 0.9fr) minmax(400px, 1.1fr);
-    gap: 42px;
-  }
-  :where(.ui-home) .home-learning {
-    gap: 42px;
-  }
-}
-@media (max-width: 820px) {
-  :where(.ui-home) .home-intro {
-    grid-template-columns: 1fr;
-    gap: var(--ui-space-8);
-    padding: 22px 0 58px;
+@layer theme, base, antd, components, utilities;
+@layer components {
+  :where(.ui-home) .home-content {
+    max-width: 1320px;
+    margin: 0 auto;
   }
   :where(.ui-home) .home-copy {
-    max-width: 680px;
+    max-width: 610px;
   }
   :where(.ui-home) .home-copy h1 {
-    font-size: clamp(44px, 10vw, 66px);
+    max-width: 660px;
+    margin: 0;
+    font-size: clamp(42px, 5.5vw, 72px);
+    font-weight: 600;
+    line-height: 1.07;
+    letter-spacing: -0.052em;
+  }
+  :where(.ui-home) .home-copy h1 span {
+    color: var(--ui-text-muted);
+  }
+  :where(.ui-home) .action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  :where(.ui-home) .release-note {
+    margin: 20px 0 0;
+    color: var(--ui-text-muted);
+    font-size: 12px;
   }
   :where(.ui-home) .home-code {
-    max-width: 720px;
+    min-width: 0;
   }
-  :where(.ui-home) .path-strip article {
-    padding-right: 18px;
+  :where(.ui-home) .execution-result {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-control);
+    color: var(--ui-text-muted);
+    background: var(--ui-surface);
+    font-size: 11px;
   }
-  :where(.ui-home) .path-strip article + article {
-    padding-left: 18px;
+  :where(.ui-home) .execution-result code {
+    color: var(--ui-text);
+    font-size: 11px;
   }
-  :where(.ui-home) .home-learning {
-    grid-template-columns: 1fr;
-    gap: 28px;
+  :where(.ui-home) .result-dot {
+    width: 7px;
+    height: 7px;
+    display: inline-block;
+    border-radius: 50%;
+    background: var(--ui-success);
   }
-  :where(.ui-home) .home-status {
-    align-items: start;
-    flex-direction: column;
-  }
-}
-@media (max-width: 560px) {
-  :where(.ui-home) .home-copy h1 {
-    font-size: 43px;
-  }
-  :where(.ui-home) .home-intro {
-    padding-top: 15px;
+  :where(.ui-home) .result-label {
+    margin-left: auto;
   }
   :where(.ui-home) .section-heading-row {
-    align-items: start;
-    flex-direction: column;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--ui-space-6);
+    margin-bottom: 26px;
   }
   :where(.ui-home) .section-heading-row h2,
   :where(.ui-home) .learning-copy h2,
   :where(.ui-home) .home-status h2 {
-    font-size: 29px;
-  }
-  :where(.ui-home) .path-strip {
-    grid-template-columns: 1fr;
+    max-width: 750px;
+    margin: 0;
+    font-size: clamp(27px, 3.5vw, 42px);
+    font-weight: 550;
+    line-height: 1.18;
+    letter-spacing: -0.04em;
   }
   :where(.ui-home) .path-strip article {
-    padding: 18px 0;
+    min-width: 0;
+    padding: 24px 28px 26px 0;
   }
   :where(.ui-home) .path-strip article + article {
-    padding-left: 0;
-    border-top: 1px solid var(--ui-border);
-    border-left: 0;
+    padding-left: 28px;
+    border-left: 1px solid var(--ui-border);
+  }
+  :where(.ui-home) .path-index {
+    color: var(--ui-link);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+  }
+  :where(.ui-home) .path-strip h3 {
+    margin: 15px 0 6px;
+    font-size: 20px;
+    font-weight: 550;
   }
   :where(.ui-home) .path-strip p {
-    min-height: 0;
+    max-width: 39ch;
+    min-height: 50px;
+    margin: 0 0 14px;
+    color: var(--ui-text-muted);
+    font-size: 13px;
   }
-  :where(.ui-home) .home-path,
-  :where(.ui-home) .home-learning,
-  :where(.ui-home) .home-status {
-    padding: 44px 0;
+  :where(.ui-home) .path-strip code {
+    color: var(--ui-text);
+    font-size: 10px;
+  }
+  :where(.ui-home) .learning-copy > p:last-child,
+  :where(.ui-home) .home-status > div > p:last-child {
+    max-width: 62ch;
+    margin: 18px 0 0;
+    color: var(--ui-text-muted);
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 820px) {
+    :where(.ui-home) .home-copy {
+      max-width: 680px;
+    }
+    :where(.ui-home) .home-copy h1 {
+      font-size: clamp(44px, 10vw, 66px);
+    }
+    :where(.ui-home) .home-code {
+      max-width: 720px;
+    }
+    :where(.ui-home) .path-strip article {
+      padding-right: 18px;
+    }
+    :where(.ui-home) .path-strip article + article {
+      padding-left: 18px;
+    }
+  }
+  @media (max-width: 560px) {
+    :where(.ui-home) .home-copy h1 {
+      font-size: 43px;
+    }
+    :where(.ui-home) .section-heading-row {
+      align-items: start;
+      flex-direction: column;
+    }
+    :where(.ui-home) .section-heading-row h2,
+    :where(.ui-home) .learning-copy h2,
+    :where(.ui-home) .home-status h2 {
+      font-size: 29px;
+    }
+    :where(.ui-home) .path-strip article {
+      padding: 18px 0;
+    }
+    :where(.ui-home) .path-strip article + article {
+      padding-left: 0;
+      border-top: 1px solid var(--ui-border);
+      border-left: 0;
+    }
+    :where(.ui-home) .path-strip p {
+      min-height: 0;
+    }
   }
 }

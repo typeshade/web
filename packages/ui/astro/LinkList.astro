@@ -1,0 +1,10 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "../recipes/cn";
+type Props = HTMLAttributes<"div">;
+const { class: className, ...attributes } = Astro.props;
+---
+
+<div {...attributes} class={cn("border-t border-ui-border", className)}>
+  <slot />
+</div>

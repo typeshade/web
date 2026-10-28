@@ -1,4 +1,7 @@
 ---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
 import "../../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
@@ -20,19 +23,19 @@ await device.dispose();`;
 >
   <ReadingSurface class="nn-docs">
     <article class="docs-article">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <Breadcrumbs aria-label="Breadcrumb">
         <a href="/ko/">TypeNN</a>
         <span>/</span>
         <span>API 참조</span>
-      </nav>
-      <header class="page-heading">
-        <p class="eyebrow">참조</p>
-        <h1>API 참조</h1>
-        <p class="lead">
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">참조</Fragment>
+        <Fragment slot="title">API 참조</Fragment>
+        <Fragment slot="description">
           현재 예제에서 사용하는 공개 API를 정리했습니다. 정확한 overload와
           옵션은 소스 선언을 확인하세요.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <section class="doc-section">
         <h2>Device와 Tensor 수명주기</h2>
         <CodeBlock title="생성, 실행, 해제" file="device.ts" code={code} />
@@ -126,12 +129,9 @@ await device.dispose();`;
           자동 미분은 서로 다른 기능입니다.
         </p>
         <p>
-          <a
-            class="text-link"
-            href="https://github.com/typeshade/typenn/tree/main/src"
-          >
+          <TextLink href="https://github.com/typeshade/typenn/tree/main/src">
             소스 선언 살펴보기 ↗
-          </a>
+          </TextLink>
         </p>
       </section>
     </article>

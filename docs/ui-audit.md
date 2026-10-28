@@ -128,9 +128,9 @@ TypeShade's playground now separates source coordinate mapping, editor providers
 Monaco loading/theme, emission, reflection rendering, console rendering, sharing
 and contracts. Providers retrieve the current document/client when invoked, and
 source-coordinate state belongs to each mounted playground. Domain execution,
-GPU/CPU rendering and workspace orchestration remain app-owned. The remaining
-orchestrator is still substantial; this is not a claim that all large application
-modules have been fully decomposed.
+GPU/CPU rendering and workspace orchestration remain app-owned. The follow-on
+controller decomposition described below separates these responsibilities from
+the entry module as well.
 
 `test:styles` checks both allowed global layers and emitted route styles. A home
 page must not load graph, pair, reconstruction or documentation selectors; docs
@@ -170,3 +170,62 @@ existing Ant CSS-in-JS package's official `StyleProvider layer` support. This
 keeps its default input sizing below consumer utilities without important rules.
 The browser suite checks that numeric/select controls fill their field, and the
 source boundary check protects the reset/layer order.
+
+## Playground controllers and editorial compositions
+
+The playground entry now coordinates editor bootstrapping, compiler analyses,
+URL publishing and gallery navigation. Its former 4,272-line module is reduced
+to 1,566 lines. The app-owned modules have explicit typed inputs and own their
+mutable state:
+
+| Owner                         | Responsibility                                                              |
+| ----------------------------- | --------------------------------------------------------------------------- |
+| `workspace-controller`        | File models/listeners, tabs, rename/import updates, pass order and disposal |
+| `host-controller`             | Lazy host starter, diagnostics, explicit Run/Stop and stale build rejection |
+| `output-controller`           | Output tabs and revision-checked asynchronous syntax colouring              |
+| `cpu-program` / `gpu-program` | Backend data and render plans from compiled modules                         |
+| `raster-controller`           | Worker pool, tile queue, fallback rendering and cancellation                |
+| `capture-controller`          | Pixel/frame recordings and console report revisions                         |
+| `result-controller`           | Canvas mount/swap, compute dispatch and current result ownership            |
+| `transport-controller`        | Playback clock, pause/restart, fullscreen and image drop                    |
+| `opening-loader`              | Example loading and decoding initial source/workspace/control links         |
+
+Controllers read current compiler/editor values through narrow ports; they do
+not import the entry module. File models, worker jobs, captures and host runs
+are not shared-package state. The shared package remains independent of Monaco,
+compiler IR, GPU resources and application datasets.
+
+Stopping a CPU draw now also retires pending resource preparation and queued
+animation-frame paints. Late failures cannot replace a newer status, fallback
+rendering closes its MessageChannel, and a failed worker retires the current
+queue. The unit suite checks cancellation during both successful and failed
+resource loading, queued paints and late messages, stale highlighting, host
+starter races, workspace disposal and nested import paths. The browser suite
+adds nested file creation/rename/deletion, import updates, actual CPU worker
+rendering, playback controls and explicit host execution/stop.
+
+Monaco is pinned to 0.57.0, which handles cancellation of its occurrence-highlight
+timer during model changes. The browser regression switches file tabs within
+the pending timer; it reproduced an unhandled `Canceled` rejection on 0.52.2.
+The newer AMD entry owns its worker URLs and Blob shims, replacing the obsolete
+`workerMain.js` shim. Client exceptions remain test failures.
+
+Product pages use shared Tailwind `Eyebrow`, `TextLink`, `Breadcrumbs`, `LinkList`,
+`LinkItem`, `PageHeading`, `HomeHero`, `HomeSection` and `StepGrid` components.
+PageHeading owns its h1 and optional description; HomeSection owns its default,
+split and action layout variants. These replace class-only page structures and
+repeated responsive rules in the English/Korean TypeNN and TypeCV routes.
+The remaining home/reading CSS is in the components layer, so consumer utilities
+can override it. It retains product typography, code and generated content rules;
+global entries continue to contain base layers only. This improves ownership,
+not a promise to minimize generated Tailwind CSS bytes or to replace every
+domain-specific stylesheet.
+
+Layered component styles declare the same layer order before their first block,
+including when a component import is emitted before the global entry. Browser
+smoke checks assert home/page heading size and code padding to detect reset
+precedence regressions; DOM structure and overflow checks alone miss them.
+
+React training/playground labels and text links also adopt the shared editorial
+primitives. Astro and React read the same recipes; browser checks compare their
+font size, weight, case and color, including the semantic link color.

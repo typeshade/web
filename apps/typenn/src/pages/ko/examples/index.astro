@@ -1,4 +1,9 @@
 ---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import LinkItem from "@typeshade/site-ui/astro/LinkItem";
+import LinkList from "@typeshade/site-ui/astro/LinkList";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
 import "../../../styles/docs.css";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import LinkButton from "@typeshade/site-ui/astro/LinkButton";
@@ -36,19 +41,19 @@ const model = `export class SimpleMLP extends nn.Module {
 >
   <ReadingSurface class="nn-docs">
     <article class="docs-article">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <Breadcrumbs aria-label="Breadcrumb">
         <a href="/ko/">TypeNN</a>
         <span>/</span>
         <span>예제</span>
-      </nav>
-      <header class="page-heading">
-        <p class="eyebrow">예제</p>
-        <h1>실행 가능한 코드에서 배우기</h1>
-        <p class="lead">
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">예제</Fragment>
+        <Fragment slot="title">실행 가능한 코드에서 배우기</Fragment>
+        <Fragment slot="description">
           예제는 프로젝트 소스 저장소로 연결됩니다. 측정하지 않은 성능이나 학습
           결과를 사이트에서 꾸며내지 않습니다.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <section class="doc-section">
         <h2>MNIST MLP</h2>
         <p>
@@ -62,12 +67,9 @@ const model = `export class SimpleMLP extends nn.Module {
           code={model}
         />
         <p>
-          <a
-            class="text-link"
-            href="https://github.com/typeshade/typenn/tree/main/examples/mnist"
-          >
+          <TextLink href="https://github.com/typeshade/typenn/tree/main/examples/mnist">
             MNIST 소스 탐색 ↗
-          </a>
+          </TextLink>
         </p>
       </section>
       <section class="doc-section">
@@ -83,29 +85,29 @@ const model = `export class SimpleMLP extends nn.Module {
       </section>
       <section class="doc-section">
         <h2>추가 소스 예제</h2>
-        <div class="link-list">
-          <a href="https://github.com/typeshade/typenn/tree/main/tests">
+        <LinkList class="link-list">
+          <LinkItem href="https://github.com/typeshade/typenn/tree/main/tests">
             <span>
               <strong>정확도 테스트</strong>
               <small>저장소의 연산 및 기울기 검증입니다.</small>
             </span>
             <b>↗</b>
-          </a>
-          <a href="https://github.com/typeshade/typenn/blob/main/TODO.md">
+          </LinkItem>
+          <LinkItem href="https://github.com/typeshade/typenn/blob/main/TODO.md">
             <span>
               <strong>구현 상태</strong>
               <small>계획된 작업과 알려진 제약입니다.</small>
             </span>
             <b>↗</b>
-          </a>
-          <a href="https://github.com/typeshade/typeshade">
+          </LinkItem>
+          <LinkItem href="https://github.com/typeshade/typeshade">
             <span>
               <strong>TypeShade 컴파일러</strong>
               <small>TypeNN 커널을 실행하는 컴파일러와 런타임입니다.</small>
             </span>
             <b>↗</b>
-          </a>
-        </div>
+          </LinkItem>
+        </LinkList>
       </section>
     </article>
   </ReadingSurface>

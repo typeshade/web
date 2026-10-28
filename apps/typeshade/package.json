@@ -42,7 +42,7 @@
     "check:glsl-precision": "bun scripts/check-glsl-precision.ts",
     "check:standalone-learning": "bun scripts/check-standalone-learning.ts",
     "sync:typeplot-assets": "node scripts/sync-typeplot-assets.mjs",
-    "test:playground-boundaries": "bun test scripts/playground-boundaries.test.ts"
+    "test:playground-boundaries": "bun test scripts/playground-boundaries.test.ts scripts/playground-controllers.test.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",

@@ -1,4 +1,6 @@
 ---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../../layouts/SiteLayout.astro";
 import Lab from "../../../components/Lab";
@@ -12,20 +14,20 @@ import Lab from "../../../components/Lab";
 >
   <ReadingSurface>
     <article class="playground-page lab-page">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <Breadcrumbs aria-label="Breadcrumb">
         <a href="/ko/">TypeNN</a>
         <span>/</span>
         <span>실습</span>
-      </nav>
-      <header class="page-heading">
-        <p class="eyebrow">브라우저에서 학습</p>
-        <h1>학습 실습실</h1>
-        <p class="lead">
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">브라우저에서 학습</Fragment>
+        <Fragment slot="title">학습 실습실</Fragment>
+        <Fragment slot="description">
           데이터셋을 고르고, 모델과 학습 설정을 정한 뒤 학습 데이터 전체로
           학습하세요. 테스트 지표는 에포크가 끝날 때마다 테스트 데이터 전체로
           계산합니다.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <Lab locale="ko" client:load />
       <div class="playground-disclosure">
         <p>

@@ -1,6 +1,8 @@
 import "../styles/playground.css";
 import {
   ThemeProvider,
+  Eyebrow,
+  TextLink,
   Button,
   Input,
   Select,
@@ -224,7 +226,7 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
         <div className="playground-workbench">
           <Panel className="playground-controls">
             <div className="control-heading">
-              <span className="eyebrow">TypeNN Runtime</span>
+              <Eyebrow as="span">TypeNN Runtime</Eyebrow>
               <h2>{words.input}</h2>
             </div>
             <MatrixEditor
@@ -296,7 +298,7 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
           <Panel className="playground-output">
             <div className="output-header">
               <div>
-                <span className="eyebrow">{words.result}</span>
+                <Eyebrow as="span">{words.result}</Eyebrow>
                 <h2>
                   {operation === "add"
                     ? "A + B"
@@ -349,7 +351,7 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
             <p className="readback-note">{words.readback}</p>
             {graph && (
               <div className="playground-graph">
-                <span className="eyebrow">{words.graphTitle}</span>
+                <Eyebrow as="span">{words.graphTitle}</Eyebrow>
                 <KernelGraph
                   snapshot={graph.snapshot}
                   plan={graph.plan}
@@ -359,12 +361,9 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
                 />
                 <p className="field-help">
                   {words.graphNote}{" "}
-                  <a
-                    className="text-link"
-                    href="https://github.com/typeshade/typenn#how-a-read-runs"
-                  >
+                  <TextLink href="https://github.com/typeshade/typenn#how-a-read-runs">
                     {words.graphReadme} ↗
-                  </a>
+                  </TextLink>
                 </p>
               </div>
             )}
@@ -382,9 +381,9 @@ export default function Playground({ locale }: { locale: "en" | "ko" }) {
               dangerouslySetInnerHTML={highlightedCode}
             />
           </pre>
-          <a className="text-link" href="https://github.com/typeshade/typenn">
+          <TextLink href="https://github.com/typeshade/typenn">
             {words.source} ↗
-          </a>
+          </TextLink>
         </div>
       </section>
     </ThemeProvider>

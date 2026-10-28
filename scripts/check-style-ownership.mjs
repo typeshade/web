@@ -63,6 +63,22 @@ for (const site of ["typenn", "typecv", "typeshade"]) {
   }
 }
 
+// Component CSS may be emitted before an app's global entry. A first layer
+// declaration fixes order for the document, so each independently imported
+// layered stylesheet must establish the same order before defining a layer.
+for (const name of [
+  "controls.css",
+  "product-home.css",
+  "product-reading.css",
+]) {
+  assert.ok(
+    readFileSync(resolve("packages/ui/styles", name), "utf8").startsWith(
+      "@layer theme, base, antd, components, utilities;",
+    ),
+    `${name}: establish cascade order before defining component styles`,
+  );
+}
+
 const routes = {
   typenn: {
     "/": [".ui-home", ".kg-panel", ".nn-docs"],

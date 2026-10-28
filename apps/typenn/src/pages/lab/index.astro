@@ -1,4 +1,6 @@
 ---
+import Breadcrumbs from "@typeshade/site-ui/astro/Breadcrumbs";
+import PageHeading from "@typeshade/site-ui/astro/PageHeading";
 import ReadingSurface from "@typeshade/site-ui/astro/ReadingSurface";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import Lab from "../../components/Lab";
@@ -12,20 +14,20 @@ import Lab from "../../components/Lab";
 >
   <ReadingSurface>
     <article class="playground-page lab-page">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <Breadcrumbs aria-label="Breadcrumb">
         <a href="/">TypeNN</a>
         <span>/</span>
         <span>Lab</span>
-      </nav>
-      <header class="page-heading">
-        <p class="eyebrow">Train in your browser</p>
-        <h1>Training lab</h1>
-        <p class="lead">
+      </Breadcrumbs>
+      <PageHeading>
+        <Fragment slot="eyebrow">Train in your browser</Fragment>
+        <Fragment slot="title">Training lab</Fragment>
+        <Fragment slot="description">
           Pick a dataset, set a model and its training settings, then train on
           the full training split. The test metric is measured on the full test
           split after each epoch.
-        </p>
-      </header>
+        </Fragment>
+      </PageHeading>
       <Lab locale="en" client:load />
       <div class="playground-disclosure">
         <p>

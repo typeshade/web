@@ -1,4 +1,9 @@
 ---
+import HomeHero from "@typeshade/site-ui/astro/HomeHero";
+import HomeSection from "@typeshade/site-ui/astro/HomeSection";
+import StepGrid from "@typeshade/site-ui/astro/StepGrid";
+import Eyebrow from "@typeshade/site-ui/astro/Eyebrow";
+import TextLink from "@typeshade/site-ui/astro/TextLink";
 import "../../styles/home.css";
 import HomeSurface from "@typeshade/site-ui/astro/HomeSurface";
 import LinkButton from "@typeshade/site-ui/astro/LinkButton";
@@ -17,9 +22,9 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
 >
   <HomeSurface class="cv-home">
     <div class="home-content home-main">
-      <section class="home-intro">
+      <HomeHero>
         <div class="home-copy">
-          <p class="eyebrow">TYPECV / COMPUTER VISION</p>
+          <Eyebrow>TYPECV / COMPUTER VISION</Eyebrow>
           <h1>
             코드에서 기하로.
             <br />더 선명한 시야.
@@ -51,14 +56,14 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
             </div>
           </div>
         </div>
-      </section>
-      <section class="home-path">
+      </HomeHero>
+      <HomeSection>
         <div class="section-intro">
-          <p class="eyebrow">01 / OPERATORS</p>
+          <Eyebrow>01 / OPERATORS</Eyebrow>
           <h2>컴퓨터 비전 기반 연산</h2>
           <p>각 연산은 SfM 그래프와 독립적으로 사용할 수 있습니다.</p>
         </div>
-        <div class="path-strip">
+        <StepGrid>
           <a href="/ko/docs/gpu-initialization/">
             <span>01</span>
             <strong>대응점 검증</strong>
@@ -74,33 +79,31 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
             <strong>장면 최적화</strong>
             <small>Schur/PCG 번들 조정</small>
           </a>
-        </div>
-      </section>
-      <section class="home-learning">
+        </StepGrid>
+      </HomeSection>
+      <HomeSection layout="split">
         <div>
-          <p class="eyebrow">02 / SCOPE</p>
+          <Eyebrow>02 / SCOPE</Eyebrow>
           <h2>컴퓨터 비전 전체를 향해. SfM은 그 일부입니다.</h2>
           <p>
             TypeCV는 확장 중인 컴퓨터 비전 라이브러리입니다. 현재 기하 비전과
             희소 3D에 집중하며 TypeShade GPU FAST/BRIEF 특징 검출·매칭 연산을
             실험적으로 제공합니다.
           </p>
-          <a class="text-link" href="/ko/docs/gpu-features/">
+          <TextLink href="/ko/docs/gpu-features/">
             GPU 특징 연산 설명 →
-          </a>{" "}
-          <a class="text-link" href="/ko/docs/roadmap/">
-            로드맵 보기 →
-          </a>
+          </TextLink>{" "}
+          <TextLink href="/ko/docs/roadmap/">로드맵 보기 →</TextLink>
         </div>
         <div class="experiment-summary">
-          <p class="eyebrow">기록된 실험</p>
+          <Eyebrow>기록된 실험</Eyebrow>
           <strong>8 / 8 시점</strong>
           <span>1,723 희소 랜드마크</span>
           <small>가정한 보정값 · 정답 데이터 없음</small>
           <a href="/ko/docs/experiments/pyramid-8134952/">실험 기록 보기 ↗</a>
         </div>
-      </section>
-      <section class="home-status">
+      </HomeSection>
+      <HomeSection layout="action">
         <h2>직접 촬영한 영상을 실행해 보세요</h2>
         <p>
           로컬 영상을 선택해 브라우저에서 프레임을 추출하고 TypeShade GPU 특징
@@ -109,7 +112,7 @@ const sample = `import { ShadeDevice, verifyImagePairGpu } from 'typecv/gpu';\n\
         <LinkButton variant="primary" size="default" href="/ko/lab/">
           SfM 실험실 열기 ↗
         </LinkButton>
-      </section>
+      </HomeSection>
     </div>
   </HomeSurface>
 </SiteLayout>

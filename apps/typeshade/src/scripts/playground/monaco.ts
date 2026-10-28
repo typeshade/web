@@ -8,27 +8,10 @@ import type {
 // is the directory the loader knows as `vs`, with no trailing slash: the loader joins
 // `/editor/editor.main.js` onto it, and a trailing slash would make that a doubled separator
 // the CDN answers with a 400.
-export const MONACO_VERSION = '0.52.2';
+// 0.57 handles canceled occurrence-highlight timers when switching file models.
+export const MONACO_VERSION = '0.57.0';
 export const MONACO_MIN = `https://cdn.jsdelivr.net/npm/monaco-editor@${MONACO_VERSION}/min`;
 export const MONACO_VS = `${MONACO_MIN}/vs`;
-
-export function monacoWorkerUrl(_label: string): string {
-  // A worker script fetched straight from the CDN is cross-origin, so each worker is a small
-  // same-origin shim that names Monaco's own baseUrl and pulls the real worker in from there.
-  //
-  // Every label loads the same bootstrap. workerMain.js carries the AMD loader and reads the
-  // module to run from the message Monaco sends it, so it serves the TypeScript worker and
-  // the plain editor worker alike. Importing language/typescript/tsWorker.js directly, as
-  // this did, hands the worker an AMD module with no loader under it, and the browser reports
-  // that as the script failing to load; the CDN serves that file, so it read as a network
-  // problem and was not one.
-  //
-  // baseUrl is the directory above vs, since the paths workerMain.js resolves start with vs/.
-  const source =
-    `self.MonacoEnvironment={baseUrl:${JSON.stringify(`${MONACO_MIN}/`)}};` +
-    `importScripts(${JSON.stringify(`${MONACO_VS}/base/worker/workerMain.js`)});`;
-  return `data:text/javascript;charset=utf-8,${encodeURIComponent(source)}`;
-}
 
 export function loadMonaco(): Promise<any> {
   const w = window as any;
@@ -41,9 +24,8 @@ export function loadMonaco(): Promise<any> {
         return;
       }
       amdRequire.config({ paths: { vs: MONACO_VS } });
-      w.MonacoEnvironment = {
-        getWorkerUrl: (_moduleId: string, label: string) => monacoWorkerUrl(label),
-      };
+      // Monaco's AMD entry configures its versioned worker assets and same-origin
+      // Blob shims. The old workerMain.js bootstrap no longer exists in 0.57.
       amdRequire(['vs/editor/editor.main'], () => resolve(w.monaco), reject);
     };
     const existing = document.querySelector('script[data-monaco-loader]');

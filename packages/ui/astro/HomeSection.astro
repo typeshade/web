@@ -1,0 +1,28 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "../recipes/cn";
+const section = cva(
+  "py-16 border-t border-ui-border [@media(max-width:560px)]:py-11",
+  {
+    variants: {
+      layout: {
+        default: "home-path",
+        split:
+          "home-learning grid grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-20 [@media(max-width:1050px)]:gap-[42px] [@media(max-width:820px)]:grid-cols-1 [@media(max-width:820px)]:gap-7",
+        action:
+          "home-status flex items-end justify-between gap-8 [&_.ui-button]:flex-none [@media(max-width:820px)]:items-start [@media(max-width:820px)]:flex-col",
+      },
+    },
+    defaultVariants: { layout: "default" },
+  },
+);
+type Props = HTMLAttributes<"section"> & {
+  layout?: Exclude<VariantProps<typeof section>["layout"], null>;
+};
+const { class: className, layout, ...attributes } = Astro.props;
+---
+
+<section {...attributes} class={cn(section({ layout }), className)}>
+  <slot />
+</section>

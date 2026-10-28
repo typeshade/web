@@ -187,6 +187,12 @@ try {
       "SGD",
   );
   await page.keyboard.press("Enter");
+  // Keyboard dispatch can finish before React commits the selected value.
+  await page.waitForFunction(
+    () =>
+      document.querySelector('[data-testid="form-result"]')?.textContent
+        .includes("Optimizer: sgd"),
+  );
   assert.match(
     await page.getByTestId("form-result").textContent(),
     /Optimizer: sgd/,

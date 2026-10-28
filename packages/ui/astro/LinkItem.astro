@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "../recipes/cn";
+type Props = HTMLAttributes<"a">;
+const { class: className, ...attributes } = Astro.props;
+---
+
+<a
+  {...attributes}
+  class={cn(
+    "group flex justify-between items-center gap-5 px-1 py-4 border-b border-ui-border [&_strong]:block [&_strong]:text-sm [&_strong]:font-[550] hover:[&_strong]:text-[var(--ui-link)] [&_small]:block [&_small]:mt-[3px] [&_small]:text-ui-text-muted [&_small]:text-xs [&_b]:text-[var(--ui-link)] [&_b]:text-[15px] [&_b]:font-normal",
+    className,
+  )}
+>
+  <slot />
+</a>

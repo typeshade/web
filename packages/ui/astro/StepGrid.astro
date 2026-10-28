@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "../recipes/cn";
+type Props = HTMLAttributes<"div">;
+const { class: className, ...attributes } = Astro.props;
+---
+
+<div
+  {...attributes}
+  class={cn(
+    "path-strip grid grid-cols-3 border-y border-ui-border [@media(max-width:560px)]:grid-cols-1",
+    className,
+  )}
+>
+  <slot />
+</div>

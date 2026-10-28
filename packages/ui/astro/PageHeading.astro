@@ -1,0 +1,30 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "../recipes/cn";
+import Eyebrow from "./Eyebrow.astro";
+type Props = HTMLAttributes<"header">;
+const { class: className, ...attributes } = Astro.props;
+---
+
+<header
+  {...attributes}
+  class={cn(
+    "page-heading pt-[7px] pb-[34px] border-b border-ui-border",
+    className,
+  )}
+>
+  {Astro.slots.has("eyebrow") && (
+    <Eyebrow>
+      <slot name="eyebrow" />
+    </Eyebrow>
+  )}
+  <h1 class="m-0 text-[clamp(36px,5vw,54px)] max-[560px]:text-[37px] font-semibold leading-[1.12] tracking-[-0.045em]">
+    <slot name="title" />
+  </h1>
+  {Astro.slots.has("description") && (
+    <p class="lead max-w-[68ch] m-0 mt-[14px] text-ui-text-muted text-base max-[560px]:text-sm leading-[1.65]">
+      <slot name="description" />
+    </p>
+  )}
+  <slot />
+</header>

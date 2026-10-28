@@ -1,0 +1,10 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cn, textLinkStyles } from "../recipes";
+type Props = HTMLAttributes<"a">;
+const { class: className, ...attributes } = Astro.props;
+---
+
+<a {...attributes} class={`text-link ${cn(textLinkStyles, className)}`}>
+  <slot />
+</a>

@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "../recipes/cn";
+type Props = HTMLAttributes<"section">;
+const { class: className, ...attributes } = Astro.props;
+---
+
+<section
+  {...attributes}
+  class={cn(
+    "home-intro grid grid-cols-[minmax(0,0.95fr)_minmax(480px,1.05fr)] gap-[clamp(44px,7vw,96px)] items-center pt-11 pb-[88px] [@media(max-width:1050px)]:grid-cols-[minmax(0,0.9fr)_minmax(400px,1.1fr)] [@media(max-width:1050px)]:gap-[42px] [@media(max-width:820px)]:grid-cols-1 [@media(max-width:820px)]:gap-8 [@media(max-width:820px)]:pt-[22px] [@media(max-width:820px)]:pb-[58px] [@media(max-width:560px)]:pt-[15px]",
+    className,
+  )}
+>
+  <slot />
+</section>
