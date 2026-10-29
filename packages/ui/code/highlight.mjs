@@ -197,16 +197,53 @@ const TYPE_PREFIX = "type _ = ";
 const TYPE_LIKE =
   /^(?![A-Z][A-Z0-9_]*$)(?:[A-Z]\w*|number|string|boolean|bigint|void|never|unknown|any|object|symbol|undefined|null|(?:f16|f32|f64|[iu](?:8|16|32|64)|bool|atomic|ptr|array|uniform|storage|vec[234]\w*|mat[234](?:x[234])?\w*|texture\w*|sampler\w*))(?:<[\w\s,.|"'[\]<>]*>)?(?:\[\])*(?:\s*\|\s*[\w.]+(?:<[\w\s,.|"'[\]<>]*>)?(?:\[\])*)*$/;
 
+/**
+ * A few keywords are keywords only with the syntax that follows them: `for` is a keyword before
+ * `(`, a modifier before a member. On its own line the grammar reads such a word as a plain
+ * name, so a span that is exactly one of them is tokenized in the context a block gives it and
+ * the context is cut. A word that is also an ordinary name (`type`, `from`, `get`, `set`) is not
+ * in the list: in prose it names a field or a method more often than it names the keyword.
+ */
+const KEYWORD_CONTEXT = {
+  for: ["", " (;;) {}"],
+  enum: ["", " E { A }"],
+  extends: ["class A ", " B {}"],
+  static: ["class A { ", " x = 1 }"],
+  async: ["", " function f() {}"],
+  abstract: ["", " class A {}"],
+  namespace: ["", " N {}"],
+  public: ["class A { ", " x = 1 }"],
+  private: ["class A { ", " x = 1 }"],
+  protected: ["class A { ", " x = 1 }"],
+  readonly: ["class A { ", " x = 1 }"],
+  override: ["class A { ", " x = 1 }"],
+};
+
+/** The source to tokenize for a span, and where the span sits in it. */
+function contextFor(text) {
+  const trimmed = text.trim();
+  const keyword = Object.hasOwn(KEYWORD_CONTEXT, trimmed)
+    ? KEYWORD_CONTEXT[trimmed]
+    : undefined;
+  if (keyword) return { before: keyword[0], after: keyword[1] };
+  if (TYPE_LIKE.test(trimmed)) return { before: TYPE_PREFIX, after: "" };
+  return { before: "", after: "" };
+}
+
 async function highlightTokens(
   text,
   language,
   extraLangs,
   matchBlocks = false,
 ) {
-  const typed = matchBlocks && TYPE_LIKE.test(text.trim());
+  const { before, after } = matchBlocks
+    ? contextFor(text)
+    : { before: "", after: "" };
+  const start = before.length;
+  const end = start + text.length;
   const result = await (
     await getHighlighter(extraLangs)
-  ).codeToTokens(typed ? TYPE_PREFIX + text : text, {
+  ).codeToTokens(before + text + after, {
     lang: language,
     themes: { light: "github-light", dark: "github-dark" },
   });
@@ -214,12 +251,20 @@ async function highlightTokens(
     .map((line) =>
       line
         .flatMap((token) => {
-          if (!typed) return [token];
-          const cut = TYPE_PREFIX.length - token.offset;
-          if (cut <= 0) return [token];
-          return cut >= token.content.length
-            ? []
-            : [{ ...token, content: token.content.slice(cut) }];
+          if (!before && !after) return [token];
+          const from = Math.max(token.offset, start);
+          const to = Math.min(token.offset + token.content.length, end);
+          return to > from
+            ? [
+                {
+                  ...token,
+                  content: token.content.slice(
+                    from - token.offset,
+                    to - token.offset,
+                  ),
+                },
+              ]
+            : [];
         })
         .map((token) => {
           const style = tokenColors(token.htmlStyle, matchBlocks);

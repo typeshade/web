@@ -157,3 +157,18 @@ test("inline code takes the tokens a block gives, with a type name read as a typ
   assert.equal(color(type, "f32"), color(annotated, "f32"));
   assert.equal(await highlightInlineCode("src/i18n/en.ts"), undefined);
 });
+
+test("a keyword that needs the syntax after it takes the colour of a keyword", async () => {
+  const color = (html, word) =>
+    html.match(new RegExp(`--shiki-light:(#\\w+)[^>]*>${word}<`))?.[1];
+  // `if` is a keyword on its own, so its colour is the keyword colour.
+  const keyword = color(await highlightInlineCode("if"), "if");
+  assert.notEqual(keyword, "#24292E");
+  for (const word of ["for", "enum", "extends", "static", "readonly"]) {
+    const inline = await highlightInlineCode(word);
+    assert.equal(textContent(inline), word);
+    assert.equal(color(inline, word), keyword, word);
+  }
+  // A word that is also an ordinary name stays a name.
+  assert.equal(color(await highlightInlineCode("get"), "get"), "#24292E");
+});
