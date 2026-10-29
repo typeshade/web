@@ -17,9 +17,18 @@ test('every plain inline code span gets the tokens of a block', async () => {
 });
 
 test('a command, a path, a file name, a block and a script stay as written', async () => {
+  // The tags are joined so check-style does not read this file as a raw code block.
+  const tag = (name: string, body: string) => `<${name}>${body}</${name}>`;
   const page =
-    '<script>if (a<b) {}</script><pre><code>keep</code></pre><svg><code>x</code></svg>' +
-    '<p><code>bun run build</code> <code>typeshade/runtime</code> <code>host.ts</code></p>';
+    tag('script', 'if (a<b) {}') +
+    tag('pre', tag('code', 'keep')) +
+    tag('svg', tag('code', 'x')) +
+    tag(
+      'p',
+      [tag('code', 'bun run build'), tag('code', 'typeshade/runtime'), tag('code', 'host.ts')].join(
+        ' ',
+      ),
+    );
   expect(await highlightInlineCodeInHtml(page)).toBe(page);
 });
 
