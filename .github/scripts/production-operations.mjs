@@ -120,12 +120,12 @@ export async function validate({
       if (metadata?.path !== workflow.path) {
         throw new Error(`${workflow.repo} workflow ${workflow.id} no longer matches expected source path ${workflow.path}.`);
       }
-      if (!metadata.state?.startsWith('disabled_')) {
+      if (metadata.state !== 'deleted' && !metadata.state?.startsWith('disabled_')) {
         throw new Error(`${workflow.repo} workflow ${workflow.id} is still active; disable the old publisher before enabling operations.`);
       }
       await requireNoActiveRuns(workflow, undefined, request);
     }
-    lines.push(`- Legacy publishers: ${legacyWorkflows.length} workflows are disabled with no active runs`);
+    lines.push(`- Legacy publishers: ${legacyWorkflows.length} workflows are disabled or deleted with no active runs`);
   } else {
     lines.push('- Disable mode: readiness and legacy publisher state are not required for rollback.');
   }

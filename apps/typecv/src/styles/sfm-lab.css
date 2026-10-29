@@ -1842,10 +1842,10 @@
   opacity: 0.6;
 }
 .sfm-map-empty {
-  color: var(--muted);
+  color: #b7c6dd;
 }
 .sfm-map-empty strong {
-  color: var(--ink);
+  color: #edf3ff;
 }
 .sfm-frame-loading {
   position: absolute;

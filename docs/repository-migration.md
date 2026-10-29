@@ -1,12 +1,90 @@
 # Repository and deployment transition
 
-This tracks execution of the website move out of the library repositories. The web PR stack
-has been merged; library cleanup changes remain open until production cutover is verified.
-Production cutover is in progress. TypeCV's first new Worker is serving traffic; the other
-sites still use their previous deployments. No repository archival, DNS change or remote
-data migration has been performed by this work.
+All three sites and the gallery are deployed from `typeshade/web`. The original library working
+directories remain untouched. No repository archival, DNS change or remote data migration has
+been performed. The current status below supersedes the dated observations later in this file.
 
 ## Current execution status (2026-10-28)
+
+Production operations are enabled; previews remain disabled. The seven old publishing workflows
+were disabled with no active runs before activation. After cleanup merges, GitHub reports all
+seven as `deleted`; a second read at 14:29 UTC confirmed no active runs. The operations guard
+accepts this explicit deleted state while still checking paths and every active run status.
+Missing or unreadable workflow metadata is not treated as deletion. Do not re-run setup to
+inspect configuration: setup deliberately disables operations. Use the read-only readiness workflow.
+
+The first complete production rollout uses web `40e3eabd0e707857126589b41ee150b852a1cec8`:
+
+| Service | Successful deploy run | Version receiving 100% of traffic |
+| --- | --- | --- |
+| TypeCV | [40701635938](https://github.com/typeshade/web/actions/runs/40701635938) | `62841e27-ffc9-478c-981c-d3d9e823704f` |
+| TypeNN | [40702329950](https://github.com/typeshade/web/actions/runs/40702329950) | `e67c2ac4-2b1d-46d5-8e5b-aee7a85d0923` |
+| TypeShade | [40702781357](https://github.com/typeshade/web/actions/runs/40702781357) | `617dbfc9-8e1b-406b-a32f-e2a1f8481060` |
+| Gallery | [40702781357](https://github.com/typeshade/web/actions/runs/40702781357) | `255bddf2-1415-4f0f-985f-8bdf2e27e386` |
+
+Readiness [40701093158](https://github.com/typeshade/web/actions/runs/40701093158) and guarded
+activation [40701448039](https://github.com/typeshade/web/actions/runs/40701448039) passed on the
+same revision. The authenticated Cloudflare deployment API independently confirmed all four
+versions at 100% on 2026-10-28 at 14:17 UTC. Existing KV, R2 and D1 resources were preserved;
+D1 already contained the eight checked-in migrations. Gallery Access secrets remain in place.
+
+GitHub-hosted public HTTP probes encounter Cloudflare's browser challenge. Deployment records
+that result as **blocked**, not a successful health check, after separately confirming the uploaded
+Worker version. No WAF, bot-protection or TLS settings were changed. External verification at
+14:15 UTC passed 27 HTTP/API checks: EN/KO homes and Playgrounds, TypeCV lab/docs/config, protected
+record-reader rejection (401 without credentials), 16-byte sample Range response (206), TypeShade
+examples/releases/gallery APIs, search assets and the gallery homepage. There are 101 published
+shader examples and four gallery entries. The inline issue form retains its existing disabled
+state (`open: false`) and GitHub-link fallback.
+
+Browser checks covered all three EN/KO homes at desktop/mobile widths, hydrated TypeCV lab
+controls and sharing consent, and TypeNN Playground CPU MatMul in both languages (exact result `[19, 22, 43, 50]`).
+TypeNN mobile navigation had no overflow at 390px. TypeShade search returned
+32 results for `ocean`; EN/KO mobile menus, three example pages and the Playground worked.
+All four gallery links loaded their shared shader into the Playground. No application runtime
+errors were observed. Initial screenshots captured lazy images and React controls before they
+were ready; scrolling and waiting for initialization confirmed they load. Google Analytics
+requests and some Cloudflare RUM requests aborted during navigation; telemetry delivery was not
+verified. All checked application assets loaded successfully.
+
+A remaining TypeCV visual regression was found after hydration: the 3D empty-state message used
+light-page text colors on a dark viewer. The source-pin follow-up fixes this in the lab stylesheet
+and adds a computed browser contrast check for EN/KO at desktop/mobile widths. This follow-up
+must pass CI and be redeployed before its correction is counted as live.
+
+Cleanup and source-pin follow-up:
+
+- TypeCV [#276](https://github.com/typeshade/typecv/pull/276) merged as
+  `451e12ccea28397fcdec0594f1194268a57f814a`. Its merge tree equals the reviewed `d8b4df6` tree;
+  no library implementation files under `src/` changed from the pinned pre-cleanup revision.
+- Historical site [#242](https://github.com/typeshade/typeshade.github.io/pull/242) merged as
+  `bca213452566152ed4b1b55dbdf8294c10d9a33a`. Its source/history remain available; its four
+  publishing workflows are removed.
+- TypeNN [#25](https://github.com/typeshade/typenn/pull/25) merged as
+  `7ffc9fcb8c5558489ed583df73498431703db2c9`. Its merge tree equals reviewed `bd15afc`;
+  no library implementation files under `src/` changed. Both library gitlinks now target their
+  cleanup merges. TypeShade compiler pin `3e1e842` is unchanged.
+- TypeCV documentation overrides preserve dated measurement paths while updating current
+  operational instructions. Their source hashes and revision must match the cleanup merge.
+  The source library's internal root `docs/website-migration.md` is excluded from public documentation pages
+  and sitemap generation; it remains available in the library repository.
+
+The source-pin follow-up passes local checks/builds for TypeCV (131 pages) and TypeNN
+(17 pages), the three TypeCV documentation/link guards, internal-doc publication filtering,
+stylesheet ownership and shared EN/KO desktop/mobile browser smoke. The 3D contrast regression
+passes with the fix and fails when the previous built CSS colors are restored. The built output
+was restored immediately after that negative check. CI remains required before merging this
+follow-up; local success is not a remote CI result.
+
+Local receipts are under `artifacts/migration/` in the cutover workspace: pre-cutover resource
+metadata, old-workflow states, post-cutover versions, HTTP results and browser screenshots/reports.
+These are ignored operational artifacts without credential values. The run/PR links and version
+IDs above are the durable handoff; local paths alone are not evidence available to other sessions.
+
+## Setup and first-rollout history
+
+The following entries record earlier observations and the actions that resolved them. Statements
+about missing environments, old versions or paused operations describe their original check time.
 
 - Web PRs #1 through #7 were merged into `main` in order using merge commits, after the owner
   authorized the CI/CD transition. The final stack merge is `f7d4584`. At that commit, the
@@ -77,10 +155,8 @@ data migration has been performed by this work.
   all other HTTP/network failures (fail). A blocked check is not reported as a health pass.
   No bot protection, WAF rule, cookie, challenge or TLS setting is modified or bypassed.
 
-Next: rerun readiness on the final verifier commit, re-enable operations with legacy publishers
-still stopped, and complete all three deployments plus external browser/API verification.
-Library cleanup PRs remain unmerged until their replacements are verified.
-Historical observations below describe their original check time, not the latest merge state.
+Readiness, activation and the three deployments subsequently passed; see the current execution
+status above. Historical observations below describe their original check time.
 
 ## Ownership
 
@@ -125,7 +201,7 @@ update after the original import. Preserve these changes before merging the remo
 The original files and working-tree status are fingerprinted in the verification workspace at
 `artifacts/migration/original-worktrees.json`; this artifact contains hashes, not credentials.
 
-## Observed production configuration
+## Historical production configuration before cutover
 
 Read-only Cloudflare API checks on 2026-10-27 confirmed these existing custom domains:
 
@@ -167,8 +243,8 @@ On 2026-10-28, the executor rechecked the live configuration and attempted the n
   at the observation time; recheck immediately before cutover.
 - Curl GET checks returned HTTP 200 for all three English/Korean entry pages and the gallery.
 
-Current production versions were captured read-only for rollback planning; refresh this table
-immediately before deployment because the old publishers are still enabled:
+The following pre-cutover versions were captured read-only for rollback planning. They are the
+original baseline, not the currently deployed versions:
 
 | Worker | Version receiving 100% of traffic on 2026-10-28 |
 | --- | --- |
@@ -221,9 +297,9 @@ again. Worker rollback does not undo D1 schema changes or stored data. Re-enable
 publisher only after disabling the new one; two repositories must not deploy the same Worker
 concurrently.
 
-## Completion record
+## Validation history
 
-Prepared review changes:
+The following evidence was gathered while preparing the original review changes:
 
 - [Web implementation #7](https://github.com/typeshade/web/pull/7): shared templates and UI,
   all three reconciled applications, website tests and operational workflows.

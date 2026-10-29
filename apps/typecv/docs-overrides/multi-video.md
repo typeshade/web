@@ -2,6 +2,11 @@
 
 Status: accepted (2026-10-20, under the owner's approval of the work in the conversation).
 
+This design record preserves measurements and implementation details from their recorded TypeCV
+revisions. Paths retained under `website/` and `scripts/` identify the implementation and commands
+measured at the time. For current sample publishing, use the web repository
+`apps/typecv/scripts/lab-remote-samples.mjs` from the repository root.
+
 This document is written for an engineer or an agent who has not read the conversation that led
 to it. It names files, symbols, defaults, gates and the numbers that accept each step. A name
 marked _(new)_ does not exist yet. Every other path and symbol named here exists on `main` at

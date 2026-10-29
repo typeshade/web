@@ -73,6 +73,43 @@ async function sparseOnly(page) {
 const fileFor = (pathname) =>
   path.join(directory, pathname.endsWith('/') ? pathname + 'index.html' : pathname);
 
+async function assertMapEmptyContrast(page, label) {
+  const empty = page.locator('.sfm-map-empty');
+  await empty.waitFor({ state: 'visible' });
+  const colors = await empty.evaluate((element) => {
+    const viewer = element.closest('.sfm-media')?.querySelector('.viewer');
+    const strong = element.querySelector('strong');
+    return {
+      body: getComputedStyle(element).color,
+      heading: strong ? getComputedStyle(strong).color : '',
+      background: viewer ? getComputedStyle(viewer).backgroundColor : '',
+    };
+  });
+  const luminance = (color) => {
+    const channels = color.match(/\d+/g)?.slice(0, 3).map((value) => Number(value) / 255);
+    if (!channels || channels.length !== 3) return null;
+    const [r, g, b] = channels.map((channel) =>
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
+    );
+    return r * 0.2126 + g * 0.7152 + b * 0.0722;
+  };
+  const ratio = (foreground, background) => {
+    const a = luminance(foreground);
+    const b = luminance(background);
+    return a === null || b === null
+      ? 0
+      : (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  };
+  assert.ok(
+    ratio(colors.body, colors.background) >= 4.5,
+    `${label}: empty-state text contrast is below 4.5:1 (${JSON.stringify(colors)})`,
+  );
+  assert.ok(
+    ratio(colors.heading, colors.background) >= 4.5,
+    `${label}: empty-state heading contrast is below 4.5:1 (${JSON.stringify(colors)})`,
+  );
+}
+
 test('all generated pages link to real pages, anchors, local runtimes and records', async () => {
   const failures = [];
   for (const route of version.routes) {
@@ -108,6 +145,73 @@ test('all generated pages link to real pages, anchors, local runtimes and record
       const shipped = await readFile(path.join(directory, 'runtime', tree, name));
       assert.ok(shipped.equals(await readFile(path.join(built, name))), `runtime/${tree}/${name}`);
     }
+  }
+});
+
+test('3D empty-state contrast meets WCAG in English and Korean at desktop and mobile widths', {
+  timeout: 60_000,
+}, async () => {
+  const mime = {
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.html': 'text/html',
+    '.json': 'application/json',
+    '.svg': 'image/svg+xml',
+    '.woff2': 'font/woff2',
+  };
+  const server = createServer(async (req, res) => {
+    const url = new URL(req.url, 'http://localhost');
+    const file = fileFor(decodeURIComponent(url.pathname));
+    if (!file.startsWith(directory + path.sep)) {
+      res.writeHead(403);
+      res.end();
+      return;
+    }
+    try {
+      res.setHeader('Content-Type', mime[path.extname(file)] ?? 'application/octet-stream');
+      res.end(await readFile(file));
+    } catch {
+      res.writeHead(404, { 'Content-Type': 'text/html' });
+      res.end(await readFile(path.join(directory, '404.html')));
+    }
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  let browser;
+  try {
+    browser = await chromium.launch({
+      executablePath: process.env.TYPESHADE_CHROMIUM || undefined,
+      args:
+        process.env.TYPECV_HARDWARE_GPU === '1'
+          ? ['--enable-unsafe-webgpu', ...(process.platform === 'win32' ? ['--use-angle=d3d11'] : [])]
+          : [
+              '--enable-unsafe-webgpu',
+              '--enable-unsafe-swiftshader',
+              '--use-angle=swiftshader',
+              '--use-vulkan=swiftshader',
+              '--enable-features=Vulkan',
+            ],
+    });
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await page.route('**/api/config/', (route) =>
+      route.fulfill({ contentType: 'application/json', body: '{"files":true}' }),
+    );
+    const url = `http://127.0.0.1:${server.address().port}`;
+    for (const [route, locale] of [['/lab/', 'English'], ['/ko/lab/', 'Korean']]) {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(url + route);
+      await page.waitForFunction(() => {
+        const state = document.querySelector('.sfm-map .viewer')?.dataset.state;
+        return state === 'ready' || state === 'error';
+      });
+      await page.locator('.sfm-map-empty').scrollIntoViewIfNeeded();
+      await assertMapEmptyContrast(page, `${locale} desktop`);
+      await page.setViewportSize({ width: 390, height: 844 });
+      await assertMapEmptyContrast(page, `${locale} mobile`);
+    }
+    await page.close();
+  } finally {
+    await browser?.close();
+    await new Promise((resolve) => server.close(resolve));
   }
 });
 

@@ -86,6 +86,34 @@ test('enable validation accepts current successful readiness run and stopped leg
   assert.ok(gh.requests.filter((r) => oldWorkflows.some((w) => r.path.startsWith(`${w.repo}/`))).every((r) => r.token === undefined));
 });
 
+test('enable accepts deleted legacy workflows but still checks every active run status', async () => {
+  const gh = fixture({ oldState: 'deleted' });
+  const lines = await validate({ env: enableEnv(), request: gh.request });
+  assert.ok(lines.some((line) => line.includes('disabled or deleted')));
+  assert.equal(gh.requests.filter((r) => r.path.endsWith('/runs')).length, 7 * 5);
+  for (const status of ['queued', 'in_progress', 'pending', 'waiting', 'requested']) {
+    const inflight = fixture({ oldState: 'deleted', activeRun: { workflowId: oldWorkflows[2].id, status } });
+    await assert.rejects(validate({ env: enableEnv(), request: inflight.request }), new RegExp(`has a ${status} run`));
+  }
+});
+
+test('deleted workflow metadata must match the expected path and be readable', async () => {
+  for (const mode of ['wrong-path', 'not-found']) {
+    const gh = fixture({ oldState: 'deleted' });
+    const request = async (input) => {
+      if (input.url.endsWith(`/actions/workflows/${oldWorkflows[0].id}`)) {
+        if (mode === 'wrong-path') return { state: 'deleted', path: '.github/workflows/unrelated.yml' };
+        const error = new Error('not found');
+        error.status = 404;
+        throw error;
+      }
+      return gh.request(input);
+    };
+    await assert.rejects(validate({ env: enableEnv(), request }),
+      mode === 'wrong-path' ? /expected source path/ : /HTTP 404/);
+  }
+});
+
 test('enable requires a successful readiness run for the exact workflow and current main SHA', async () => {
   const badRuns = [
     { conclusion: 'failure' },
