@@ -545,56 +545,42 @@ export function sidebar(
   const labels = d.labels.sidebarGroups;
   const topicLabels = d.labels.topics;
   const page = (key: DocsPageKey): SidebarItem => docsPage(locale, key);
+  // The Language group reads in the order a shader author needs the pages: the types, then the
+  // GPU types the examples of every later page use, then functions, control flow, resources and
+  // stages, then the key types, the libraries and the builtins. The "next" link at the foot of
+  // each page follows this order (src/components/pages/Language*Page.astro).
+  const topic = (key: keyof typeof topicLabels, href: string): SidebarItem => ({
+    label: topicLabels[key],
+    href: localePath(locale, href),
+    depth: 1,
+  });
   const languagePages: SidebarItem[] = [
     page('guide'),
-    {
-      label: topicLabels.stringKeys,
-      href: localePath(locale, links.languageStringKeys.href),
-      depth: 1,
-    },
-    { label: topicLabels.types, href: localePath(locale, links.languageTypes.href), depth: 1 },
-    {
-      label: topicLabels.functions,
-      href: localePath(locale, links.languageFunctions.href),
-      depth: 1,
-    },
-    {
-      label: topicLabels.controlFlow,
-      href: localePath(locale, links.languageControlFlow.href),
-      depth: 1,
-    },
-    {
-      label: topicLabels.gpuTypes,
-      href: localePath(locale, links.languageGpuTypes.href),
-      depth: 1,
-    },
-    {
-      label: topicLabels.resources,
-      href: localePath(locale, links.languageResources.href),
-      depth: 1,
-    },
-    { label: topicLabels.stages, href: localePath(locale, links.languageStages.href), depth: 1 },
-    {
-      label: topicLabels.algorithms,
-      href: localePath(locale, links.languageAlgorithms.href),
-      depth: 1,
-    },
-    { label: topicLabels.random, href: localePath(locale, links.languageRandom.href), depth: 1 },
+    topic('types', links.languageTypes.href),
+    topic('gpuTypes', links.languageGpuTypes.href),
+    topic('functions', links.languageFunctions.href),
+    topic('controlFlow', links.languageControlFlow.href),
+    topic('resources', links.languageResources.href),
+    topic('stages', links.languageStages.href),
+    topic('stringKeys', links.languageStringKeys.href),
+    topic('algorithms', links.languageAlgorithms.href),
+    topic('random', links.languageRandom.href),
+    { ...page('languageBuiltins'), depth: 1 },
   ];
-  // A mapping set is an index one level in, the way a topic is, with its own sections one
-  // level further in. They open only while the reader is inside the set, the way the
-  // compiler internals open their sections, so the Language group never carries every
-  // section of all three sets at once.
+  // A mapping set is an index with its own sections one level further in. The three sets are
+  // the way in for a reader who knows TypeScript, WGSL or GLSL, so they form a group of their
+  // own after Getting Started. A set opens its sections only while the reader is inside it, the
+  // way the compiler internals open theirs, so the group never carries all fourteen at once.
+  const comingFrom: SidebarItem[] = [];
   for (const set of mappingSets) {
-    languagePages.push({ ...page(set.index), depth: 1 });
+    comingFrom.push(page(set.index));
     if (path?.startsWith(links[set.index].href)) {
-      for (const s of set.sections) languagePages.push({ ...page(s.link), depth: 2 });
+      for (const s of set.sections) comingFrom.push({ ...page(s.link), depth: 1 });
     }
   }
-  languagePages.push({ ...page('languageBuiltins'), depth: 1 });
-  // The Reference group opens with the language reference, the surface a shader author
-  // writes, and its six kind pages one level in; then the compiler's own API reference with
-  // its categories, then the internals and the language service.
+  // The Language reference group opens with the language reference, the surface a shader author
+  // writes, and its six kind pages one level in, then the codes and the rules. The compiler API
+  // is the group after it: its categories, the internals and the language service.
   const reference: SidebarItem[] = [page('reference')];
   for (const section of languageSections()) {
     reference.push({
@@ -634,26 +620,30 @@ export function sidebar(
       href: localePath(locale, links.rulesGuarantees.href),
       depth: 2,
     });
-  reference.push({ label: d.api.h1, href: localePath(locale, links.api.href) });
+  // The compiler's API reference is a group of its own: a host application and a tool call it,
+  // and a shader author never does.
+  const compilerApi: SidebarItem[] = [
+    { label: d.api.h1, href: localePath(locale, links.api.href) },
+  ];
   for (const { category, members } of apiCategories()) {
-    reference.push({
+    compilerApi.push({
       label: apiCategoryCopy(locale, category.slug).name,
       href: localePath(locale, `/api/${category.slug}/`),
       depth: 1,
     });
     if (category.slug !== openCategory) continue;
     for (const m of members)
-      reference.push({
+      compilerApi.push({
         label: m.name,
         href: localePath(locale, `/api/${m.slug}/`),
         depth: 2,
         code: true,
       });
   }
-  reference.push(page('internals'));
+  compilerApi.push(page('internals'));
   if (path?.startsWith(links.internals.href))
-    for (const s of sections) reference.push({ ...s, depth: 1 });
-  reference.push(page('languageService'));
+    for (const s of sections) compilerApi.push({ ...s, depth: 1 });
+  compilerApi.push(page('languageService'));
   return [
     {
       title: labels.getStarted,
@@ -665,6 +655,7 @@ export function sidebar(
         page('editor'),
       ],
     },
+    { title: labels.comingFrom, items: comingFrom },
     { title: labels.language, items: languagePages },
     {
       title: labels.concepts,
@@ -678,7 +669,8 @@ export function sidebar(
       ],
     },
     { title: labels.examples, items: [page('examples'), page('mnist')] },
-    { title: labels.reference, items: reference },
+    { title: labels.languageReference, items: reference },
+    { title: labels.compilerApi, items: compilerApi },
     { title: labels.project, items: [page('checks'), page('benchmarks')] },
   ];
 }

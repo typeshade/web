@@ -9,6 +9,8 @@
 // program that stops being refused, and one that stops compiling, both fail the build here.
 // A sentence the compiler no longer agrees with never reaches the page.
 import { compileTsSource } from '../../vendor/shader-dsl/src/compiler/ts/source-file.ts';
+import { emittedStructDecls } from '../../vendor/shader-dsl/src/compiler/ts/structs.ts';
+import { emitGlslFragment } from '../../vendor/shader-dsl/src/index.ts';
 
 /** The sections the page runs in, in order. */
 export type LoweringSectionKey =
@@ -32,6 +34,11 @@ export interface LoweringRow {
   /** The emitted WGSL this row is about, sliced out of the module by name. Null on a row the
    *  compiler refuses. */
   readonly wgsl: string | null;
+  /** The emitted GLSL ES 3.00 for the same declarations, sliced out by name. Null on a refused
+   *  row, and on a row whose module the GLSL backend cannot emit (`glslNote` says why). */
+  readonly glsl: string | null;
+  /** The GLSL backend's own sentence on a row it cannot emit, such as a compute entry. */
+  readonly glslNote: string | null;
   /** The compiler's own refusal, on a row that has one. */
   readonly diagnostic: LoweringDiagnostic | null;
 }
@@ -108,6 +115,71 @@ function sliceDecl(wgsl: string, name: string, id: string): string {
   );
 }
 
+/** One emitted GLSL declaration, from the line its name is on to the line that closes it. A
+ *  function opens with its return type (`float[2] bounds(`), a struct closes with `};` and a
+ *  constant or a module variable is one line. An entry has no name in GLSL, it is `main`, so a
+ *  name that is not found falls back to the entry the stage source carries. */
+function sliceGlslDecl(glsl: string, name: string): string | null {
+  const lines = glsl.split('\n');
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const fn = new RegExp(`^\\w+(?:\\[\\d+\\])?\\s+${escaped}\\s*\\(`);
+  const struct = new RegExp(`^struct\\s+${escaped}\\s*\\{?`);
+  const single = new RegExp(
+    `^(?:(?:const|uniform|highp|mediump|lowp)\\s+)*\\w+\\s+${escaped}\\b(?:\\[[^\\]]*\\])?\\s*(?:=[^;]*)?;\\s*$`,
+  );
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    if (single.test(line)) return line;
+    const closing = fn.test(line) ? '}' : struct.test(line) ? '};' : null;
+    if (closing === null) continue;
+    for (let j = i; j < lines.length; j++) {
+      if (lines[j] === closing) return lines.slice(i, j + 1).join('\n');
+    }
+  }
+  return null;
+}
+
+/** The GLSL for the declarations a row shows. The whole module goes through the fragment
+ *  emitter with its entries kept; a module with entries of both stages is tried by stage. A
+ *  module the backend cannot emit (a compute entry) gives the backend's own sentence. */
+function glslFor(
+  module: Parameters<typeof emitGlslFragment>[0],
+  names: readonly string[],
+  id: string,
+): { glsl: string | null; note: string | null } {
+  const sources: string[] = [];
+  let refusal: string | null = null;
+  for (const stage of [undefined, 'fragment', 'vertex'] as const) {
+    try {
+      sources.push(emitGlslFragment(module, stage, { entryPoints: true }).source);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (stage === undefined) refusal = message;
+      else if (sources.length === 0) refusal ??= message;
+    }
+  }
+  if (sources.length === 0) {
+    if (refusal !== null && /cannot emit this module/.test(refusal))
+      return { glsl: null, note: refusal };
+    throw new Error(
+      `[typescript-lowering] '${id}': the GLSL emit failed: ${refusal ?? 'no source'}`,
+    );
+  }
+  const parts = names.map((name) => {
+    for (const source of sources) {
+      const found = sliceGlslDecl(source, name);
+      if (found !== null) return found;
+    }
+    // An entry is `void main()` in GLSL, whatever its name was.
+    const entry = sources.find((source) => /^void main\(\)/m.test(source));
+    if (entry !== undefined) return entry.trimEnd();
+    throw new Error(
+      `[typescript-lowering] '${id}': the GLSL emit carries no declaration called '${name}'`,
+    );
+  });
+  return { glsl: parts.join('\n\n'), note: null };
+}
+
 interface Built {
   readonly row: LoweringRow;
   readonly problem: string | null;
@@ -121,7 +193,14 @@ function buildRow(spec: RowSpec): Built {
     emit: true,
   });
   const errors = result.diagnostics.filter((d) => d.category === 'error');
-  const row = { id: spec.id, ts: spec.ts, wgsl: null, diagnostic: null };
+  const row = {
+    id: spec.id,
+    ts: spec.ts,
+    wgsl: null,
+    glsl: null,
+    glslNote: null,
+    diagnostic: null,
+  };
 
   if (spec.refused) {
     if (errors.length === 0) {
@@ -148,7 +227,21 @@ function buildRow(spec: RowSpec): Built {
     return { row, problem: `'${spec.id}': no declaration named for the emitted column` };
   try {
     const text = names.map((name) => sliceDecl(result.wgsl!, name, spec.id)).join('\n\n');
-    return { row: { ...row, wgsl: text }, problem: null };
+    const { glsl, note } = glslFor(
+      {
+        consts: [...result.consts],
+        structs: emittedStructDecls(result.structs),
+        bindings: [...result.bindings],
+        funcs: [...result.funcs],
+        overrides: [...result.overrides],
+        vars: [...result.vars],
+        enables: result.enables,
+        ...(result.directives.length > 0 ? { diagnostics: result.directives } : {}),
+      },
+      names,
+      spec.id,
+    );
+    return { row: { ...row, wgsl: text, glsl, glslNote: note }, problem: null };
   } catch (error) {
     return { row, problem: error instanceof Error ? error.message : String(error) };
   }

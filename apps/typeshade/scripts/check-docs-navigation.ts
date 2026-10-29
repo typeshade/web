@@ -55,7 +55,7 @@ for (const file of files(dist)) {
   const sections = find(nav, (node) => hasClass(node, 'sidebar-sections'));
   assert(sections, `${route}: no full documentation tree`);
   const groups = elements(sections, (e) => 'data-sidebar-section' in e.attribs);
-  assert.equal(groups.length, 6, `${route}: missing documentation group`);
+  assert.equal(groups.length, 8, `${route}: missing documentation group`);
   assert(
     groups.every((e) => e.name === 'section'),
     `${route}: group is still collapsible`,

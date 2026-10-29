@@ -27,13 +27,13 @@ The site follows the shapes readers already know, and nothing else:
   Examples; then a language menu (globe icon, current language, list of the others), a
   dark-mode switch (sun or moon), GitHub as an icon. Under 64rem, a menu button and a panel
   with the same items.
-- **Docs**: VitePress. Sidebar on the left in six groups (Get started, Language, Concepts,
-  Examples, Reference, Project), the document in the middle at 996px from 1600 (prose at 700px), an outline of the page's
+- **Docs**: VitePress. Sidebar on the left in eight groups (Get started, Coming from, Language,
+  Concepts, Examples, Language reference, Compiler API, Project), the document in the middle at 996px from 1600 (prose at 700px), an outline of the page's
   own headings on the right on wide screens, an "Edit this page" link beside a "Report an
   issue" link and previous and next at the bottom, which follow the sidebar's order. Under 64rem the sidebar is a bar under the
   header that names the current page. Every guide page lives under `/guide/` and is written in
   the dictionaries, except the compiler internals under `/guide/internals/`, one page per
-  section of AUTHORING.md. The reference lives under `/api/`; its sidebar group closes with
+  section of AUTHORING.md. The compiler API reference lives under `/api/`; its sidebar group, Compiler API, closes with
   Compiler internals, whose sections open one level in only on their own pages, and Language
   service.
 - **Reference**: MDN. `/api/` lists the categories, `/api/<category>/` the exports in one of

@@ -156,10 +156,12 @@ export const en = {
       /** The sidebar's own group headings (src/lib/links.ts sidebar()). */
       sidebarGroups: {
         getStarted: 'Getting Started',
+        comingFrom: 'Coming from',
         language: 'Language',
         concepts: 'Concepts',
         examples: 'Examples',
-        reference: 'Reference',
+        languageReference: 'Language reference',
+        compilerApi: 'Compiler API',
         project: 'Project',
       },
       conceptPages: {
@@ -2672,6 +2674,7 @@ export const en = {
           'A kernel accepts `Map<Channel, V>` and `Set<Channel>`. The host passes string keys. Before the loops, the call converts them to ids. Afterward, it converts ids back to strings and preserves insertion order. An unknown string produces a `TypeError`. Open `Map<string, V>` and `Set<string>` are refused.',
         exampleP:
           '[string-keys-record](exampleStringKeysRecord) calls a Record-indexed kernel on WebGPU, WebGL2 and the CPU. [Control flow](languageControlFlow) describes collection loops and their supported tiers.',
+        next: 'Next: Algorithms',
       },
       types: {
         title: 'TypeShade types',
@@ -2716,7 +2719,7 @@ export const en = {
         example: '6. Connect the type to an entry point',
         exampleP:
           'After defining a struct, use it as an entry point parameter. The value shape and field metadata then define the meaning of that shader input.',
-        next: 'Next: Functions',
+        next: 'Next: GPU types',
       },
       functions: {
         title: 'TypeShade functions',
@@ -2803,13 +2806,13 @@ export const en = {
         intro:
           'TypeShade uses familiar TypeScript conditional and loop syntax, but the code executes on the GPU. Understand control flow in terms of compilable computation, not the full dynamic behavior of the JavaScript runtime.',
         ts: '1. TypeScript control flow',
-        tsP: 'Syntax such as if/else and for is familiar, but every condition and loop in TypeShade must be lowerable to GPU code. Matching syntax does not imply that all JavaScript runtime semantics are available.',
+        tsP: 'Syntax such as `if`/`else` and `for` is familiar, but every condition and loop in TypeShade must be lowerable to GPU code. Matching syntax does not imply that all JavaScript runtime semantics are available.',
         branch: '2. Branches',
         branchIndexP:
           'TypeShade chooses between paths with the `if` statement and with the conditional expression.',
-        ifStatement: 'The if statement',
+        ifStatement: 'The `if` statement',
         branchP:
-          'Use if/else to express calculation paths. Inside a branch, keep values and resources within the TypeShade GPU model.',
+          'Use `if`/`else` to express calculation paths. Inside a branch, keep values and resources within the TypeShade GPU model.',
         conditional: 'The conditional expression',
         conditionalP:
           'A value chosen by a condition is written `c ? a : b`. WGSL has no `?:` operator. For a scalar or a vector, the WGSL emit is `select(b, a, c)`, with the false value first and the condition last. WGSL evaluates both values.',
@@ -2819,10 +2822,10 @@ export const en = {
         loopIndexP: 'A loop is written as a statement or as an array method.',
         loopStatements: 'Loop statements',
         loopStatementsP:
-          'Write a for loop, a while loop, or for...of over an array. A for loop may count to a value known only at run time, such as a uniform field or the length of an array.',
+          'Write a `for` loop, a `while` loop, or `for...of` over an array. A `for` loop may count to a value known only at run time, such as a uniform field or the length of an array.',
         loopMethods: 'Array methods',
         loopMethodsP:
-          "An array's map, forEach, some, every, reduce, fill, findIndex, findLastIndex, indexOf, lastIndexOf and includes compile too, each to a counted loop, and map takes an array with a fixed length.",
+          "An array's `map`, `forEach`, `some`, `every`, `reduce`, `fill`, `findIndex`, `findLastIndex`, `indexOf`, `lastIndexOf` and `includes` compile too, each to a counted loop, and `map` takes an array with a fixed length.",
         // A kernel function (compiler change 0013): the loop the compiler may run on the GPU.
         kernel: '4. Kernel functions',
         kernelIndexP:
@@ -2865,13 +2868,13 @@ export const en = {
         collect: '5. Collecting results',
         collectIndexP:
           'A loop in a kernel function collects results into an array with `push`, or into a `Map` or a `Set`.',
-        push: 'Appending with push',
+        push: 'Appending with `push`',
         pushP:
           'A loop appends to an array parameter with `out.push(v)`, as a statement, any number of times in an iteration and in any branch. The array starts empty in the function. The elements land in the order a sequential run of the loop appends them, on every tier, and `out.length` after the loop is the count appended.',
         pushCapacity: 'Capacity and count',
         pushHostP:
           'The host array is the capacity. The call writes the first elements up to that capacity and leaves the rest as they were. The count the function returns may exceed the capacity, so a host that sees `n > out.length` can call again with more room. On WebGPU the loop runs in three dispatches: each iteration counts its pushes, one workgroup scans the counts into offsets, and each iteration stores its pushes at its offset. WebGL2 runs no loop that pushes.',
-        collections: 'Map and Set',
+        collections: '`Map` and `Set`',
         collectionsP:
           "A parameter may also be ECMAScript's `Set<K>` or `Map<K, V>`, with `K` a `u32`, an `i32`, an `f32` or a [key type](languageStringKeys). A loop adds to it with `s.add(k)` or `m.set(k, v)`. The host passes JavaScript's own `Set` or `Map`, and when the call resolves it holds the entries a sequential run leaves: each key once, in the order first added, with the value set last.",
         collectionsReadP:
@@ -2903,12 +2906,12 @@ export const en = {
           '`typeshade/algorithms` and `typeshade/random` are kernel functions written in TypeShade, and they fuse with yours in one scope. [Algorithms](languageAlgorithms) and [Random numbers](languageRandom) list them.',
         boundary: '7. Where JavaScript control flow stops',
         boundaryItems: [
-          'Write filter, find and the other array methods that change a length or can give undefined as a loop. findIndex and indexOf give -1 where nothing matches.',
+          'Write `filter`, `find` and the other array methods that change a length or can give `undefined` as a loop. `findIndex` and `indexOf` give -1 where nothing matches.',
           'Do not rely on general runtime objects.',
           'Keep conditions and loop ranges based on GPU-compilable values.',
           'A control-flow pattern valid in TypeScript is not automatically valid under TypeShade shader semantics.',
         ],
-        next: 'Next: GPU types',
+        next: 'Next: Resources',
       },
       gpuTypes: {
         title: 'TypeShade GPU types',
@@ -2947,7 +2950,7 @@ export const en = {
         liveCenter: 'centre, in uv space',
         liveRadius: 'radius, in uv units',
         liveTint: 'disc colour',
-        next: 'Next: Resources',
+        next: 'Next: Functions',
       },
       resources: {
         title: 'TypeShade resources',
@@ -3000,7 +3003,7 @@ export const en = {
         helper: '4. Helper functions',
         helperP:
           'An undecorated function is a helper, not an entry point. Do not put entry points on classes or treat `this` as a pipeline object.',
-        next: 'Next: Algorithms',
+        next: 'Next: String keys and Record',
       },
       // The common modules (compiler change 0072): typeshade/algorithms (surface §72) and
       // typeshade/random (surface §73), each a page of its own in the Language group.
@@ -3135,14 +3138,18 @@ export const en = {
         title: 'TypeScript constructs and what each one lowers to',
         description: `What ${facts.constructRows} TypeScript constructs become in a "use typeshade" file: declarations, functions, classes, control flow, and the shader text the compiler writes.`,
         h1: 'TypeScript constructs',
-        intro: `TypeShade is TypeScript's syntax, checked by a shader compiler. A construct either lowers to shader code or is refused with a reason, and the emitted pane of every card is what the compiler wrote at the pinned commit. There are ${facts.constructRows} of them, on the section pages below.`,
+        intro: `TypeShade is TypeScript's syntax, checked by a shader compiler. A construct either lowers to shader code or is refused with a reason, and the emitted WGSL and GLSL of every card are what the compiler wrote at the pinned commit. There are ${facts.constructRows} of them, on the section pages below.`,
         readingH: 'How to read a card',
-        readingP:
-          'The head of a card names the construct, and a badge marks one the language refuses. The sentence under it says what becomes of the construct. The left pane is the TypeScript, taken from a `"use typeshade"` program that is compiled while this page is built. The right pane is the emitted WGSL, cut out of that program by name, and a refused card carries the compiler\'s own code and message there instead.',
+        readingP: `The head of a card names the construct, and a badge marks one the language refuses. The sentence under it says what becomes of the construct. The left pane is the TypeScript, taken from a \`"use typeshade"\` program that is compiled while this page is built. The right pane has a tab for the emitted WGSL and one for the emitted ${glsl}, each cut out of that program by name. A construct the GLSL backend cannot emit, such as a compute entry, shows the backend's own sentence in the GLSL tab. A refused card carries the compiler's own code and message in the right pane instead.`,
         guidesP:
-          'A card says what happens. The pages before this one say why: [types](languageTypes), [functions](languageFunctions), [control flow](languageControlFlow), [GPU types](languageGpuTypes) and [resources](languageResources). The builtins have [a table of their own](languageBuiltins).',
+          'A card says what happens. The pages before this one say why: [types](languageTypes), [GPU types](languageGpuTypes), [functions](languageFunctions), [control flow](languageControlFlow) and [resources](languageResources). The builtins have [a table of their own](languageBuiltins).',
         paneTs: 'TypeScript',
         paneWgsl: 'Emitted WGSL',
+        paneGlsl: `Emitted ${glsl}`,
+        tabWgsl: 'WGSL',
+        tabGlsl: 'GLSL',
+        tabsLabel: 'Emitted shader code',
+        glslNone: 'The compiler emits no GLSL for this construct. The backend says:',
         paneDiagnostic: 'Compiler diagnostic',
         refused: 'Refused',
         /** The index names its sections and links each one; the cards themselves are on

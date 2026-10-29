@@ -31,5 +31,5 @@ const headings = [
   <ConceptDoc locale={locale} rows={content.mappingRows.slice(1)} columns={content.mappingRows[0]} />
   <h2 id="example">{content.example}</h2><p>{content.exampleP}</p>
   <TypeShadeCode code={`class VsIn {\n  @location(0) position: vec3\n}\n\n@vertex\nexport function vs(vin: VsIn): vec4 {\n  return vec4(vin.position, 1)\n}`} />
-  <p><a href={localePath(locale, links.languageFunctions.href)}>{content.next}</a></p>
+  <p><a href={localePath(locale, links.languageGpuTypes.href)}>{content.next}</a></p>
 </Docs>

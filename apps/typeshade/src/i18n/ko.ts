@@ -246,10 +246,12 @@ export const ko: Copy = {
       editor: '에디터 지원',
       sidebarGroups: {
         getStarted: 'Getting Started',
+        comingFrom: '다른 언어에서',
         language: '언어',
         concepts: '개념',
         examples: '예제',
-        reference: '참조',
+        languageReference: '언어 참조',
+        compilerApi: '컴파일러 API',
         project: '프로젝트',
       },
       conceptPages: {
@@ -2845,6 +2847,7 @@ export const ko: Copy = {
           '커널은 `Map<Channel, V>`와 `Set<Channel>`을 받습니다. 호스트는 문자열 키를 넘깁니다. 호출은 루프를 실행하기 전에 키를 id로 바꾸고, 끝난 뒤에는 문자열로 되돌리며 삽입 순서를 유지합니다. 알 수 없는 문자열은 `TypeError`를 냅니다. 값 집합이 열린 `Map<string, V>`와 `Set<string>`은 거부됩니다.',
         exampleP:
           '[string-keys-record](exampleStringKeysRecord)는 WebGPU, WebGL2, CPU에서 Record를 인덱싱하는 커널을 호출합니다. [제어 흐름](languageControlFlow)은 컬렉션 루프와 지원 tier를 설명합니다.',
+        next: '다음: 알고리즘',
       },
       types: {
         title: 'TypeShade 타입',
@@ -2889,7 +2892,7 @@ export const ko: Copy = {
         example: '6. 실제 진입점와 연결하기',
         exampleP:
           '구조체를 정의한 뒤 진입점 매개변수에서 사용할 수 있습니다. 이때 값의 구조와 필드 메타데이터가 셰이더 입력의 의미를 결정합니다.',
-        next: '다음: Functions',
+        next: '다음: GPU types',
       },
       functions: {
         title: 'TypeShade 함수',
@@ -2976,12 +2979,12 @@ export const ko: Copy = {
         intro:
           'TypeShade는 TypeScript의 조건문과 반복문 문법을 사용합니다. 코드는 GPU에서 실행되므로 제어 흐름에 사용할 수 있는 계산은 컴파일러의 지원 범위로 제한됩니다.',
         ts: '1. TypeScript 제어 흐름',
-        tsP: 'if/else와 for 같은 구문은 익숙하지만, TypeShade에서는 각 조건식과 반복식이 GPU 코드로 변환할 수 있어야 합니다. 문법이 같다는 것이 JavaScript 런타임 의미론 전체를 가져온다는 뜻은 아닙니다.',
+        tsP: '`if`/`else`와 `for` 같은 구문은 익숙하지만, TypeShade에서는 각 조건식과 반복식이 GPU 코드로 변환할 수 있어야 합니다. 문법이 같다는 것이 JavaScript 런타임 의미론 전체를 가져온다는 뜻은 아닙니다.',
         branch: '2. 분기',
         branchIndexP: 'TypeShade는 `if` 문과 조건 표현식으로 경로를 고릅니다.',
-        ifStatement: 'if 문',
+        ifStatement: '`if` 문',
         branchP:
-          'if/else는 계산 경로를 표현합니다. 분기 안에서도 TypeShade가 이해하는 값과 리소스만 사용합니다.',
+          '`if`/`else`는 계산 경로를 표현합니다. 분기 안에서도 TypeShade가 이해하는 값과 리소스만 사용합니다.',
         conditional: '조건 표현식',
         conditionalP:
           '조건에 따라 값을 고를 때는 `c ? a : b`로 씁니다. WGSL에는 `?:` 연산자가 없습니다. 스칼라나 벡터라면 WGSL 출력은 `select(b, a, c)`입니다. 거짓일 때의 값이 먼저 오고 조건이 마지막에 옵니다. WGSL은 두 값을 모두 계산합니다.',
@@ -2991,10 +2994,10 @@ export const ko: Copy = {
         loopIndexP: '반복은 문장이나 배열 메서드로 씁니다.',
         loopStatements: '반복문',
         loopStatementsP:
-          'for 루프와 while 루프, 배열을 도는 for...of를 씁니다. for 루프는 유니폼 필드나 배열의 길이처럼 실행 중에야 정해지는 값까지 셀 수 있습니다.',
+          '`for` 루프와 `while` 루프, 배열을 도는 `for...of`를 씁니다. `for` 루프는 유니폼 필드나 배열의 길이처럼 실행 중에야 정해지는 값까지 셀 수 있습니다.',
         loopMethods: '배열 메서드',
         loopMethodsP:
-          '배열의 map, forEach, some, every, reduce, fill, findIndex, findLastIndex, indexOf, lastIndexOf, includes도 저마다 카운트 루프로 컴파일되며, map은 길이가 정해진 배열에 씁니다.',
+          '배열의 `map`, `forEach`, `some`, `every`, `reduce`, `fill`, `findIndex`, `findLastIndex`, `indexOf`, `lastIndexOf`, `includes`도 저마다 카운트 루프로 컴파일되며, `map`은 길이가 정해진 배열에 씁니다.',
         kernel: '4. 커널 함수',
         kernelIndexP:
           '커널 함수는 컴파일러가 GPU에서 돌릴 수 있는 루프를 담은 함수입니다. 아래에서 커널 함수의 조건, GPU에서 도는 루프, 워크그룹 크기, 컴파일러의 보고를 차례로 설명합니다.',
@@ -3034,13 +3037,13 @@ export const ko: Copy = {
         collect: '5. 결과 모으기',
         collectIndexP:
           '커널 함수의 루프는 결과를 `push`로 배열에 모으거나 `Map`이나 `Set`에 모읍니다.',
-        push: 'push로 덧붙이기',
+        push: '`push`로 덧붙이기',
         pushP:
           '루프는 `out.push(v)`로 배열 매개변수에 값을 덧붙입니다. 문장으로 쓰며, 한 반복 안에서 몇 번이든, 어느 분기에서든 쓸 수 있습니다. 함수 안에서 이 배열은 빈 상태로 시작합니다. 원소는 모든 tier에서 루프를 차례로 실행했을 때 덧붙는 순서대로 놓이고, 루프 뒤의 `out.length`는 덧붙인 개수입니다.',
         pushCapacity: '용량과 개수',
         pushHostP:
           '호스트 배열의 길이가 용량입니다. 호출은 앞에서부터 용량만큼 원소를 쓰고, 나머지는 그대로 둡니다. 함수가 돌려주는 개수는 용량보다 클 수 있습니다. 그래서 `n > out.length`를 본 호스트는 더 큰 배열로 다시 호출할 수 있습니다. WebGPU에서 이 루프는 디스패치 세 번으로 돕니다. 먼저 반복마다 덧붙일 개수를 세고, 워크그룹 하나가 그 개수를 오프셋으로 스캔한 뒤, 반복마다 자기 오프셋에 값을 저장합니다. WebGL2는 값을 덧붙이는 루프를 돌리지 않습니다.',
-        collections: 'Map과 Set',
+        collections: '`Map`과 `Set`',
         collectionsP:
           '매개변수는 ECMAScript의 `Set<K>`나 `Map<K, V>`일 수도 있습니다. `K`는 `u32`, `i32`, `f32` 또는 [키 타입](languageStringKeys)입니다. 루프는 `s.add(k)`나 `m.set(k, v)`로 값을 넣습니다. 호스트는 JavaScript의 `Set`이나 `Map`을 그대로 넘깁니다. 호출이 끝나면 루프를 차례로 실행했을 때 남는 항목이 그 안에 들어 있습니다. 키는 한 번씩, 처음 넣은 순서대로 들어가고, 값은 마지막에 넣은 것입니다.',
         collectionsReadP:
@@ -3071,12 +3074,12 @@ export const ko: Copy = {
           '`typeshade/algorithms`와 `typeshade/random`은 TypeShade로 쓴 커널 함수이며, 한 스코프 안에서 직접 쓴 커널 함수와 합쳐집니다. [알고리즘](languageAlgorithms)과 [난수](languageRandom)에서 목록을 볼 수 있습니다.',
         boundary: '7. JavaScript와의 경계',
         boundaryItems: [
-          'filter, find처럼 길이를 바꾸거나 undefined를 줄 수 있는 배열 메서드는 루프로 씁니다. findIndex와 indexOf는 찾는 원소가 없으면 -1을 줍니다.',
+          '`filter`, `find`처럼 길이를 바꾸거나 `undefined`를 줄 수 있는 배열 메서드는 루프로 씁니다. `findIndex`와 `indexOf`는 찾는 원소가 없으면 -1을 줍니다.',
           '일반 런타임 객체에 의존하지 않습니다.',
           '조건과 반복에는 GPU에서 계산 가능한 값과 범위만 사용할 수 있습니다.',
           'TypeScript에서 유효한 제어 흐름이라고 해서 TypeShade 셰이더 언어 규칙에서도 자동으로 유효한 것은 아닙니다.',
         ],
-        next: '다음: GPU types',
+        next: '다음: Resources',
       },
       gpuTypes: {
         title: 'TypeShade GPU 타입',
@@ -3115,7 +3118,7 @@ export const ko: Copy = {
         liveCenter: 'uv 공간 기준 위치',
         liveRadius: 'uv 단위 반지름',
         liveTint: '원반 색',
-        next: '다음: Resources',
+        next: '다음: Functions',
       },
       resources: {
         title: 'TypeShade 리소스',
@@ -3168,7 +3171,7 @@ export const ko: Copy = {
         helper: '4. Helper function',
         helperP:
           '데코레이터가 없는 함수는 진입점이 아니라 헬퍼입니다. 진입점을 class method로 만들거나 `this`를 파이프라인 객체로 취급하지 않습니다.',
-        next: '다음: 알고리즘',
+        next: '다음: 문자열 키와 Record',
       },
       algorithms: {
         title: 'typeshade/algorithms: 맵, 리덕션, 스캔',
@@ -3299,14 +3302,18 @@ export const ko: Copy = {
         title: 'TypeScript 문법과 그 변환 결과',
         description: `"use typeshade" 파일에서 TypeScript 문법 ${facts.constructRows}가지가 각각 무엇이 되는지 정리합니다. 선언, 함수, 클래스, 제어 흐름, 그리고 컴파일러가 생성하는 셰이더 코드를 함께 싣습니다.`,
         h1: 'TypeScript 문법',
-        intro: `TypeShade는 셰이더 컴파일러가 검사하는 TypeScript 문법입니다. 문법 하나는 셰이더 코드로 하향 변환되거나, 이유를 명시한 진단과 함께 거부됩니다. 카드마다 오른쪽 칸에 놓인 코드는 고정된 커밋의 컴파일러가 낸 것입니다. 아래 섹션 페이지에 ${facts.constructRows}가지를 나눠 실었습니다.`,
+        intro: `TypeShade는 셰이더 컴파일러가 검사하는 TypeScript 문법입니다. 문법 하나는 셰이더 코드로 하향 변환되거나, 이유를 명시한 진단과 함께 거부됩니다. 카드마다 오른쪽 칸에 놓인 WGSL과 GLSL은 고정된 커밋의 컴파일러가 낸 것입니다. 아래 섹션 페이지에 ${facts.constructRows}가지를 나눠 실었습니다.`,
         readingH: '카드 하나를 읽는 법',
-        readingP:
-          '카드 머리에는 문법의 이름이 있고, 언어가 거절하는 문법에는 표시가 하나 붙습니다. 이름 아래에는 변환 결과를 설명합니다. 왼쪽 칸은 TypeScript이며, 이 페이지를 빌드할 때 컴파일하는 `"use typeshade"` 프로그램에서 그대로 가져옵니다. 오른쪽 칸은 생성된 WGSL이고, 그 프로그램에서 이름으로 잘라 낸 부분입니다. 거절되는 카드에는 그 자리에 컴파일러가 낸 코드와 메시지가 들어갑니다.',
+        readingP: `카드 머리에는 문법의 이름이 있고, 언어가 거절하는 문법에는 표시가 하나 붙습니다. 이름 아래에는 변환 결과를 설명합니다. 왼쪽 칸은 TypeScript이며, 이 페이지를 빌드할 때 컴파일하는 \`"use typeshade"\` 프로그램에서 그대로 가져옵니다. 오른쪽 칸에는 생성된 WGSL 탭과 생성된 ${glsl} 탭이 있고, 각각 그 프로그램에서 이름으로 잘라 낸 부분입니다. 컴퓨트 진입점처럼 GLSL 백엔드가 내보낼 수 없는 문법은 GLSL 탭에 백엔드의 메시지가 나옵니다. 거절되는 카드에는 오른쪽 칸에 컴파일러가 낸 코드와 메시지가 들어갑니다.`,
         guidesP:
-          '각 카드에는 변환 결과를 제시합니다. 관련 언어 규칙은 [타입](languageTypes), [함수](languageFunctions), [제어 흐름](languageControlFlow), [GPU 타입](languageGpuTypes), [리소스](languageResources)에서 설명합니다. 내장 함수는 [별도의 표](languageBuiltins)에 있습니다.',
+          '각 카드에는 변환 결과를 제시합니다. 관련 언어 규칙은 [타입](languageTypes), [GPU 타입](languageGpuTypes), [함수](languageFunctions), [제어 흐름](languageControlFlow), [리소스](languageResources)에서 설명합니다. 내장 함수는 [별도의 표](languageBuiltins)에 있습니다.',
         paneTs: 'TypeScript',
         paneWgsl: '생성된 WGSL',
+        paneGlsl: `생성된 ${glsl}`,
+        tabWgsl: 'WGSL',
+        tabGlsl: 'GLSL',
+        tabsLabel: '생성된 셰이더 코드',
+        glslNone: '이 문법은 GLSL로 생성되지 않습니다. 백엔드의 메시지는 다음과 같습니다.',
         paneDiagnostic: '컴파일러 진단',
         refused: '거절',
         pagesH: '섹션',

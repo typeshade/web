@@ -2,7 +2,7 @@
 import Docs from '../../layouts/Docs.astro';
 import TypeShadeCode from '../TypeShadeCode.astro';
 import Rich from '../Rich.astro';
-import { copyFor, type Locale } from '../../i18n/index.ts';
+import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
 import { editCopy, links } from '../../lib/links.ts';
 
 interface Props { locale: Locale }
@@ -35,4 +35,5 @@ export function gain(c: Channel, by: Record<Channel, f32>): f32 {
   <h2 id="collections">{content.collections}</h2>
   <p><Rich text={content.collectionsP} locale={locale} /></p>
   <p><Rich text={content.exampleP} locale={locale} /></p>
+  <p><a href={localePath(locale, links.languageAlgorithms.href)}>{content.next}</a></p>
 </Docs>

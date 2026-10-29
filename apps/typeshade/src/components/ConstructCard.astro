@@ -20,6 +20,12 @@
 //              so no card repeats a column heading.
 //   emitTitle  the title bar over the right pane.
 //   wgsl       the emitted WGSL, or null on a construct the compiler refuses.
+//   glsl       the emitted GLSL ES 3.00 for the same declarations, or null when `wgsl` is null
+//              or the GLSL backend cannot emit the module.
+//   glslNote   the GLSL backend's own sentence on a module it cannot emit, such as a compute
+//              entry. The GLSL tab shows it in place of code.
+//   tabs       the words of the right pane's tabs: the tab strip's label, the two tab names,
+//              the two frames' accessible names and titles, and the line over `glslNote`.
 //   diagnostic the compiler's own code and message, on a construct it refuses. A card
 //              carries one of `wgsl` and `diagnostic`, and a card with both or with neither
 //              stops the build.
@@ -29,9 +35,14 @@
 // CSS: the owning component stylesheet, under "The construct card". The classes are .construct-cards,
 // .construct-card, .construct-card-head, .construct-card-name, .construct-card-badge,
 // .construct-card-note, .construct-card-panes, .construct-card-pane,
-// .construct-card-pane-title and .construct-card-refusal. The panes sit side by side from
-// 48rem and stack below it, the TypeScript first.
+// .construct-card-pane-title and .construct-card-refusal. The panes sit side by side when the
+// card itself is 48rem wide and stack below it, the TypeScript first. The right pane has a tab
+// for the WGSL and one for the GLSL (the shared TabList and Tab, enhanced by
+// src/scripts/target-tabs.ts); with no script both frames stack and keep their title bars.
 import { Code } from 'astro-expressive-code/components';
+import TabList from '@typeshade/site-ui/astro/TabList';
+import Tab from '@typeshade/site-ui/astro/Tab';
+import './CodeTabs.css';
 import CodeFrame from './CodeFrame.astro';
 import Rich from './Rich.astro';
 import { localePath, type Locale } from '../i18n/index.ts';
@@ -50,11 +61,14 @@ interface Props {
   tsTitle: string;
   emitTitle: string;
   wgsl: string | null;
+  glsl: string | null;
+  glslNote: string | null;
   diagnostic: ConstructDiagnostic | null;
   refusedLabel: string;
   diagnosticTitle: string;
+  tabs: { label: string; wgsl: string; glsl: string; wgslRegion: string; glslRegion: string; glslTitle: string; glslNone: string };
 }
-const { locale, id, name, becomes, ts, tsTitle, emitTitle, wgsl, diagnostic, refusedLabel, diagnosticTitle } = Astro.props;
+const { locale, id, name, becomes, ts, tsTitle, emitTitle, wgsl, glsl, glslNote, diagnostic, refusedLabel, diagnosticTitle, tabs } = Astro.props;
 
 if ((wgsl === null) === (diagnostic === null)) {
   const what = wgsl === null ? 'no emit and no diagnostic' : 'an emit and a diagnostic at once';
@@ -76,17 +90,41 @@ const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(loca
     {diagnostic && <span class="inline-block rounded-sm border border-diag bg-transparent px-[7px] text-label whitespace-nowrap text-diag">{refusedLabel}</span>}
   </div>
   <p class="construct-card-note max-inline-[62ch] text-ui text-text-2"><Rich text={becomes} locale={locale} /></p>
-  <div class="mbs-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2">
-    <div class="construct-card-pane min-inline-0">
-      <CodeFrame label={region(tsTitle)} holdTokens>
-        <Code code={ts} lang="ts" title={tsTitle} locale={locale} wrap />
-      </CodeFrame>
+  <div class="@container mbs-3">
+  <div class="grid grid-cols-1 items-start gap-3 @3xl:grid-cols-2">
+    <div class="construct-card-pane construct-card-source min-inline-0">
+      <div class="construct-card-label flex gap-ui-3 border-b border-solid border-ui-border">
+        <span class="min-h-ui-control-large flex-none border-b-2 border-solid border-b-ui-focus px-1 py-ui-2 font-semibold text-ui-focus">{tsTitle}</span>
+      </div>
+      <div class="tabs-panel">
+        <CodeFrame label={region(tsTitle)} holdTokens>
+          <Code code={ts} lang="ts" locale={locale} wrap />
+        </CodeFrame>
+      </div>
     </div>
     {wgsl !== null ? (
-      <div class="construct-card-pane min-inline-0">
-        <CodeFrame label={region(emitTitle)} holdTokens>
-          <Code code={wgsl} lang="wgsl" title={emitTitle} locale={locale} wrap />
-        </CodeFrame>
+      <div class="construct-card-pane construct-card-tabs min-inline-0" data-front-tabs>
+        <TabList class="tabs-head" aria-label={tabs.label}>
+          <Tab id={`${id}-tab-wgsl`} aria-controls={`${id}-wgsl`} aria-selected="true">{tabs.wgsl}</Tab>
+          <Tab id={`${id}-tab-glsl`} aria-controls={`${id}-glsl`} aria-selected="false">{tabs.glsl}</Tab>
+        </TabList>
+        <div class="tabs-panel" role="tabpanel" id={`${id}-wgsl`} aria-labelledby={`${id}-tab-wgsl`}>
+          <CodeFrame label={tabs.wgslRegion} holdTokens>
+            <Code code={wgsl} lang="wgsl" title={emitTitle} locale={locale} wrap />
+          </CodeFrame>
+        </div>
+        <div class="tabs-panel" role="tabpanel" id={`${id}-glsl`} aria-labelledby={`${id}-tab-glsl`}>
+          {glsl !== null ? (
+            <CodeFrame label={tabs.glslRegion} holdTokens>
+              <Code code={glsl} lang="glsl" title={tabs.glslTitle} locale={locale} wrap />
+            </CodeFrame>
+          ) : (
+            <div class="construct-card-glsl-none text-ui text-text-2">
+              <p>{tabs.glslNone}</p>
+              <p class="diagnostic">{glslNote}</p>
+            </div>
+          )}
+        </div>
       </div>
     ) : (
       <div class="construct-card-refusal min-inline-0">
@@ -95,15 +133,20 @@ const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(loca
       </div>
     )}
   </div>
+  </div>
 </li>
+
+<script>
+  import '../scripts/target-tabs.ts';
+</script>
 
 <style>
   /* One TypeScript construct per card on /guide/language/from-typescript/. An Ant Card, and
      the card is what separates one construct from the next: the same page as three columns of
      code put a hairline between rows that ran ten lines tall, and a reader could not see where
      a construct ended. The head names the construct, the sentence under it runs at the card's
-     full width, and the panes sit side by side from 48rem and stack below it with the
-     TypeScript first. Every measure is relative to the card, so the cards stay inside the
+     full width, and the panes sit side by side when the card is 48rem wide and stack below it
+     with the TypeScript first. Every measure is relative to the card, so the cards stay inside the
      document column (DESIGN.md, the Container Rule) at every width.
 
      The card sits in the document column, so its list item, heading and paragraphs meet
@@ -122,8 +165,8 @@ const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(loca
     --ec-codePadBlk: 10px; --ec-codePadInl: 12px; --ec-codeFontSize: var(--text-code); --ec-codeLineHt: 1.6;
   }
   .construct-card-pane :global(.expressive-code .copy) { display: none }
-  /* A pane is about 280px wide in the document column, and a line of a real program is longer
-     than that, so a line wraps at a space and reads on under the hanging indent Expressive
+  /* A pane is at least 360px wide, since two panes share a card only from 48rem. A line longer
+     than that wraps at a space and reads on under the hanging indent Expressive
      Code gives it. A name breaks inside itself only where the name alone is wider than the
      pane. Two rules keep a break off the middle of a name: <CodeFrame holdTokens> holds a
      token with a hyphen or an angle bracket in it together, and `overflow-wrap: normal`
@@ -141,6 +184,11 @@ const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(loca
      a frame's title bar and the message starts where the frame's first line of code starts,
      so the two panes of a refused construct read as one row. */
   .construct-card-pane-title { margin: 0 }
+  /* Once the tabs run, the strip names the pane and the frame needs no title bar of its own; with
+     no script the strip stays out of the page, both panes stack, and each frame keeps its title. */
+  .construct-card-tabs[data-ready] :global(.expressive-code figcaption.header) { display: none }
+  .construct-card-tabs[data-ready] .tabs-panel[hidden] { display: none }
+  .construct-card-glsl-none { padding: 10px 12px }
   .construct-card-refusal .diagnostic { margin-block-start: 10px }
   /* The code keeps the diagnostic's red as a link, underlined so it reads as one. */
   .construct-card-refusal .diagnostic b a { color: inherit; text-decoration: underline; text-underline-offset: 3px }
