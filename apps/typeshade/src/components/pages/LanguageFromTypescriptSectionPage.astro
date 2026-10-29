@@ -83,9 +83,12 @@ const setPath = links.languageFromTypescript.href;
             tsTitle={c.paneTs}
             emitTitle={c.paneWgsl}
             wgsl={row.wgsl}
+            glsl={row.glsl}
+            glslNote={row.glslNote}
             diagnostic={row.diagnostic}
             refusedLabel={c.refused}
             diagnosticTitle={c.paneDiagnostic}
+            tabs={{ label: c.tabsLabel, wgsl: c.tabWgsl, glsl: c.tabGlsl, wgslRegion: `${c.paneWgsl}, ${c.rows[row.id]!.name.replace(/`/g, '')}`, glslRegion: `${c.paneGlsl}, ${c.rows[row.id]!.name.replace(/`/g, '')}`, glslTitle: c.paneGlsl, glslNone: c.glslNone }}
           />
         ))}
       </ul>

@@ -3138,14 +3138,18 @@ export const en = {
         title: 'TypeScript constructs and what each one lowers to',
         description: `What ${facts.constructRows} TypeScript constructs become in a "use typeshade" file: declarations, functions, classes, control flow, and the shader text the compiler writes.`,
         h1: 'TypeScript constructs',
-        intro: `TypeShade is TypeScript's syntax, checked by a shader compiler. A construct either lowers to shader code or is refused with a reason, and the emitted pane of every card is what the compiler wrote at the pinned commit. There are ${facts.constructRows} of them, on the section pages below.`,
+        intro: `TypeShade is TypeScript's syntax, checked by a shader compiler. A construct either lowers to shader code or is refused with a reason, and the emitted WGSL and GLSL of every card are what the compiler wrote at the pinned commit. There are ${facts.constructRows} of them, on the section pages below.`,
         readingH: 'How to read a card',
-        readingP:
-          'The head of a card names the construct, and a badge marks one the language refuses. The sentence under it says what becomes of the construct. The left pane is the TypeScript, taken from a `"use typeshade"` program that is compiled while this page is built. The right pane is the emitted WGSL, cut out of that program by name, and a refused card carries the compiler\'s own code and message there instead.',
+        readingP: `The head of a card names the construct, and a badge marks one the language refuses. The sentence under it says what becomes of the construct. The left pane is the TypeScript, taken from a \`"use typeshade"\` program that is compiled while this page is built. The right pane has a tab for the emitted WGSL and one for the emitted ${glsl}, each cut out of that program by name. A construct the GLSL backend cannot emit, such as a compute entry, shows the backend's own sentence in the GLSL tab. A refused card carries the compiler's own code and message in the right pane instead.`,
         guidesP:
           'A card says what happens. The pages before this one say why: [types](languageTypes), [GPU types](languageGpuTypes), [functions](languageFunctions), [control flow](languageControlFlow) and [resources](languageResources). The builtins have [a table of their own](languageBuiltins).',
         paneTs: 'TypeScript',
         paneWgsl: 'Emitted WGSL',
+        paneGlsl: `Emitted ${glsl}`,
+        tabWgsl: 'WGSL',
+        tabGlsl: 'GLSL',
+        tabsLabel: 'Emitted shader code',
+        glslNone: 'The compiler emits no GLSL for this construct. The backend says:',
         paneDiagnostic: 'Compiler diagnostic',
         refused: 'Refused',
         /** The index names its sections and links each one; the cards themselves are on
