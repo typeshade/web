@@ -26,5 +26,5 @@ const headings = [
   <TypeShadeCode code={`@vertex\nexport function vs(\n  @builtin("vertex_index") vid: u32,\n  vin: VsIn\n): vec4 {\n  return camera.view * vec4(vin.position, 1)\n}\n\n@fragment\nexport function fs(): vec4 {\n  return vec4(1, 0, 0, 1)\n}`} />
   <h2 id="helper">{content.helper}</h2><p><Rich text={content.helperP} locale={locale} /></p>
   <TypeShadeCode code={`function saturate(x: f32): f32 {\n  return clamp(x, 0.0, 1.0)\n}`} />
-  <p><a href={localePath(locale, links.languageAlgorithms.href)}>{content.next}</a></p>
+  <p><a href={localePath(locale, links.languageStringKeys.href)}>{content.next}</a></p>
 </Docs>

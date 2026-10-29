@@ -246,10 +246,12 @@ export const ko: Copy = {
       editor: '에디터 지원',
       sidebarGroups: {
         getStarted: 'Getting Started',
+        comingFrom: '다른 언어에서',
         language: '언어',
         concepts: '개념',
         examples: '예제',
-        reference: '참조',
+        languageReference: '언어 참조',
+        compilerApi: '컴파일러 API',
         project: '프로젝트',
       },
       conceptPages: {
@@ -2845,6 +2847,7 @@ export const ko: Copy = {
           '커널은 `Map<Channel, V>`와 `Set<Channel>`을 받습니다. 호스트는 문자열 키를 넘깁니다. 호출은 루프를 실행하기 전에 키를 id로 바꾸고, 끝난 뒤에는 문자열로 되돌리며 삽입 순서를 유지합니다. 알 수 없는 문자열은 `TypeError`를 냅니다. 값 집합이 열린 `Map<string, V>`와 `Set<string>`은 거부됩니다.',
         exampleP:
           '[string-keys-record](exampleStringKeysRecord)는 WebGPU, WebGL2, CPU에서 Record를 인덱싱하는 커널을 호출합니다. [제어 흐름](languageControlFlow)은 컬렉션 루프와 지원 tier를 설명합니다.',
+        next: '다음: 알고리즘',
       },
       types: {
         title: 'TypeShade 타입',
@@ -2889,7 +2892,7 @@ export const ko: Copy = {
         example: '6. 실제 진입점와 연결하기',
         exampleP:
           '구조체를 정의한 뒤 진입점 매개변수에서 사용할 수 있습니다. 이때 값의 구조와 필드 메타데이터가 셰이더 입력의 의미를 결정합니다.',
-        next: '다음: Functions',
+        next: '다음: GPU types',
       },
       functions: {
         title: 'TypeShade 함수',
@@ -3076,7 +3079,7 @@ export const ko: Copy = {
           '조건과 반복에는 GPU에서 계산 가능한 값과 범위만 사용할 수 있습니다.',
           'TypeScript에서 유효한 제어 흐름이라고 해서 TypeShade 셰이더 언어 규칙에서도 자동으로 유효한 것은 아닙니다.',
         ],
-        next: '다음: GPU types',
+        next: '다음: Resources',
       },
       gpuTypes: {
         title: 'TypeShade GPU 타입',
@@ -3115,7 +3118,7 @@ export const ko: Copy = {
         liveCenter: 'uv 공간 기준 위치',
         liveRadius: 'uv 단위 반지름',
         liveTint: '원반 색',
-        next: '다음: Resources',
+        next: '다음: Functions',
       },
       resources: {
         title: 'TypeShade 리소스',
@@ -3168,7 +3171,7 @@ export const ko: Copy = {
         helper: '4. Helper function',
         helperP:
           '데코레이터가 없는 함수는 진입점이 아니라 헬퍼입니다. 진입점을 class method로 만들거나 `this`를 파이프라인 객체로 취급하지 않습니다.',
-        next: '다음: 알고리즘',
+        next: '다음: 문자열 키와 Record',
       },
       algorithms: {
         title: 'typeshade/algorithms: 맵, 리덕션, 스캔',
@@ -3304,7 +3307,7 @@ export const ko: Copy = {
         readingP:
           '카드 머리에는 문법의 이름이 있고, 언어가 거절하는 문법에는 표시가 하나 붙습니다. 이름 아래에는 변환 결과를 설명합니다. 왼쪽 칸은 TypeScript이며, 이 페이지를 빌드할 때 컴파일하는 `"use typeshade"` 프로그램에서 그대로 가져옵니다. 오른쪽 칸은 생성된 WGSL이고, 그 프로그램에서 이름으로 잘라 낸 부분입니다. 거절되는 카드에는 그 자리에 컴파일러가 낸 코드와 메시지가 들어갑니다.',
         guidesP:
-          '각 카드에는 변환 결과를 제시합니다. 관련 언어 규칙은 [타입](languageTypes), [함수](languageFunctions), [제어 흐름](languageControlFlow), [GPU 타입](languageGpuTypes), [리소스](languageResources)에서 설명합니다. 내장 함수는 [별도의 표](languageBuiltins)에 있습니다.',
+          '각 카드에는 변환 결과를 제시합니다. 관련 언어 규칙은 [타입](languageTypes), [GPU 타입](languageGpuTypes), [함수](languageFunctions), [제어 흐름](languageControlFlow), [리소스](languageResources)에서 설명합니다. 내장 함수는 [별도의 표](languageBuiltins)에 있습니다.',
         paneTs: 'TypeScript',
         paneWgsl: '생성된 WGSL',
         paneDiagnostic: '컴파일러 진단',

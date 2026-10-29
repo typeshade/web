@@ -628,7 +628,8 @@ why lives on its own page.
   install command. The home ships no shader runtime. Both locales share these templates.
   Primary navigation stays beside the brand, with search and preferences at the far edge.
 - `/guide/…`: the documentation, on the layout every documentation site uses (VitePress,
-  Docusaurus): a sidebar on the left with six groups, the document in the middle, and on a
+  Docusaurus): a sidebar on the left with eight groups (Getting Started, Coming from, Language, Concepts,
+  Examples, Language reference, Compiler API, Project), the document in the middle, and on a
   wide screen an outline of the page on the right. Under 64rem the sidebar is a bar under the
   header that names the current page. Every page carries its own headings in that outline,
   and closes with a link to the file it is written in ("Edit this page", the VitePress
@@ -781,10 +782,11 @@ page's See also links back to the builder. No other export with a language entry
 it: `reflect` and `location` name something else. A parameter, a return value and a property show their type as a link to the page of
 every name in it that has one.
 
-The sidebar's Reference group opens with the reference's own index and then lists the
-category index pages; on a page of one category, that category's members follow it one level
-in. The language reference's kinds open the same way, on an entry's own page. A function opens
-its family only (maths, packing, textures). The other kinds stay closed. Compiler internals and Language service close the group, and the
+The sidebar's Compiler API group opens with the API's own index and then lists the category
+index pages; on a page of one category, that category's members follow it one level in. The
+Language reference group opens with the reference's own index, and its kinds open the same way,
+on an entry's own page. A function opens
+its family only (maths, packing, textures). The other kinds stay closed. Compiler internals and Language service close the Compiler API group, and the
 internals' sections open under their overview the same way, only on their own pages, so the
 sidebar never carries every page of the reference at once, and the page a reader is on is
 scrolled into view inside the sidebar's own scroller. The guide links into the reference the way MDN links a function's first mention: the
@@ -1185,3 +1187,14 @@ language, and every page declares its alternates with `hreflang`. A host per lan
   restarts the clock, and Back returns to the tiles. It opens both examples drawn in passes: the trail builds up over frames and Restart clears it, feedback-trail draws on WebGPU, WebGL2 and the CPU oracle and separable-blur on WebGPU and the CPU oracle, and the link carries the graph. A runner with no
   route to the Monaco CDN is reported on its own.
 - `scripts/check-seo.mjs` and `scripts/openseo-audit.mts`, after the build: the metadata every page carries, and OpenSEO's audit over the built site (README, Checks).
+
+### Reading order of the guide
+
+The sidebar order is the reading order, and the "Next" link at the foot of a Language page
+follows it. Getting Started comes first. Coming from holds the three mapping sets (TypeScript,
+WGSL, GLSL) for a reader who arrives with another language. The Language group reads Types,
+GPU types, Functions, Control flow, Resources, Shader stages, String keys and Record,
+Algorithms, Random numbers and Builtin functions: the GPU types come before the pages whose
+examples use `f32` and `vec3`. A change to this order changes `sidebar()` in `src/lib/links.ts`
+and the `next` link of each page in the same commit, since previous and next at the bottom of a
+page walk the sidebar.

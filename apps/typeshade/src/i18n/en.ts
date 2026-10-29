@@ -156,10 +156,12 @@ export const en = {
       /** The sidebar's own group headings (src/lib/links.ts sidebar()). */
       sidebarGroups: {
         getStarted: 'Getting Started',
+        comingFrom: 'Coming from',
         language: 'Language',
         concepts: 'Concepts',
         examples: 'Examples',
-        reference: 'Reference',
+        languageReference: 'Language reference',
+        compilerApi: 'Compiler API',
         project: 'Project',
       },
       conceptPages: {
@@ -2672,6 +2674,7 @@ export const en = {
           'A kernel accepts `Map<Channel, V>` and `Set<Channel>`. The host passes string keys. Before the loops, the call converts them to ids. Afterward, it converts ids back to strings and preserves insertion order. An unknown string produces a `TypeError`. Open `Map<string, V>` and `Set<string>` are refused.',
         exampleP:
           '[string-keys-record](exampleStringKeysRecord) calls a Record-indexed kernel on WebGPU, WebGL2 and the CPU. [Control flow](languageControlFlow) describes collection loops and their supported tiers.',
+        next: 'Next: Algorithms',
       },
       types: {
         title: 'TypeShade types',
@@ -2716,7 +2719,7 @@ export const en = {
         example: '6. Connect the type to an entry point',
         exampleP:
           'After defining a struct, use it as an entry point parameter. The value shape and field metadata then define the meaning of that shader input.',
-        next: 'Next: Functions',
+        next: 'Next: GPU types',
       },
       functions: {
         title: 'TypeShade functions',
@@ -2908,7 +2911,7 @@ export const en = {
           'Keep conditions and loop ranges based on GPU-compilable values.',
           'A control-flow pattern valid in TypeScript is not automatically valid under TypeShade shader semantics.',
         ],
-        next: 'Next: GPU types',
+        next: 'Next: Resources',
       },
       gpuTypes: {
         title: 'TypeShade GPU types',
@@ -2947,7 +2950,7 @@ export const en = {
         liveCenter: 'centre, in uv space',
         liveRadius: 'radius, in uv units',
         liveTint: 'disc colour',
-        next: 'Next: Resources',
+        next: 'Next: Functions',
       },
       resources: {
         title: 'TypeShade resources',
@@ -3000,7 +3003,7 @@ export const en = {
         helper: '4. Helper functions',
         helperP:
           'An undecorated function is a helper, not an entry point. Do not put entry points on classes or treat `this` as a pipeline object.',
-        next: 'Next: Algorithms',
+        next: 'Next: String keys and Record',
       },
       // The common modules (compiler change 0072): typeshade/algorithms (surface §72) and
       // typeshade/random (surface §73), each a page of its own in the Language group.
@@ -3140,7 +3143,7 @@ export const en = {
         readingP:
           'The head of a card names the construct, and a badge marks one the language refuses. The sentence under it says what becomes of the construct. The left pane is the TypeScript, taken from a `"use typeshade"` program that is compiled while this page is built. The right pane is the emitted WGSL, cut out of that program by name, and a refused card carries the compiler\'s own code and message there instead.',
         guidesP:
-          'A card says what happens. The pages before this one say why: [types](languageTypes), [functions](languageFunctions), [control flow](languageControlFlow), [GPU types](languageGpuTypes) and [resources](languageResources). The builtins have [a table of their own](languageBuiltins).',
+          'A card says what happens. The pages before this one say why: [types](languageTypes), [GPU types](languageGpuTypes), [functions](languageFunctions), [control flow](languageControlFlow) and [resources](languageResources). The builtins have [a table of their own](languageBuiltins).',
         paneTs: 'TypeScript',
         paneWgsl: 'Emitted WGSL',
         paneDiagnostic: 'Compiler diagnostic',
