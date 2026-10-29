@@ -11,8 +11,9 @@ import { kernelLoopWarnings } from '../../lib/kernel-loops.ts';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const content = copyFor(locale).language.topics.controlFlow;
-const h2 = (slug: string, text: string) => ({ depth: 2, slug, text });
-const h3 = (slug: string, text: string) => ({ depth: 3, slug, text });
+// A heading may name code in backticks; the outline carries the words without them.
+const h2 = (slug: string, text: string) => ({ depth: 2, slug, text: text.replace(/`/g, '') });
+const h3 = (slug: string, text: string) => ({ depth: 3, slug, text: text.replace(/`/g, '') });
 const headings = [
   h2('ts', content.ts),
   h2('branch', content.branch), h3('if', content.ifStatement), h3('conditional', content.conditional), h3('costly-arm', content.costlyArm),
@@ -28,16 +29,16 @@ const warnings = kernelLoopWarnings();
 
 <Docs locale={locale} path={links.languageControlFlow.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
   <h1>{content.h1}</h1><p>{content.intro}</p>
-  <h2 id="ts">{content.ts}</h2><p>{content.tsP}</p>
+  <h2 id="ts">{content.ts}</h2><p><Rich text={content.tsP} locale={locale} /></p>
   <h2 id="branch">{content.branch}</h2><p><Rich text={content.branchIndexP} locale={locale} /></p>
-  <h3 id="if">{content.ifStatement}</h3><p>{content.branchP}</p>
+  <h3 id="if"><Rich text={content.ifStatement} locale={locale} /></h3><p><Rich text={content.branchP} locale={locale} /></p>
   <TypeShadeCode code={`@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  if (camera.pos.x > 0) {\n    pixels[gid.x] = 1\n  } else {\n    pixels[gid.x] = 0\n  }\n}`} />
   <h3 id="conditional">{content.conditional}</h3><p><Rich text={content.conditionalP} locale={locale} /></p>
   <h3 id="costly-arm">{content.costlyArm}</h3><p><Rich text={content.costlyArmP} locale={locale} /></p>
   <h2 id="loop">{content.loop}</h2><p>{content.loopIndexP}</p>
-  <h3 id="loop-statements">{content.loopStatements}</h3><p>{content.loopStatementsP}</p>
+  <h3 id="loop-statements">{content.loopStatements}</h3><p><Rich text={content.loopStatementsP} locale={locale} /></p>
   <TypeShadeCode code={`for (let i = 0; i < 4; i++) {\n  pixels[i] = pixels[i] + camera.pos.x\n}`} />
-  <h3 id="loop-methods">{content.loopMethods}</h3><p>{content.loopMethodsP}</p>
+  <h3 id="loop-methods">{content.loopMethods}</h3><p><Rich text={content.loopMethodsP} locale={locale} /></p>
   <h2 id="kernel">{content.kernel}</h2><p>{content.kernelIndexP}</p>
   <h3 id="kernel-function">{content.kernelFunction}</h3><p><Rich text={content.kernelFunctionP} locale={locale} /></p>
   <p><Rich text={content.kernelCallP} locale={locale} /></p>
@@ -58,11 +59,11 @@ const warnings = kernelLoopWarnings();
   </table>
   <h3 id="kernel-layout">{content.kernelLayout}</h3><p><Rich text={content.kernelLayoutP} locale={locale} /></p>
   <h2 id="collect">{content.collect}</h2><p><Rich text={content.collectIndexP} locale={locale} /></p>
-  <h3 id="push">{content.push}</h3><p><Rich text={content.pushP} locale={locale} /></p>
+  <h3 id="push"><Rich text={content.push} locale={locale} /></h3><p><Rich text={content.pushP} locale={locale} /></p>
   <TypeShadeCode code={`export function strong(xs: array<f32>, t: f32, out: array<u32>): u32 {\n  for (let i: u32 = 0; i < xs.length; i++) {\n    if (xs[i] > t) {\n      out.push(i)\n    }\n  }\n  return out.length\n}`} />
   <h3 id="push-capacity">{content.pushCapacity}</h3><p><Rich text={content.pushHostP} locale={locale} /></p>
   <TypeShadeCode code={`const out = new Uint32Array(1024) // the capacity\nconst n = await strong(xs, 0.5, out) // out holds the first indices, in ascending order`} title="host.ts" />
-  <h3 id="collections">{content.collections}</h3><p><Rich text={content.collectionsP} locale={locale} /></p>
+  <h3 id="collections"><Rich text={content.collections} locale={locale} /></h3><p><Rich text={content.collectionsP} locale={locale} /></p>
   <TypeShadeCode code={`export function labels(pixels: array<u32>, seen: Set<u32>): u32 {\n  for (let i: u32 = 0; i < pixels.length; i++) {\n    if (pixels[i] !== 0) {\n      seen.add(pixels[i])\n    }\n  }\n  return seen.size\n}`} />
   <p><Rich text={content.collectionsReadP} locale={locale} /></p>
   <h2 id="fuse">{content.fuse}</h2><p>{content.fuseIndexP}</p>

@@ -2806,13 +2806,13 @@ export const en = {
         intro:
           'TypeShade uses familiar TypeScript conditional and loop syntax, but the code executes on the GPU. Understand control flow in terms of compilable computation, not the full dynamic behavior of the JavaScript runtime.',
         ts: '1. TypeScript control flow',
-        tsP: 'Syntax such as if/else and for is familiar, but every condition and loop in TypeShade must be lowerable to GPU code. Matching syntax does not imply that all JavaScript runtime semantics are available.',
+        tsP: 'Syntax such as `if`/`else` and `for` is familiar, but every condition and loop in TypeShade must be lowerable to GPU code. Matching syntax does not imply that all JavaScript runtime semantics are available.',
         branch: '2. Branches',
         branchIndexP:
           'TypeShade chooses between paths with the `if` statement and with the conditional expression.',
-        ifStatement: 'The if statement',
+        ifStatement: 'The `if` statement',
         branchP:
-          'Use if/else to express calculation paths. Inside a branch, keep values and resources within the TypeShade GPU model.',
+          'Use `if`/`else` to express calculation paths. Inside a branch, keep values and resources within the TypeShade GPU model.',
         conditional: 'The conditional expression',
         conditionalP:
           'A value chosen by a condition is written `c ? a : b`. WGSL has no `?:` operator. For a scalar or a vector, the WGSL emit is `select(b, a, c)`, with the false value first and the condition last. WGSL evaluates both values.',
@@ -2822,10 +2822,10 @@ export const en = {
         loopIndexP: 'A loop is written as a statement or as an array method.',
         loopStatements: 'Loop statements',
         loopStatementsP:
-          'Write a for loop, a while loop, or for...of over an array. A for loop may count to a value known only at run time, such as a uniform field or the length of an array.',
+          'Write a `for` loop, a `while` loop, or `for...of` over an array. A `for` loop may count to a value known only at run time, such as a uniform field or the length of an array.',
         loopMethods: 'Array methods',
         loopMethodsP:
-          "An array's map, forEach, some, every, reduce, fill, findIndex, findLastIndex, indexOf, lastIndexOf and includes compile too, each to a counted loop, and map takes an array with a fixed length.",
+          "An array's `map`, `forEach`, `some`, `every`, `reduce`, `fill`, `findIndex`, `findLastIndex`, `indexOf`, `lastIndexOf` and `includes` compile too, each to a counted loop, and `map` takes an array with a fixed length.",
         // A kernel function (compiler change 0013): the loop the compiler may run on the GPU.
         kernel: '4. Kernel functions',
         kernelIndexP:
@@ -2868,13 +2868,13 @@ export const en = {
         collect: '5. Collecting results',
         collectIndexP:
           'A loop in a kernel function collects results into an array with `push`, or into a `Map` or a `Set`.',
-        push: 'Appending with push',
+        push: 'Appending with `push`',
         pushP:
           'A loop appends to an array parameter with `out.push(v)`, as a statement, any number of times in an iteration and in any branch. The array starts empty in the function. The elements land in the order a sequential run of the loop appends them, on every tier, and `out.length` after the loop is the count appended.',
         pushCapacity: 'Capacity and count',
         pushHostP:
           'The host array is the capacity. The call writes the first elements up to that capacity and leaves the rest as they were. The count the function returns may exceed the capacity, so a host that sees `n > out.length` can call again with more room. On WebGPU the loop runs in three dispatches: each iteration counts its pushes, one workgroup scans the counts into offsets, and each iteration stores its pushes at its offset. WebGL2 runs no loop that pushes.',
-        collections: 'Map and Set',
+        collections: '`Map` and `Set`',
         collectionsP:
           "A parameter may also be ECMAScript's `Set<K>` or `Map<K, V>`, with `K` a `u32`, an `i32`, an `f32` or a [key type](languageStringKeys). A loop adds to it with `s.add(k)` or `m.set(k, v)`. The host passes JavaScript's own `Set` or `Map`, and when the call resolves it holds the entries a sequential run leaves: each key once, in the order first added, with the value set last.",
         collectionsReadP:
@@ -2906,7 +2906,7 @@ export const en = {
           '`typeshade/algorithms` and `typeshade/random` are kernel functions written in TypeShade, and they fuse with yours in one scope. [Algorithms](languageAlgorithms) and [Random numbers](languageRandom) list them.',
         boundary: '7. Where JavaScript control flow stops',
         boundaryItems: [
-          'Write filter, find and the other array methods that change a length or can give undefined as a loop. findIndex and indexOf give -1 where nothing matches.',
+          'Write `filter`, `find` and the other array methods that change a length or can give `undefined` as a loop. `findIndex` and `indexOf` give -1 where nothing matches.',
           'Do not rely on general runtime objects.',
           'Keep conditions and loop ranges based on GPU-compilable values.',
           'A control-flow pattern valid in TypeScript is not automatically valid under TypeShade shader semantics.',
