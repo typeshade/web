@@ -29,8 +29,8 @@
 // CSS: the owning component stylesheet, under "The construct card". The classes are .construct-cards,
 // .construct-card, .construct-card-head, .construct-card-name, .construct-card-badge,
 // .construct-card-note, .construct-card-panes, .construct-card-pane,
-// .construct-card-pane-title and .construct-card-refusal. The panes sit side by side from
-// 48rem and stack below it, the TypeScript first.
+// .construct-card-pane-title and .construct-card-refusal. The panes sit side by side when the
+// card itself is 48rem wide and stack below it, the TypeScript first.
 import { Code } from 'astro-expressive-code/components';
 import CodeFrame from './CodeFrame.astro';
 import Rich from './Rich.astro';
@@ -76,7 +76,8 @@ const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(loca
     {diagnostic && <span class="inline-block rounded-sm border border-diag bg-transparent px-[7px] text-label whitespace-nowrap text-diag">{refusedLabel}</span>}
   </div>
   <p class="construct-card-note max-inline-[62ch] text-ui text-text-2"><Rich text={becomes} locale={locale} /></p>
-  <div class="mbs-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2">
+  <div class="@container mbs-3">
+  <div class="grid grid-cols-1 items-start gap-3 @3xl:grid-cols-2">
     <div class="construct-card-pane min-inline-0">
       <CodeFrame label={region(tsTitle)} holdTokens>
         <Code code={ts} lang="ts" title={tsTitle} locale={locale} wrap />
@@ -95,6 +96,7 @@ const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(loca
       </div>
     )}
   </div>
+  </div>
 </li>
 
 <style>
@@ -102,8 +104,8 @@ const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(loca
      the card is what separates one construct from the next: the same page as three columns of
      code put a hairline between rows that ran ten lines tall, and a reader could not see where
      a construct ended. The head names the construct, the sentence under it runs at the card's
-     full width, and the panes sit side by side from 48rem and stack below it with the
-     TypeScript first. Every measure is relative to the card, so the cards stay inside the
+     full width, and the panes sit side by side when the card is 48rem wide and stack below it
+     with the TypeScript first. Every measure is relative to the card, so the cards stay inside the
      document column (DESIGN.md, the Container Rule) at every width.
 
      The card sits in the document column, so its list item, heading and paragraphs meet
@@ -122,8 +124,8 @@ const errorPage = diagnostic && errorCodePath(diagnostic.code) ? localePath(loca
     --ec-codePadBlk: 10px; --ec-codePadInl: 12px; --ec-codeFontSize: var(--text-code); --ec-codeLineHt: 1.6;
   }
   .construct-card-pane :global(.expressive-code .copy) { display: none }
-  /* A pane is about 280px wide in the document column, and a line of a real program is longer
-     than that, so a line wraps at a space and reads on under the hanging indent Expressive
+  /* A pane is at least 360px wide, since two panes share a card only from 48rem. A line longer
+     than that wraps at a space and reads on under the hanging indent Expressive
      Code gives it. A name breaks inside itself only where the name alone is wider than the
      pane. Two rules keep a break off the middle of a name: <CodeFrame holdTokens> holds a
      token with a hyphen or an angle bracket in it together, and `overflow-wrap: normal`

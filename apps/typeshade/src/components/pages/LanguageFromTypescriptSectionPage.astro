@@ -39,7 +39,12 @@ for (const g of group.groups) {
   if (!headingOf[g.key]) throw new Error(`[from-typescript] the group '${g.key}' has no heading in the dictionary`);
   if (cardAnchors.has(anchor(g.key))) throw new Error(`[from-typescript] the group '${g.key}' has the anchor of a card`);
 }
-const headings: Heading[] = group.groups.map((g) => ({ depth: 2, slug: anchor(g.key), text: headingOf[g.key]! }));
+// The outline lists each run and, under it, each card: a section holds up to fifteen cards, and
+// the outline is how a reader finds one without scrolling the page.
+const headings: Heading[] = group.groups.flatMap((g) => [
+  { depth: 2, slug: anchor(g.key), text: headingOf[g.key]! },
+  ...g.rows.map((row) => ({ depth: 3, slug: anchor(row.id), text: c.rows[row.id]!.name.replace(/`/g, '') })),
+]);
 // The trail names the set this page belongs to. Four of the six section names (Functions,
 // Control flow and the like) are also pages of the Language guide, so the h1 alone does not say
 // which page a reader is on.
@@ -67,7 +72,7 @@ const setPath = links.languageFromTypescript.href;
   {group.groups.map((run) => (
     <>
       <h2 id={anchor(run.key)}>{headingOf[run.key]}</h2>
-      <ul class="construct-cards grid grid-cols-[repeat(auto-fill,minmax(min(100%,620px),1fr))] gap-4">
+      <ul class="construct-cards grid grid-cols-1 gap-4">
         {run.rows.map((row) => (
           <ConstructCard
             locale={locale}
@@ -89,9 +94,8 @@ const setPath = links.languageFromTypescript.href;
 </Docs>
 
 <style>
-  /* One card per row until two fit. A card holds two code panes side by side, and 620px is
-     where a pane is still the ~280px the panes are written for, so the column answers the
-     extra width with another card instead of stretching one card's panes across it. The list
-     takes the whole column and outranks `.doc ul` and the column's measure on its blocks. */
+  /* One card per row. A card holds two code panes, and they sit side by side only where each
+     pane keeps a line of code readable; the card decides that for itself (ConstructCard.astro).
+     The list takes the whole column and outranks `.doc ul` and the column's measure on its blocks. */
   .construct-cards { max-inline-size: none; margin: 24px 0 0; padding: 0; list-style: none }
 </style>
