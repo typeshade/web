@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  highlightInlineCode,
   highlightTypeScriptBlock,
   highlightTypeScriptInline,
+  isInlineSourceCode,
   isTypeScriptExpression,
   prepareMarkedHighlights,
   typescriptFenceLanguage,
@@ -111,4 +113,47 @@ test("fence aliases and metadata select TS or TSX while unknown languages stay u
     highlighted.has(`block:wgsl:@compute @workgroup_size(1) fn main() {}`),
     false,
   );
+});
+
+test("inline source code covers every span but commands, paths, file names and prose", async () => {
+  for (const code of [
+    "push",
+    "f32",
+    "if",
+    "+=",
+    "c ? a : b",
+    "select(b, a, c)",
+    "vec3<f32>",
+    "@compute",
+    "TS8070",
+  ])
+    assert.equal(isInlineSourceCode(code), true, code);
+  for (const code of [
+    "bun run build",
+    "typeshade/runtime",
+    "@typeshade/mcp",
+    "src/i18n/en.ts",
+    "host.ts",
+    "tsconfig.json",
+    "https://typeshade.dev",
+    "--features",
+    "forward → predict",
+    "This loop runs on the CPU because it is not a counted loop.",
+    "var<private>",
+    "한국어 설명",
+    "",
+  ])
+    assert.equal(isInlineSourceCode(code), false, code);
+});
+
+test("inline code takes the tokens a block gives, with a type name read as a type", async () => {
+  const text = (html) => textContent(html);
+  assert.equal(text(await highlightInlineCode("Map<K, V>")), "Map<K, V>");
+  assert.equal(text(await highlightInlineCode("f32")), "f32");
+  const type = await highlightInlineCode("f32");
+  const annotated = await highlightTypeScriptBlock("let x: f32");
+  const color = (html, word) =>
+    html.match(new RegExp(`--shiki-light:(#\\w+)[^>]*>${word}<`))?.[1];
+  assert.equal(color(type, "f32"), color(annotated, "f32"));
+  assert.equal(await highlightInlineCode("src/i18n/en.ts"), undefined);
 });

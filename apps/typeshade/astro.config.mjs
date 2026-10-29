@@ -10,7 +10,6 @@ import rehypeMath from './src/lib/rehype-math.mjs';
 import remarkApiLinks from './src/lib/remark-api-links.mjs';
 import remarkDocTables from './src/lib/remark-doc-tables.mjs';
 import remarkErrorLinks from './src/lib/remark-error-links.mjs';
-import remarkInlineCodeHighlight from './src/lib/remark-inline-code-highlight.mjs';
 import remarkPackageName from './src/lib/remark-package-name.mjs';
 import remarkPromoteBoldLeads from './src/lib/remark-promote-bold-leads.mjs';
 import remarkRuleLinks from './src/lib/remark-rule-links.mjs';
@@ -168,7 +167,6 @@ export default defineConfig({
       remarkPromoteBoldLeads,
       remarkDocTables,
       remarkApiLinks,
-      remarkInlineCodeHighlight,
       remarkErrorLinks,
       remarkRuleLinks,
       // Formulas in LaTeX, `$…$` and `$$…$$`, rendered to MathML by rehypeMath (src/lib/math.mjs).

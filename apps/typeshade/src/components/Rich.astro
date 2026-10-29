@@ -16,8 +16,6 @@ import { renderMath } from '../lib/math.mjs';
 import { OPEN_VERIFICATIONS, mentionParts, ruleByNumber, rulePath } from '../lib/design-rules.ts';
 import { apiPage, links } from '../lib/links.ts';
 import { copyFor, defaultLocale, localePath, ruleWords, type Locale } from '../i18n/index.ts';
-import '@typeshade/site-ui/code-highlight.css';
-import { highlightTypeScriptInline } from '@typeshade/site-ui/code/highlight';
 
 interface Props {
   text: string;
@@ -58,8 +56,8 @@ const PAGES: Record<string, string> = {
 
 type Part =
   | { kind: 'text'; value: string }
-  | { kind: 'code'; value: string; highlighted?: string }
-  | { kind: 'link'; value: string; href: string; code: boolean; auto?: true; highlighted?: string }
+  | { kind: 'code'; value: string }
+  | { kind: 'link'; value: string; href: string; code: boolean; auto?: true }
   | { kind: 'flag'; value: string }
   | { kind: 'math'; value: string };
 
@@ -124,30 +122,22 @@ if (written !== rendered) {
   throw new Error(`[Rich] ${written} link(s) written, ${rendered} rendered; a key may hold a character the pattern refuses: ${text.slice(0, 80)}`);
 }
 
-// Complete the synchronous link and first-mention decisions before Shiki's async work. Most
-// backticks name APIs and stay in the code face; expressions with clear TS syntax get tokens.
-const highlightedParts: Part[] = await Promise.all(withRules.map(async (part) => {
-  if (part.kind === 'code' || (part.kind === 'link' && part.code)) {
-    return { ...part, highlighted: await highlightTypeScriptInline(part.value) };
-  }
-  return part;
-}));
 ---
 
 {
-  highlightedParts.map((p) =>
+  withRules.map((p) =>
     p.kind === 'text' ? (
       p.value
     ) : p.kind === 'code' ? (
-      p.highlighted ? <Fragment set:html={p.highlighted} /> : <code>{p.value}</code>
+      <code>{p.value}</code>
     ) : p.kind === 'math' ? (
       <Fragment set:html={p.value} />
     ) : p.kind === 'flag' ? (
       <span class="ms-1.5 whitespace-nowrap rounded-sm border border-line-2 bg-surface-1 px-1.5 text-label text-text-2">{p.value}</span>
     ) : inert ? (
-      p.code ? (p.highlighted ? <Fragment set:html={p.highlighted} /> : <code>{p.value}</code>) : p.value
+      p.code ? (<code>{p.value}</code>) : p.value
     ) : (
-      <a href={p.href}>{p.code ? (p.highlighted ? <Fragment set:html={p.highlighted} /> : <code>{p.value}</code>) : p.value}</a>
+      <a href={p.href}>{p.code ? (<code>{p.value}</code>) : p.value}</a>
     ),
   )
 }
