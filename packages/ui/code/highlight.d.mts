@@ -2,6 +2,11 @@ export function isTypeScriptExpression(value: string): boolean;
 export function highlightTypeScriptInline(
   value: string,
 ): Promise<string | undefined>;
+export function isInlineSourceCode(value: string): boolean;
+export function highlightInlineCode(
+  value: string,
+  options?: { langs?: readonly unknown[] },
+): Promise<string | undefined>;
 export function highlightTypeScriptBlock(
   value: string,
   language?: "typescript" | "tsx",

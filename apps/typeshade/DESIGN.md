@@ -432,10 +432,15 @@ cards takes the column. A third measure needs a reason.
 - **Tag.** A 12px chip with a 4px radius, a `#d9d9d9` border and the `#fafafa` fill: an
   optional parameter, a target's support state, the one example that emits a single target.
   The target state that reads "not supported" swaps the border and text to the red.
-- **Inline code.** Identifiers in document prose use Plex Mono at weight 500, a surface-2
-  fill, a line-2 border and a 4px radius. Small internal padding separates the text from its
-  frame. Wrapped calls repeat the decoration on each line. Long identifiers wrap within the
-  reading column, and linked code retains the link colour. Both themes use the shared tokens.
+- **Inline code.** Identifiers in document prose use Plex Mono at weight 400, as the code
+  frames do, on a surface-2 fill with a line-2 border and a 4px radius. Small internal padding
+  separates the text from its frame. Wrapped calls repeat the decoration on each line. Long
+  identifiers wrap within the reading column. Both themes use the shared tokens.
+  Every span gets the tokens of a code frame: the same GitHub themes, the same TypeShade
+  grammar and the same 5.5:1 colour floor, so a word has one colour in a sentence and in a
+  frame. `src/middleware.ts` applies this to the finished page (`src/lib/highlight-html.mjs`),
+  so a component only writes `<code>`. A command, a path, a module specifier, a file name, a
+  URL, a flag and a sentence keep the plain code face (`isInlineSourceCode`).
 - **Code frames.** Expressive Code in the same shape as a card: 8px radius, a 1px `#f0f0f0`
   border, a `#fafafa` tab bar, white code at 13px, no shadow. The copy button is the one piece
   of chrome the plugin draws itself, and it carries the page's language.

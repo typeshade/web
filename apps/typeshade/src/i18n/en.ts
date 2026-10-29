@@ -2802,52 +2802,103 @@ export const en = {
         h1: 'Control flow: familiar syntax, explicit GPU execution',
         intro:
           'TypeShade uses familiar TypeScript conditional and loop syntax, but the code executes on the GPU. Understand control flow in terms of compilable computation, not the full dynamic behavior of the JavaScript runtime.',
-        ts: '1. Start from the TypeScript control-flow model',
+        ts: '1. TypeScript control flow',
         tsP: 'Syntax such as if/else and for is familiar, but every condition and loop in TypeShade must be lowerable to GPU code. Matching syntax does not imply that all JavaScript runtime semantics are available.',
-        branch: '2. Branching',
+        branch: '2. Branches',
+        branchIndexP:
+          'TypeShade chooses between paths with the `if` statement and with the conditional expression.',
+        ifStatement: 'The if statement',
         branchP:
           'Use if/else to express calculation paths. Inside a branch, keep values and resources within the TypeShade GPU model.',
-        branchValueP: `A value chosen by a condition is written \`c ? a : b\`. WGSL has no \`?:\` operator. For a scalar or a vector, the WGSL emit is \`select(b, a, c)\`, with the false value first and the condition last. WGSL evaluates both values. An arm that calls a function of the file, reads a texture or holds eight or more operations is lowered to a variable and an \`if\` by the compiler, so only the arm taken runs (Rule 7.2); a cheap arm stays \`select\`. ${glsl} keeps \`?:\` for the cheap arm and takes the same \`if\` for the costly one. A struct or an array is chosen through a variable and an \`if\` on both targets.`,
+        conditional: 'The conditional expression',
+        conditionalP:
+          'A value chosen by a condition is written `c ? a : b`. WGSL has no `?:` operator. For a scalar or a vector, the WGSL emit is `select(b, a, c)`, with the false value first and the condition last. WGSL evaluates both values.',
+        costlyArm: 'Costly arms',
+        costlyArmP: `An arm that calls a function of the file, reads a texture or holds eight or more operations is lowered to a variable and an \`if\` by the compiler, so only the arm taken runs (Rule 7.2). A cheap arm stays \`select\`. ${glsl} keeps \`?:\` for the cheap arm and takes the same \`if\` for the costly one. A struct or an array is chosen through a variable and an \`if\` on both targets.`,
         loop: '3. Loops',
-        loopP:
-          "Write a for loop, a while loop, or for...of over an array. A for loop may count to a value known only at run time, such as a uniform field or the length of an array. An array's map, forEach, some, every, reduce, fill, findIndex, findLastIndex, indexOf, lastIndexOf and includes compile too, each to a counted loop, and map takes an array with a fixed length.",
+        loopIndexP: 'A loop is written as a statement or as an array method.',
+        loopStatements: 'Loop statements',
+        loopStatementsP:
+          'Write a for loop, a while loop, or for...of over an array. A for loop may count to a value known only at run time, such as a uniform field or the length of an array.',
+        loopMethods: 'Array methods',
+        loopMethodsP:
+          "An array's map, forEach, some, every, reduce, fill, findIndex, findLastIndex, indexOf, lastIndexOf and includes compile too, each to a counted loop, and map takes an array with a fixed length.",
         // A kernel function (compiler change 0013): the loop the compiler may run on the GPU.
-        kernel: '4. A loop that runs as a kernel',
-        kernelP:
-          "An exported function that is not an entry point and takes an array with no size, `array<T>`, or a 2D storage texture, `texture_storage_2d<F, A>`, is a kernel function (Rule 8.22). A sampled texture alone makes none, so an exported helper that reads one stays a helper. The array or the texture is the caller's, read and written in place. Each `for` at the top of its body is a loop the compiler may run on the GPU, one invocation per iteration, and a host file awaits the function like any import. No `@compute`, binding or `global_invocation_id` is written. `@workgroup_size([128])` before the function sets the workgroup of its loops on WebGPU, which is 64 without it. A loop that reduces always runs in workgroups of 256, so the attribute on a function with such a loop is refused (`TS8077`). The last workgroup of a dispatch holds the lanes past the loop's last iteration, and none of them returns early: a workgroup wholly past the end returns as one, and in the workgroup that holds the last iteration such a lane runs that iteration again with every write masked, so every lane of a workgroup runs the same control flow, the form that completed on a D3D12 device where an early return hung. Where that lane would read what another lane writes, it skips the iteration under the same flag. The results do not change on any tier.",
-        kernelRulesP:
-          "The compiler runs a loop on the GPU when it proves that no iteration touches what another one does. The loop is a counted `for`, or a `for...of`, that steps by a constant and that nothing returns from or breaks out of. Each write lands on a name declared inside the loop, on an outer array or a texture at an index made from the loop's own, on an integer array the loop combines into at any index, on a variable the loop combines with `+=`, `*=`, `min`, `max`, `&`, `|` or `^`, which the GPU and the CPU fold in one tree order, on an array the loop only appends to with `push`, or on a `Map` or a `Set` the loop adds to. The loop reads an array it writes only where it writes it. It never reads a variable it combines, an array it appends to or a `Map` or a `Set` it adds to. It calls no function that writes a module variable or a binding, and has no barrier, no workgroup memory and no `console` call.",
-        kernelLayoutP:
-          'An ordinary WebGPU kernel call can upload only live fields of a read-only object array. Flat `f32`, `i32` and `u32` fields keep declaration order. Every declared host field is still validated, with property-read order preserved. Written, resident, fused and unproved inputs keep the full layout; so do modules built with `typeshade({ fuse: true })`. Entry bindings, reflection, manifests and raw bytes keep their external layout. CPU and WebGL2 retain their representation. Smaller uploads do not guarantee a faster complete call; physical-device measurements remain necessary.',
-        kernelWarnP:
-          'A loop the proof refuses runs on the CPU, and the program is correct either way. The proof never looks at a loop in an entry, a helper or a fragment shader, which stays per-invocation code. The compiler marks a refused loop with the warning `TS8070`: its first sentence names the line and the names in your code, and its second gives the remedy. At the pinned compiler the warnings read:',
-        kernelRule: 'Rule',
-        kernelWarning: 'Warning',
-        // An array's methods, push, and Map and Set in a kernel function (compiler changes 0078,
-        // 0079 and 0080).
-        methods: "5. An array's methods, push, Map and Set",
+        kernel: '4. Kernel functions',
+        kernelIndexP:
+          'A kernel function holds loops that the compiler may run on the GPU. The sections below state what makes one, which loops run, how the workgroup is sized and what the compiler reports.',
+        kernelFunction: 'What a kernel function is',
+        kernelFunctionP:
+          "An exported function that is not an entry point and takes an array with no size, `array<T>`, or a 2D storage texture, `texture_storage_2d<F, A>`, is a kernel function (Rule 8.22). A sampled texture alone makes none, so an exported helper that reads one stays a helper. The array or the texture is the caller's, read and written in place.",
+        kernelCallP:
+          'Each `for` at the top of its body is a loop the compiler may run on the GPU, one invocation per iteration, and a host file awaits the function like any import. No `@compute`, binding or `global_invocation_id` is written.',
+        kernelProof: 'Loops that run on the GPU',
+        kernelShapeP:
+          'The compiler runs a loop on the GPU when it proves that no iteration touches what another one does. The loop is a counted `for`, or a `for...of`, that steps by a constant and that nothing returns from or breaks out of.',
+        kernelWritesP:
+          "Each write lands on a name declared inside the loop, on an outer array or a texture at an index made from the loop's own, on an integer array the loop combines into at any index, on a variable the loop combines with `+=`, `*=`, `min`, `max`, `&`, `|` or `^`, which the GPU and the CPU fold in one tree order, on an array the loop only appends to with `push`, or on a `Map` or a `Set` the loop adds to.",
+        kernelReadsP:
+          'The loop reads an array it writes only where it writes it. It never reads a variable it combines, an array it appends to or a `Map` or a `Set` it adds to. It calls no function that writes a module variable or a binding, and has no barrier, no workgroup memory and no `console` call.',
+        workgroupSize: 'Workgroup size',
+        workgroupSizeP:
+          '`@workgroup_size([128])` before the function sets the workgroup of its loops on WebGPU, which is 64 without it. A loop that reduces always runs in workgroups of 256, so the attribute on a function with such a loop is refused (`TS8077`).',
+        lastWorkgroup: 'The last workgroup',
+        lastWorkgroupP:
+          "The last workgroup of a dispatch holds the lanes past the loop's last iteration, and none of them returns early. A workgroup wholly past the end returns as one. In the workgroup that holds the last iteration, such a lane runs that iteration again with every write masked. So every lane of a workgroup runs the same control flow, the form that completed on a D3D12 device where an early return hung.",
+        lastWorkgroupReadP:
+          'Where that lane would read what another lane writes, it skips the iteration under the same flag. The results do not change on any tier.',
+        // An array's methods in a kernel function (compiler change 0078).
+        kernelMethods: 'Array methods in a kernel function',
         methodsP:
           "The methods of an array but `map` work on a kernel function's array too: `forEach`, `reduce`, `some`, `every`, `fill`, `findIndex`, `findLastIndex`, `indexOf`, `lastIndexOf` and `includes` (Rule 8.18). Each is the loop it stands for, written into the function where the call is, with the function handed over as the loop's body. The proof reads it as it reads a `for` loop, so both loops below run on the GPU: `forEach` writes `out` at its own index, and `reduce` with `+` is a reduction.",
         methodsOrderP:
           'A `reduce` adds in the tree order of a reduction on every tier, and TypeScript adds from left to right, so an `f32` sum may differ in the last places. The determinism report lists it as `order` (Rule 7.2). `some`, `every` and `includes` are an `|` and an `&` over every element. `findIndex`, `indexOf` and their `Last` forms are a `min` or a `max` of the index, which give the answer of the first element that decides. A function handed over runs for every element, so one that writes what it captures is refused.',
+        kernelWarn: 'Refused loops',
+        kernelWarnP:
+          'A loop the proof refuses runs on the CPU, and the program is correct either way. The proof never looks at a loop in an entry, a helper or a fragment shader, which stays per-invocation code. The compiler marks a refused loop with the warning `TS8070`: its first sentence names the line and the names in your code, and its second gives the remedy. At the pinned compiler the warnings read:',
+        kernelRule: 'Rule',
+        kernelWarning: 'Warning',
+        kernelLayout: 'Upload layout',
+        kernelLayoutP:
+          'An ordinary WebGPU kernel call can upload only live fields of a read-only object array. Flat `f32`, `i32` and `u32` fields keep declaration order. Every declared host field is still validated, with property-read order preserved. Written, resident, fused and unproved inputs keep the full layout; so do modules built with `typeshade({ fuse: true })`. Entry bindings, reflection, manifests and raw bytes keep their external layout. CPU and WebGL2 retain their representation. Smaller uploads do not guarantee a faster complete call; physical-device measurements remain necessary.',
+        // push, and Map and Set in a kernel function (compiler changes 0079 and 0080).
+        collect: '5. Collecting results',
+        collectIndexP:
+          'A loop in a kernel function collects results into an array with `push`, or into a `Map` or a `Set`.',
+        push: 'Appending with push',
         pushP:
           'A loop appends to an array parameter with `out.push(v)`, as a statement, any number of times in an iteration and in any branch. The array starts empty in the function. The elements land in the order a sequential run of the loop appends them, on every tier, and `out.length` after the loop is the count appended.',
+        pushCapacity: 'Capacity and count',
         pushHostP:
           'The host array is the capacity. The call writes the first elements up to that capacity and leaves the rest as they were. The count the function returns may exceed the capacity, so a host that sees `n > out.length` can call again with more room. On WebGPU the loop runs in three dispatches: each iteration counts its pushes, one workgroup scans the counts into offsets, and each iteration stores its pushes at its offset. WebGL2 runs no loop that pushes.',
+        collections: 'Map and Set',
         collectionsP:
-          "A parameter may also be ECMAScript's `Set<K>` or `Map<K, V>`, with `K` a `u32`, an `i32`, an `f32` or a [key type](languageStringKeys). A loop adds to it with `s.add(k)` or `m.set(k, v)`. The host passes JavaScript's own `Set` or `Map`, and when the call resolves it holds the entries a sequential run leaves: each key once, in the order first added, with the value set last. A later loop reads it with `has`, `get` and `size`, and reads `m.get(k)!` only where `m.has(k)` guards it. Collection loops run on WebGPU and the CPU tier. WebGL2 cannot run them. String keys convert to ids before the loops and back afterward, preserving insertion order. An unknown host string is a `TypeError`. Open `Map<string, V>` and `Set<string>` stay refused. [kernel-set-unique](exampleKernelSetUnique) and [host-set-unique](exampleHostSetUnique) show both.",
+          "A parameter may also be ECMAScript's `Set<K>` or `Map<K, V>`, with `K` a `u32`, an `i32`, an `f32` or a [key type](languageStringKeys). A loop adds to it with `s.add(k)` or `m.set(k, v)`. The host passes JavaScript's own `Set` or `Map`, and when the call resolves it holds the entries a sequential run leaves: each key once, in the order first added, with the value set last.",
+        collectionsReadP:
+          'A later loop reads it with `has`, `get` and `size`, and reads `m.get(k)!` only where `m.has(k)` guards it. Collection loops run on WebGPU and the CPU tier. WebGL2 cannot run them. String keys convert to ids before the loops and back afterward, preserving insertion order. An unknown host string is a `TypeError`. Open `Map<string, V>` and `Set<string>` stay refused. [kernel-set-unique](exampleKernelSetUnique) and [host-set-unique](exampleHostSetUnique) show both.',
         // A chain of kernel calls (compiler changes 0058, 0069, 0071, 0072, 0074 and 0075).
-        fuse: '6. A chain of kernel calls',
+        fuse: '6. Chains of kernel calls',
+        fuseIndexP:
+          'A host can run several kernel calls as one plan. The sections below state how calls fuse, what the report says, how the plan takes its workgroup counts and constants, which resources it uses and which kernels the library supplies.',
+        fuseCalls: 'Fusing calls',
         fuseP:
-          'A host can call several kernel functions inside `device.fuse()` without a registration import (Rule 11.13). `fuse()` from `typeshade/fuse` remains supported for the default owner. At this compiler pin, `typeshade({ fuse: true })` still supplies the facts needed to combine eligible calls. On WebGPU, calls that read what the call before them wrote at the same index run as one dispatch, in one submission. The report the scope returns names each group, and says why two calls run apart. An entry call in the body forms a group of its own, and so does a loop that pushes onto an array. A call taking a `Map` or `Set` also forms its own group, reporting `b takes a Map or a Set` or its CPU fallback reason. `FuseReport` and `mergeReports`, which adds several reports into one, come from `typeshade/runtime` too, so a host that only reads reports ships no planner.',
+          'A host can call several kernel functions inside `device.fuse()` without a registration import (Rule 11.13). `fuse()` from `typeshade/fuse` remains supported for the default owner. At this compiler pin, `typeshade({ fuse: true })` still supplies the facts needed to combine eligible calls. On WebGPU, calls that read what the call before them wrote at the same index run as one dispatch, in one submission.',
+        fuseReport: 'The fuse report',
+        fuseReportP:
+          'The report the scope returns names each group, and says why two calls run apart. An entry call in the body forms a group of its own, and so does a loop that pushes onto an array. A call taking a `Map` or `Set` also forms its own group, reporting `b takes a Map or a Set` or its CPU fallback reason. `FuseReport` and `mergeReports`, which adds several reports into one, come from `typeshade/runtime` too, so a host that only reads reports ships no planner.',
+        fuseIndirect: 'Indirect workgroup counts',
         fuseIndirectP:
           'An entry call may take its workgroup count from an array an earlier call wrote. `entry(bindings, { indirect, offset })` reads the three counts at element `offset` of a `Resident<Uint32Array>` when the call runs. A chain of calls then needs no read between them, and in a scope the group of such a call reports `indirect: true`.',
+        fuseConstants: 'Constants on an entry',
         fuseOverrideP:
           'Inside `device.fuse()`, an imported compute entry takes the same optional `{ constants }` third argument as a direct call. Its runtime-sized storage arrays are Residents of that owner. The call remains a group of its own in the plan’s submission and keeps the owner’s fp64 flavor. On WebGPU its `workgroupShapes` reports the selected dimensions, such as `[[32, 1, 1]]`. Selecting constants adds no submission, fence or readback. The [host-compute example](exampleHostCompute) returns the report and reads its output after the plan.',
+        device: 'Devices and owners',
         deviceP:
           "`createDevice()` from `typeshade/runtime` opens an owner of the calls. `device.array()` makes the `Resident` arrays its calls take, and `device.fuse()` runs a body's calls as one plan on that device. Ordinary calls infer the unique owner of their arrays and textures. Calls without owned resources use the default owner. Mixing owners is refused before execution, and each `Resident` keeps its owner for its life. `device.release(r)` gives an array back to the device's pool for the next `array()` of the same element and length.",
+        chunk: 'Chunks',
         chunkP:
           "A kernel that iterates inside one dispatch can run long enough for a GPU watchdog to reset the device. Cut its loop into chunks. `device.chunkSize(key, max)` gives the units of the next chunk under the device's time budget, `createDevice({ timeBudgetMs })`, and `device.fuse(body, { chunk: { key, units } })` runs and times that chunk alone. The report gains a `chunk` row, and `device.chunkRates` holds what the device measured.",
+        modules: 'Library kernels',
         modulesP:
           '`typeshade/algorithms` and `typeshade/random` are kernel functions written in TypeShade, and they fuse with yours in one scope. [Algorithms](languageAlgorithms) and [Random numbers](languageRandom) list them.',
         boundary: '7. Where JavaScript control flow stops',
