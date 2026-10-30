@@ -16,12 +16,12 @@
   ],
   "builds": [
     {
-      "revision": "a21f702467d242ceccd9bafb5d92fafcf3886890",
-      "runtime": "a21f702467d242ceccd9bafb5d92fafcf3886890",
-      "runtimeDigest": "976d6bef3b47408808bdb674e3f93098565076d1f0d317a705506a5f2865e1f0",
+      "revision": "b502924f415ed0f23a41e286e4fa424b9906ea25",
+      "runtime": "b502924f415ed0f23a41e286e4fa424b9906ea25",
+      "runtimeDigest": "16f4aac39ff999e6e645c7e4ebd39799317317829bd21493d74a1988ae0f55fb",
       "inputProjection": true,
-      "url": "/benchmarks/artifacts/976d6bef3b47408808bdb674e3f93098565076d1f0d317a705506a5f2865e1f0.js",
-      "bytes": 505394,
+      "url": "/benchmarks/artifacts/16f4aac39ff999e6e645c7e4ebd39799317317829bd21493d74a1988ae0f55fb.js",
+      "bytes": 513803,
       "cases": [
         {
           "id": "layout-aos-8-read-1",
@@ -458,12 +458,12 @@
       ]
     },
     {
-      "revision": "3e1e8420a5313e045beb175131148920bfdc2d07",
-      "runtime": "3e1e8420a5313e045beb175131148920bfdc2d07",
-      "runtimeDigest": "976d6bef3b47408808bdb674e3f93098565076d1f0d317a705506a5f2865e1f0",
+      "revision": "49f4f2884c0c38dc6134c837efd5565e5395b721",
+      "runtime": "49f4f2884c0c38dc6134c837efd5565e5395b721",
+      "runtimeDigest": "f7a6a017f204290717bab1fb9aa8923583788c13973717a2e1aed5aca2ec2965",
       "inputProjection": true,
-      "url": "/benchmarks/artifacts/976d6bef3b47408808bdb674e3f93098565076d1f0d317a705506a5f2865e1f0.js",
-      "bytes": 505394,
+      "url": "/benchmarks/artifacts/f7a6a017f204290717bab1fb9aa8923583788c13973717a2e1aed5aca2ec2965.js",
+      "bytes": 554218,
       "cases": [
         {
           "id": "layout-aos-8-read-1",
@@ -557,8 +557,8 @@
           "dispatches": 1,
           "separate": false,
           "source": "\"use typeshade\";\nclass Args { n: u32; }\nclass Item { f0: f32; f1: f32; f2: f32; f3: f32; f4: f32; f5: f32; f6: f32; f7: f32; }\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<Item>>;\ndeclare const out: storage<array<f32>, \"read_write\">;\n\n@compute([64])\nexport function main(@builtin(\"global_invocation_id\") gid: vec3u): void {\n const i: u32 = gid.x;\n if (i >= args.n) { return; }\n out[i] = src[i].f0 + src[i].f1 + src[i].f2 + src[i].f3 + src[i].f4 + src[i].f5 + src[i].f6 + src[i].f7;\n}",
-          "wgsl": "struct Args {\n  n: u32,\n}\n\nstruct Item {\n  f0: f32,\n  f1: f32,\n  f2: f32,\n  f3: f32,\n  f4: f32,\n  f5: f32,\n  f6: f32,\n  f7: f32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<Item>;\n@group(0) @binding(2) var<storage, read_write> out: array<f32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  let _lc0 = src[i];\n  out[i] = _lc0.f0 + _lc0.f1 + _lc0.f2 + _lc0.f3 + _lc0.f4 + _lc0.f5 + _lc0.f6 + _lc0.f7;\n}\n",
-          "shader": "7ff10aef509970d21f9159edc0d03b224ee5b91021bbca4898d3f66f0f2ef347",
+          "wgsl": "struct Args {\n  n: u32,\n}\n\nstruct Item {\n  f0: f32,\n  f1: f32,\n  f2: f32,\n  f3: f32,\n  f4: f32,\n  f5: f32,\n  f6: f32,\n  f7: f32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<Item>;\n@group(0) @binding(2) var<storage, read_write> out: array<f32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  if ((i >= args.n)) {\n    return;\n  }\n  out[i] = src[i].f0 + src[i].f1 + src[i].f2 + src[i].f3 + src[i].f4 + src[i].f5 + src[i].f6 + src[i].f7;\n}\n",
+          "shader": "119c87477a995920854702763455ff218daa73607609d347b01da4035c79c969",
           "bindings": [
             { "name": "args", "binding": 0, "group": 0 },
             { "name": "src", "binding": 1, "group": 0 },
@@ -900,5 +900,5 @@
       ]
     }
   ],
-  "digest": "53d2b5fcd8bd7f7bc625dcaaec5766b93c30c2bbaef8566cf0a60d95ae1e8ab1"
+  "digest": "c9126d524a750b2311f44da2acbbcaafe42e8d10e83aa6f6957428923fce4a6a"
 }
