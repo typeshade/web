@@ -451,6 +451,7 @@ cards takes the column. A third measure needs a reason.
   declares. The names come from the language registry (`src/lib/code-names.ts`). A link, a control,
   navigation and a script keep their text. A word the registry does not hold, and a plain word
   such as `bool`, still needs the author's backticks.
+
 - **Code frames.** Expressive Code in the same shape as a card: 8px radius, a 1px `#f0f0f0`
   border, a `#fafafa` tab bar, white code at 13px, no shadow. The copy button is the one piece
   of chrome the plugin draws itself, and it carries the page's language.
