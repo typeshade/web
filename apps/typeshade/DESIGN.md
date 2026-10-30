@@ -441,6 +441,17 @@ cards takes the column. A third measure needs a reason.
   frame. `src/middleware.ts` applies this to the finished page (`src/lib/highlight-html.mjs`),
   so a component only writes `<code>`. A command, a path, a module specifier, a file name, a
   URL, a flag and a sentence keep the plain code face (`isInlineSourceCode`).
+
+  A name of the language in plain text is code as well, so a sentence needs no backticks for it.
+  `wrapKnownNames` (`src/lib/highlight-html.mjs`) wraps, before the tokens are added: the type
+  names with a digit (`f32`, `vec3`, `mat4x4`), the builtin values and functions that no sentence
+  uses as a word (`global_invocation_id`, `atan2`), an attribute with its arguments
+  (`@builtin("position")`), a generic form (`uniform<T>`), a call of a function whose name is also
+  a word (`dot(a, b)`, but not "a dot"), and a camelCase name that a code block of the same page
+  declares. The names come from the language registry (`src/lib/code-names.ts`). A link, a control,
+  navigation and a script keep their text. A word the registry does not hold, and a plain word
+  such as `bool`, still needs the author's backticks.
+
 - **Code frames.** Expressive Code in the same shape as a card: 8px radius, a 1px `#f0f0f0`
   border, a `#fafafa` tab bar, white code at 13px, no shadow. The copy button is the one piece
   of chrome the plugin draws itself, and it carries the page's language.
