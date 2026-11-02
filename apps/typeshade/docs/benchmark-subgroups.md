@@ -132,6 +132,43 @@ compile them. The probe stays fixed WGSL, since it belongs to the instrument and
 build under comparison. The validation record above describes the fixed-WGSL revision at
 `de6a75d`; the record for this revision is on the pull request.
 
+### Validation record of the revision
+
+Observed on 2026-11-02 UTC on branch `claude/benchmark-subgroups` at `19349d5`, base `main`
+`66d2e50`, compiler pin `cdb12dc`. Node 22.23.4, Bun 1.4.3 for the catalog and 1.4.4 for the
+tests, Playwright's Chromium on SwiftShader, Wrangler from the lockfile with a temporary local
+D1. The Astro build ran with `--max-old-space-size=12288`.
+
+| Command                                                         | Observed result                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun@1.4.3 scripts/regression-catalog.ts --new`, then `--check` | Reproduced; builds `8c088df7` and `cdb12dc0`, 26 cases each, workload `36a4ba89…`, digest `2cfc0a9e…`. The baseline records `TS8024` on the two reductions and `TS8004` on the atomic case; the candidate's three subgroup programs carry `enable subgroups;`. The `atomics-bins-1-workgroup` program compiles to the same bytes on both builds. The runtime artifacts are unchanged.                                                                                                                                                                                                                                              |
+| `bun test scripts/`                                             | Passed; 113 tests, 614 expectations.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `bun run check:types`                                           | Passed for the site and the Worker.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `bun run build`                                                 | Passed, with every check it runs first.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `qa:seo`, `qa:worker-routes`, `qa:openseo`                      | Passed; 2,682 pages, 2,562 sitemap entries; 8 prefixes shadow no page; no warning or critical issue.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `check:benchmark-catalog`, `check:notes --dist`, `test:styles`  | Passed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `PLAYWRIGHT_CHROMIUM=… node scripts/check-benchmarks.mjs`       | Passed: 68 quick and 204 extended rows; the three subgroup cases are `refused` on the baseline (3 and 9 rows) and every other row passed with its corruption probe; the probe saw size 4, 16 subgroups per workgroup of 64, consecutive lanes; with the feature hidden, the candidate's three cases are `unsupported` (3 rows), the baseline's refusals stand and the run completes; receipts, retry, cancellation, corrupt artifact and corrupt program checks as before; both locales and themes at 390 and 1440. The first run on `11107db` failed in the quick-run assertion that still expected every row passed (`19349d5`). |
+
+Layout unchanged: header 65 pixels, run control 44, charts 836 pixels wide at 1440 and 358 at 390.
+
+Medians of the device time on this software adapter, extended profile, 262,144 elements, in
+milliseconds per dispatch, baseline build then candidate build:
+
+| Case                        | Baseline | Candidate |
+| --------------------------- | -------- | --------- |
+| `reduction-workgroup`       | 84.58    | 91.21     |
+| `reduction-subgroup`        | refused  | 41.41     |
+| `reduction-subgroup-levels` | refused  | 57.37     |
+| `atomics-bins-1`            | 9.87     | 11.64     |
+| `atomics-bins-1-subgroup`   | refused  | 5.38      |
+| `atomics-bins-1-workgroup`  | 86.06    | 82.46     |
+
+The compiled programs reproduce the fixed-WGSL numbers above within the run's noise: the
+subgroup reduction takes about half the workgroup tree's time on this device, and the subgroup
+fold before one atomic about half the per-lane atomics' time. None of this is a GPU result.
+
+Not run: a hardware adapter; the production collector.
+
 ## Status
 
 In progress: the conversion is on PR #22, waiting on its checks and the owner's go-ahead.
