@@ -2221,7 +2221,7 @@ export const en = {
       meaningP:
         "A few names are in both languages and mean different things. GLSL's `mod` rounds the quotient down, and WGSL's `%` truncates it toward zero. WGSL's `round` sends a half to the even integer and GLSL's may send it either way, so the compiler writes `roundEven`. TypeShade has `mod` and `%`, and the compiler writes each target the text that keeps the meaning.",
       swizzleP:
-        'GLSL can assign to several components at once, as in `c.xy = uv`. WGSL writes one component at a time, so the compiler refuses that assignment with `TS8018`. An assignment to one component, `c.x = uv.x`, compiles.',
+        'GLSL can assign to several components at once, as in `c.xy = uv`, and so can TypeShade (change 0106): the compiler reads the old components the operation needs into a `let`, then writes each destination component in turn, so WGSL needs no `swizzle_assignment` extension. A swizzle that names a component twice, `c.xx = uv`, is refused with `TS8018`.',
       colGlsl: `${facts.glslTarget}`,
       colWgsl: 'WGSL',
       colSource: 'TypeShade',
@@ -2703,7 +2703,7 @@ export const en = {
           'When fields do not need decorators, a type alias is the smallest representation. It is also useful when the same GPU value shape is shared across helper parameters and return values.',
         struct: '2. A class is a struct and its functions',
         structP:
-          'A TypeShade class is a GPU struct and the functions written with it. The fields are the bytes the host writes. A constructor, a method and a static function each lower to a plain function, so `new Ray(o, d)` calls `Ray_new` and `r.at(t)` calls `Ray_at(r, t)`. Nothing keeps an object alive between them.',
+          'A TypeShade class is a GPU struct and the functions written with it. The fields are the bytes the host writes. A constructor, a method and a static function each lower to a plain function, so `new Ray(o, d)` calls `Ray_new` and `r.at(t)` calls `Ray_at(&r, t)` when `r` is a `let`, so the method reads and writes the object in place, and `Ray_at(r, t)` when it is a `const` (Rule 8.28). Nothing keeps an object alive between them. A class is its struct and its functions (Rule 8.29): every rule for a struct applies to its fields and every rule for a function to its constructor, its methods, its accessors and its static functions, wherever a struct or a function can be. A method that changes its object, called on an element of the array a kernel function takes, is a write to that element, as an `@inout` argument is.',
         attrs: '3. Field decorators describe layout',
         attrsP:
           'A field takes `@location` and `@builtin`, which bind it to the pipeline, and `@interpolate`, `@invariant` and `@blend_src`, which qualify a varying or an output. `@align` is read and refused, and `@size`, `@offset` and `@ignore` are not attributes the compiler knows. The whole set it accepts is `@vertex`, `@fragment`, `@compute`, `@builtin`, `@location`, `@interpolate`, `@invariant`, `@blend_src`, `@diagnostic`, and `@inout` and `@out` on a parameter of a function.',
@@ -2845,7 +2845,7 @@ export const en = {
           'A kernel function holds loops that the compiler may run on the GPU. The sections below state what makes one, which loops run, how the workgroup is sized and what the compiler reports.',
         kernelFunction: 'What a kernel function is',
         kernelFunctionP:
-          "An exported function that is not an entry point and takes an array with no size, `array<T>`, or a 2D storage texture, `texture_storage_2d<F, A>`, is a kernel function (Rule 8.22). A sampled texture alone makes none, so an exported helper that reads one stays a helper. The array or the texture is the caller's, read and written in place.",
+          "An exported function that is not an entry point and takes an array with no size, `array<T>`, or a 2D storage texture, `texture_storage_2d<F, A>`, is a kernel function (Rule 8.22). A sampled texture alone makes none, so an exported helper that reads one stays a helper. The array or the texture is the caller's, read and written in place. A method that changes its object, called on an element of the array, is a write to that element, as an `@inout` argument is, for the proof of the loops (Rule 8.29).",
         kernelCallP:
           'Each `for` at the top of its body is a loop the compiler may run on the GPU, one invocation per iteration, and a host file awaits the function like any import. No `@compute`, binding or `global_invocation_id` is written.',
         kernelProof: 'Loops that run on the GPU',
@@ -2898,7 +2898,7 @@ export const en = {
           'A host can run several kernel calls as one plan. The sections below state how calls fuse, what the report says, how the plan takes its workgroup counts and constants, which resources it uses and which kernels the library supplies.',
         fuseCalls: 'Fusing calls',
         fuseP:
-          'A host can call several kernel functions inside `device.fuse()` without a registration import (Rule 11.13). `fuse()` from `typeshade/fuse` remains supported for the default owner. At this compiler pin, `typeshade({ fuse: true })` still supplies the facts needed to combine eligible calls. On WebGPU, calls that read what the call before them wrote at the same index run as one dispatch, in one submission.',
+          'A host can call several kernel functions inside `device.fuse()` without a registration import (Rule 11.13). `fuse()` from `typeshade/fuse` remains supported for the default owner. At this compiler pin, `typeshade({ fuse: true })` still supplies the facts needed to combine eligible calls. On WebGPU, calls that read what the call before them wrote at the same index run as one dispatch, in one submission. A method that changes its object, called on an element of an array, counts as a write to that element in the facts the plan reads, as an `@inout` argument does (Rule 8.29).',
         fuseReport: 'The fuse report',
         fuseReportP:
           'The report the scope returns names each group, and says why two calls run apart. An entry call in the body forms a group of its own, and so does a loop that pushes onto an array. A call taking a `Map` or `Set` also forms its own group, reporting `b takes a Map or a Set` or its CPU fallback reason. `FuseReport` and `mergeReports`, which adds several reports into one, come from `typeshade/runtime` too, so a host that only reads reports ships no planner.',
