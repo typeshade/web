@@ -23,7 +23,7 @@ concurrency:
 jobs:
   stills:
     if: github.ref == 'refs/heads/main' && vars.WEBSITE_OPERATIONS_ENABLED == 'true' && inputs.task != 'access'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     environment: typeshade-production
     steps:
