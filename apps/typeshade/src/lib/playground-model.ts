@@ -236,6 +236,7 @@ export function main(@location(0) uv: vec2): vec4 {
     cpuNoResources: t.cpuNoResources,
     entryCountOne: t.entryCount(1),
     noGlsl: t.noGlsl,
+    noModule: t.noModule,
     resultTab: t.resultTab,
     copy: t.copy,
     copied: t.copied,

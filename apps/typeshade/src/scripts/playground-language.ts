@@ -112,6 +112,8 @@ export interface Analysis {
   readonly diagnostics: readonly TypeshadeDiagnostic[];
   readonly hasDirective: boolean;
   readonly module?: unknown;
+  /** The generated module a host.ts import of the document reads, as JavaScript. */
+  readonly hostModule?: string;
 }
 
 export interface ResultByKind {

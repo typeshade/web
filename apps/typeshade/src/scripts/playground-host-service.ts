@@ -362,6 +362,17 @@ const COMMONJS: ts.CompilerOptions = {
 };
 
 /** host.ts and the modules it imports, as the frame runs them. */
+/** The generated module a host.ts import of the shader file at `uri` reads: the code the Vite
+ *  plugin generates for the import (`hostFace`), which opens the device, builds the pipelines,
+ *  packs the bindings and dispatches or draws. The page shows it read-only, so a reader sees
+ *  every step between host.ts and the GPU. Undefined when the module does not compile. */
+export function hostModuleOf(
+  uri: string,
+  read: (uri: string) => string | undefined,
+): string | undefined {
+  return faceOf(uri, read)?.code;
+}
+
 export function hostBuild(text: string, read: (uri: string) => string | undefined): HostBuild {
   const modules: Record<string, string> = {};
   const problems: string[] = [];
