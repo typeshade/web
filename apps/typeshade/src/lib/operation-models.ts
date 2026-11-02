@@ -353,6 +353,134 @@ export function operationModel(name: string): OperationModel | undefined {
         'workgroupUniformLoad',
       ].filter((x) => x !== name),
     };
+  if (name.startsWith('subgroup') && !name.startsWith('subgroupMatrix')) {
+    // A fixture of four lanes, lane 0 to 3, and the one-lane subgroup GLSL ES 3.00 and the CPU
+    // oracle run (Rule 11.21). `?` is a value WGSL leaves indeterminate: a shuffle that names a
+    // lane outside the subgroup.
+    const x = [3, 1, 4, 1];
+    const p = [true, false, true, true];
+    const setup = 'subgroup of 4 lanes; x = [3, 1, 4, 1]; p = [true, false, true, true]';
+    const lanes = (values: readonly (number | string | boolean)[]) =>
+      `[${values.join(', ')}] by lane`;
+    const every = (value: number | boolean) => `${show(value)} in every lane`;
+    const oneLane = (value: string) => `one lane (WebGL2, CPU oracle): ${value}`;
+    const fold = (f: (a: number, b: number) => number, unit: number) =>
+      x.reduce((a, b) => f(a, b), unit);
+    const scan = (f: (a: number, b: number) => number, unit: number, inclusive: boolean) => {
+      const out: number[] = [];
+      let acc = unit;
+      for (const v of x) {
+        if (inclusive) acc = f(acc, v);
+        out.push(acc);
+        if (!inclusive) acc = f(acc, v);
+      }
+      return out;
+    };
+    const table: Record<string, OperationCase[]> = {
+      subgroupAdd: [
+        { input: 'subgroupAdd(x)', output: every(fold((a, b) => a + b, 0)) },
+        { input: 'subgroupAdd(x)', output: oneLane('x') },
+      ],
+      subgroupMul: [
+        { input: 'subgroupMul(x)', output: every(fold((a, b) => a * b, 1)) },
+        { input: 'subgroupMul(x)', output: oneLane('x') },
+      ],
+      subgroupMin: [
+        { input: 'subgroupMin(x)', output: every(fold(Math.min, Infinity)) },
+        { input: 'subgroupMin(x)', output: oneLane('x') },
+      ],
+      subgroupMax: [
+        { input: 'subgroupMax(x)', output: every(fold(Math.max, -Infinity)) },
+        { input: 'subgroupMax(x)', output: oneLane('x') },
+      ],
+      subgroupAnd: [
+        { input: 'subgroupAnd(x)', output: every(fold((a, b) => a & b, 0xffffffff) >>> 0) },
+        { input: 'subgroupAnd(x)', output: oneLane('x') },
+      ],
+      subgroupOr: [
+        { input: 'subgroupOr(x)', output: every(fold((a, b) => a | b, 0) >>> 0) },
+        { input: 'subgroupOr(x)', output: oneLane('x') },
+      ],
+      subgroupXor: [
+        { input: 'subgroupXor(x)', output: every(fold((a, b) => a ^ b, 0) >>> 0) },
+        { input: 'subgroupXor(x)', output: oneLane('x') },
+      ],
+      subgroupExclusiveAdd: [
+        { input: 'subgroupExclusiveAdd(x)', output: lanes(scan((a, b) => a + b, 0, false)) },
+        { input: 'subgroupExclusiveAdd(x)', output: oneLane('0') },
+      ],
+      subgroupInclusiveAdd: [
+        { input: 'subgroupInclusiveAdd(x)', output: lanes(scan((a, b) => a + b, 0, true)) },
+        { input: 'subgroupInclusiveAdd(x)', output: oneLane('x') },
+      ],
+      subgroupExclusiveMul: [
+        { input: 'subgroupExclusiveMul(x)', output: lanes(scan((a, b) => a * b, 1, false)) },
+        { input: 'subgroupExclusiveMul(x)', output: oneLane('1') },
+      ],
+      subgroupInclusiveMul: [
+        { input: 'subgroupInclusiveMul(x)', output: lanes(scan((a, b) => a * b, 1, true)) },
+        { input: 'subgroupInclusiveMul(x)', output: oneLane('x') },
+      ],
+      subgroupAll: [
+        { input: 'subgroupAll(p)', output: every(p.every(Boolean)) },
+        { input: 'subgroupAll(p)', output: oneLane('p') },
+      ],
+      subgroupAny: [
+        { input: 'subgroupAny(p)', output: every(p.some(Boolean)) },
+        { input: 'subgroupAny(p)', output: oneLane('p') },
+      ],
+      subgroupBallot: [
+        {
+          input: 'subgroupBallot(p)',
+          output: `vec4u(${p.reduce((m, v, i) => m | (v ? 1 << i : 0), 0)}, 0, 0, 0) in every lane: bit i is lane i`,
+        },
+        { input: 'subgroupBallot(p)', output: oneLane('vec4u(u32(p), 0, 0, 0)') },
+      ],
+      subgroupElect: [
+        { input: 'subgroupElect()', output: lanes([true, false, false, false]) },
+        { input: 'subgroupElect()', output: oneLane('true') },
+      ],
+      subgroupBroadcast: [
+        { input: 'subgroupBroadcast(x, 2)', output: every(x[2]!) },
+        { input: 'subgroupBroadcast(x, 2)', output: oneLane('x, the lane’s own value') },
+      ],
+      subgroupBroadcastFirst: [
+        { input: 'subgroupBroadcastFirst(x)', output: every(x[0]!) },
+        { input: 'subgroupBroadcastFirst(x)', output: oneLane('x') },
+      ],
+      subgroupShuffle: [
+        { input: 'subgroupShuffle(x, 3 - lane)', output: lanes([x[3]!, x[2]!, x[1]!, x[0]!]) },
+        { input: 'subgroupShuffle(x, id)', output: oneLane('x, whatever id names') },
+      ],
+      subgroupShuffleDown: [
+        { input: 'subgroupShuffleDown(x, 1)', output: lanes([x[1]!, x[2]!, x[3]!, '?']) },
+        { input: 'subgroupShuffleDown(x, 1)', output: oneLane('x') },
+      ],
+      subgroupShuffleUp: [
+        { input: 'subgroupShuffleUp(x, 1)', output: lanes(['?', x[0]!, x[1]!, x[2]!]) },
+        { input: 'subgroupShuffleUp(x, 1)', output: oneLane('x') },
+      ],
+      subgroupShuffleXor: [
+        { input: 'subgroupShuffleXor(x, 1)', output: lanes([x[1]!, x[0]!, x[3]!, x[2]!]) },
+        { input: 'subgroupShuffleXor(x, 1)', output: oneLane('x') },
+      ],
+    };
+    const model = table[name];
+    if (model)
+      return {
+        setup,
+        cases: model,
+        related: [
+          'subgroupAdd',
+          'subgroupElect',
+          'subgroupBallot',
+          'subgroupBroadcast',
+          'subgroupShuffle',
+        ]
+          .filter((n) => n !== name)
+          .slice(0, 4),
+      };
+  }
   const matrix = /^mat([234])(?:x([234]))?f?$/.exec(name);
   if (matrix) {
     const columns = Number(matrix[1]),
