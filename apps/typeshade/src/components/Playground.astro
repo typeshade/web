@@ -249,6 +249,10 @@ const { t, host, examples, seeded, library, opening, importsBefore, importsAfter
                 compiling it, drawing it. The stylesheet takes it away once a GPU canvas draws or
                 the CPU canvas shows; the script takes it away on a failure, which the note under
                 the frame then explains. */}
+            {/* In place of a picture, for a module host.ts cannot call yet
+                (docs/playground-one-runtime.md, Decision 1). The stylesheet shows it while the
+                tool's data-result is none. */}
+            <p class="result-none" data-result-none><span><Rich text={w.resultVertexDriven} locale={locale} /></span></p>
             <div class="frame-wait" data-frame-wait role="status" data-compiling={t.wait.compiling} data-drawing={t.wait.drawing}><span class="frame-wait-spin" aria-hidden="true"></span><span data-frame-wait-text>{t.wait.loading}</span></div>
           </div>
           {/* The transport: the shader clock the canvas draws at, held or run from zero, and
@@ -500,6 +504,25 @@ const { t, host, examples, seeded, library, opening, importsBefore, importsAfter
   .gpu-frame[data-logs='1'] > canvas { cursor: crosshair; }
   .gpu-frame > canvas[data-gpu-canvas][data-backend='none'] { opacity: 0; }
   .gpu-frame > canvas[data-canvas] { image-rendering: pixelated; }
+  /* What the Result tab shows (src/scripts/playground.ts, resultBy). For host.ts's frame and for
+     a module no host can call yet, the site runner's controls and notes go: they drive a
+     runner that draws nothing there. */
+  .result-none { display: none; }
+  .ts-playground[data-result='none'] .result-none { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; padding: 24px; color: var(--color-text-2); font: 400 .8125rem/1.55 var(--font-sans); text-align: center; text-wrap: pretty; }
+  .ts-playground[data-result='host'] .canvas-meta,
+  .ts-playground[data-result='host'] .transport,
+  .ts-playground[data-result='host'] .bindings,
+  .ts-playground[data-result='host'] [data-gpu-note],
+  .ts-playground[data-result='host'] [data-pixel-note],
+  .ts-playground[data-result='host'] [data-drop-hint],
+  .ts-playground[data-result='host'] [data-canvas-note],
+  .ts-playground[data-result='none'] .canvas-meta,
+  .ts-playground[data-result='none'] .transport,
+  .ts-playground[data-result='none'] .bindings,
+  .ts-playground[data-result='none'] [data-gpu-note],
+  .ts-playground[data-result='none'] [data-pixel-note],
+  .ts-playground[data-result='none'] [data-drop-hint],
+  .ts-playground[data-result='none'] [data-canvas-note] { display: none; }
   /* The still is the seeded example's picture at the pin. It goes when the reader's program
      has a frame up, and for good once they have edited it, since from then on it shows
      something else. */

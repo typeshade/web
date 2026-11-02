@@ -160,6 +160,9 @@ export const links = {
   typennGithub: { label: 'TypeNN on GitHub', href: 'https://github.com/typeshade/typenn' },
   commit: { label: facts.pinnedCommit, href: `${mirror}/tree/${facts.pinnedCommit}` },
   releases: { label: 'Watch releases', href: `${mirror}/releases` },
+  // The open design of a host call for a fragment entry that reads vertex output; until it
+  // lands the Playground draws no picture for such a module (docs/playground-one-runtime.md).
+  vertexHostIssue: { label: 'typeshade/typeshade#204', href: `${mirror}/issues/204` },
   license: { label: facts.licenseName, href: at('LICENSE') },
   changelog: { label: 'Changelog', href: at('CHANGELOG.md') },
   examplesDir: {

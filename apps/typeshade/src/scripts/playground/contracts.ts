@@ -190,6 +190,8 @@ export interface PlaygroundCopy {
     readonly hostNone: string;
     readonly hostUnloaded: string;
     readonly hostStopped: string;
+    readonly hostNote: string;
+    readonly hostLinked: string;
   };
 }
 

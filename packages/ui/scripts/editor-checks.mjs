@@ -132,43 +132,28 @@ export function fs(@location(0) uv: vec2): Color {
     document.querySelector('[data-file-tab="lib/colors.shade.ts"]').click();
   });
 
-  // A real worker-pool draw verifies that the moved worker URL is bundled by Vite.
+  // The fragment entry reads the vertex prelude's `uv`, which no host can call yet (Rule 8.24),
+  // so the Result tab draws nothing and says why (apps/typeshade/docs/playground-one-runtime.md,
+  // Decision 1).
   await page.locator('[data-target="result"]').click();
-  await page.locator("[data-engine]").selectOption("cpu");
-  await page.locator("[data-resolution]").selectOption("64");
-  await page.waitForFunction(
-    () => {
-      const note = document.querySelector("[data-canvas-note]");
-      return Number(note?.dataset.px) > 0 && Number(note?.dataset.workers) > 0;
-    },
-    undefined,
-    { timeout: 60000 },
-  );
   await page.waitForFunction(
     () => {
       const root = document.querySelector("[data-playground]");
       return (
-        root?.dataset.version ===
+        root?.dataset.result === "none" &&
+        root.dataset.version ===
           document.querySelector("[data-gpu-frame]")?.dataset.settled &&
-        !root?.classList.contains("has-errors")
+        !root.classList.contains("has-errors")
       );
     },
     undefined,
     { timeout: 60000 },
   );
-  assert.equal(
-    await page.locator("[data-canvas]").evaluate((canvas) => canvas.width),
-    64,
-  );
-  await page.locator("[data-play]").click();
-  assert.equal(
-    await page.locator("[data-play]").getAttribute("aria-pressed"),
-    "true",
-  );
-  await page.locator("[data-restart]").click();
-  await page.locator("[data-play]").click();
+  assert.ok(await page.locator("[data-result-none]").isVisible());
+  assert.ok(await page.locator("[data-transport]").isHidden());
 
-  // host.ts remains inert until the explicit Run action, and Stop removes its sandbox.
+  // For a module no host can call, host.ts runs only on the explicit Run action, and Stop
+  // removes its sandbox.
   await page.locator('[data-file-tab="host.ts"]').click();
   await page.waitForFunction(
     () => window.monaco.editor.getEditors()[0].getModel().getValue().length > 0,
@@ -196,10 +181,41 @@ export function fs(@location(0) uv: vec2): Color {
   assert.equal(await page.locator("[data-host-frame]").count(), 1);
   await page.locator("[data-run-host]").click();
   assert.equal(await page.locator("[data-host-frame]").count(), 0);
+
+  // A fragment entry that reads only its position is one a host can call, so the Result tab is
+  // host.ts's frame, started by the page with no click (phase 2 of the same record).
   await page.locator('[data-file-tab="main.shade.ts"]').click();
   await page.evaluate(
     (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
+    `"use typeshade"
+
+@fragment
+export function main(@builtin("position") p: vec4): vec4 {
+  return vec4(fract(p.x / 32.), 0.5, 0.5, 1.);
+}
+`,
+  );
+  await page.waitForFunction(
+    () =>
+      document.querySelector("[data-playground]")?.dataset.result === "host" &&
+      document.querySelectorAll("[data-host-frame]").length === 1,
+    undefined,
+    { timeout: 60000 },
+  );
+  assert.equal(
+    await page.locator("[data-host-frame]").getAttribute("sandbox"),
+    "allow-scripts",
+  );
+  await page.evaluate(
+    (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
     source,
+  );
+  await page.waitForFunction(
+    () =>
+      document.querySelector("[data-playground]")?.dataset.result === "none" &&
+      document.querySelectorAll("[data-host-frame]").length === 0,
+    undefined,
+    { timeout: 60000 },
   );
   page.once("dialog", (dialog) => dialog.accept());
   await page

@@ -10,7 +10,7 @@
 //   - Any other module gets `run()`, which opens the program runtime and logs the entries of
 //     the compiled program, the module's default export. Most of the gallery is this case: an
 //     entry that reads the `uv` the fullscreen triangle hands it is not one a host can draw yet
-//     (Rule 8.20), and hovering its name in the import says why.
+//     (Rule 8.24), and hovering its name in the import says why.
 //
 // A binding's value is written from the TypeScript type the host face gives the bindings
 // object, the first member of each union, so the call matches the module's own declaration.
@@ -106,7 +106,7 @@ const comment = (text: string): string => {
 
 const HEADER = (file: string): string =>
   comment(
-    `host.ts: the TypeScript an application writes around ${file}. It runs when you click Run, in a sandboxed frame with a canvas of its own, and its console lines go to the Console tab. The import is the shader module: hover a name to read what a host sees.`,
+    `host.ts: the TypeScript an application writes around ${file}. It runs in a sandboxed frame with a canvas of its own, which the Result tab shows when ${file} has an entry a host can call; otherwise it runs when you click Run. Its console lines go to the Console tab. The import is the shader module: hover a name to read what a host sees.`,
   );
 
 /** The starter host.ts for the module at `file` (a name at the workspace's root), from the

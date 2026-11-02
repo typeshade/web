@@ -13,6 +13,9 @@ interface HostContext {
   readonly view: View;
   readonly openedExample: string;
   readonly examples: readonly PlaygroundExample[];
+  /** Whether the Result tab shows host.ts's frame for the module that compiled last, so an
+   *  edit to host.ts runs it again (docs/playground-one-runtime.md, phase 2). */
+  readonly hostResult: boolean;
 }
 interface HostOptions {
   startFrame: typeof startHostFrame;
@@ -53,6 +56,11 @@ export function createHostController({
   // own: not on a keystroke, not from a link. A host example opens with its own host.ts; any
   // other file gets a starter written from its host face (playground-host-default.ts) the first
   // time host.ts is shown, run or downloaded.
+  //
+  // For a module a host can call, the frame is the Result tab (docs/playground-one-runtime.md,
+  // phase 2): the page runs host.ts itself once the module compiles and again after an edit
+  // settles. It does so for the host.ts the example or the starter brings and for one the reader
+  // has edited. A host.ts that a link carries waits for Run until the reader edits it.
 
   const HOST_TAB = 'host.ts';
 
@@ -85,6 +93,16 @@ export function createHostController({
   /** True while the page itself writes host.ts, which is no edit of the reader's. */
   let hostSetting = false;
 
+  /** Whether the page may run host.ts without a click: the example's own, the starter, or a
+   *  text the reader has edited, but not one a link brought. */
+  let hostTrusted = true;
+
+  /** Whether the page started the run in the frame, with no click on Run. Such a run keeps the
+   *  reader on their tab and writes what it returned or threw under the frame. */
+  let hostAuto = false;
+
+  let autoTimer = 0;
+
   const hostText = (): string => (hostReady && hostModel ? (hostModel.getValue() as string) : '');
 
   /** Whether the link has to carry host.ts. */
@@ -111,6 +129,7 @@ export function createHostController({
     hostChecks += 1;
     hostReady = text !== undefined;
     hostPristine = pristine;
+    hostTrusted = text === undefined || text === pristine;
     hostMarkers = 0;
     if (hostModel) {
       hostSetting = true;
@@ -140,12 +159,15 @@ export function createHostController({
   };
 
   /** An edit of the reader's to host.ts: checked once the typing settles, and carried by the
-   *  link. It runs only on Run. */
+   *  link. Where the frame is the Result tab, it runs again once the typing settles; elsewhere
+   *  it runs only on Run. */
   const hostEdited = (): void => {
     if (hostSetting) return;
     hostTicket += 1;
+    hostTrusted = true;
     window.clearTimeout(hostTimer);
     hostTimer = window.setTimeout(checkHost, 350);
+    if (context.hostResult) autoRunHost(600);
     onEdit();
     paintTabs();
   };
@@ -161,10 +183,11 @@ export function createHostController({
 
   const hostResult = root.querySelector('[data-host-result]');
 
-  /** The line under the frame that shows what run() returned, or hides it. */
+  /** The line under the frame that shows what run() returned, or what a run the page started
+   *  threw, or hides it. */
   const showHostResult = (text: string | undefined): void => {
     if (!(hostResult instanceof HTMLElement)) return;
-    hostResult.textContent = text === undefined ? '' : `run() ${text}`;
+    hostResult.textContent = text ?? '';
     hostResult.hidden = text === undefined;
   };
 
@@ -189,14 +212,21 @@ export function createHostController({
     runHostButton.setAttribute('aria-label', running ? w.stopHost : w.runHost);
     if (runHostLabel instanceof HTMLElement)
       runHostLabel.textContent = running ? w.stopHost : w.runHost;
-    if (hostNote instanceof HTMLElement) hostNote.hidden = !running;
+    if (hostNote instanceof HTMLElement) {
+      hostNote.textContent = w.hostNote;
+      hostNote.hidden = !running;
+    }
   };
 
   /** Removes the frame of a run, if one is up. `say` adds a line saying so to its report. */
   const stopHost = (say = false): void => {
     hostTicket += 1;
+    window.clearTimeout(autoTimer);
     showHostResult(undefined);
-    if (!hostRun) return;
+    if (!hostRun) {
+      syncRunHost();
+      return;
+    }
     hostRun.stop();
     hostRun = undefined;
     syncRunHost();
@@ -244,14 +274,16 @@ export function createHostController({
         return;
       case 'error':
         hostLine('error', at(event.line), event.text);
-        showHostReport();
+        if (hostAuto) showHostResult(`${at(event.line)} ${event.text}`);
+        else showHostReport();
         return;
       case 'returned':
         hostLine('log', 'run()', event.text);
         // What a run returns is written to the Console tab. A run that drew nothing leaves
         // the Result tab an empty frame, so the tab with its value comes to the front; one
-        // that drew keeps its picture, with the value on a line under it.
-        if (event.drew) showHostResult(event.text);
+        // that drew keeps its picture, with the value on a line under it. A run the page
+        // started keeps the reader's tab and puts the value under the frame either way.
+        if (event.drew || hostAuto) showHostResult(`run() ${event.text}`);
         else showHostReport();
         return;
       case 'started':
@@ -264,11 +296,16 @@ export function createHostController({
     }
   };
 
-  const runHost = async (): Promise<void> => {
+  /** Runs host.ts in a new frame. `auto` is a run the page starts for the Result tab: it does not
+   *  open host.ts's checking, and it leaves the reader on the tab they chose. */
+  const runHost = async (auto = false): Promise<void> => {
     if (!context.client || !hostModel || !(frame instanceof HTMLElement)) return;
     stopHost();
     const ticket = hostTicket;
-    hostSeen = true;
+    if (!auto) {
+      hostSeen = true;
+      hostTrusted = true;
+    }
     await ensureHost();
     if (!hostReady || ticket !== hostTicket) return;
     let build = await context.client.request('hostBuild', HOST_URI, context.version, {
@@ -280,7 +317,7 @@ export function createHostController({
     });
     if (!build || ticket !== hostTicket) return;
     checkHost();
-    if (context.view !== 'result' && context.view !== 'console') selectView('result');
+    if (!auto && context.view !== 'result' && context.view !== 'console') selectView('result');
     hostList = document.createElement('ol');
     hostList.dataset.consoleBlock = 'host';
     hostLines = 0;
@@ -288,6 +325,7 @@ export function createHostController({
     paintConsole({ report: 'host', lines: 0 }, sentence(w.hostConsole), hostList);
     for (const problem of build.problems) hostLine('error', HOST_TAB, problem);
     if (!build.host.code) return;
+    hostAuto = auto;
     const example = context.examples.find((candidate) => candidate.id === context.openedExample);
     hostRun = startFrame(
       frame,
@@ -301,6 +339,23 @@ export function createHostController({
     );
     syncRunHost();
   };
+  /** Runs host.ts for the Result tab once `delay` ms pass with no other call. A host.ts a link
+   *  brought is not run: the line under the frame asks for Run instead. */
+  const autoRunHost = (delay = 0): void => {
+    window.clearTimeout(autoTimer);
+    autoTimer = window.setTimeout(() => {
+      if (hostTrusted) {
+        void runHost(true);
+        return;
+      }
+      stopHost();
+      if (hostNote instanceof HTMLElement) {
+        hostNote.textContent = w.hostLinked;
+        hostNote.hidden = false;
+      }
+    }, delay);
+  };
+
   if (runHostButton instanceof HTMLButtonElement)
     runHostButton.addEventListener('click', () => {
       if (hostRun) stopHost(true);
@@ -316,6 +371,7 @@ export function createHostController({
     ensureHost,
     hostEdited,
     stopHost,
+    autoRunHost,
     get hostModel() {
       return hostModel;
     },
