@@ -1,6 +1,6 @@
 # Playground on one runtime
 
-Status: proposed. No implementation has started.
+Status: accepted (merged in #18); decisions recorded 2026-11-02. No implementation has started.
 
 ## Request and baseline
 
@@ -106,8 +106,7 @@ there in `typeshade/runtime`. The runtime source is read-only and comes from the
 Until `typeshade/typeshade#204` gives multi-pass and vertex-driven drawing a host shape, the 76
 vertex-driven examples cannot run through host.ts. The Playground says so in place of a
 picture, names the rule (Rule 8.24) and the issue, and still shows WGSL, GLSL and Reflection.
-This is a visible reduction until #204 lands, and the owner decides whether to accept it
-(Open decisions, 1).
+This is a visible reduction until #204 lands, which the owner accepted (Decisions, 1).
 
 ## Compiler work this depends on
 
@@ -130,14 +129,19 @@ Each phase is its own pull request.
    `lib/shader-runtime.ts`, `lib/render-runtime.ts` and the runner half of
    `scripts/playground-bindings.ts`.
 
-## Open decisions
+## Decisions
 
-1. Accept that the vertex-driven examples show no picture in the Playground between phase 2
-   and phase 5, or keep the site runner for them only, labelled as not the runtime.
-2. Where the per-example host files live: in the compiler repository next to each example
-   (proposed), or in this repository.
-3. Whether the home page and the live examples outside the Playground move to the runtime in
-   the same series. They use the same site runner.
+The owner decided the three open questions on 2026-11-02, in the Claude Code session, by
+approving the recommendations ("승인", confirmed in a follow-up question).
+
+1. **Vertex-driven examples.** Between phase 2 and phase 5, the 76 vertex-driven examples show
+   no picture. The Playground says why in its place, names Rule 8.24 and
+   `typeshade/typeshade#204`, and still shows WGSL, GLSL and Reflection. The site runner is not
+   kept for them.
+2. **Per-example host files.** Each example's `host.ts` lives in the compiler repository, next
+   to the example, as `examples/hosts/` does today.
+3. **Home page and live examples.** They move to the runtime in a separate series after this
+   one. They keep the site runner until then.
 
 ## Verification for each phase
 
