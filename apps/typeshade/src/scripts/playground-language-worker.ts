@@ -27,6 +27,7 @@ import {
   hostCompletions,
   hostDiagnostics,
   hostHover,
+  hostModuleOf,
   hostStarter,
 } from './playground-host-service.ts';
 
@@ -60,7 +61,14 @@ function analyse(languageService: TypeshadeLanguageService, uri: string): Analys
   const merged = mergeCompileDiagnostics(diagnostics, result.diagnostics);
   if (result.diagnostics.some((diagnostic) => diagnostic.category === 'error'))
     return { diagnostics: merged, hasDirective };
-  return { diagnostics: merged, hasDirective, module: result.module };
+  // The module a host.ts import of this file reads (design: playground-one-runtime.md, D2).
+  let hostModule: string | undefined;
+  try {
+    hostModule = hostModuleOf(uri, readDocument);
+  } catch {
+    hostModule = undefined;
+  }
+  return { diagnostics: merged, hasDirective, module: result.module, hostModule };
 }
 
 self.addEventListener('message', (event: MessageEvent<LanguageRequest>) => {

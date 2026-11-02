@@ -940,6 +940,8 @@ export const ko: Copy = {
     glslVertexTab: 'GLSL 버텍스',
     glslFragmentTab: 'GLSL 프래그먼트',
     noGlsl: '이 모듈은 GLSL을 내지 않습니다.',
+    moduleTab: '호스트 모듈',
+    noModule: '호스트 모듈이 없습니다. 먼저 셰이더 파일이 컴파일되어야 합니다.',
     diagnostics: '진단',
     idle: '컴파일 대기 중',
     ready: '컴파일 성공',
