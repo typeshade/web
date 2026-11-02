@@ -125,7 +125,7 @@ export async function checkRegressions(page, url) {
   // A device without the subgroups extension skips the fixed subgroup cases as unsupported and
   // still completes; the one fixed case that needs no extension runs.
   await fault(
-    "const hasFeature=GPUSupportedFeatures.prototype.has;GPUSupportedFeatures.prototype.has=function(n){return n==='subgroups'?false:hasFeature.call(this,n)};",
+    "const hasFeature=GPUSupportedFeatures.prototype.has;GPUSupportedFeatures.prototype.has=function(n){return n==='subgroups'?false:hasFeature.call(this,n)};const listFeatures=GPUSupportedFeatures.prototype[Symbol.iterator];GPUSupportedFeatures.prototype[Symbol.iterator]=function*(){for(const f of listFeatures.call(this))if(f!=='subgroups')yield f;};",
   );
   const noSubgroups = await run();
   assert.equal(noSubgroups.status, 'complete');
