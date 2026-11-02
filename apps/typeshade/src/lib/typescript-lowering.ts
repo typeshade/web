@@ -166,9 +166,15 @@ function glslFor(
     );
   }
   const parts = names.map((name) => {
+    // A function that writes its struct or optional result into the caller's variable is
+    // spelled `f_into` with a pointer in WGSL (change 0104, `wgsl-ptr.ts`) and keeps its own
+    // name in GLSL, which returns the value; the row names the WGSL spelling.
+    const spellings = name.endsWith('_into') ? [name, name.slice(0, -'_into'.length)] : [name];
     for (const source of sources) {
-      const found = sliceGlslDecl(source, name);
-      if (found !== null) return found;
+      for (const spelling of spellings) {
+        const found = sliceGlslDecl(source, spelling);
+        if (found !== null) return found;
+      }
     }
     // An entry is `void main()` in GLSL, whatever its name was.
     const entry = sources.find((source) => /^void main\(\)/m.test(source));
@@ -488,7 +494,7 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
       id: 'optionalValue',
       ts: 'function root(x: f32): f32 | undefined {\n  if (x < 0.) {\n    return undefined\n  }\n  return sqrt(x)\n}',
       after: 'export function rootOr(x: f32): f32 {\n  return root(x) ?? 1.\n}',
-      pick: ['root', 'rootOr'],
+      pick: ['root_into', 'rootOr'],
     },
     {
       id: 'overloads',
@@ -535,7 +541,7 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
       ts: 'class Ray {\n  origin: vec3\n  dir: vec3\n  constructor(origin: vec3, dir: vec3) {\n    this.origin = origin\n    this.dir = dir\n  }\n}',
       after:
         'export function start(o: vec3, d: vec3): vec3 {\n  const r = new Ray(o, d)\n  return r.origin\n}',
-      pick: ['Ray_new'],
+      pick: ['Ray_new_into'],
     },
     {
       id: 'method',
@@ -747,7 +753,7 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
     {
       id: 'integerLiteral',
       ts: 'class Hit {\n  constructor(public index: i32) {}\n  offset(value: i32): i32 { return this.index + value; }\n}\nexport function counts(): i32 {\n  let n = -1;\n  const hit = new Hit(n);\n  n = hit.index;\n  return hit.offset(n);\n}',
-      pick: ['Hit_new', 'Hit_offset', 'counts'],
+      pick: ['Hit_new_into', 'Hit_offset', 'counts'],
     },
     {
       id: 'increment',

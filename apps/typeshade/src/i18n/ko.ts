@@ -664,6 +664,7 @@ export const ko: Copy = {
         textures: '텍스처와 스토리지',
         atomics: '원자적 연산',
         barriers: '배리어',
+        subgroups: '서브그룹',
         f64: '에뮬레이션 배정밀도',
         constructors: '생성자',
         resources: '배열과 바인딩',
@@ -2165,7 +2166,7 @@ export const ko: Copy = {
         `[${glsl} 명세](specGlslEs)와 [WebGL2 명세](specWebgl2)가 두 번째를 정의합니다.`,
         '[MDN WebGPU API](mdnWebgpu)와 [MDN WebGL2RenderingContext](mdnWebgl2)에서 호스트가 각각을 드라이버에 어떻게 넘기는지 볼 수 있습니다.',
         `언어 참조의 [함수](referenceFunctions)에는 내장 함수마다 컴파일러가 쓰는 WGSL과 ${glsl} 코드가 있고, [타입](referenceTypes)에는 타입마다 같은 내용이 있습니다.`,
-        `[내장 함수](languageBuiltins) 페이지 하나에 내장 함수 ${facts.builtins}개가 모두 있고, 백엔드마다 쓰는 코드가 함께 있습니다. 그중 ${facts.glslAbsentBuiltins}개는 ${glsl} 형태가 없습니다.`,
+        `[내장 함수](languageBuiltins) 페이지 하나에 내장 함수 ${facts.builtins}개가 모두 있고, 백엔드마다 쓰는 코드가 함께 있습니다. 그중 ${facts.glslAbsentBuiltins}개는 ${glsl} 고유의 형태가 없습니다. 작성기에 형태가 없거나, 작성기가 실행되기 전에 패스가 호출을 다시 씁니다.`,
       ],
       nextP:
         '다음은 [예제](examples)입니다. 컴파일러 레지스트리의 예제마다 어떤 타깃을 생성하는지 적혀 있습니다.',
@@ -2413,6 +2414,7 @@ export const ko: Copy = {
         'workgroup-scratch': '워크그룹 스크래치 메모리',
         'workgroup-reduce': '워크그룹 리덕션',
         'atomic-histogram': '원자적 히스토그램',
+        'subgroup-reduce': '원자 연산 앞의 서브그룹 리덕션',
         'gpu-console': 'GPU에서 온 콘솔 출력',
         'compute-reduction-twin': '컴퓨트 리덕션',
         'hillshade-twin': '음영 기복도',
@@ -2542,7 +2544,7 @@ export const ko: Copy = {
         'loops-over-data':
           '데이터를 다루는 프로그램이 쓰는 세 가지 루프를 Tint와 실제 WebGL2 컨텍스트로 확인합니다.',
         'path-tracer': '평범한 TypeScript로 쓴 작은 경로 추적기입니다.',
-        'workgroup-tile-2d': '`@compute([8, 8])`는 WGSL의 `@workgroup_size(8, 8)`입니다.',
+        'workgroup-tile-2d': '`compute([8, 8], f)`는 WGSL의 `@workgroup_size(8, 8)`입니다.',
         'loop-kernel': '런타임 크기의 출력 배열에서 각 원소를 처리하는 지형 커널입니다.',
         'loop-reduction': '배열을 도는 루프로 합, 평균과 분산, 히스토그램을 구합니다.',
         'loop-struct-array': '파티클 한 걸음을 `array<Particle>`을 도는 루프로 씁니다.',
@@ -2563,6 +2565,8 @@ export const ko: Copy = {
           '인보케이션 64개가 값 64개를 워크그룹 메모리로 하나에 모읍니다. `workgroupBarrier()`가 라운드 순서를 잡습니다.',
         'atomic-histogram':
           '여러 인보케이션이 `atomicAdd(bins[bin], 1)`로 같은 칸에 동시에 값을 더합니다. 한 번의 호출은 쪼갤 수 없는 한 걸음이고, 스토리지 구조체의 필드와 `storage<atomic<u32>>` 선언이 위치를 적는 나머지 두 가지 모양을 보여 주며, 원자 연산이 돌려주는 값은 더하기 전에 들어 있던 값입니다.',
+        'subgroup-reduce':
+          '`subgroupAdd`가 서브그룹의 값을 명령 하나로 접고, `subgroupElect`가 고른 레인 하나가 그 합을 `atomicAdd`로 칸에 더합니다.',
         'gpu-console':
           '컴퓨트 커널 안에서 `console.log("i =", gid.x, p)`를 부릅니다. 문자열 리터럴은 라벨이 되고, 크기가 정해진 값은 무엇이든 인자로 넘길 수 있습니다.',
         'compute-reduction-twin':
@@ -2597,7 +2601,7 @@ export const ko: Copy = {
           '큰 기준값에 화면에서 조금씩 움직이는 값을 더한 x로 sin(x)를 구합니다.',
         'id-pick': 'WGSL 방식의 진입점 입출력입니다.',
         'clip-planes':
-          '`@builtin("clip_distances")`로 사용자 클립 평면 네 개를 둡니다. 래스터라이저가 래스터화하기 전에 읽는 버텍스 출력입니다.',
+          '`builtin<"clip_distances", ...>`로 사용자 클립 평면 네 개를 둡니다. 래스터라이저가 래스터화하기 전에 읽는 버텍스 출력입니다.',
         'uniform-array': '`array<f32, 4>`를 담은 `uniform`입니다.',
         'sample-branch': 'WGSL은 `textureSample`을 균일한 제어 흐름에서만 부르게 합니다.',
         'integer-math': 'GLSL ES 3.00에 해당 입력 타입의 오버로드가 없는 정수 `abs`와 `dot`입니다.',
@@ -2623,8 +2627,8 @@ export const ko: Copy = {
         'host-set-unique': 'Set과 Map에 모으기',
       },
       descriptions: {
-        'host-draw': '전체 화면 `@fragment` 진입점과 이를 그리는 호스트입니다.',
-        'host-compute': '`@compute` 진입점과 호스트입니다.',
+        'host-draw': '전체 화면 `fragment(...)` 진입점과 이를 그리는 호스트입니다.',
+        'host-compute': '`compute(...)` 진입점과 호스트입니다.',
         'host-kernel': '커널 함수 두 개와 이를 부르는 호스트입니다.',
         'host-resident':
           '커널 함수 세 개와, 이를 `resident()` 배열 위에서 이어 부르는 호스트입니다.',
@@ -2641,9 +2645,9 @@ export const ko: Copy = {
       },
       blurbs: {
         'host-draw':
-          '전체 화면 `@fragment` 진입점과 이를 그리는 호스트입니다. 호스트는 `fs`를 가져와 프레임마다 `fs(canvas, { frame })`를 한 번 부르고 유니폼에 시간을 넣습니다. 셰이더는 전체 화면 삼각형 하나를 그립니다. WebGPU를 먼저 시도하고, 사용할 수 없으면 WebGL2, 그다음 CPU tier를 사용합니다. 호스트 코드에는 파이프라인, 버퍼, 바인드 그룹이 없습니다.',
+          '전체 화면 `fragment(…)` 진입점과 이를 그리는 호스트입니다. 호스트는 `fs`를 가져와 프레임마다 `fs(canvas, { frame })`를 한 번 부르고 유니폼에 시간을 넣습니다. 셰이더는 전체 화면 삼각형 하나를 그립니다. WebGPU를 먼저 시도하고, 사용할 수 없으면 WebGL2, 그다음 CPU tier를 사용합니다. 호스트 코드에는 파이프라인, 버퍼, 바인드 그룹이 없습니다.',
         'host-compute':
-          '`@compute` 진입점과 이를 실행하는 호스트입니다. `run()`은 선언한 기본값을 쓰고, `runSpecialized()`는 직접 호출과 `device.fuse()` 안의 호출에 `{ constants }`를 넘깁니다. `WIDTH`는 워크그룹 크기를, `GAIN`은 출력 배율을 정합니다. 호스트는 선택한 폭으로 그룹 개수를 계산하고, 계획의 배열을 Resident로 유지한 뒤 결과와 디스패치 리포트를 돌려준다. 상수를 선택한 디바이스 계획에서는 WebGPU와 CPU tier가 워크그룹당 32개 인보케이션을 사용하며, WebGL2는 기본값 64를 유지하면서 `GAIN`을 선택합니다.',
+          '`compute(…)` 진입점과 이를 실행하는 호스트입니다. `run()`은 선언한 기본값을 쓰고, `runSpecialized()`는 직접 호출과 `device.fuse()` 안의 호출에 `{ constants }`를 넘깁니다. `WIDTH`는 워크그룹 크기를, `GAIN`은 출력 배율을 정합니다. 호스트는 선택한 폭으로 그룹 개수를 계산하고, 계획의 배열을 Resident로 유지한 뒤 결과와 디스패치 리포트를 돌려준다. 상수를 선택한 디바이스 계획에서는 WebGPU와 CPU tier가 워크그룹당 32개 인보케이션을 사용하며, WebGL2는 기본값 64를 유지하면서 `GAIN`을 선택합니다.',
         'host-kernel':
           '커널 함수 두 개와 이를 부르는 호스트입니다. `exposure`는 `array<f32>`를 돌고, `peak`는 그 배열을 하나의 값으로 줄입니다. 호스트는 `Float32Array`를 넘겨 `await exposure(1.5, pixels)`를 부르고, 숫자 하나를 얻으려고 `await peak(pixels)`를 부릅니다. 컴파일러가 반복이 서로 독립이라고 증명한 루프는 GPU에서 반복마다 인보케이션 하나로 실행되고, 배열은 제자리에서 바뀌어 돌아온다.',
         'host-resident':
@@ -2875,7 +2879,7 @@ export const ko: Copy = {
         boundary: '4. TypeScript의 class와 다른 점',
         boundaryItems: [
           '진입점은 최상위 함수이고 메서드가 아닙니다.',
-          '인스턴스 필드가 없는 class도 생성할 수 있으며 메서드, 접근자와 static 멤버를 가질 수 있습니다. 호스트에서는 `{}` 값입니다. 리플렉션은 소스에 필드를 추가하지 않고 GPU 내부 표현의 크기를 반영합니다. std430에서는 4바이트, std140에서는 16바이트입니다.',
+          '인스턴스 필드가 없는 class도 생성할 수 있으며 메서드, 접근자와 static 멤버를 가질 수 있습니다. 호스트에서는 `{}` 값이고, 모듈이 class를 내보내면 반환값은 그 class의 인스턴스입니다(규칙 8.21). 리플렉션은 소스에 필드를 추가하지 않고 GPU 내부 표현의 크기를 반영합니다. std430에서는 4바이트, std140에서는 16바이트입니다.',
           '베이스 타입으로 읽기만 하며 메서드 선택이 같다고 컴파일러가 입증하면 파생 값을 베이스 class 자리에 쓸 수 있습니다. 메서드 재정의, 수신 객체의 변경이나 별칭을 통한 관찰 가능한 변경이 있으면 구체적인 타입을 쓰거나 지원 범위 밖에 남습니다.',
           'getter와 setter는 각각 제 함수로 내려가고, 생성자는 TypeScript처럼 클래스마다 하나입니다.',
           '`new`는 함수 본문 안에서 값을 만들고, 모듈 상수는 객체 리터럴로 씁니다.',
@@ -3513,11 +3517,11 @@ export const ko: Copy = {
           },
           constructorNew: {
             name: '`constructor`와 `new`',
-            p: '`new`는 `Ray_new` 호출입니다. 구조체를 지어 돌려줍니다.',
+            p: '`new`는 `Ray_new` 호출입니다. 구조체를 지어 돌려줍니다. WGSL은 이를 `Ray_new_into`로 쓰고 구조체를 받는 변수에 직접 써 넣습니다(변경 0104). GLSL은 값을 돌려줍니다.',
           },
           fieldlessClass: {
             name: '필드 없는 클래스',
-            p: '인스턴스 필드 없이도 생성하고 메서드를 호출할 수 있습니다. 호스트 값은 `{}`이며, GPU에는 소스 값에 없는 내부 저장 멤버를 둡니다.',
+            p: '인스턴스 필드 없이도 생성하고 메서드를 호출할 수 있습니다. 호스트 값은 `{}`이고, 모듈이 class를 내보내면 반환값은 그 class의 인스턴스입니다(규칙 8.21). GPU에는 소스 값에 없는 내부 저장 멤버를 둡니다.',
           },
           method: {
             name: '메서드',
@@ -3980,6 +3984,7 @@ export const ko: Copy = {
           textures: '텍스처와 스토리지',
           atomics: '원자적 연산',
           barriers: '배리어',
+          subgroups: '서브그룹',
           f64: '에뮬레이션 배정밀도',
         },
         bitsP: `${glsl}에는 비트 내장 함수가 하나도 없습니다. 그래서 위 칸은 GLSL 생성기가 정의하는 작은 함수를 부릅니다. 그 정의는 해당 타깃에 있는 시프트와 마스크, 비교만으로 쓰여 있습니다. 하나도 부르지 않는 모듈은 정의도 싣지 않습니다.`,

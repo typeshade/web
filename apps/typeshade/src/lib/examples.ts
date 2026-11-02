@@ -453,39 +453,40 @@ export const facts = {
 // asks for a copy decision. Comparing them only at the commit the copy was written at left
 // the check inert from the next pin on, which is when it has something to catch.
 const pinned = {
-  commit: '3e1e8420',
-  shadeExamples: 101,
+  commit: 'cdb12dc0',
+  shadeExamples: 102,
   shadeRenderable: 76,
   fp64Examples: 12,
   testFiles: 420,
-  builtins: 169,
+  builtins: 190,
   portableBuiltins: 44,
-  glslAbsentBuiltins: 43,
+  glslAbsentBuiltins: 64,
   mathAliasBuiltins: 27,
   constructRows: 74,
-  wgslBuiltinIds: 16,
-  glslCapabilities: 4,
-  languageEntries: 317,
+  wgslBuiltinIds: 18,
+  glslCapabilities: 5,
+  languageEntries: 340,
   languageTypes: 65,
   languageAttributes: 12,
-  languageBuiltinValues: 16,
-  languageFunctions: 175,
+  languageBuiltinValues: 18,
+  languageFunctions: 196,
   languageConstants: 8,
   languageMathMembers: 41,
   errorCodesTs: 51,
   errorCodesSd: 36,
   errorCodesRetired: 2,
-  rules: 125,
-  rulesTest: 118,
+  rules: 132,
+  rulesTest: 121,
   rulesCode: 2,
   rulesPending: 0,
-  rulesReview: 5,
-  rulesSurfaceSections: 50,
-  // This migration advances from 91c2fe31 directly to 3e1e8420, across the intermediate pin
-  // a21f7024. The displayed rule history therefore counts every change since 91c2fe31.
+  rulesReview: 9,
+  rulesSurfaceSections: 51,
+  // The pin before this one on the branch that carries it is 8c088df7 (the bot's refresh of
+  // 2026-11-02); the displayed rule history counts the rules added and changed since it: Rule
+  // 11.21 added (change 0117), two fingerprints moved.
   rulesAdded: 1,
   rulesRemoved: 0,
-  rulesChanged: 11,
+  rulesChanged: 2,
 };
 const drift: string[] = [];
 if (facts.shadeExamples !== pinned.shadeExamples)

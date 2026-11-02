@@ -67,7 +67,7 @@ export const LANGUAGE_SLUGS: Readonly<Record<LanguageKind, string>> = {
   math: 'math',
 };
 
-/** The sections the functions page is cut into. The first ten are the families the builtin
+/** The sections the functions page is cut into. The first eleven are the families the builtin
  *  table already groups the spelling registry by (src/lib/builtin-table.ts); the last two
  *  hold the names the registry has no id for, which the front end lowers itself. */
 export type LanguageFamily = BuiltinFamily | 'constructors' | 'resources';
@@ -81,6 +81,7 @@ export const LANGUAGE_FAMILIES: readonly LanguageFamily[] = [
   'textures',
   'atomics',
   'barriers',
+  'subgroups',
   'f64',
   'constructors',
   'resources',

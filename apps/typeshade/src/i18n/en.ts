@@ -616,6 +616,7 @@ export const en = {
         textures: 'Textures and storage',
         atomics: 'Atomics',
         barriers: 'Barriers',
+        subgroups: 'Subgroups',
         f64: 'Emulated double',
         constructors: 'Constructors',
         resources: 'Arrays and bindings',
@@ -2237,7 +2238,7 @@ export const en = {
         `[${facts.glslTarget} specification](specGlslEs) and the [WebGL2 specification](specWebgl2) define the second.`,
         '[MDN WebGPU API](mdnWebgpu) and [MDN WebGL2RenderingContext](mdnWebgl2) show how a host hands each of them to a driver.',
         `[Functions](referenceFunctions) in the language reference gives each builtin with the WGSL and ${facts.glslTarget} text the compiler writes for it, and [Types](referenceTypes) does the same for every type.`,
-        `[Builtin functions](languageBuiltins) lists all ${facts.builtins} builtins on one page, with the text each backend writes. ${facts.glslAbsentBuiltins} of them have no ${glsl} form.`,
+        `[Builtin functions](languageBuiltins) lists all ${facts.builtins} builtins on one page, with the text each backend writes. ${facts.glslAbsentBuiltins} of them have no ${glsl} form of their own: the writer has none, or a pass rewrites the call before the writer runs.`,
       ],
       nextP:
         'Next: [Examples](examples), where every example in the compiler’s registry names the targets it emits.',
@@ -2709,7 +2710,7 @@ export const en = {
         boundary: '4. Where TypeScript classes stop',
         boundaryItems: [
           'An entry point is a top-level function, not a method.',
-          'A class with no instance fields can be constructed and can have methods, accessors and static members. Its host value is `{}`. Reflection includes the internal GPU storage footprint: 4 bytes in std430 and 16 bytes in std140, with no authored field added.',
+          'A class with no instance fields can be constructed and can have methods, accessors and static members. Its host value is `{}`, and a result is an instance of the class when the module exports it (Rule 8.21). Reflection includes the internal GPU storage footprint: 4 bytes in std430 and 16 bytes in std140, with no authored field added.',
           'A derived value can be used where its base class is declared when the compiler proves that the base view is read-only and preserves dispatch. Overrides, receiver writes and observable alias mutation require a concrete type or remain unsupported.',
           'A getter and a setter each lower to a function of their own, and a class has one constructor, as in TypeScript.',
           '`new` builds a value inside a function body, and a module constant takes an object literal.',
@@ -3362,11 +3363,11 @@ export const en = {
           },
           constructorNew: {
             name: '`constructor` and `new`',
-            p: '`new` is a call of `Ray_new`, which builds the struct and hands it back.',
+            p: '`new` is a call of `Ray_new`, which builds the struct and hands it back. WGSL spells it `Ray_new_into` and writes the struct into the variable that receives it (change 0104); GLSL returns it.',
           },
           fieldlessClass: {
             name: 'Class without fields',
-            p: 'Construction and method calls work with no instance fields. The host value is `{}`; the GPU receives an internal storage member that is absent from the source value.',
+            p: 'Construction and method calls work with no instance fields. The host value is `{}`, and a result is an instance of the class when the module exports it (Rule 8.21); the GPU receives an internal storage member that is absent from the source value.',
           },
           method: {
             name: 'Method',
@@ -3813,7 +3814,7 @@ export const en = {
         h1: 'Builtin functions',
         intro: `A builtin is a function the GPU already has. A call carries one neutral name through the compiler, and each backend writes its own spelling for that name, so the call is written once and emitted twice. The registry holds ${facts.builtins} names.`,
         readingH: 'How to read a row',
-        readingP: `The first column is the name the call carries, with a placeholder argument in each position it takes. The next two are the text the WGSL backend and the ${glsl} backend write for that call, run from the compiler's own spelling table at the pinned commit. ${facts.portableBuiltins} of the names are spelled the same way on both targets, and ${facts.glslAbsentBuiltins} have no ${glsl} form at all, where the cell carries the compiler's own message. ${facts.mathAliasBuiltins} answer to a \`Math.\` name as well, which the last column of the maths and cast tables shows. [WGSL vs ${glsl}](conceptsWgsl) compiles one shader to both targets and lists where they differ.`,
+        readingP: `The first column is the name the call carries, with a placeholder argument in each position it takes. The next two are the text the WGSL backend and the ${glsl} backend write for that call, run from the compiler's own spelling table at the pinned commit. ${facts.portableBuiltins} of the names are spelled the same way on both targets, and ${facts.glslAbsentBuiltins} have no ${glsl} form of their own, where the cell carries the compiler's own message: the writer has none, or a pass rewrites the call before the writer runs (the subgroup functions, which GLSL runs as one invocation). ${facts.mathAliasBuiltins} answer to a \`Math.\` name as well, which the last column of the maths and cast tables shows. [WGSL vs ${glsl}](conceptsWgsl) compiles one shader to both targets and lists where they differ.`,
         idsP: `A few of these names are chosen by the compiler and never written by hand. A layered texture read, a depth comparison, a storage fetch and a texel read at an unsigned coordinate each take a name of their own, so the argument order of a call never depends on the texture it landed on. An \`abs\` of an unsigned value and an integer \`dot\` take one too, because ${glsl} has no overload for either.`,
         precedenceH: 'A name the file declares',
         precedenceP:
@@ -3836,6 +3837,7 @@ export const en = {
           textures: 'Textures and storage',
           atomics: 'Atomics',
           barriers: 'Barriers',
+          subgroups: 'Subgroups',
           f64: 'Emulated double',
         },
         bitsP: `${glsl} has none of the bit builtins, so the column above names a small function the GLSL writer defines over the shifts, masks and comparisons that target does have. A module that calls none of them carries none of the definitions.`,

@@ -283,6 +283,7 @@ export const SHADE_GROUPS = [
       'workgroup-scratch',
       'workgroup-reduce',
       'atomic-histogram',
+      'subgroup-reduce',
       'gpu-console',
       'compute-sync',
       'compute-reduction-twin',
