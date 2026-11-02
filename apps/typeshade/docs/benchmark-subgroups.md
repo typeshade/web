@@ -171,4 +171,5 @@ Not run: a hardware adapter; the production collector.
 
 ## Status
 
-In progress: the conversion is on PR #22, waiting on its checks and the owner's go-ahead.
+Done. PR #22 merged into `main` at `52f4a67` on 2026-11-02 on the owner's go-ahead, with
+every check green on `47cb9dc`.
