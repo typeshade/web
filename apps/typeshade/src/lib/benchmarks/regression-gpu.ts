@@ -22,9 +22,11 @@ export async function prepareCompiled(device: GPUDevice, job: CompiledCase, n: n
     const args = make(16, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
     device.queue.writeBuffer(src, 0, input.buffer);
     device.queue.writeBuffer(args, 0, new Uint32Array([n, 0, 0, 0]));
-    const layout = job.wgsl
+    // A case the build refused never reaches here; a case without a program is run by its host.
+    const program = job.wgsl && job.bindings ? { wgsl: job.wgsl, bindings: job.bindings } : null;
+    const layout = program
       ? device.createBindGroupLayout({
-          entries: job.bindings.map((b) => ({
+          entries: program.bindings.map((b) => ({
             binding: b.binding,
             visibility: GPUShaderStage.COMPUTE,
             buffer: {
@@ -41,13 +43,16 @@ export async function prepareCompiled(device: GPUDevice, job: CompiledCase, n: n
     const pipeline = layout
       ? await device.createComputePipelineAsync({
           layout: device.createPipelineLayout({ bindGroupLayouts: [layout] }),
-          compute: { module: device.createShaderModule({ code: job.wgsl }), entryPoint: 'main' },
+          compute: {
+            module: device.createShaderModule({ code: program!.wgsl }),
+            entryPoint: 'main',
+          },
         })
       : undefined;
     const bindings = layout
       ? device.createBindGroup({
           layout,
-          entries: job.bindings.map((b) => ({
+          entries: program!.bindings.map((b) => ({
             binding: b.binding,
             resource: { buffer: b.name === 'args' ? args : b.name === 'src' ? src : out },
           })),

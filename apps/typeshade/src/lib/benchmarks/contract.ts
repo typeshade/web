@@ -99,6 +99,19 @@ export const metadataSchema = z
           .strict(),
       })
       .strict(),
+    // What one workgroup saw of its subgroups (subgroups.ts), null on a device without the
+    // feature; absent in records before the subgroup cases.
+    subgroups: z
+      .object({
+        minSize: z.number().int().min(1).max(1024).nullable(),
+        maxSize: z.number().int().min(1).max(1024).nullable(),
+        size: z.number().int().min(1).max(1024),
+        numSubgroups: z.number().int().min(1).max(64),
+        consecutive: z.boolean(),
+      })
+      .strict()
+      .nullable()
+      .optional(),
     webgl: z
       .object({
         state: z.enum(['available', 'unavailable']),

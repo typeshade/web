@@ -46,17 +46,32 @@ export async function checkRegressions(page, url) {
   const quick = await run();
   writeFileSync('shots/benchmarks/unified-quick.json', JSON.stringify(quick, null, 2));
   assert.equal(quick.status, 'complete', JSON.stringify(quick.results.at(-1)));
-  assert.equal(quick.results.length, 60);
+  assert.equal(quick.results.length, 68);
+  // The baseline build refuses the three cases that call the subgroup built-in functions:
+  // their rows say so and measure nothing.
+  const refusedRow = (r) =>
+    r.build === 'baseline' &&
+    ['reduction-subgroup', 'reduction-subgroup-levels', 'atomics-bins-1-subgroup'].includes(r.id);
+  assert.equal(quick.results.filter(refusedRow).length, 3);
   assert(
-    quick.results.every(
-      (r) =>
-        r.status === 'passed' &&
-        r.corruptionDetected &&
-        r.checkedValues > 0 &&
-        r.wallMs.length === 3,
+    quick.results.every((r) =>
+      refusedRow(r)
+        ? r.status === 'failed' &&
+          r.reason === 'refused' &&
+          !r.corruptionDetected &&
+          r.checkedValues === 0 &&
+          r.wallMs.length === 0
+        : r.status === 'passed' &&
+          r.corruptionDetected &&
+          r.checkedValues > 0 &&
+          r.wallMs.length === 3,
     ),
   );
-  assert(quick.results.filter((r) => r.kind === 'compiled').every((r) => r.gpuSubmissions > 0));
+  assert(
+    quick.results
+      .filter((r) => r.kind === 'compiled' && !refusedRow(r))
+      .every((r) => r.gpuSubmissions > 0),
+  );
   assert(quick.results.some((r) => r.kind === 'resident' && r.readbackMs.length === 3));
   assert.equal(await root.locator('[data-section]:visible').count(), 4);
   assert.equal(quick.peers[1].runtime.tier, 'webgpu');
@@ -82,8 +97,15 @@ export async function checkRegressions(page, url) {
   await root.locator('[data-profile]').selectOption('extended');
   const extended = await run();
   assert.equal(extended.status, 'complete');
-  assert.equal(extended.results.length, 180);
-  assert(extended.results.every((r) => r.wallMs.length === 15 && r.status === 'passed'));
+  assert.equal(extended.results.length, 204);
+  assert.equal(extended.results.filter(refusedRow).length, 9);
+  assert(
+    extended.results.every((r) =>
+      refusedRow(r)
+        ? r.status === 'failed' && r.reason === 'refused' && r.wallMs.length === 0
+        : r.wallMs.length === 15 && r.status === 'passed',
+    ),
+  );
   writeFileSync('shots/benchmarks/unified-extended.json', JSON.stringify(extended, null, 2));
   await root.locator('[data-profile]').selectOption('quick');
   // Each Run action sends the completed record once and shows a stable receipt.
@@ -122,6 +144,37 @@ export async function checkRegressions(page, url) {
   assert.equal(noTiming.metadata.webgl.debugExtension, false);
   assert.equal(noTiming.metadata.webgl.unmaskedRenderer, null);
   await page.unroute('**/regression.worker-*.js');
+  // A device without the subgroups extension skips the subgroup cases the candidate compiled
+  // as unsupported and still completes; the baseline's refusals stand, and the one case that
+  // needs no extension runs on both builds.
+  await fault(
+    "const hasFeature=GPUSupportedFeatures.prototype.has;GPUSupportedFeatures.prototype.has=function(n){return n==='subgroups'?false:hasFeature.call(this,n)};const listFeatures=GPUSupportedFeatures.prototype[Symbol.iterator];GPUSupportedFeatures.prototype[Symbol.iterator]=function*(){for(const f of listFeatures.call(this))if(f!=='subgroups')yield f;};",
+  );
+  const noSubgroups = await run();
+  assert.equal(noSubgroups.status, 'complete');
+  assert.equal(noSubgroups.results.length, 68);
+  assert.equal(noSubgroups.metadata.subgroups, null);
+  assert.equal(
+    await root.locator('[data-subgroups]').textContent(),
+    'The adapter has no subgroups extension. The subgroup cases are skipped.',
+  );
+  const skipped = noSubgroups.results.filter((r) => r.reason === 'unsupported');
+  assert.equal(skipped.length, 3);
+  assert(
+    skipped.every((r) => r.build === 'candidate' && r.status === 'failed' && r.wallMs.length === 0),
+  );
+  assert.equal(noSubgroups.results.filter((r) => r.reason === 'refused').length, 3);
+  assert.deepEqual([...new Set(skipped.map((r) => r.id))].sort(), [
+    'atomics-bins-1-subgroup',
+    'reduction-subgroup',
+    'reduction-subgroup-levels',
+  ]);
+  assert(
+    noSubgroups.results
+      .filter((r) => r.id === 'atomics-bins-1-workgroup')
+      .every((r) => r.status === 'passed'),
+  );
+  await page.unroute('**/regression.worker-*.js');
   // A corrupt GPU program automatically sends the failed run's diagnostic record.
   await fault(
     "const create=GPUDevice.prototype.createShaderModule;GPUDevice.prototype.createShaderModule=function(d){return create.call(this,{...d,code:d.code.replaceAll('out[i] = src[i].f0;','out[i] = src[i].f0 + 1.0;')});};",
@@ -146,7 +199,7 @@ export async function checkRegressions(page, url) {
   await root.locator('[data-stop]').click();
   const partial = await record();
   assert.equal(partial.status, 'cancelled');
-  assert(partial.results.length > 0 && partial.results.length < 180);
+  assert(partial.results.length > 0 && partial.results.length < 204);
   assert.equal(partial.results.length % 2, 0);
   await page.waitForFunction(() =>
     document

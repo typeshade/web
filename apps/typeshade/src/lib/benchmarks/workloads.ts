@@ -1,6 +1,6 @@
 /** Fixed application inputs and programs. Change this revision when their work changes. */
-export const WORKLOAD_REVISION = 'applications-3';
-export const INSTRUMENT_REVISION = 'unified-2';
+export const WORKLOAD_REVISION = 'applications-5';
+export const INSTRUMENT_REVISION = 'unified-4';
 export const LEGACY_APPLICATIONS = [
   'image',
   'particles',

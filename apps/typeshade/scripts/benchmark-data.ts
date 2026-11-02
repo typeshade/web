@@ -5,6 +5,7 @@ import type { BenchRecord } from '../src/lib/benchmarks/contract.ts';
 import { parseAnyRecord as parseRecord } from '../src/lib/benchmarks/records.ts';
 import { pairedResults, summarizePaired } from '../src/lib/benchmarks/comparison.ts';
 import { median } from '../src/lib/benchmarks/fixtures.ts';
+import { summarizeFixed } from '../src/lib/benchmarks/comparison.ts';
 
 const [mode, file] = process.argv.slice(2);
 if (!file || !['export', 'analyze'].includes(mode ?? ''))
@@ -134,6 +135,7 @@ if (mode === 'export') {
         summary,
         comparisons,
         regressionSummary: summarizePaired(regressionRuns),
+        subgroupSummary: summarizeFixed(regressionRuns),
       },
       null,
       2,
