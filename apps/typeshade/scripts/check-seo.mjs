@@ -26,6 +26,8 @@ const decode = (s) =>
   s
     .replace(/&#39;/g, "'")
     .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
 
 const sitemapUrls = new Set(
