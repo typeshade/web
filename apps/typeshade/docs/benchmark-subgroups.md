@@ -65,7 +65,56 @@ Reports are voluntary and unverified. Maintainers export them with
 `bun scripts/benchmark-data.ts export` and read `subgroupSummary` per adapter. A software
 renderer (SwiftShader) runs a barrier as a thread switch and says nothing about a GPU.
 
-## Validation
+## Validation record
 
-To be recorded before the pull request is marked ready: the commands, the configuration and the
-observed results.
+Observed on 2026-11-02 UTC on branch `claude/benchmark-subgroups` at `de6a75d`, base `main`
+`2bd140d`, compiler pin `3e1e8420` unchanged. Node 24.22.1, pnpm 10.28.2, Bun 1.4.3 for the
+catalog and 1.4.4 for the tests, Chrome for Testing 153.0.8010.12 on SwiftShader, Wrangler from
+the lockfile with a temporary local D1. The Astro build ran with `--max-old-space-size=12288`;
+the default heap ran out in this container. These checks validate the instrument and the
+presentation; a software device establishes no GPU performance.
+
+| Command                                                                | Observed result                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run check:types`                                                  | Passed for the site and the Worker.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `bun test scripts/benchmarks.test.ts`                                  | Passed; 18 tests, one added for the unsupported rows and the fixed-case pairing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `bun run test:playground-boundaries`                                   | Passed; 11 tests.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `check:style`, `check:copy`, `check:i18n`, the build's checks          | Passed; 3,397 translated strings, route parity.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `bun@1.4.3 scripts/regression-catalog.ts --new`, then `--check`        | Reproduced; two builds `a21f7024` and `3e1e8420`, 26 cases each, workload `d0c12750…`; runtime artifacts unchanged. The first catalog, generated before the measurement sources were formatted, did not reproduce and was replaced (`a8d91b0`).                                                                                                                                                                                                                                                                                                                        |
+| `bun run check:benchmark-catalog`                                      | Passed; the 22 retained fixtures reproduce on `94203d3c`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `astro build`, `pagefind`                                              | Passed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `bun run qa:seo`, `qa:worker-routes`, `qa:openseo`                     | Passed; 2,614 pages, 2,494 sitemap entries; 8 prefixes shadow no page; no warning or critical issue.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `pnpm test:styles apps/typeshade/dist`, `check-reference-notes --dist` | Passed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `PLAYWRIGHT_CHROMIUM=… node scripts/check-benchmarks.mjs`              | Passed: 68 quick and 204 extended rows, every row passed with its corruption probe; the probe saw size 4, 16 subgroups per workgroup of 64, consecutive lanes; the four fixed cases passed on both builds; with the feature hidden, the three cases that need it were skipped as `unsupported` (6 rows), the run completed and the collector accepted it; receipts, retry, cancellation, corrupt artifact and corrupt program checks as before; both locales and themes at 390 and 1440. The first run stalled in the fault test, which hid `has()` alone (`de6a75d`). |
+
+Layout, from `shots/benchmarks/measurements.json`: the header stays 65 pixels tall; the document
+width equals the viewport; the run control is 44 pixels tall; the controls and every chart are 836
+pixels wide at 1440 and 358 at 390, as before this change. The compute chart holds ten rows.
+
+Medians of the device time on this software adapter, extended profile, 262,144 elements, in
+milliseconds per dispatch, baseline build then candidate build:
+
+| Case                        | Baseline | Candidate |
+| --------------------------- | -------- | --------- |
+| `reduction-workgroup`       | 87.49    | 85.48     |
+| `reduction-subgroup`        | 44.93    | 44.68     |
+| `reduction-subgroup-levels` | 64.24    | 66.53     |
+| `atomics-bins-1`            | 15.10    | 12.63     |
+| `atomics-bins-1-subgroup`   | 6.60     | 8.04      |
+| `atomics-bins-1-workgroup`  | 103.86   | 101.19    |
+
+The two builds run the same bytes for these cases, so their difference is the run's noise. On this
+device the subgroup reduction took about half the workgroup tree's time and the subgroup fold
+before one atomic about half the per-lane atomics' time; the workgroup tree before one atomic took
+seven times the per-lane atomics' time. SwiftShader runs a barrier as a thread switch, which is why
+the tree is slow here. None of this is a GPU result.
+
+Not run: a hardware adapter; the production collector (the check uses a local D1 and intercepts
+submissions for the repeated runs).
+
+## Status
+
+Draft, on the owner's decision of 2026-11-02 to write compiler proposal 0117 first (the subgroup
+built-in functions become authorable) and to replace these fixed WGSL cases with TypeShade source
+compiled at each build once the pin carries it. The code that stays either way: the feature
+request, the probe, the `unsupported` contract, the dictionaries and the checks.
