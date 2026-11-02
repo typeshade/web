@@ -14,9 +14,14 @@ fold before `atomicAdd`. This change measures; it decides nothing about the comp
 
 ## Scope
 
-- Four fixed WGSL cases join the unified benchmark's compiled cases
-  (`src/lib/benchmarks/subgroups.ts`). TypeShade does not author subgroup built-ins, so they
-  are written by hand in the compiled cases' layout and run unchanged on both builds:
+- Four subgroup cases join the unified benchmark's compiled cases
+  (`src/lib/benchmarks/subgroups.ts`). They are TypeShade programs in the compiled cases'
+  layout, and each build of the comparison compiles them like every other case. Since
+  compiler change 0117 (pin `cdb12dc`) an author writes the subgroup built-in functions; a
+  build whose compiler predates the change refuses the three programs that call them, the
+  catalog records the refusal on that build (`refused`) instead of a program, and the
+  instrument reports their rows there as `failed` with the reason `refused`, nothing measured.
+  The run still completes, and the candidate build runs all four:
   - `reduction-subgroup`: one `subgroupAdd` per subgroup, lane 0 sums the `num_subgroups`
     partials. Right on any assignment of lanes to subgroups.
   - `reduction-subgroup-levels`: a second `subgroupAdd` level over the partials. Right only
@@ -34,17 +39,21 @@ fold before `atomicAdd`. This change measures; it decides nothing about the comp
 - A device without the feature skips the three cases that need it. Their rows are `failed` with
   the reason `unsupported`, nothing measured, and the run still completes. A passed row for such
   a case on such a device is rejected, and so is an unsupported row on a device that has it.
-- Workload `applications-4`, instrument `unified-3`. The comparison stays `a21f7024` against
-  `3e1e8420`; the catalog digest, the workload hash and the measurement hash move. Retained
-  catalogs and their records are unchanged.
+- Workload `applications-5`, instrument `unified-4`. The comparison is `8c088df7` (refuses the
+  three subgroup programs) against `cdb12dc0` (compiles all four); the catalog digest, the
+  workload hash and the measurement hash move. Retained catalogs and their records are
+  unchanged.
+- A `refused` row is accepted only where the catalog records the refusal on that build, and a
+  passed or measured row for such a case on such a build is rejected.
 - The page's device section shows the probe. The method section explains the cases. The
   compute chart gains the four rows. Both locales.
-- `bun scripts/benchmark-data.ts analyze` adds `subgroupSummary`: each fixed case's median
+- `bun scripts/benchmark-data.ts analyze` adds `subgroupSummary`: each subgroup case's median
   against its reference's, within one build, one size and one run, for elapsed and GPU time.
-  A value above 1 means the subgroup fold took less time on that device.
+  A value above 1 means the subgroup fold took less time on that device. A build that refused
+  the case contributes no ratio for it.
 
 Out of scope: any compiler change, a new section or chart, a new collector endpoint, a move of
-the compiler pin.
+the compiler pin (the pin moved to `cdb12dc` in PR #14, before this change was rebased on it).
 
 ## What a record answers
 
@@ -112,9 +121,17 @@ the tree is slow here. None of this is a GPU result.
 Not run: a hardware adapter; the production collector (the check uses a local D1 and intercepts
 submissions for the repeated runs).
 
+## Revision of 2026-11-02: TypeShade source
+
+The cases were first fixed WGSL programs that both builds ran unchanged, because the pinned
+compiler (`3e1e8420`) did not author the subgroup built-in functions. On the owner's decision
+of 2026-11-02, compiler proposal 0117 made them authorable (implemented at `cdb12dc`), the pin
+moved there (PR #14), and this change was rebased on it: the four cases are now TypeShade
+source, compiled by each build, and the `refused` row reason records a build that cannot
+compile them. The probe stays fixed WGSL, since it belongs to the instrument and not to a
+build under comparison. The validation record above describes the fixed-WGSL revision at
+`de6a75d`; the record for this revision is on the pull request.
+
 ## Status
 
-Draft, on the owner's decision of 2026-11-02 to write compiler proposal 0117 first (the subgroup
-built-in functions become authorable) and to replace these fixed WGSL cases with TypeShade source
-compiled at each build once the pin carries it. The code that stays either way: the feature
-request, the probe, the `unsupported` contract, the dictionaries and the checks.
+In progress: the conversion is on PR #22, waiting on its checks and the owner's go-ahead.

@@ -331,10 +331,10 @@ import {
 } from '../src/lib/benchmarks/comparison.ts';
 import { postBenchmarkRecord } from '../src/lib/benchmarks/send-record.ts';
 import { reportGroups, formatChange } from '../src/lib/benchmarks/report.ts';
-import { FIXED_CASES } from '../src/lib/benchmarks/subgroups.ts';
+import { SUBGROUP_CASES } from '../src/lib/benchmarks/subgroups.ts';
 function pairedRecord(): RegressionRecord {
   const metadata = exampleRecord().metadata;
-  // The paired instrument runs the fixed subgroup cases, so its device has the extension.
+  // The paired instrument runs the subgroup cases, so its device has the extension.
   metadata.webgpu.features = ['subgroups'];
   const ids = [...regressionCatalog.builds[0]!.cases.map((e) => e.id), ...APPLICATIONS];
   return {
@@ -380,6 +380,9 @@ function pairedRecord(): RegressionRecord {
     results: ids.flatMap((id) =>
       [0, 1].map((build) => {
         const e = regressionCatalog.builds[0]!.cases.find((e) => e.id === id);
+        // A case this build's compiler refused has rows that say so and measure nothing.
+        const refused =
+          'refused' in (regressionCatalog.builds[build]!.cases.find((c) => c.id === id) ?? {});
         return {
           id,
           n: 16384,
@@ -389,27 +392,29 @@ function pairedRecord(): RegressionRecord {
             : id === 'resident-image'
               ? ('resident' as const)
               : ('host' as const),
-          status: 'passed' as const,
-          reason: 'none' as const,
+          status: refused ? ('failed' as const) : ('passed' as const),
+          reason: refused ? ('refused' as const) : ('none' as const),
           setupMs: 1,
           coldMs: 2,
-          wallMs: build === 0 ? [2, 4, 6] : [1, 2, 3],
+          wallMs: refused ? [] : build === 0 ? [2, 4, 6] : [1, 2, 3],
           readbackMs: id === 'resident-image' ? [1, 2, 3] : null,
           gpuNs: null,
           gpuTiming: 'unsupported' as const,
           dispatches: e?.dispatches ?? (id === 'resident-image' ? 16 : 1),
-          checkedValues: fieldCount(id)
-            ? 16384 * 9
-            : e
-              ? outputLength(e as any, 16384)
-              : id === 'particles'
-                ? 16384 * 8
-                : id === 'peak'
-                  ? 1
-                  : id === 'collect'
-                    ? 381
-                    : 16384,
-          corruptionDetected: true,
+          checkedValues: refused
+            ? 0
+            : fieldCount(id)
+              ? 16384 * 9
+              : e
+                ? outputLength(e as any, 16384)
+                : id === 'particles'
+                  ? 16384 * 8
+                  : id === 'peak'
+                    ? 1
+                    : id === 'collect'
+                      ? 381
+                      : 16384,
+          corruptionDetected: !refused,
           logicalBytes: e
             ? storageBytes(e as any, 16384)
             : 16384 * (fieldCount(id) ? 36 : id === 'particles' ? 32 : id === 'collect' ? 8 : 4),
@@ -479,22 +484,31 @@ test('legacy and paired provenance, complete pairs and checked outputs are enfor
   expect(parseAnyRecord(partial).results.length).toBe(2);
   expect(pairedResults(partial)).toEqual([]);
 });
-test('a fixed subgroup case is skipped as unsupported only on a device without the extension', () => {
-  const fixed = regressionCatalog.builds[0]!.cases.filter(
+test('a subgroup case is refused by a build that predates it, and skipped as unsupported only on a device without the extension', () => {
+  const needing = regressionCatalog.builds[0]!.cases.filter(
     (c) => 'features' in c && c.features.length,
   );
-  expect(fixed.map((c) => c.id).sort()).toEqual([
+  expect(needing.map((c) => c.id).sort()).toEqual([
     'atomics-bins-1-subgroup',
     'reduction-subgroup',
     'reduction-subgroup-levels',
   ]);
   expect(regressionCatalog.builds.every((b) => b.cases.length === 26)).toBe(true);
-  // Both builds carry the same fixed bytes.
-  for (const c of fixed)
-    expect(regressionCatalog.builds[1]!.cases.find((x) => x.id === c.id)!.shader).toBe(c.shader);
+  // The baseline build predates compiler change 0117 and refuses the three programs that use
+  // the subgroup built-in functions; the candidate compiles all four into its own WGSL.
+  const refusedOn = (build: number) =>
+    regressionCatalog.builds[build]!.cases.filter((c) => 'refused' in c).map((c) => c.id);
+  expect(refusedOn(0).sort()).toEqual(needing.map((c) => c.id).sort());
+  expect(refusedOn(1)).toEqual([]);
+  for (const c of SUBGROUP_CASES) {
+    const built = regressionCatalog.builds[1]!.cases.find((x) => x.id === c.id)!;
+    expect('wgsl' in built && /^enable subgroups;$/m.test(built.wgsl)).toBe(
+      c.features.includes('subgroups'),
+    );
+  }
   const skip = (r: RegressionRecord) => {
     for (const row of r.results)
-      if (fixed.some((c) => c.id === row.id))
+      if (needing.some((c) => c.id === row.id) && row.build === 'candidate')
         Object.assign(row, {
           status: 'failed',
           reason: 'unsupported',
@@ -516,6 +530,30 @@ test('a fixed subgroup case is skipped as unsupported only on a device without t
   expect(() => parseAnyRecord(withFeature)).not.toThrow();
   skip(withFeature);
   expect(() => parseAnyRecord(withFeature)).toThrow();
+  // A refused row stands only where the catalog records the refusal, and measures nothing.
+  const measured = pairedRecord();
+  measured.results.find(
+    (row) => row.id === 'reduction-subgroup' && row.build === 'baseline',
+  )!.wallMs = [1];
+  expect(() => parseAnyRecord(measured)).toThrow();
+  const ran = pairedRecord();
+  Object.assign(
+    ran.results.find((row) => row.id === 'reduction-subgroup' && row.build === 'baseline')!,
+    { status: 'passed', reason: 'none', wallMs: [1, 2, 3] },
+  );
+  expect(() => parseAnyRecord(ran)).toThrow();
+  const forged = pairedRecord();
+  Object.assign(
+    forged.results.find((row) => row.id === 'reduction-subgroup' && row.build === 'candidate')!,
+    {
+      status: 'failed',
+      reason: 'refused',
+      wallMs: [],
+      checkedValues: 0,
+      corruptionDetected: false,
+    },
+  );
+  expect(() => parseAnyRecord(forged)).toThrow();
   // A device without it skips them and the run is still complete; a passed row there is not.
   const without = pairedRecord();
   without.metadata.webgpu.features = [];
@@ -523,18 +561,14 @@ test('a fixed subgroup case is skipped as unsupported only on a device without t
   expect(() => parseAnyRecord(without)).toThrow();
   skip(without);
   expect(parseAnyRecord(without).status).toBe('complete');
-  const measured = structuredClone(without);
-  measured.results.find((row) => row.id === 'reduction-subgroup')!.wallMs = [1];
-  expect(() => parseAnyRecord(measured)).toThrow();
-  // The reference pairing reads the fixed cases against their references within a build.
-  expect(summarizeFixed([withFeature]).every((g) => g.fixed === 'atomics-bins-1-workgroup')).toBe(
-    true,
-  );
-  const ran = pairedRecord();
-  ran.metadata.webgpu.features = ['subgroups'];
-  expect(
-    summarizeFixed([ran]).filter((g) => g.metric === 'wallMs' && g.build === 'baseline'),
-  ).toHaveLength(4);
+  // The reference pairing reads the subgroup cases against their references within a build,
+  // so the refusing baseline pairs only the case it compiled.
+  const pairs = summarizeFixed([withFeature]).filter((g) => g.metric === 'wallMs');
+  expect(pairs.every((g) => g.fixed === 'atomics-bins-1-workgroup')).toBe(true);
+  expect(pairs.map((g) => g.build).sort()).toEqual(['baseline', 'candidate']);
+  const full = summarizeFixed([pairedRecord()]).filter((g) => g.metric === 'wallMs');
+  expect(full.filter((g) => g.build === 'baseline')).toHaveLength(1);
+  expect(full.filter((g) => g.build === 'candidate')).toHaveLength(4);
 });
 test('calibration is bounded and device validity uses only measured samples', () => {
   let count = 1;
@@ -607,7 +641,7 @@ test('a projected baseline is accepted while retained full-input baselines stay 
     builds: optimizedPrior.builds.map((b) => b.revision),
     runtimes: optimizedPrior.builds.map((b) => b.runtimeDigest),
   });
-  // A retained catalog has no fixed subgroup case; its record carries its own case list.
+  // A retained catalog has no subgroup case; its record carries its own case list.
   const idsOf = (c: (typeof retainedCatalogs)[number]) => [
     ...c.builds[0]!.cases.map((e) => e.id),
     ...('applications' in c ? (c.applications as readonly string[]) : LEGACY_APPLICATIONS),
@@ -642,7 +676,7 @@ test('a projected baseline is accepted while retained full-input baselines stay 
 test('unified workload contains each original experiment and application once per build', () => {
   expect(regressionCatalog.builds[0]!.cases.map((c) => c.id)).toEqual([
     ...catalog.cases.map((c) => c.id),
-    ...FIXED_CASES.map((c) => c.id),
+    ...SUBGROUP_CASES.map((c) => c.id),
   ]);
   const r = pairedRecord();
   expect(r.results).toHaveLength(68);
@@ -713,7 +747,8 @@ test('application references cover cold fields, insertion order and output corru
 test('paired ratios require a complete same-adapter run and expose sample spread', () => {
   const r = pairedRecord();
   const pairs = pairedResults(r);
-  expect(pairs).toHaveLength(34);
+  // The three subgroup cases the baseline build refuses have no pair.
+  expect(pairs).toHaveLength(31);
   expect(pairs[0]!.wallRatio).toBe(2);
   expect(pairs[0]!.bufferRatio).toBe(2);
   expect(pairs[0]!.baselineWallP90).toBe(4);

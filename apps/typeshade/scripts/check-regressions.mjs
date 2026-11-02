@@ -83,7 +83,18 @@ export async function checkRegressions(page, url) {
   const extended = await run();
   assert.equal(extended.status, 'complete');
   assert.equal(extended.results.length, 204);
-  assert(extended.results.every((r) => r.wallMs.length === 15 && r.status === 'passed'));
+  // The baseline build refuses the three cases that call the subgroup built-in functions.
+  const refusedRow = (r) =>
+    r.build === 'baseline' &&
+    ['reduction-subgroup', 'reduction-subgroup-levels', 'atomics-bins-1-subgroup'].includes(r.id);
+  assert.equal(extended.results.filter(refusedRow).length, 9);
+  assert(
+    extended.results.every((r) =>
+      refusedRow(r)
+        ? r.status === 'failed' && r.reason === 'refused' && r.wallMs.length === 0
+        : r.wallMs.length === 15 && r.status === 'passed',
+    ),
+  );
   writeFileSync('shots/benchmarks/unified-extended.json', JSON.stringify(extended, null, 2));
   await root.locator('[data-profile]').selectOption('quick');
   // Each Run action sends the completed record once and shows a stable receipt.
@@ -122,8 +133,9 @@ export async function checkRegressions(page, url) {
   assert.equal(noTiming.metadata.webgl.debugExtension, false);
   assert.equal(noTiming.metadata.webgl.unmaskedRenderer, null);
   await page.unroute('**/regression.worker-*.js');
-  // A device without the subgroups extension skips the fixed subgroup cases as unsupported and
-  // still completes; the one fixed case that needs no extension runs.
+  // A device without the subgroups extension skips the subgroup cases the candidate compiled
+  // as unsupported and still completes; the baseline's refusals stand, and the one case that
+  // needs no extension runs on both builds.
   await fault(
     "const hasFeature=GPUSupportedFeatures.prototype.has;GPUSupportedFeatures.prototype.has=function(n){return n==='subgroups'?false:hasFeature.call(this,n)};const listFeatures=GPUSupportedFeatures.prototype[Symbol.iterator];GPUSupportedFeatures.prototype[Symbol.iterator]=function*(){for(const f of listFeatures.call(this))if(f!=='subgroups')yield f;};",
   );
@@ -136,8 +148,11 @@ export async function checkRegressions(page, url) {
     'The adapter has no subgroups extension. The subgroup cases are skipped.',
   );
   const skipped = noSubgroups.results.filter((r) => r.reason === 'unsupported');
-  assert.equal(skipped.length, 6);
-  assert(skipped.every((r) => r.status === 'failed' && r.wallMs.length === 0));
+  assert.equal(skipped.length, 3);
+  assert(
+    skipped.every((r) => r.build === 'candidate' && r.status === 'failed' && r.wallMs.length === 0),
+  );
+  assert.equal(noSubgroups.results.filter((r) => r.reason === 'refused').length, 3);
   assert.deepEqual([...new Set(skipped.map((r) => r.id))].sort(), [
     'atomics-bins-1-subgroup',
     'reduction-subgroup',

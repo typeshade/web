@@ -22,7 +22,7 @@ export const regressionResultSchema = z
     build: z.enum(['baseline', 'candidate']),
     kind: z.enum(['compiled', 'host', 'resident']),
     status: z.enum(['passed', 'failed']),
-    reason: z.enum(['none', 'validation', 'device-lost', 'unsupported']),
+    reason: z.enum(['none', 'validation', 'device-lost', 'unsupported', 'refused']),
     setupMs: ms,
     coldMs: ms,
     wallMs: samples,
@@ -98,7 +98,7 @@ export const regressionRecordSchema = z
     const applications =
       'applications' in active ? (active.applications as readonly string[]) : LEGACY_APPLICATIONS;
     const ids = [...active.builds[0]!.cases.map((c) => c.id), ...applications];
-    const unified = ['unified-2', 'unified-3'].includes(active.instrument);
+    const unified = ['unified-2', 'unified-3', 'unified-4'].includes(active.instrument);
     if (unified && r.status === 'complete' && r.peers[1]?.runtime?.tier !== 'webgpu') fail();
     for (const row of r.results) {
       const key = `${row.id}:${row.n}:${row.build}`;
@@ -111,7 +111,24 @@ export const regressionRecordSchema = z
       seen.set(key, row);
       const e = active.builds[0]!.cases.find((c) => c.id === row.id);
       const kind = e ? 'compiled' : row.id === 'resident-image' ? 'resident' : 'host';
-      // A fixed case is skipped as unsupported only on a device without a feature it needs,
+      // A case the build's compiler refused (the subgroup cases on a build that predates
+      // compiler change 0117) has rows that say so and measure nothing.
+      const built = active.builds[row.build === 'baseline' ? 0 : 1]!.cases.find(
+        (c) => c.id === row.id,
+      );
+      const refused = built !== undefined && 'refused' in built;
+      if (row.reason === 'refused') {
+        if (
+          !refused ||
+          row.status !== 'failed' ||
+          row.wallMs.length > 0 ||
+          row.checkedValues !== 0 ||
+          row.corruptionDetected ||
+          row.gpuNs !== null
+        )
+          fail();
+      } else if (refused) fail();
+      // A case needing a feature is skipped as unsupported only on a device without it,
       // with nothing measured.
       const needs = e && 'features' in e ? (e.features as readonly string[]) : [];
       if (row.reason === 'unsupported') {
@@ -124,7 +141,7 @@ export const regressionRecordSchema = z
           row.gpuNs !== null
         )
           fail();
-      } else if (needs.some((f) => !r.metadata.webgpu.features.includes(f))) fail();
+      } else if (!refused && needs.some((f) => !r.metadata.webgpu.features.includes(f))) fail();
       if (row.kind !== kind || (e && row.logicalBytes !== storageBytes(e as Experiment, row.n)))
         fail();
       if (
@@ -185,7 +202,9 @@ export const regressionRecordSchema = z
     if (
       r.status === 'complete' &&
       (r.results.length !== ids.length * 2 * PROFILES[r.profile].sizes.length ||
-        r.results.some((x) => x.status !== 'passed' && x.reason !== 'unsupported') ||
+        r.results.some(
+          (x) => x.status !== 'passed' && x.reason !== 'unsupported' && x.reason !== 'refused',
+        ) ||
         r.peers.length !== 2 ||
         r.loadMs.length !== 2 ||
         !r.peers.every((x) => x.webgpu.available))

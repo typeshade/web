@@ -13,7 +13,7 @@ import {
   INSTRUMENT_REVISION,
 } from '../src/lib/benchmarks/workloads.ts';
 import legacy from '../src/lib/benchmarks/catalog-v1.json';
-import { FIXED_BINDINGS, FIXED_CASES } from '../src/lib/benchmarks/subgroups.ts';
+import { SUBGROUP_CASES } from '../src/lib/benchmarks/subgroups.ts';
 
 const sha = (s: string | Uint8Array) => createHash('sha256').update(s).digest('hex');
 const pin = execFileSync('git', ['-C', 'vendor/shader-dsl', 'rev-parse', 'HEAD'], {
@@ -38,10 +38,16 @@ for (const revision of revisions) {
   const { compile } = await load('src/compiler/ts/compile.ts');
   const { packModule } = await load('src/compiler/ts/pack.ts');
   const { hostFace } = await load('src/compiler/ts/host-face.ts');
-  // The fixed WGSL cases (subgroups.ts) are not compiled: both builds run the same bytes.
+  const bindingsOf = (pack: { bindings: { name: string; binding: number; group: number }[] }) =>
+    pack.bindings.map(({ name, binding, group }) => ({ name, binding, group }));
   const cases: (
     | (typeof legacy.cases)[number]
-    | ((typeof FIXED_CASES)[number] & { shader: string; bindings: typeof FIXED_BINDINGS })
+    | ((typeof SUBGROUP_CASES)[number] & {
+        wgsl: string;
+        shader: string;
+        bindings: { name: string; binding: number; group: number }[];
+      })
+    | ((typeof SUBGROUP_CASES)[number] & { refused: string })
   )[] = legacy.cases.map((e) => {
     if (!e.source) return e;
     const result = compile(e.source, { fileName: `${e.id}.shade.ts` });
@@ -61,7 +67,24 @@ for (const revision of revisions) {
       ),
     };
   });
-  for (const c of FIXED_CASES) cases.push({ ...c, shader: sha(c.wgsl), bindings: FIXED_BINDINGS });
+  // The subgroup cases (subgroups.ts) are compiled like the others. A build whose compiler
+  // predates change 0117 refuses the source; the catalog records the refusal on that build and
+  // the instrument reports the case's rows there as `refused`, measuring nothing.
+  for (const e of SUBGROUP_CASES) {
+    const result = compile(e.source, { fileName: `${e.id}.shade.ts` });
+    const errors = result.diagnostics.filter(
+      (d: { category: string }) => d.category === 'error',
+    ) as { code?: string; message: string }[];
+    if (errors.length > 0) {
+      cases.push({ ...e, refused: `${errors[0]!.code ?? ''} ${errors[0]!.message}`.trim() });
+      continue;
+    }
+    const pack = packModule(result.module, { emit: { level: 'O1', parens: 'minimal' } });
+    const enables = /^enable subgroups;$/m.test(pack.wgsl);
+    if (enables !== e.features.includes('subgroups'))
+      throw new Error(`${e.id}: the program's directives and its declared features disagree`);
+    cases.push({ ...e, wgsl: pack.wgsl, shader: sha(pack.wgsl), bindings: bindingsOf(pack) });
+  }
   const face = hostFace(APPLICATION_SOURCE, {
     fileName: 'applications.shade.ts',
     fuse: true,
@@ -151,7 +174,7 @@ const workload = sha(
     cases: builds[0]!.cases.map((c) => ({
       source: c.source,
       id: c.id,
-      ...('features' in c ? { wgsl: c.wgsl, features: c.features } : {}),
+      ...('features' in c ? { features: c.features } : {}),
     })),
   }),
 );

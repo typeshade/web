@@ -41,9 +41,10 @@ export function pairedResults(record: RegressionRecord) {
     });
 }
 
-/** The fixed subgroup cases against their references within one build and one run: the
+/** The subgroup cases against their references within one build and one run: the
  *  reference's median over the case's, for elapsed and GPU time. A ratio above 1 means the
- *  subgroup fold took less time on that device. Skipped cases give no ratio. */
+ *  subgroup fold took less time on that device. A case a build refused or a device skipped
+ *  gives no ratio. */
 export const FIXED_PAIRS = [
   ['reduction-workgroup', 'reduction-subgroup'],
   ['reduction-workgroup', 'reduction-subgroup-levels'],

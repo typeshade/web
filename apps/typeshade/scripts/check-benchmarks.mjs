@@ -91,12 +91,23 @@ try {
   assert.equal(workerLoads, 0);
   const first = await run();
   assert.equal(first.status, 'complete', JSON.stringify(first.results.at(-1)));
-  assert.equal(first.revision, 'applications-4');
-  assert.equal(first.instrument, 'unified-3');
+  assert.equal(first.revision, 'applications-5');
+  assert.equal(first.instrument, 'unified-4');
   assert.equal(first.results.length, 68);
+  // The baseline build predates compiler change 0117 and refuses the three cases that call
+  // the subgroup built-in functions: their rows say so and measure nothing.
+  const refused = (r) =>
+    r.build === 'baseline' &&
+    ['reduction-subgroup', 'reduction-subgroup-levels', 'atomics-bins-1-subgroup'].includes(r.id);
+  assert.equal(first.results.filter(refused).length, 3);
   assert(
-    first.results.every(
-      (r) => r.status === 'passed' && r.corruptionDetected && r.wallMs.length === 3,
+    first.results.every((r) =>
+      refused(r)
+        ? r.status === 'failed' &&
+          r.reason === 'refused' &&
+          !r.corruptionDetected &&
+          r.wallMs.length === 0
+        : r.status === 'passed' && r.corruptionDetected && r.wallMs.length === 3,
     ),
   );
   assert.equal(new Set(first.results.map((r) => `${r.id}:${r.n}:${r.build}`)).size, 68);
@@ -105,7 +116,8 @@ try {
   assert.equal(await root.locator('[data-section]:visible').count(), 4);
   assert.equal(await root.locator('[data-case]').count(), 34);
   assert.equal(await root.locator('table').count(), 0);
-  // SwiftShader has the subgroups extension: the probe and every fixed case ran.
+  // SwiftShader has the subgroups extension: the probe ran, and every subgroup case the
+  // candidate build compiled ran on it.
   assert.equal(first.metadata.subgroups.size, 4);
   assert.equal(first.metadata.subgroups.numSubgroups, 16);
   assert.equal(first.metadata.subgroups.consecutive, true);
@@ -116,7 +128,11 @@ try {
     'atomics-bins-1-subgroup',
     'atomics-bins-1-workgroup',
   ])
-    assert(first.results.filter((r) => r.id === id).every((r) => r.status === 'passed'));
+    assert(
+      first.results
+        .filter((r) => r.id === id && r.build === 'candidate')
+        .every((r) => r.status === 'passed'),
+    );
   await page.waitForFunction(() =>
     document.querySelector('[data-send-status]').textContent.startsWith('Results received.'),
   );

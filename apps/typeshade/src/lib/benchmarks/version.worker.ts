@@ -292,7 +292,16 @@ async function command(data: any) {
       uploadBytes: fieldCount(data.id) ? [] : null,
       inputBytes: null,
     };
-    // A fixed case whose feature the device lacks is reported, not run (reason `unsupported`).
+    // A case this build's compiler refused (the subgroup cases on a build that predates
+    // compiler change 0117) is reported, not run (reason `refused`).
+    if (job && 'refused' in job) {
+      skipped = true;
+      row.status = 'failed';
+      row.reason = 'refused';
+      await device.popErrorScope();
+      return { count: 1 };
+    }
+    // A case whose feature the device lacks is reported, not run (reason `unsupported`).
     if (
       job &&
       'features' in job &&
