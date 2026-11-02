@@ -1624,7 +1624,7 @@ export const en = {
       applications:
         'Complete image, particle, reduction and collection calls, plus a resident image chain.',
       data: 'Object and field arrays, buffer transfers and memory access patterns.',
-      compute: 'Integer arithmetic, reduction and atomic additions.',
+      compute: 'Integer arithmetic, reduction, subgroup folds and atomic additions.',
       execution: 'Workgroup sizes and queue submission patterns.',
     },
     caseNames: {
@@ -1653,6 +1653,10 @@ export const en = {
       'reduction-workgroup': 'Workgroup reduction',
       'atomics-bins-1': 'Atomic additions, 1 bin',
       'atomics-bins-256': 'Atomic additions, 256 bins',
+      'reduction-subgroup': 'Subgroup reduction',
+      'reduction-subgroup-levels': 'Subgroup reduction, 2 levels',
+      'atomics-bins-1-subgroup': 'Atomic additions, 1 bin, subgroup fold first',
+      'atomics-bins-1-workgroup': 'Atomic additions, 1 bin, workgroup fold first',
       'workgroup-64': 'Workgroup size 64',
       'workgroup-128': 'Workgroup size 128',
       'workgroup-256': 'Workgroup size 256',
@@ -1691,6 +1695,8 @@ export const en = {
       'First-call time includes case preparation. Repeated compiled timings are per dispatch in a calibrated batch. Application timings cover the complete call. Resident timings cover a fixed chain; readback is recorded separately in the JSON.',
     comparisonProbes:
       'The field-read kernel cases measure validation and packing in separate probes before the actual call. These probes can warm caches and are not additive parts of elapsed time. Uploaded bytes count actual buffer writes. Available GPU times cover the compute pass with equal query overhead in both builds. Query buffers are excluded from workload memory. Shared runtime information describes the actual opened device; artifact and compiler hashes remain separate provenance.',
+    comparisonSubgroups:
+      'The subgroup cases are fixed WGSL programs that use the subgroups extension, which TypeShade does not author yet. Both builds run the same bytes, so they compare a subgroup fold with the workgroup tree and with per-lane atomic additions on this device. A device without the extension skips them and reports them as unsupported. The two-level reduction assumes that a subgroup holds consecutive lanes; the device probe above reports whether it does.',
     comparisonMemory:
       'Peak buffer bytes count live WebGPU buffers created through the instrument. They exclude textures, driver allocations and JavaScript memory. The record also includes allocation and submission counts.',
     comparisonTrust:
@@ -1781,6 +1787,12 @@ export const en = {
     deviceH: 'Reported device',
     webgpu: 'WebGPU adapter',
     webgl: 'WebGL renderer',
+    subgroups: 'Subgroups',
+    subgroupInfo:
+      'Size {size} (adapter range {range}), {count} per workgroup of 64 lanes, {lanes}.',
+    subgroupConsecutive: 'consecutive lanes',
+    subgroupScattered: 'lanes not consecutive',
+    subgroupUnavailable: 'The adapter has no subgroups extension. The subgroup cases are skipped.',
   },
   checks: {
     title: 'How TypeShade is checked: oracle, compile gate, goldens',

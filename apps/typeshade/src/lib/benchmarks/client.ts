@@ -43,6 +43,19 @@ export function mountBenchmarks(root: HTMLElement): void {
         ),
       ].join(', ') || copy.unavailable;
     get('webgl').textContent = m.webgl.unmaskedRenderer || m.webgl.renderer || copy.unavailable;
+    const sg = m.subgroups;
+    get('subgroups').textContent = sg
+      ? copy.subgroupInfo
+          .replace('{size}', String(sg.size))
+          .replace('{count}', String(sg.numSubgroups))
+          .replace(
+            '{range}',
+            sg.minSize !== null && sg.maxSize !== null
+              ? `${sg.minSize}-${sg.maxSize}`
+              : copy.unavailable,
+          )
+          .replace('{lanes}', sg.consecutive ? copy.subgroupConsecutive : copy.subgroupScattered)
+      : copy.subgroupUnavailable;
     get('software').hidden =
       ![m.webgpu.description, m.webgpu.device, m.webgpu.architecture].some((s) =>
         /swiftshader|llvmpipe|software rasterizer/i.test(s),

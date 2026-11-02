@@ -41,6 +41,58 @@ export function pairedResults(record: RegressionRecord) {
     });
 }
 
+/** The fixed subgroup cases against their references within one build and one run: the
+ *  reference's median over the case's, for elapsed and GPU time. A ratio above 1 means the
+ *  subgroup fold took less time on that device. Skipped cases give no ratio. */
+export const FIXED_PAIRS = [
+  ['reduction-workgroup', 'reduction-subgroup'],
+  ['reduction-workgroup', 'reduction-subgroup-levels'],
+  ['atomics-bins-1', 'atomics-bins-1-subgroup'],
+  ['atomics-bins-1', 'atomics-bins-1-workgroup'],
+] as const;
+export function summarizeFixed(records: readonly RegressionRecord[]) {
+  const groups = new Map<string, { key: object; ratios: number[]; runs: Set<string> }>();
+  for (const r of new Map(records.map((r) => [r.id, r])).values()) {
+    if (r.status !== 'complete') continue;
+    for (const [reference, fixed] of FIXED_PAIRS)
+      for (const a of r.results.filter((row) => row.id === reference && row.status === 'passed')) {
+        const b = r.results.find(
+          (row) =>
+            row.id === fixed && row.n === a.n && row.build === a.build && row.status === 'passed',
+        );
+        if (!b) continue;
+        for (const metric of ['wallMs', 'gpuNs'] as const) {
+          const x = median(a[metric] ?? []);
+          const y = median(b[metric] ?? []);
+          if (x === null || y === null || x <= 0 || y <= 0) continue;
+          const key = {
+            digest: r.digest,
+            build: a.build,
+            n: a.n,
+            reference,
+            fixed,
+            metric,
+            adapter: r.metadata.webgpu,
+            subgroups: r.metadata.subgroups ?? null,
+            browser: r.metadata.userAgent,
+          };
+          const id = JSON.stringify(key);
+          const group = groups.get(id) ?? { key, ratios: [], runs: new Set<string>() };
+          group.ratios.push(x / y);
+          group.runs.add(r.id);
+          groups.set(id, group);
+        }
+      }
+  }
+  return [...groups.values()].map((g) => ({
+    ...g.key,
+    runs: g.runs.size,
+    referenceOverFixedMedian: median(g.ratios),
+    p10: quantile(g.ratios, 0.1),
+    p90: quantile(g.ratios, 0.9),
+  }));
+}
+
 export function summarizePaired(records: readonly RegressionRecord[]) {
   const groups = new Map<string, { key: object; ratios: number[]; runs: Set<string> }>();
   for (const r of new Map(records.map((r) => [r.id, r])).values()) {

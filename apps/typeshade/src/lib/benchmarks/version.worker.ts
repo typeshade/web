@@ -13,7 +13,8 @@ import {
   fieldCount,
   type Application,
 } from './workloads.ts';
-import { storageBytes } from './contract.ts';
+import { storageBytes, type Metadata } from './contract.ts';
+import { PROBE_WORDS, readSubgroupProbe, SUBGROUP_PROBE } from './subgroups.ts';
 import type { Experiment } from './definitions.ts';
 
 // Each build runs in its own worker, so runtime globals and pipeline caches cannot mix.
@@ -29,7 +30,8 @@ let live = 0,
   allocations = 0,
   submissions = 0;
 let lost = false,
-  invalid = false;
+  invalid = false,
+  skipped = false;
 let timing: { query: GPUQuerySet; resolved: GPUBuffer; read: GPUBuffer } | undefined;
 let measuring = false,
   passes = 0,
@@ -119,9 +121,55 @@ async function command(data: any) {
     const adapter = (await navigator.gpu?.requestAdapter()) ?? null;
     let metadata = benchmarkMetadata(adapter);
     if (!adapter) return { metadata, unsupported: true, loadMs: performance.now() - start };
+    const subgroups = adapter.features.has('subgroups');
     device = await adapter.requestDevice({
-      requiredFeatures: metadata.webgpu.timestamps ? ['timestamp-query'] : [],
+      requiredFeatures: [
+        ...(metadata.webgpu.timestamps ? (['timestamp-query'] as GPUFeatureName[]) : []),
+        ...(subgroups ? (['subgroups'] as GPUFeatureName[]) : []),
+      ],
     });
+    // One workgroup reports its subgroups before the instrument counts buffers.
+    let probe: Metadata['subgroups'] = null;
+    if (subgroups) {
+      const out = device.createBuffer({
+        size: PROBE_WORDS * 4,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+      });
+      const read = device.createBuffer({
+        size: PROBE_WORDS * 4,
+        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+      });
+      try {
+        const pipeline = await device.createComputePipelineAsync({
+          layout: 'auto',
+          compute: {
+            module: device.createShaderModule({ code: SUBGROUP_PROBE }),
+            entryPoint: 'main',
+          },
+        });
+        const enc = device.createCommandEncoder();
+        const pass = enc.beginComputePass();
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(
+          0,
+          device.createBindGroup({
+            layout: pipeline.getBindGroupLayout(0),
+            entries: [{ binding: 0, resource: { buffer: out } }],
+          }),
+        );
+        pass.dispatchWorkgroups(1);
+        pass.end();
+        enc.copyBufferToBuffer(out, 0, read, 0, PROBE_WORDS * 4);
+        device.queue.submit([enc.finish()]);
+        await read.mapAsync(GPUMapMode.READ);
+        probe = readSubgroupProbe(new Uint32Array(read.getMappedRange().slice(0)), adapter.info);
+        read.unmap();
+      } finally {
+        out.destroy();
+        read.destroy();
+      }
+    }
+    metadata = { ...metadata, subgroups: probe };
     void device.lost.then(() => {
       lost = true;
     });
@@ -213,6 +261,7 @@ async function command(data: any) {
     submissions = 0;
     gpu = [];
     invalid = false;
+    skipped = false;
     device.pushErrorScope('validation');
     const job = regressionCatalog.builds[data.build]!.cases.find((e) => e.id === data.id);
     row = {
@@ -243,6 +292,18 @@ async function command(data: any) {
       uploadBytes: fieldCount(data.id) ? [] : null,
       inputBytes: null,
     };
+    // A fixed case whose feature the device lacks is reported, not run (reason `unsupported`).
+    if (
+      job &&
+      'features' in job &&
+      job.features?.some((f) => !device.features.has(f as GPUFeatureName))
+    ) {
+      skipped = true;
+      row.status = 'failed';
+      row.reason = 'unsupported';
+      await device.popErrorScope();
+      return { count: 1 };
+    }
     const start = performance.now();
     if (job) compiled = await prepareCompiled(device, job, data.n);
     if (fieldCount(data.id)) {
@@ -279,6 +340,7 @@ async function command(data: any) {
     return { count };
   }
   if (data.command === 'warmup') {
+    if (skipped) return {};
     row.dispatches = row.kind === 'compiled' ? data.count : row.dispatches;
     for (let i = 0; i < data.warmup; i++) {
       if (compiled) await compiled.dispatch(row.dispatches);
@@ -288,6 +350,7 @@ async function command(data: any) {
     return {};
   }
   if (data.command === 'sample') {
+    if (skipped) return {};
     if (lost || invalid) throw new Error('validation');
     if (compiled) {
       const x = await compiled.dispatch(row.dispatches);
@@ -308,6 +371,7 @@ async function command(data: any) {
     return {};
   }
   if (data.command === 'finish') {
+    if (skipped) return { row };
     if (compiled) await compiled.verify(row);
     if ((await device.popErrorScope()) || lost || invalid) throw new Error('validation');
     row.gpuNs = validDeviceSamples(gpu);

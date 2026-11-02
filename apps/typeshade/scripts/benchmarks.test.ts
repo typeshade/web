@@ -324,11 +324,18 @@ import {
   numbersMatch,
 } from '../src/lib/benchmarks/workloads.ts';
 import { nextBatch, MAX_DISPATCHES, validDeviceSamples } from '../src/lib/benchmarks/timing.ts';
-import { pairedResults, summarizePaired } from '../src/lib/benchmarks/comparison.ts';
+import {
+  pairedResults,
+  summarizeFixed,
+  summarizePaired,
+} from '../src/lib/benchmarks/comparison.ts';
 import { postBenchmarkRecord } from '../src/lib/benchmarks/send-record.ts';
 import { reportGroups, formatChange } from '../src/lib/benchmarks/report.ts';
+import { FIXED_CASES } from '../src/lib/benchmarks/subgroups.ts';
 function pairedRecord(): RegressionRecord {
   const metadata = exampleRecord().metadata;
+  // The paired instrument runs the fixed subgroup cases, so its device has the extension.
+  metadata.webgpu.features = ['subgroups'];
   const ids = [...regressionCatalog.builds[0]!.cases.map((e) => e.id), ...APPLICATIONS];
   return {
     schema: 2,
@@ -472,6 +479,63 @@ test('legacy and paired provenance, complete pairs and checked outputs are enfor
   expect(parseAnyRecord(partial).results.length).toBe(2);
   expect(pairedResults(partial)).toEqual([]);
 });
+test('a fixed subgroup case is skipped as unsupported only on a device without the extension', () => {
+  const fixed = regressionCatalog.builds[0]!.cases.filter(
+    (c) => 'features' in c && c.features.length,
+  );
+  expect(fixed.map((c) => c.id).sort()).toEqual([
+    'atomics-bins-1-subgroup',
+    'reduction-subgroup',
+    'reduction-subgroup-levels',
+  ]);
+  expect(regressionCatalog.builds.every((b) => b.cases.length === 26)).toBe(true);
+  // Both builds carry the same fixed bytes.
+  for (const c of fixed)
+    expect(regressionCatalog.builds[1]!.cases.find((x) => x.id === c.id)!.shader).toBe(c.shader);
+  const skip = (r: RegressionRecord) => {
+    for (const row of r.results)
+      if (fixed.some((c) => c.id === row.id))
+        Object.assign(row, {
+          status: 'failed',
+          reason: 'unsupported',
+          wallMs: [],
+          checkedValues: 0,
+          corruptionDetected: false,
+        });
+  };
+  // A device that has the extension runs them, so a skipped row is inconsistent.
+  const withFeature = pairedRecord();
+  withFeature.metadata.webgpu.features = ['subgroups'];
+  withFeature.metadata.subgroups = {
+    minSize: 4,
+    maxSize: 4,
+    size: 4,
+    numSubgroups: 16,
+    consecutive: true,
+  };
+  expect(() => parseAnyRecord(withFeature)).not.toThrow();
+  skip(withFeature);
+  expect(() => parseAnyRecord(withFeature)).toThrow();
+  // A device without it skips them and the run is still complete; a passed row there is not.
+  const without = pairedRecord();
+  without.metadata.webgpu.features = [];
+  without.metadata.subgroups = null;
+  expect(() => parseAnyRecord(without)).toThrow();
+  skip(without);
+  expect(parseAnyRecord(without).status).toBe('complete');
+  const measured = structuredClone(without);
+  measured.results.find((row) => row.id === 'reduction-subgroup')!.wallMs = [1];
+  expect(() => parseAnyRecord(measured)).toThrow();
+  // The reference pairing reads the fixed cases against their references within a build.
+  expect(summarizeFixed([withFeature]).every((g) => g.fixed === 'atomics-bins-1-workgroup')).toBe(
+    true,
+  );
+  const ran = pairedRecord();
+  ran.metadata.webgpu.features = ['subgroups'];
+  expect(
+    summarizeFixed([ran]).filter((g) => g.metric === 'wallMs' && g.build === 'baseline'),
+  ).toHaveLength(4);
+});
 test('calibration is bounded and device validity uses only measured samples', () => {
   let count = 1;
   while (count < MAX_DISPATCHES) count = nextBatch(count, null);
@@ -543,6 +607,12 @@ test('a projected baseline is accepted while retained full-input baselines stay 
     builds: optimizedPrior.builds.map((b) => b.revision),
     runtimes: optimizedPrior.builds.map((b) => b.runtimeDigest),
   });
+  // A retained catalog has no fixed subgroup case; its record carries its own case list.
+  const idsOf = (c: (typeof retainedCatalogs)[number]) => [
+    ...c.builds[0]!.cases.map((e) => e.id),
+    ...('applications' in c ? (c.applications as readonly string[]) : LEGACY_APPLICATIONS),
+  ];
+  saved.results = saved.results.filter((row) => idsOf(optimizedPrior).includes(row.id));
   expect(() => parseAnyRecord(saved)).not.toThrow();
 
   const prior = retainedCatalogs.find(
@@ -558,6 +628,7 @@ test('a projected baseline is accepted while retained full-input baselines stay 
     builds: prior.builds.map((b) => b.revision),
     runtimes: prior.builds.map((b) => b.runtimeDigest),
   });
+  retained.results = retained.results.filter((row) => idsOf(prior).includes(row.id));
   for (const row of retained.results)
     if (fieldCount(row.id) && row.build === 'baseline') {
       row.inputBytes = row.n * 32;
@@ -569,16 +640,17 @@ test('a projected baseline is accepted while retained full-input baselines stay 
   expect(() => parseAnyRecord(retained)).toThrow();
 });
 test('unified workload contains each original experiment and application once per build', () => {
-  expect(regressionCatalog.builds[0]!.cases.map((c) => c.id)).toEqual(
-    catalog.cases.map((c) => c.id),
-  );
+  expect(regressionCatalog.builds[0]!.cases.map((c) => c.id)).toEqual([
+    ...catalog.cases.map((c) => c.id),
+    ...FIXED_CASES.map((c) => c.id),
+  ]);
   const r = pairedRecord();
-  expect(r.results).toHaveLength(60);
-  expect(new Set(r.results.map((row) => `${row.id}:${row.n}:${row.build}`)).size).toBe(60);
+  expect(r.results).toHaveLength(68);
+  expect(new Set(r.results.map((row) => `${row.id}:${row.n}:${row.build}`)).size).toBe(68);
   expect(reportGroups(r, 16384, 'wall').map((g) => [g.section, g.items.length])).toEqual([
     ['applications', 5],
     ['data', 14],
-    ['compute', 6],
+    ['compute', 10],
     ['execution', 5],
   ]);
   for (const id of [
@@ -641,7 +713,7 @@ test('application references cover cold fields, insertion order and output corru
 test('paired ratios require a complete same-adapter run and expose sample spread', () => {
   const r = pairedRecord();
   const pairs = pairedResults(r);
-  expect(pairs).toHaveLength(30);
+  expect(pairs).toHaveLength(34);
   expect(pairs[0]!.wallRatio).toBe(2);
   expect(pairs[0]!.bufferRatio).toBe(2);
   expect(pairs[0]!.baselineWallP90).toBe(4);

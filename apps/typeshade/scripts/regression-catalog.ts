@@ -13,6 +13,7 @@ import {
   INSTRUMENT_REVISION,
 } from '../src/lib/benchmarks/workloads.ts';
 import legacy from '../src/lib/benchmarks/catalog-v1.json';
+import { FIXED_BINDINGS, FIXED_CASES } from '../src/lib/benchmarks/subgroups.ts';
 
 const sha = (s: string | Uint8Array) => createHash('sha256').update(s).digest('hex');
 const pin = execFileSync('git', ['-C', 'vendor/shader-dsl', 'rev-parse', 'HEAD'], {
@@ -37,7 +38,11 @@ for (const revision of revisions) {
   const { compile } = await load('src/compiler/ts/compile.ts');
   const { packModule } = await load('src/compiler/ts/pack.ts');
   const { hostFace } = await load('src/compiler/ts/host-face.ts');
-  const cases = legacy.cases.map((e) => {
+  // The fixed WGSL cases (subgroups.ts) are not compiled: both builds run the same bytes.
+  const cases: (
+    | (typeof legacy.cases)[number]
+    | ((typeof FIXED_CASES)[number] & { shader: string; bindings: typeof FIXED_BINDINGS })
+  )[] = legacy.cases.map((e) => {
     if (!e.source) return e;
     const result = compile(e.source, { fileName: `${e.id}.shade.ts` });
     if (result.diagnostics.some((d: { category: string }) => d.category === 'error'))
@@ -56,6 +61,7 @@ for (const revision of revisions) {
       ),
     };
   });
+  for (const c of FIXED_CASES) cases.push({ ...c, shader: sha(c.wgsl), bindings: FIXED_BINDINGS });
   const face = hostFace(APPLICATION_SOURCE, {
     fileName: 'applications.shade.ts',
     fuse: true,
@@ -142,7 +148,11 @@ const workload = sha(
   JSON.stringify({
     application: APPLICATION_SOURCE,
     projection: PROJECTION_SOURCE,
-    cases: builds[0]!.cases.map(({ source, id }) => ({ source, id })),
+    cases: builds[0]!.cases.map((c) => ({
+      source: c.source,
+      id: c.id,
+      ...('features' in c ? { wgsl: c.wgsl, features: c.features } : {}),
+    })),
   }),
 );
 const identity = {
@@ -158,6 +168,7 @@ const identity = {
         'workloads.ts',
         'fixtures.ts',
         'definitions.ts',
+        'subgroups.ts',
         'regression-contract.ts',
         'contract.ts',
       ].map((file) => ({

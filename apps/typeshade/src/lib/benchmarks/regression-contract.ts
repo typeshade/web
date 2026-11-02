@@ -22,7 +22,7 @@ export const regressionResultSchema = z
     build: z.enum(['baseline', 'candidate']),
     kind: z.enum(['compiled', 'host', 'resident']),
     status: z.enum(['passed', 'failed']),
-    reason: z.enum(['none', 'validation', 'device-lost']),
+    reason: z.enum(['none', 'validation', 'device-lost', 'unsupported']),
     setupMs: ms,
     coldMs: ms,
     wallMs: samples,
@@ -61,7 +61,7 @@ export const regressionRecordSchema = z
     metadata: metadataSchema,
     peers: z.array(metadataSchema).max(2),
     loadMs: z.array(ms).max(2),
-    results: z.array(regressionResultSchema).max(180),
+    results: z.array(regressionResultSchema).max(240),
   })
   .strict()
   .superRefine((r, ctx) => {
@@ -98,12 +98,8 @@ export const regressionRecordSchema = z
     const applications =
       'applications' in active ? (active.applications as readonly string[]) : LEGACY_APPLICATIONS;
     const ids = [...active.builds[0]!.cases.map((c) => c.id), ...applications];
-    if (
-      active.instrument === 'unified-2' &&
-      r.status === 'complete' &&
-      r.peers[1]?.runtime?.tier !== 'webgpu'
-    )
-      fail();
+    const unified = ['unified-2', 'unified-3'].includes(active.instrument);
+    if (unified && r.status === 'complete' && r.peers[1]?.runtime?.tier !== 'webgpu') fail();
     for (const row of r.results) {
       const key = `${row.id}:${row.n}:${row.build}`;
       if (
@@ -115,6 +111,20 @@ export const regressionRecordSchema = z
       seen.set(key, row);
       const e = active.builds[0]!.cases.find((c) => c.id === row.id);
       const kind = e ? 'compiled' : row.id === 'resident-image' ? 'resident' : 'host';
+      // A fixed case is skipped as unsupported only on a device without a feature it needs,
+      // with nothing measured.
+      const needs = e && 'features' in e ? (e.features as readonly string[]) : [];
+      if (row.reason === 'unsupported') {
+        if (
+          row.status !== 'failed' ||
+          !needs.some((f) => !r.metadata.webgpu.features.includes(f)) ||
+          row.wallMs.length > 0 ||
+          row.checkedValues !== 0 ||
+          row.corruptionDetected ||
+          row.gpuNs !== null
+        )
+          fail();
+      } else if (needs.some((f) => !r.metadata.webgpu.features.includes(f))) fail();
       if (row.kind !== kind || (e && row.logicalBytes !== storageBytes(e as Experiment, row.n)))
         fail();
       if (
@@ -151,7 +161,7 @@ export const regressionRecordSchema = z
       )
         fail();
       if (
-        ['unified-1', 'unified-2'].includes(active.instrument) &&
+        ['unified-1', 'unified-2', 'unified-3'].includes(active.instrument) &&
         e &&
         (e.kind === 'atomic' || e.kind === 'upload' || e.kind === 'readback' || e.dispatches > 1) &&
         row.dispatches !== e.dispatches
@@ -159,7 +169,7 @@ export const regressionRecordSchema = z
         fail();
       if ((row.kind === 'resident') !== (row.readbackMs !== null)) fail();
       if (row.readbackMs && row.readbackMs.length !== row.wallMs.length) fail();
-      if (active.instrument === 'unified-2' && fields && row.status === 'passed') {
+      if (unified && fields && row.status === 'passed') {
         if (row.logicalBytes !== row.n * 36) fail();
         const inputBytes = row.n * (projected[row.build === 'baseline' ? 0 : 1] ? fields : 8) * 4;
         if (row.inputBytes !== inputBytes) fail();
@@ -175,7 +185,7 @@ export const regressionRecordSchema = z
     if (
       r.status === 'complete' &&
       (r.results.length !== ids.length * 2 * PROFILES[r.profile].sizes.length ||
-        r.results.some((x) => x.status !== 'passed') ||
+        r.results.some((x) => x.status !== 'passed' && x.reason !== 'unsupported') ||
         r.peers.length !== 2 ||
         r.loadMs.length !== 2 ||
         !r.peers.every((x) => x.webgpu.available))

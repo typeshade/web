@@ -91,20 +91,32 @@ try {
   assert.equal(workerLoads, 0);
   const first = await run();
   assert.equal(first.status, 'complete', JSON.stringify(first.results.at(-1)));
-  assert.equal(first.revision, 'applications-3');
-  assert.equal(first.instrument, 'unified-2');
-  assert.equal(first.results.length, 60);
+  assert.equal(first.revision, 'applications-4');
+  assert.equal(first.instrument, 'unified-3');
+  assert.equal(first.results.length, 68);
   assert(
     first.results.every(
       (r) => r.status === 'passed' && r.corruptionDetected && r.wallMs.length === 3,
     ),
   );
-  assert.equal(new Set(first.results.map((r) => `${r.id}:${r.n}:${r.build}`)).size, 60);
+  assert.equal(new Set(first.results.map((r) => `${r.id}:${r.n}:${r.build}`)).size, 68);
   for (const job of catalog.cases)
     assert.equal(first.results.filter((r) => r.id === job.id).length, 2);
   assert.equal(await root.locator('[data-section]:visible').count(), 4);
-  assert.equal(await root.locator('[data-case]').count(), 30);
+  assert.equal(await root.locator('[data-case]').count(), 34);
   assert.equal(await root.locator('table').count(), 0);
+  // SwiftShader has the subgroups extension: the probe and every fixed case ran.
+  assert.equal(first.metadata.subgroups.size, 4);
+  assert.equal(first.metadata.subgroups.numSubgroups, 16);
+  assert.equal(first.metadata.subgroups.consecutive, true);
+  assert((await root.locator('[data-subgroups]').textContent()).startsWith('Size 4'));
+  for (const id of [
+    'reduction-subgroup',
+    'reduction-subgroup-levels',
+    'atomics-bins-1-subgroup',
+    'atomics-bins-1-workgroup',
+  ])
+    assert(first.results.filter((r) => r.id === id).every((r) => r.status === 'passed'));
   await page.waitForFunction(() =>
     document.querySelector('[data-send-status]').textContent.startsWith('Results received.'),
   );
@@ -123,7 +135,7 @@ try {
   for (const metric of ['gpu', 'buffers', 'cold', 'readback', 'wall']) {
     await root.locator('[data-metric]').selectOption(metric);
     assert.equal(await root.locator('[data-section]:visible').count(), 4);
-    assert.equal(await root.locator('[data-case]').count(), 30);
+    assert.equal(await root.locator('[data-case]').count(), 34);
     if (metric === 'readback') assert.equal(await root.locator('[data-bars]:visible').count(), 1);
   }
   assert.equal(posts, 1);
@@ -295,7 +307,7 @@ try {
   writeFileSync('shots/benchmarks/measurements.json', JSON.stringify(measurements, null, 2));
   writeFileSync('shots/benchmarks/instrument-record.json', JSON.stringify(first, null, 2));
   console.log(
-    'unified benchmarks: one run/report, 60 quick / 180 extended checks, four section charts, every original experiment, correctness probes, automatic submission, retry and localized layouts passed.',
+    'unified benchmarks: one run/report, 68 quick / 204 extended checks, four section charts, every original experiment, the subgroup cases, correctness probes, automatic submission, retry and localized layouts passed.',
   );
 } finally {
   await browser?.close();

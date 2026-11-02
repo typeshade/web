@@ -1563,7 +1563,7 @@ export const ko: Copy = {
     sectionInfo: {
       applications: '이미지, 입자, 리덕션, 컬렉션 호출 전체와 GPU 상주 이미지 처리를 비교합니다.',
       data: '객체 배열과 필드별 배열, 버퍼 전송, 메모리 접근 방식을 비교합니다.',
-      compute: '정수 연산, 리덕션, 원자적 덧셈을 비교합니다.',
+      compute: '정수 연산, 리덕션, 서브그룹 합산, 원자적 덧셈을 비교합니다.',
       execution: '작업 그룹 크기와 큐 제출 방식을 비교합니다.',
     },
     caseNames: {
@@ -1592,6 +1592,10 @@ export const ko: Copy = {
       'reduction-workgroup': '작업 그룹 리덕션',
       'atomics-bins-1': '원자적 덧셈, 슬롯 1개',
       'atomics-bins-256': '원자적 덧셈, 슬롯 256개',
+      'reduction-subgroup': '서브그룹 리덕션',
+      'reduction-subgroup-levels': '서브그룹 리덕션, 2단계',
+      'atomics-bins-1-subgroup': '원자적 덧셈, 슬롯 1개, 서브그룹 합산 후',
+      'atomics-bins-1-workgroup': '원자적 덧셈, 슬롯 1개, 작업 그룹 합산 후',
       'workgroup-64': '작업 그룹 크기 64',
       'workgroup-128': '작업 그룹 크기 128',
       'workgroup-256': '작업 그룹 크기 256',
@@ -1630,6 +1634,8 @@ export const ko: Copy = {
       '첫 호출 시간에는 작업 준비가 포함됩니다. 컴파일된 프로그램의 반복 시간은 보정한 묶음에서 디스패치당 측정한 값입니다. 애플리케이션 시간은 호출 전체를 포함합니다. 기기 상주 시간은 정해진 연속 호출을 포함하며, 되읽기 시간은 JSON에 따로 기록합니다.',
     comparisonProbes:
       '필드 읽기 커널의 입력 검사와 버퍼 패킹은 실제 호출 전에 각각 측정합니다. 이 측정이 캐시 상태에 영향을 줄 수 있으므로, 두 값의 합을 전체 소요 시간의 일부로 해석할 수는 없습니다. 업로드 바이트는 실제 버퍼 쓰기의 크기입니다. GPU 시간은 측정할 수 있을 때만 표시하며, 두 빌드의 컴퓨트 패스에 같은 쿼리 비용이 들어갑니다. 쿼리 버퍼는 작업의 메모리 집계에서 제외합니다. 공통 런타임 정보는 실제로 열린 디바이스를 나타내며, 아티팩트와 컴파일러 해시는 별도로 기록합니다.',
+    comparisonSubgroups:
+      '서브그룹 항목은 subgroups 확장을 쓰는 고정 WGSL 프로그램입니다. TypeShade는 아직 이 확장을 작성하지 못합니다. 두 빌드가 같은 바이트를 실행하므로, 이 기기에서 서브그룹 합산을 작업 그룹 트리 및 레인별 원자적 덧셈과 비교합니다. 확장이 없는 기기는 이 항목을 건너뛰고 미지원으로 기록합니다. 두 단계 리덕션은 한 서브그룹이 연속한 레인을 갖는다고 가정합니다. 위의 기기 정보가 실제로 그런지 보여 줍니다.',
     comparisonMemory:
       '최대 버퍼 크기는 측정 도구를 거쳐 생성된 WebGPU 버퍼의 동시 사용량입니다. 텍스처, 드라이버 내부 할당과 JavaScript 메모리는 제외합니다. 할당 횟수와 제출 횟수도 기록에 포함됩니다.',
     comparisonTrust:
@@ -1720,6 +1726,11 @@ export const ko: Copy = {
     deviceH: '보고된 기기',
     webgpu: 'WebGPU 어댑터',
     webgl: 'WebGL 렌더러',
+    subgroups: '서브그룹',
+    subgroupInfo: '크기 {size} (어댑터 범위 {range}), 64 레인 작업 그룹당 {count}개, {lanes}.',
+    subgroupConsecutive: '레인 연속',
+    subgroupScattered: '레인 비연속',
+    subgroupUnavailable: '어댑터에 subgroups 확장이 없습니다. 서브그룹 항목은 건너뜁니다.',
   },
   checks: {
     title: 'TypeShade 검증: CPU 오라클, 컴파일 게이트, 골든 파일',
