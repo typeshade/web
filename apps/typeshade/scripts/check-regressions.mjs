@@ -47,16 +47,31 @@ export async function checkRegressions(page, url) {
   writeFileSync('shots/benchmarks/unified-quick.json', JSON.stringify(quick, null, 2));
   assert.equal(quick.status, 'complete', JSON.stringify(quick.results.at(-1)));
   assert.equal(quick.results.length, 68);
+  // The baseline build refuses the three cases that call the subgroup built-in functions:
+  // their rows say so and measure nothing.
+  const refusedRow = (r) =>
+    r.build === 'baseline' &&
+    ['reduction-subgroup', 'reduction-subgroup-levels', 'atomics-bins-1-subgroup'].includes(r.id);
+  assert.equal(quick.results.filter(refusedRow).length, 3);
   assert(
-    quick.results.every(
-      (r) =>
-        r.status === 'passed' &&
-        r.corruptionDetected &&
-        r.checkedValues > 0 &&
-        r.wallMs.length === 3,
+    quick.results.every((r) =>
+      refusedRow(r)
+        ? r.status === 'failed' &&
+          r.reason === 'refused' &&
+          !r.corruptionDetected &&
+          r.checkedValues === 0 &&
+          r.wallMs.length === 0
+        : r.status === 'passed' &&
+          r.corruptionDetected &&
+          r.checkedValues > 0 &&
+          r.wallMs.length === 3,
     ),
   );
-  assert(quick.results.filter((r) => r.kind === 'compiled').every((r) => r.gpuSubmissions > 0));
+  assert(
+    quick.results
+      .filter((r) => r.kind === 'compiled' && !refusedRow(r))
+      .every((r) => r.gpuSubmissions > 0),
+  );
   assert(quick.results.some((r) => r.kind === 'resident' && r.readbackMs.length === 3));
   assert.equal(await root.locator('[data-section]:visible').count(), 4);
   assert.equal(quick.peers[1].runtime.tier, 'webgpu');
@@ -83,10 +98,6 @@ export async function checkRegressions(page, url) {
   const extended = await run();
   assert.equal(extended.status, 'complete');
   assert.equal(extended.results.length, 204);
-  // The baseline build refuses the three cases that call the subgroup built-in functions.
-  const refusedRow = (r) =>
-    r.build === 'baseline' &&
-    ['reduction-subgroup', 'reduction-subgroup-levels', 'atomics-bins-1-subgroup'].includes(r.id);
   assert.equal(extended.results.filter(refusedRow).length, 9);
   assert(
     extended.results.every((r) =>
