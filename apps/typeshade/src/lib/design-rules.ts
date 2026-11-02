@@ -767,6 +767,7 @@ const READ_AGAINST: Readonly<Record<string, string>> = {
   '8.21': '1yomddNpa0ZKNrCDY_0ci4V355l8_mcqrb6YXBZ_DOI=',
   '8.22': 'RRSYqKRm8CRNz6jUXROYf4rHdqey9cqVKO8ceusX66E=',
   '8.23': 'f-xLjZFeYOCDU4adgPkmjFZGyktDfoUX77R16joaKzI=',
+  '8.24': '7_T8SKwihYWaXZ9tFJ4jNqL5s_RkQINCIiK9rtlPC2c=',
   '8.25': 'XZRD1So9e-OFRi9VePXRjyCfT2_T_xaPFWQw_Uy0ZrM=',
   '9.2': 'UjdAYZRLzP-1L7XryMHNvYUQDbMNmFmw-YnvSbJL2LU=',
   '10.1': 'd8TWuezE06vSk0zrFfeQ9pKxFXYk_P4q_IC94Ny_CF8=',

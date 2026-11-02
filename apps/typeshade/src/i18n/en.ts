@@ -1239,6 +1239,14 @@ export const en = {
       hostNone: 'host.ts exports neither animate nor run, so only its top level ran.',
       hostUnloaded: 'The frame could not load the runtime, so host.ts did not run.',
       hostStopped: 'host.ts stopped, and its frame is gone.',
+      // The Result tab is host.ts's frame for a module a host can call, and the page runs it on
+      // open and after an edit (docs/playground-one-runtime.md, phase 2). One a link carries
+      // waits for the button.
+      hostLinked: 'This link brings its own host.ts. It runs when you press Run host.ts.',
+      // In place of a picture, for a module host.ts cannot call yet (Decision 1 of the same
+      // record). `vertexHostIssue` is typeshade/typeshade#204.
+      resultVertexDriven:
+        'This program has no picture here yet. The Result tab shows what host.ts draws, and host.ts has no entry of this program to call: a host cannot call a fragment entry that reads what a vertex entry writes (Rule 8.24). How a host draws such an entry is the open question of [typeshade/typeshade#204](vertexHostIssue). The WGSL, GLSL, Host module and Reflection tabs still show what the compiler emits.',
       // A host example's tile in the gallery: two files, and no still.
       hostTile: 'Module and host.ts',
     },

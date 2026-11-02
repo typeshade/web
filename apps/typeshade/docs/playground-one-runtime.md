@@ -1,6 +1,7 @@
 # Playground on one runtime
 
-Status: accepted (merged in #18); decisions recorded 2026-11-02. No implementation has started.
+Status: accepted (merged in #18); decisions recorded 2026-11-02. Phase 1 is done (#21). Phase 2
+is in progress on branch `claude/playground-phase-2`.
 
 ## Request and baseline
 

@@ -1200,6 +1200,9 @@ export const ko: Copy = {
       hostNone: 'host.ts가 animate도 run도 내보내지 않아서 최상위 코드만 실행했습니다.',
       hostUnloaded: '프레임이 런타임을 불러오지 못해 host.ts를 실행하지 못했습니다.',
       hostStopped: 'host.ts를 멈추고 프레임을 닫았습니다.',
+      hostLinked: '이 링크에는 자체 host.ts가 들어 있습니다. host.ts 실행을 누르면 실행됩니다.',
+      resultVertexDriven:
+        '이 프로그램은 아직 여기서 그림을 보여 주지 않습니다. 결과 탭은 host.ts가 그린 것을 보여 주는데, 이 프로그램에는 host.ts가 호출할 수 있는 엔트리가 없습니다. 버텍스 엔트리가 쓴 값을 읽는 프래그먼트 엔트리는 호스트가 호출할 수 없습니다(규칙 8.24). 호스트가 이런 엔트리를 어떻게 그릴지는 [typeshade/typeshade#204](vertexHostIssue)에서 아직 정하지 않았습니다. WGSL, GLSL, 호스트 모듈, 리플렉션 탭에서는 컴파일러가 내보낸 결과를 계속 볼 수 있습니다.',
       hostTile: '모듈과 host.ts',
     },
   },
