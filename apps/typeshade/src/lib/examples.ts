@@ -481,12 +481,13 @@ const pinned = {
   rulesPending: 0,
   rulesReview: 9,
   rulesSurfaceSections: 51,
-  // The pin before this one on the branch that carries it is 8c088df7 (the bot's refresh of
-  // 2026-11-02); the displayed rule history counts the rules added and changed since it: Rule
-  // 11.21 added (change 0117), two fingerprints moved.
-  rulesAdded: 1,
+  // The pin before this one on main is 3e1e8420: this pin advances across the intermediate
+  // pins the bot's branch carried (03aedde, 8c088df), and the displayed rule history counts
+  // every rule added and changed since 3e1e8420, as main's first-parent history reads it. A
+  // build of the branch itself sees the intermediate pin and smaller counts.
+  rulesAdded: 7,
   rulesRemoved: 0,
-  rulesChanged: 2,
+  rulesChanged: 23,
 };
 const drift: string[] = [];
 if (facts.shadeExamples !== pinned.shadeExamples)
