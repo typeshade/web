@@ -2,11 +2,12 @@ import type { ModuleDecl } from '../../../vendor/shader-dsl/src/core/ir/nodes.ts
 import type { EmitChoice, PlaygroundCopy, Target, View } from './contracts.ts';
 import { emitGlsl, emitWgsl } from './emission.ts';
 const isTarget = (view: View): view is Target =>
-  view === 'wgsl' || view === 'glslVertex' || view === 'glslFragment';
+  view === 'wgsl' || view === 'glslVertex' || view === 'glslFragment' || view === 'module';
 const TARGET_LANGUAGE: Readonly<Record<Target, string>> = {
   wgsl: 'wgsl',
   glslVertex: 'cpp',
   glslFragment: 'cpp',
+  module: 'javascript',
 };
 interface OutputState {
   readonly emitted: Partial<Record<Target, string>>;
@@ -43,6 +44,8 @@ export function createOutputController(
     const choice = currentChoice();
     const glsl = emitGlsl(module, choice);
     return {
+      // A pass is drawn by the program, so a host imports the program's module, not the pass's.
+      module: state.emitted.module,
       wgsl: emitWgsl(module, choice),
       glslVertex: 'failed' in glsl ? undefined : glsl.vertex,
       glslFragment: 'failed' in glsl ? undefined : glsl.fragment,
@@ -58,7 +61,8 @@ export function createOutputController(
     // pass emits (compiler change 0026), and with any other file the program's.
     const source = emittedFor(state.workspace.activeFile)[target];
     if (!source) {
-      output.textContent = target === 'wgsl' ? copy.noOutput : copy.noGlsl;
+      output.textContent =
+        target === 'wgsl' ? copy.noOutput : target === 'module' ? copy.noModule : copy.noGlsl;
       sizeLabel.textContent = '';
       return;
     }

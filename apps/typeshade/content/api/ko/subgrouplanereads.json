@@ -1,0 +1,8 @@
+{
+  "slug": "subgrouplanereads",
+  "source": "9b9093eaf77a8b2e319ca5858922429a1921890ecddfb66069502e92d35cf3be",
+  "texts": {
+    "summary": "다른 레인의 값을 읽는 서브그룹 함수 집합입니다. 레인 하나인 서브그룹은 이렇게 읽을 수 없습니다. 브로드캐스트와 셔플이 여기에 듭니다.",
+    "description": "결정론 보고서가 읽습니다."
+  }
+}

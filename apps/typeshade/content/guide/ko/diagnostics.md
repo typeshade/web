@@ -1,6 +1,6 @@
 ---
 id: diagnostics
-source: 0bfe59bd4d4d96296aca5f0ef005a29cdc03db329e1cdb61feb99f83281ded6b
+source: 80bc39adb1481ce36f7c47155425b2cd3f8965b80e87a65b18cf8ba140bb834d
 sourceLine: 1786
 rules: 12.2 i81jajIqKPFQCmZ8J1MOkejuMSPX2dkEGKTlWS3-yBQ=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 6.2 X1TddP_Ob7b4QaR9Qbuoo1UgPCngNA5JdtbbWwd_lOc=, 6.10 suiaQZS1y-SaWxDmJXHL21Qzp_yYkddUlpCNV8AsLVc=, 8.13 aNXyjNJvi1bR7zPmCgF2WJ0PmaP_Qk6WWqXOOuEbzCg=, 8.14 SP-Fa9DtpBru_e2Zuh3x8ZUFrqweaTrNrJs-c8RHbE0=, 8.17 iy_UhoCMHYdgpfUXu8eRAllyZo67mQ2c6BRfQtMcIYY=, 6.6 qXyf0FpXuS4xir_HpHadSIsWFZT2WtMx8M-wm9BvJOE=, 12.3 CjhXTenX6H0V0STxt5Bka_Sp7X0GVUeCZR9Mt1IqNvA=
 ---
@@ -121,7 +121,7 @@ warning no-float-eq  (fn same)
 
 ```
 error[SD0030] unsupported-capability
-  backend 'glsl-es300' cannot emit this module — missing capabilities: compute, subgroups
+  backend 'glsl-es300' cannot emit this module — missing capabilities: compute, clipDistances
 ```
 
 ### 소스 위치

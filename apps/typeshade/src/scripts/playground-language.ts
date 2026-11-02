@@ -112,6 +112,11 @@ export interface Analysis {
   readonly diagnostics: readonly TypeshadeDiagnostic[];
   readonly hasDirective: boolean;
   readonly module?: unknown;
+  /** The generated module a host.ts import of the document reads, as JavaScript. */
+  readonly hostModule?: string;
+  /** Whether a host can call an entry of the document (Rule 8.24), so the Result tab runs it
+   *  through host.ts (playground-host-service.ts, `hostCallable`). */
+  readonly hostCallable?: boolean;
 }
 
 export interface ResultByKind {

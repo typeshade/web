@@ -24,9 +24,11 @@ import type { Analysis, LanguageReply, LanguageRequest } from './playground-lang
 import { mergeCompileDiagnostics } from './playground-diagnostics.ts';
 import {
   hostBuild,
+  hostCallable,
   hostCompletions,
   hostDiagnostics,
   hostHover,
+  hostModuleOf,
   hostStarter,
 } from './playground-host-service.ts';
 
@@ -60,7 +62,24 @@ function analyse(languageService: TypeshadeLanguageService, uri: string): Analys
   const merged = mergeCompileDiagnostics(diagnostics, result.diagnostics);
   if (result.diagnostics.some((diagnostic) => diagnostic.category === 'error'))
     return { diagnostics: merged, hasDirective };
-  return { diagnostics: merged, hasDirective, module: result.module };
+  // The module a host.ts import of this file reads (design: playground-one-runtime.md, D2).
+  // Whether the Result tab runs it through host.ts (phase 2 of the same record).
+  let hostModule: string | undefined;
+  let callable = false;
+  try {
+    hostModule = hostModuleOf(uri, readDocument);
+    callable = hostCallable(uri, readDocument);
+  } catch {
+    hostModule = undefined;
+    callable = false;
+  }
+  return {
+    diagnostics: merged,
+    hasDirective,
+    module: result.module,
+    hostModule,
+    hostCallable: callable,
+  };
 }
 
 self.addEventListener('message', (event: MessageEvent<LanguageRequest>) => {

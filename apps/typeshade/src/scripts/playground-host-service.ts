@@ -361,6 +361,27 @@ const COMMONJS: ts.CompilerOptions = {
   esModuleInterop: true,
 };
 
+/** The generated module a host.ts import of the shader file at `uri` reads: the code the Vite
+ *  plugin generates for the import (`hostFace`), which opens the device, builds the pipelines,
+ *  packs the bindings and dispatches or draws. The page shows it read-only, so a reader sees
+ *  every step between host.ts and the GPU. Undefined when the module does not compile. */
+export function hostModuleOf(
+  uri: string,
+  read: (uri: string) => string | undefined,
+): string | undefined {
+  return faceOf(uri, read)?.code;
+}
+
+/** Whether a host can call an entry of the module at `uri` (Rule 8.24): its host face lists a
+ *  `@fragment` entry that reads no vertex output, a `@compute` entry or a kernel function. The
+ *  Result tab runs such a module through host.ts (docs/playground-one-runtime.md, phase 2). */
+export function hostCallable(uri: string, read: (uri: string) => string | undefined): boolean {
+  return (faceOf(uri, read)?.exports ?? []).some(
+    (exported) =>
+      exported.kind === 'fragment' || exported.kind === 'compute' || exported.kind === 'kernel',
+  );
+}
+
 /** host.ts and the modules it imports, as the frame runs them. */
 export function hostBuild(text: string, read: (uri: string) => string | undefined): HostBuild {
   const modules: Record<string, string> = {};

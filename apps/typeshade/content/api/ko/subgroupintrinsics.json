@@ -1,0 +1,8 @@
+{
+  "slug": "subgroupintrinsics",
+  "source": "8b81429bfc35def0a51fec9b6207c165095f2444ca5fac03980239861341d9c0",
+  "texts": {
+    "summary": "WGSL subgroups 확장의 서브그룹 내장 함수 집합입니다.",
+    "description": "WGSL에서는 각 함수가 그대로 호출됩니다. GLSL ES 3.00과 CPU 오라클에서는 서브그룹이 인보케이션 하나이므로(Rule 11.21), `passes/subgroups-one-lane.ts`가 GLSL 작성기가 실행되기 전에 각 호출을 다시 쓰고, 오라클의 표가 각 함수에 레인 하나의 값을 줍니다. 기능(capability) 패스가 호출에서 `subgroups`를 파생하고, 균일성 검사가 이 집합을 읽고, 프런트 엔드가 호출을 분기하도록 내보냅니다."
+  }
+}

@@ -1,7 +1,8 @@
 ---
 id: capabilities-extensions
-source: a858267c3b5964e4075622c21e79f81f80159fa988da160c87e9198b09e639bd
+source: c46215d10a002f7f11ed6a962519feb804c7fef18348d698198ad27406292667
 sourceLine: 2291
+rules: 11.21 NGIrnrXEAXjbu_CT68JK1XC6NGSjxGH7XAQK99t8d5Q=
 ---
 
 이 페이지는 모듈에 필요한 GPU 기능의 선언, 타깃별 요구 사항, 생성된 디바이스의 지원 여부 확인을 설명합니다. 백엔드가 코드를 생성하지 않고 fail closed 방식으로 실패하는 조건도 다룹니다.
@@ -45,26 +46,27 @@ id별 요구 사항은 _호스트 기능_(host feature)과 _소스 지시문_(so
 기능에 따라 이 둘 중 하나만 필요할 수도, 둘 다 필요할 수도, 둘 다 필요 없을 수도
 있습니다.
 
-| `enables` id         | WebGL2 및 GLSL ES 3.00                                    | WebGPU 및 WGSL                                                     |
-| -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------ |
-| `floatRenderTarget`  | 호스트 기능 `EXT_color_buffer_float`                      | 코어 사양, 따로 요청할 것 없음                                     |
-| `float32Blend`       | 호스트 기능 `EXT_float_blend`                             | 호스트 기능 `float32-blendable`                                    |
-| `float32Filterable`  | 호스트 기능 `OES_texture_float_linear`                    | 호스트 기능 `float32-filterable`                                   |
-| `multiview`          | 지시문 `GL_OVR_multiview2`와 호스트 기능 `OVR_multiview2` | 미지원, fail closed로 실패                                         |
-| `f16`                | 미지원, fail closed로 실패                                | 지시문 `f16`과 호스트 기능 `shader-f16`                            |
-| `subgroups`          | 미지원, fail closed로 실패                                | 지시문 `subgroups`와 호스트 기능 `subgroups`                       |
-| `clipDistances`      | 미지원, fail closed로 실패                                | 지시문 `clip_distances`와 호스트 기능 `clip-distances`             |
-| `primitiveIndex`     | 미지원, fail closed로 실패                                | 지시문 `primitive_index`와 호스트 기능 `primitive-index`           |
-| `dualSourceBlending` | 미지원, fail closed로 실패                                | 지시문 `dual_source_blending`과 호스트 기능 `dual-source-blending` |
-| `bgra8unormStorage`  | 미지원, fail closed로 실패                                | 호스트 기능 `bgra8unorm-storage`, 파생                             |
-| `packed4x8Dot`       | 미지원, fail closed로 실패                                | 코어 사양, 파생. 언어 기능 하나를 확인해야 함                      |
+| `enables` id         | WebGL2 및 GLSL ES 3.00                                           | WebGPU 및 WGSL                                                     |
+| -------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `floatRenderTarget`  | 호스트 기능 `EXT_color_buffer_float`                             | 코어 사양, 따로 요청할 것 없음                                     |
+| `float32Blend`       | 호스트 기능 `EXT_float_blend`                                    | 호스트 기능 `float32-blendable`                                    |
+| `float32Filterable`  | 호스트 기능 `OES_texture_float_linear`                           | 호스트 기능 `float32-filterable`                                   |
+| `multiview`          | 지시문 `GL_OVR_multiview2`와 호스트 기능 `OVR_multiview2`        | 미지원, fail closed로 실패                                         |
+| `f16`                | 미지원, fail closed로 실패                                       | 지시문 `f16`과 호스트 기능 `shader-f16`                            |
+| `subgroups`          | 서브그룹 하나가 인보케이션 하나(규칙 11.21), 따로 요청할 것 없음 | 지시문 `subgroups`와 호스트 기능 `subgroups`                       |
+| `clipDistances`      | 미지원, fail closed로 실패                                       | 지시문 `clip_distances`와 호스트 기능 `clip-distances`             |
+| `primitiveIndex`     | 미지원, fail closed로 실패                                       | 지시문 `primitive_index`와 호스트 기능 `primitive-index`           |
+| `dualSourceBlending` | 미지원, fail closed로 실패                                       | 지시문 `dual_source_blending`과 호스트 기능 `dual-source-blending` |
+| `bgra8unormStorage`  | 미지원, fail closed로 실패                                       | 호스트 기능 `bgra8unorm-storage`, 파생                             |
+| `packed4x8Dot`       | 미지원, fail closed로 실패                                       | 코어 사양, 파생. 언어 기능 하나를 확인해야 함                      |
 
-아래쪽 다섯 행은 아무도 직접 선언하지 않는 기능입니다. `@builtin("clip_distances")`,
-`@builtin("primitive_index")`, `@blend_src(n)`을 적으면 해당 기능이 파생됩니다. WGSL은
-이 셋을 저마다 짝이 맞는 `enable` 없이는 거부하기 때문입니다. `"bgra8unorm"` 스토리지
-텍스처와 packed 4x8 계열 함수 호출도 각각 바인딩과 호출에서 기능을 끌어냅니다. 어떤
-사용으로도 파생되지 않는 `f16`과, 서브그룹 내장 값을 하나도 읽지 않는 파일의 `subgroups`는
-앞에서 본 문자열 지시문으로 적습니다.
+아래쪽 여섯 행은 아무도 직접 선언하지 않는 기능입니다. `@builtin("clip_distances")`,
+`@builtin("primitive_index")`, `@builtin("subgroup_id")`, `@blend_src(n)`을 적으면 해당
+기능이 파생됩니다. WGSL은 이들을 저마다 짝이 맞는 `enable` 없이는 거부하기 때문입니다.
+`"bgra8unorm"` 스토리지 텍스처, packed 4x8 계열 함수 호출, 서브그룹 내장 함수 호출
+(`subgroupAdd(x)`, 변경 0117)도 각각 바인딩과 호출에서 기능을 끌어냅니다. 어떤 사용으로도
+파생되지 않는 `f16`은 앞에서 본 문자열 지시문으로 적습니다. 서브그룹 내장 값을 읽지 않고
+서브그룹 함수도 부르지 않는 파일의 `subgroups`도 같습니다.
 
 호스트 기능만 있고 소스 지시문이 없는 기능은 선언해도 생성되는 셰이더가 한 바이트도
 달라지지 않습니다. `float32Blend`와 `float32Filterable` 이름에 붙은 `32`에는 이유가
@@ -98,9 +100,11 @@ capabilityMatrix([wgslBackend, glslEs300Backend])
   `multiview`를 선언한 모듈은 지시문만 생성하고 여전히 단일 뷰로 렌더링합니다. 나머지 네 기능은
   쓸 수 있습니다. `clipDistances`, `primitiveIndex`, `dualSourceBlending`은 각 속성에
   필요한 기능입니다. `subgroups`는 컴퓨트나 프래그먼트 진입점에
-  `@builtin("subgroup_invocation_id")`이나 `@builtin("subgroup_size")`를 적으면 쓰게
-  됩니다. 다만 서브그룹 내장 함수(`subgroupAdd` 등)는 아직 없는데, 이는 기능과는 별개인
-  빈자리입니다. 어떤 어댑터가 이 네 기능 가운데 하나를 실제로 갖추었는지 알려면
+  `@builtin("subgroup_invocation_id")`이나 `@builtin("subgroup_size")`를 적거나, 컴퓨트
+  진입점에 `@builtin("subgroup_id")`이나 `@builtin("num_subgroups")`를 적거나, 서브그룹 내장
+  함수 21개 가운데 하나(`subgroupAdd` 등, 변경 0117)를 부르면 쓰게 됩니다. GLSL ES 3.00에서는
+  비용이 없습니다. 거기서는 서브그룹이 인보케이션 하나이므로(규칙 11.21) 접은 값은 레인
+  자신의 값이고 `subgroup_size`는 `1u`입니다. 어떤 어댑터가 이 네 기능 가운데 하나를 실제로 갖추었는지 알려면
   `reflect().requiredFeatures`를 씁니다. 디바이스는 `requestDevice`에서 요청받은 선택
   기능만 갖습니다. 컴파일 게이트가 바로 그렇게 코퍼스에서 목록을 뽑아 요청하며,
   `examples/clip-planes.shade.ts`가 게이트의 Tint에서 컴파일되는 것도 그 덕분입니다. 이

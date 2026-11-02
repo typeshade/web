@@ -1,6 +1,159 @@
 import type { FunctionLesson } from './function-lessons-en.ts';
 
 export const operationLessons = {
+  // The subgroup built-in functions (compiler change 0117): a fixture of four lanes, and the
+  // one-lane subgroup WebGL2 and the CPU oracle run (Rule 11.21).
+  subgroupAdd: {
+    meaning:
+      'A subgroup fold adds the value of every lane of the subgroup and gives the sum to every lane, in one instruction with no barrier.',
+    use: 'Use it to pre-reduce before an atomic or a workgroup tree: one atomic per subgroup instead of one per lane.',
+    try: "Compare the four-lane sum with the one-lane case: WebGL2 and the CPU oracle run a subgroup of one invocation (Rule 11.21), so the fold is the lane's own value.",
+    caution:
+      'Every lane of the subgroup must reach the call together (uniform control flow). An integer sum has one value in any order; a float sum does not, and the determinism report lists it as order.',
+  },
+  subgroupMul: {
+    meaning:
+      'A subgroup fold multiplies the values of every lane and gives the product to every lane.',
+    use: 'Use it for a product over lanes that would otherwise take a loop over workgroup memory.',
+    try: "Compare the four-lane product with the one-lane case, where the product is the lane's own value.",
+    caution:
+      'Every lane must reach the call together. A float product has no fixed order across devices; an integer product wraps at 32 bits.',
+  },
+  subgroupMin: {
+    meaning: 'A subgroup fold gives every lane the smallest value any lane holds.',
+    use: 'Use it to find a minimum across lanes without workgroup memory.',
+    try: 'Compare the four-lane minimum with the one-lane case.',
+    caution:
+      'Every lane must reach the call together. The result is exact in any order, so the determinism report lists no row for it.',
+  },
+  subgroupMax: {
+    meaning: 'A subgroup fold gives every lane the largest value any lane holds.',
+    use: 'Use it to find a maximum across lanes without workgroup memory.',
+    try: 'Compare the four-lane maximum with the one-lane case.',
+    caution: 'Every lane must reach the call together. The result is exact in any order.',
+  },
+  subgroupAnd: {
+    meaning: "A subgroup fold gives every lane the bitwise AND of every lane's integer.",
+    use: 'Use it to test a bit that every lane set, or to combine masks.',
+    try: 'The fixture folds 3, 1, 4 and 1: no bit is set in all four, so the result is 0.',
+    caution:
+      'Every lane must reach the call together. The argument is an i32 or a u32, or a vector of them.',
+  },
+  subgroupOr: {
+    meaning: "A subgroup fold gives every lane the bitwise OR of every lane's integer.",
+    use: 'Use it to collect flags any lane raised.',
+    try: 'The fixture folds 3, 1, 4 and 1 into 7: the bits of 3 and 4 together.',
+    caution:
+      'Every lane must reach the call together. The argument is an i32 or a u32, or a vector of them.',
+  },
+  subgroupXor: {
+    meaning: "A subgroup fold gives every lane the bitwise XOR of every lane's integer.",
+    use: 'Use it for a parity over lanes, or to cancel values that appear twice.',
+    try: 'The fixture folds 3, 1, 4 and 1: the two equal values cancel and 3 ^ 4 is 7.',
+    caution:
+      'Every lane must reach the call together. The argument is an i32 or a u32, or a vector of them.',
+  },
+  subgroupExclusiveAdd: {
+    meaning:
+      'An exclusive scan gives each lane the sum of the lanes before it, and lane 0 the sum of none, 0.',
+    use: 'Use it to assign each lane an offset, such as where to write in a compacted output.',
+    try: 'Read the lanes left to right: each value is the running sum before that lane. On one lane the scan is 0.',
+    caution:
+      'Every lane must reach the call together. A float scan has no fixed order across devices; the report lists it as order.',
+  },
+  subgroupInclusiveAdd: {
+    meaning: 'An inclusive scan gives each lane the sum of the lanes up to and including it.',
+    use: "Use it where the offset after each lane's own value is wanted; the last lane holds the subgroup's sum.",
+    try: "Read the lanes left to right: each value is the running sum through that lane. On one lane it is the lane's own value.",
+    caution:
+      'Every lane must reach the call together. A float scan has no fixed order across devices.',
+  },
+  subgroupExclusiveMul: {
+    meaning:
+      'An exclusive scan gives each lane the product of the lanes before it, and lane 0 the product of none, 1.',
+    use: 'Use it for a running product across lanes.',
+    try: 'Read the lanes left to right. On one lane the scan is 1.',
+    caution:
+      'Every lane must reach the call together. A float scan has no fixed order across devices.',
+  },
+  subgroupInclusiveMul: {
+    meaning: 'An inclusive scan gives each lane the product of the lanes up to and including it.',
+    use: "Use it for a running product that includes the lane's own value.",
+    try: "Read the lanes left to right. On one lane it is the lane's own value.",
+    caution:
+      'Every lane must reach the call together. A float scan has no fixed order across devices.',
+  },
+  subgroupAll: {
+    meaning: "A vote gives every lane true when every lane's bool is true.",
+    use: 'Use it to take a branch only when the whole subgroup agrees, such as skipping work every lane would skip.',
+    try: "The fixture has one false lane, so the vote is false. On one lane the vote is the lane's own bool.",
+    caution:
+      'Every lane must reach the call together, so the call cannot sit under a condition that differs by lane.',
+  },
+  subgroupAny: {
+    meaning: "A vote gives every lane true when at least one lane's bool is true.",
+    use: 'Use it to keep work alive while any lane still needs it.',
+    try: "The fixture has three true lanes, so the vote is true. On one lane the vote is the lane's own bool.",
+    caution:
+      'Every lane must reach the call together. The right side of subgroupElect() && subgroupAny(p) is reached by one lane and is refused.',
+  },
+  subgroupBallot: {
+    meaning:
+      "A ballot gives every lane a vec4u with one bit per lane: bit i of word i / 32 is lane i's bool.",
+    use: 'Use it to count the lanes that voted, with countOneBits, or to find the first lane that did.',
+    try: 'The fixture votes true, false, true, true: bits 0, 2 and 3, which is 13. On one lane only bit 0 can be set.',
+    caution: "Every lane must reach the call together. Bits past the subgroup's size are 0.",
+  },
+  subgroupElect: {
+    meaning:
+      'An election is true in exactly one lane of the subgroup, the active lane with the lowest id, and false in the others.',
+    use: "Use it to let one lane do a subgroup's shared work, such as one atomicAdd of a fold.",
+    try: 'Lane 0 is elected in the fixture. On one lane the election is always true.',
+    caution:
+      'Every lane must reach the call together. Which lane is elected depends on which lanes are active.',
+  },
+  subgroupBroadcast: {
+    meaning: 'A broadcast gives every lane the value the named lane holds.',
+    use: "Use it to share one lane's result, such as a value lane 0 computed, with the whole subgroup.",
+    try: "The fixture broadcasts lane 2, so every lane reads 4. On one lane the call gives the lane's own value, whatever lane it names.",
+    caution:
+      "The lane is written as a number in the call (a const-expression in WGSL); a lane computed at run time is subgroupShuffle's. A read of a lane other than 0 is a target row of the determinism report on WebGL2 and the oracle.",
+  },
+  subgroupBroadcastFirst: {
+    meaning: 'A broadcast gives every lane the value the first active lane holds.',
+    use: "Use it to share the elected lane's value with the subgroup.",
+    try: "Lane 0 is first in the fixture, so every lane reads 3. On one lane it is the lane's own value.",
+    caution:
+      'Every lane must reach the call together. Which lane is first depends on which lanes are active.',
+  },
+  subgroupShuffle: {
+    meaning: 'A shuffle gives each lane the value of the lane it names, which may differ per lane.',
+    use: 'Use it to permute values across lanes, such as reversing or rotating them.',
+    try: "The fixture asks lane i for lane 3 - i, which reverses the four values. On one lane the call gives the lane's own value, whatever id names.",
+    caution:
+      "The lane is a u32 computed at run time; a lane at or past the subgroup's size gives an indeterminate value. A read of another lane is a target row of the determinism report on WebGL2 and the oracle.",
+  },
+  subgroupShuffleDown: {
+    meaning: 'A shuffle gives each lane the value of the lane delta above it.',
+    use: 'Use it for a neighbour read, such as a difference between adjacent lanes.',
+    try: "With delta 1 each lane reads the next lane; the last lane names a lane past the subgroup, shown as ?. On one lane the call gives the lane's own value.",
+    caution:
+      "A lane past the subgroup's size gives an indeterminate value. A read of another lane is a target row of the determinism report on WebGL2 and the oracle.",
+  },
+  subgroupShuffleUp: {
+    meaning: 'A shuffle gives each lane the value of the lane delta below it.',
+    use: 'Use it for a neighbour read from the lane before.',
+    try: "With delta 1 each lane reads the previous lane; lane 0 names a lane below the subgroup, shown as ?. On one lane the call gives the lane's own value.",
+    caution:
+      'A lane below 0 gives an indeterminate value. A read of another lane is a target row of the determinism report on WebGL2 and the oracle.',
+  },
+  subgroupShuffleXor: {
+    meaning: 'A shuffle gives each lane the value of the lane whose id is its own XOR a mask.',
+    use: 'Use it for butterfly exchanges, the step of a tree reduction within a subgroup.',
+    try: "With mask 1 lanes 0 and 1 swap, and lanes 2 and 3 swap. On one lane the call gives the lane's own value.",
+    caution:
+      "A lane at or past the subgroup's size gives an indeterminate value. A read of another lane is a target row of the determinism report on WebGL2 and the oracle.",
+  },
   textureSample: {
     meaning:
       'Filtered sampling looks up a texture at normalized coordinates. A sampler controls interpolation and addressing; nearby fragments determine the mip level.',

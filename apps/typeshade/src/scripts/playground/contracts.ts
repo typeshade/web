@@ -151,6 +151,7 @@ export interface PlaygroundCopy {
   readonly cpuNoResources: string;
   readonly entryCountOne: string;
   readonly noGlsl: string;
+  readonly noModule: string;
   readonly resultTab: string;
   readonly starting: string;
   readonly serviceFailed: string;
@@ -189,11 +190,13 @@ export interface PlaygroundCopy {
     readonly hostNone: string;
     readonly hostUnloaded: string;
     readonly hostStopped: string;
+    readonly hostNote: string;
+    readonly hostLinked: string;
   };
 }
 
 /** The files the compiler emits, one per tab over the text panel. */
-export type Target = 'wgsl' | 'glslVertex' | 'glslFragment';
+export type Target = 'wgsl' | 'glslVertex' | 'glslFragment' | 'module';
 
 /** What the one tab strip over the result column selects: the canvas, one of the three
  *  emitted files, or the reflection. */

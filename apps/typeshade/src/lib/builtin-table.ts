@@ -27,12 +27,17 @@ type Spelling = {
 /** A module of the pinned compiler, transpiled and run with no imports resolved. Every table
  *  read below is a plain object or set built at module scope, so an unresolved import only
  *  matters to a function this file never calls. */
-function evaluate(file: string): Record<string, unknown> {
+function evaluate(
+  file: string,
+  imports: Readonly<Record<string, Record<string, unknown>>> = {},
+): Record<string, unknown> {
   const js = ts.transpileModule(readFileSync(abs(file), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
   const mod: Record<string, unknown> = {};
-  new Function('exports', 'require', js)(mod, () => ({}));
+  // `imports` maps a specifier the file imports at module scope to a module evaluated before
+  // it: math-alias.ts spreads the registry's subgroup ids into a set as it loads (change 0117).
+  new Function('exports', 'require', js)(mod, (spec: string) => imports[spec] ?? {});
   return mod;
 }
 
@@ -47,6 +52,7 @@ export type BuiltinFamily =
   | 'textures'
   | 'atomics'
   | 'barriers'
+  | 'subgroups'
   | 'f64';
 
 /** The order the page's sections run in. */
@@ -60,6 +66,7 @@ export const BUILTIN_FAMILIES: readonly BuiltinFamily[] = [
   'textures',
   'atomics',
   'barriers',
+  'subgroups',
   'f64',
 ];
 
@@ -230,6 +237,28 @@ const FAMILY_OF: Readonly<Record<string, BuiltinFamily>> = {
   storageBarrier: 'barriers',
   textureBarrier: 'barriers',
   workgroupUniformLoad: 'barriers',
+  // subgroups (change 0117): the 21 functions of WGSL's `subgroups` extension
+  subgroupAdd: 'subgroups',
+  subgroupAll: 'subgroups',
+  subgroupAnd: 'subgroups',
+  subgroupAny: 'subgroups',
+  subgroupBallot: 'subgroups',
+  subgroupBroadcast: 'subgroups',
+  subgroupBroadcastFirst: 'subgroups',
+  subgroupElect: 'subgroups',
+  subgroupExclusiveAdd: 'subgroups',
+  subgroupExclusiveMul: 'subgroups',
+  subgroupInclusiveAdd: 'subgroups',
+  subgroupInclusiveMul: 'subgroups',
+  subgroupMax: 'subgroups',
+  subgroupMin: 'subgroups',
+  subgroupMul: 'subgroups',
+  subgroupOr: 'subgroups',
+  subgroupShuffle: 'subgroups',
+  subgroupShuffleDown: 'subgroups',
+  subgroupShuffleUp: 'subgroups',
+  subgroupShuffleXor: 'subgroups',
+  subgroupXor: 'subgroups',
   // f64
   f64: 'f64',
   f64FromParts: 'f64',
@@ -243,6 +272,29 @@ const FAMILY_OF: Readonly<Record<string, BuiltinFamily>> = {
 // the registry. An id with no count anywhere stops the build, so a call is never printed with
 // the wrong number of slots.
 const ARITY_OF: Readonly<Record<string, number>> = {
+  // subgroups (change 0117): a fold, a scan or a vote takes the lane's value, a broadcast or a
+  // shuffle adds the lane, and the election takes nothing
+  subgroupAdd: 1,
+  subgroupAll: 1,
+  subgroupAnd: 1,
+  subgroupAny: 1,
+  subgroupBallot: 1,
+  subgroupBroadcast: 2,
+  subgroupBroadcastFirst: 1,
+  subgroupElect: 0,
+  subgroupExclusiveAdd: 1,
+  subgroupExclusiveMul: 1,
+  subgroupInclusiveAdd: 1,
+  subgroupInclusiveMul: 1,
+  subgroupMax: 1,
+  subgroupMin: 1,
+  subgroupMul: 1,
+  subgroupOr: 1,
+  subgroupShuffle: 2,
+  subgroupShuffleDown: 2,
+  subgroupShuffleUp: 2,
+  subgroupShuffleXor: 2,
+  subgroupXor: 1,
   select: 3,
   i32: 1,
   u32: 1,
@@ -402,7 +454,9 @@ let cache: Tables | null = null;
 
 function build(): Tables {
   const registry = evaluate('src/core/intrinsics.ts');
-  const mathAlias = evaluate('src/compiler/ts/math-alias.ts');
+  const mathAlias = evaluate('src/compiler/ts/math-alias.ts', {
+    '../../core/intrinsics.js': registry,
+  });
 
   const intrinsics = registry.INTRINSICS as Record<string, Spelling> | undefined;
   const portable = registry.PORTABLE_INTRINSICS as ReadonlySet<string> | undefined;
