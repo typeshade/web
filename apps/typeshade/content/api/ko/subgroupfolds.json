@@ -1,0 +1,8 @@
+{
+  "slug": "subgroupfolds",
+  "source": "dbe0cc60778078ebbe27bcad69cd2990b2e69a2a879cb8e230d40a4640e081a4",
+  "texts": {
+    "summary": "레인의 값을 접는(fold) 서브그룹 함수 집합입니다. 부동소수점 형태는 정해진 순서가 없으며, 스캔도 함께 나열합니다.",
+    "description": "`subgroupMin`과 `subgroupMax`는 어떤 순서로도 결과가 같으므로 들어 있지 않습니다. 결정론 보고서가 읽습니다."
+  }
+}

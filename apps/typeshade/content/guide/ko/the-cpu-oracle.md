@@ -2,7 +2,7 @@
 id: the-cpu-oracle
 source: 0a224eaa9ccd465cd4aa68ea7c576d6ff52f953f985959fd180f849cee768c6d
 sourceLine: 1438
-rules: 8.22 RRSYqKRm8CRNz6jUXROYf4rHdqey9cqVKO8ceusX66E=, 7.2 xGq0Nofxm1Jtgfkv9PIlY9amCnZ_OI5RVn_kbDUFg2U=, 3.9 3B2rlXJXA0GupXGpH-mhQpicZan-WehN8Xf4nhFST6Q=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 8.25 XZRD1So9e-OFRi9VePXRjyCfT2_T_xaPFWQw_Uy0ZrM=, 7.6 kyzs2Ws4Mk2xUgP_v9ZM_z6jm_3zIWP2-BekxmeHpC8=, 12.7 TawOmv8klHJxgWPx5cItYK8gProqi2towGMRoE6fL2M=
+rules: 8.22 KZX4br5aY4KJfRtQvkYd5jJ4drnkFSbO1ngvskHPhJw=, 7.2 iYJ344Wi-VTSCnmajhMO7u7f1ogRHO4F_dzJhuFXUZU=, 3.9 3B2rlXJXA0GupXGpH-mhQpicZan-WehN8Xf4nhFST6Q=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 8.25 kf3cBLjGMs8IwKcbQz-CZKCza4XRYOMQfRhX4ueQFq0=, 7.6 kyzs2Ws4Mk2xUgP_v9ZM_z6jm_3zIWP2-BekxmeHpC8=, 12.7 Mvr2vY3Krl66Bglu9ejs51aqLb_3vraF1hO4FLdrK48=
 ---
 
 이 페이지는 같은 모듈을 CPU에서 배정밀도로 실행하고 GPU 결과와 비교하는 방법을 설명합니다.

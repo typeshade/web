@@ -313,7 +313,8 @@ export function fs(@location(0) uv: vec2): vec4 {
   const a = uv.x * 2.
   let b = uv.y
   b = b + a
-  for (let i: i32 = 0; i < 4; i++) {
+  const n = i32(uv.x * 8.)
+  for (let i: i32 = 0; i < n; i++) {
     b += a
   }
   let w: i32 = 0
@@ -569,7 +570,7 @@ function buildWgsl(): WgslMapping {
       row(
         'for',
         pick(statements, 'for (var i:', 'statement snippet'),
-        'for (let i: i32 = 0; i < 4; i++)',
+        'for (let i: i32 = 0; i < n; i++)',
       ),
       row('while', pick(statements, 'for (var _w:', 'statement snippet'), 'while (w < 4)'),
       row('switch', pick(statements, 'switch i32(b)', 'statement snippet'), 'switch (i32(b))'),

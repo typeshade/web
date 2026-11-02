@@ -344,3 +344,25 @@ id first, then the pull request that did the work.
 - 0099: the optional-result guide describes bare return and fall-through. Null-only results
   produce null; results admitting undefined produce undefined. Plain-valued bare returns
   remain TS8021, including the error reference's existing trigger and repair.
+- 0103: a method reads its object in place when the receiver is a place. The classes page's
+  struct lesson (en and ko) says `r.at(t)` calls `Ray_at(&r, t)` for a `let` receiver and
+  `Ray_at(r, t)` for a `const` one (Rule 8.28); the lowering rows that pick `Ray_at` and `hit`
+  read the pinned emit. Handled in #14.
+- 0106: a swizzle of distinct components is an assignment target. The WGSL-versus-GLSL page's
+  swizzle paragraph (en and ko) says the compiler writes each destination component in turn and
+  that only a repeated component is `TS8018`; the error reference's `TS8018` example is a write
+  through a temporary, not a swizzle. Handled in #14.
+- 0109: an exported class is a value of the host face. The page that copied the §64 table no
+  longer carries a struct-as-interface row at this pin; the classes page's boundary list and the
+  fieldless-class lowering row (en and ko) say a result is an instance of the class when the
+  module exports it (Rule 8.21). Handled in #14.
+- 0110: a class is its struct and its functions. The classes page (§26), the kernel-function
+  paragraph (§65) and the fuse paragraph (§71), in both languages, carry Rule 8.29's paragraph
+  and the sentence on a changing method called on an element. Handled in #14.
+- 0117: the subgroup built-in functions and `subgroup_id`/`num_subgroups`. The language
+  reference reads the 21 functions and the two values from the compiler's tables at the pin, in
+  a `subgroups` family of the builtins page (en and ko); the Korean sections `capabilities-extensions`
+  and `diagnostics` are translated again from the pinned `AUTHORING.md`; the `subgroup-reduce`
+  example joins the compute group, the Playground picker and the stills' no-GLSL list with its
+  Korean title and description; the three new exports are translated. Handled in #14. The
+  unified benchmark's four fixed WGSL cases become TypeShade source in #22, which waits on this pin.
