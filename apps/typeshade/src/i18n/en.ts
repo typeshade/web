@@ -1434,7 +1434,7 @@ export const en = {
       importP:
         'Configure the Vite plugin to import `.shade.ts` files. Exported helper functions run on the CPU. Call a `@compute` entry with `await entry(bindings, workgroups)` to run it on supported WebGPU or WebGL2 environments and read back its output. Call a full-screen `@fragment` entry with `entry(canvas, bindings)`. It selects an available backend in WebGPU, WebGL2, CPU order; the runtime creates the required device and pipelines. The setup below uses the source package installed from Git.',
       setupP:
-        'After installation, add the Vite plugin and the host `tsconfig.json` settings below. The scripts run Vite and the installed CLI through `tsx`. The `prepare` script writes the host views that `tsc` reads. A view carries the JSDoc comment written above each export of the module. Add `*.shade.typeshade.ts` to `.gitignore`.',
+        'After installation, add the Vite plugin and the host `tsconfig.json` settings below. The scripts run Vite and the installed CLI through `tsx`. The `prepare` script writes the host views that `tsc` reads. A view spells each type with the shader’s own name, such as `f32` or `vec3`, and `typeshade/runtime` exports those names as types. A view also carries the JSDoc comment written above each export of the module. Add `*.shade.typeshade.ts` to `.gitignore`.',
       viteLabel: 'The Vite plugin, vite.config.ts',
       tsconfigLabel: 'Host configuration, tsconfig.json',
       packageLabel: 'Development scripts, package.json',

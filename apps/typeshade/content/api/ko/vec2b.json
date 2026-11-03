@@ -1,0 +1,7 @@
+{
+  "slug": "vec2b",
+  "source": "c238a5a52488373c25f4b6bd53c41d234ad4e3f7cf818b844f1adb5a4c2c5f94",
+  "texts": {
+    "summary": "호스트 값으로서의 vec2b입니다. bool 두 개로 된 readonly 튜플입니다."
+  }
+}

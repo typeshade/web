@@ -1,0 +1,7 @@
+{
+  "slug": "i32-type",
+  "source": "51d2633fcb0afd829d09276aba0c363761dfc89736aaafd2bfea80b78bdbb2a6",
+  "texts": {
+    "summary": "호스트 값으로서의 i32입니다. i32 범위의 정수인 숫자이며, 호출이 범위를 검사합니다."
+  }
+}

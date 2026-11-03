@@ -1,0 +1,7 @@
+{
+  "slug": "vec3f",
+  "source": "e0654172ac107710661ed840c9c19df0576211c393ea921af2be98476dba8659",
+  "texts": {
+    "summary": "WGSL의 vec3f이며, vec3과 같은 타입입니다."
+  }
+}

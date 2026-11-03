@@ -1,0 +1,7 @@
+{
+  "slug": "vec2i-type",
+  "source": "8f06cc6d03d30ddab9f9a650899a519faa7b227657c3af56f39632a8bdfefa3e",
+  "texts": {
+    "summary": "호스트 값으로서의 vec2i입니다. i32 두 개로 된 readonly 튜플입니다."
+  }
+}

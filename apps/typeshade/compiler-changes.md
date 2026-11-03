@@ -381,3 +381,8 @@ id first, then the pull request that did the work.
   `sum`, go with their reference pages; the reference note on `pow` is retired with its entry
   (open: a note for `Math.pow` and `**`); typeplot's `pow` calls are read as `**` by
   `src/lib/typeplot-shaders.ts`. Handled in #25.
+- 0116: the host type family. The 48 host types of `typeshade/runtime` are API reference pages in
+  the Runtime category, with Korean translations, and a name two entry points give to two
+  declarations (`f32` of the IR builder and of the runtime) gets a page for each; no page copies
+  the §64 host values table, and the quick start (en and ko) says that a view spells each type
+  with the shader's own name. Handled in #25.

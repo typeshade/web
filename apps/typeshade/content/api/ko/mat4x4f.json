@@ -1,0 +1,7 @@
+{
+  "slug": "mat4x4f",
+  "source": "d80632e38389278e6657ba0df88e5fcf3dadc97b101948accb4712d813b2dc9d",
+  "texts": {
+    "summary": "WGSL의 mat4x4f이며, mat4x4와 같은 타입입니다."
+  }
+}

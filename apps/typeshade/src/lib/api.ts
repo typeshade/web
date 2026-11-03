@@ -144,7 +144,7 @@ export const API_CATEGORIES: readonly ApiCategory[] = [
     slug: 'runtime-api',
     name: 'Runtime',
     summary:
-      'The program runtime that runs compiled programs on WebGPU, and the array a kernel call keeps on the device.',
+      'The program runtime that runs compiled programs on WebGPU, the array a kernel call keeps on the device, and the host types a host view spells values with.',
   },
   {
     slug: 'diagnostics',
@@ -196,6 +196,8 @@ const CATEGORY_BY_FILE: Readonly<Record<string, string>> = {
   'src/core/resident.ts': 'runtime-api',
   // typeshade/runtime, the program runtime (compiler change 0025).
   'src/runtime/runtime.ts': 'runtime-api',
+  // The host type family of change 0116: the host values of Rule 8.21, spelled as a shader spells them.
+  'src/runtime/host-types.ts': 'runtime-api',
   'src/runtime/program.ts': 'runtime-api',
   'src/runtime/resources.ts': 'runtime-api',
   // typeshade/fuse, the fuse scope of a host (compiler change 0058).
@@ -971,16 +973,20 @@ const KIND_ORDER: readonly ApiKind[] = ['function', 'constant', 'class', 'interf
 
 /** A slug for every export, decided by the names themselves. Two names that differ only in
  *  case (EmitFragment, emitFragment) want one slug: the kinds settle which of them keeps it,
- *  and the others take their kind as a suffix. The order the checker hands the exports over in
- *  changes nothing here, so an upstream reorder cannot move a page to another permalink. */
+ *  and the others take their kind as a suffix. The same holds for one name that two entry
+ *  points give to two declarations (`f32`, the IR builder of `typeshade/core/ir` and the host
+ *  type of `typeshade/runtime`, compiler change 0116): each is keyed by `key`, its name and the
+ *  entry point that exports it (`exportKey`). The order the checker hands the exports over in
+ *  changes nothing here, so an upstream reorder cannot move a page to another permalink. The
+ *  map is keyed by `key` where one is given, else by the name. */
 export function assignSlugs(
-  exports: readonly { readonly name: string; readonly kind: ApiKind }[],
+  exports: readonly { readonly name: string; readonly kind: ApiKind; readonly key?: string }[],
 ): Map<string, string> {
-  const groups = new Map<string, { name: string; kind: ApiKind }[]>();
-  for (const { name, kind } of exports) {
+  const groups = new Map<string, { name: string; kind: ApiKind; key: string }[]>();
+  for (const { name, kind, key } of exports) {
     const base = slugify(name);
     const list = groups.get(base) ?? [];
-    list.push({ name, kind });
+    list.push({ name, kind, key: key ?? name });
     groups.set(base, list);
   }
   const slugs = new Map<string, string>();
@@ -988,7 +994,8 @@ export function assignSlugs(
     const sorted = [...list].sort(
       (a, b) =>
         KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind) ||
-        a.name.localeCompare(b.name, 'en'),
+        a.name.localeCompare(b.name, 'en') ||
+        a.key.localeCompare(b.key, 'en'),
     );
     const taken = new Set<string>();
     sorted.forEach((item, at) => {
@@ -996,11 +1003,15 @@ export function assignSlugs(
       let n = 2;
       while (taken.has(slug)) slug = `${base}-${item.kind}-${n++}`;
       taken.add(slug);
-      slugs.set(item.name, slug);
+      slugs.set(item.key, slug);
     });
   }
   return slugs;
 }
+
+/** The key `assignSlugs` files one export under: its name and the entry point a host imports it
+ *  from first. */
+export const exportKey = (name: string, specifier: string): string => `${name} ${specifier}`;
 
 function build(): Built {
   const configPath = abs('tsconfig.json');
@@ -1020,6 +1031,7 @@ function build(): Built {
   // and stops the build instead.
   const symbols: {
     readonly name: string;
+    readonly key: string;
     readonly symbol: ts.Symbol;
     readonly decls: readonly ts.Declaration[];
     readonly decl: ts.Declaration;
@@ -1040,21 +1052,20 @@ function build(): Built {
     for (const raw of exported) {
       if (point.only && !point.only.includes(raw.name)) continue;
       const symbol = raw.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(raw) : raw;
-      const known = symbols.find((s) => s.name === raw.name);
-      if (known && known.symbol === symbol) {
+      // The same declaration under one name adds its specifier to that page. Another
+      // declaration under a name an earlier entry point gave out gets a page of its own.
+      const known = symbols.find((s) => s.name === raw.name && s.symbol === symbol);
+      if (known) {
         known.modules.push(point.specifier);
         continue;
       }
-      if (known)
-        throw new Error(
-          `[api] ${point.specifier} exports ${raw.name}, which ${known.modules[0]} exports as another declaration`,
-        );
       const decls = symbol.declarations ?? [];
       const decl = decls[0];
       if (!decl) throw new Error(`[api] ${raw.name} has no declaration`);
       const type = checker.getTypeOfSymbolAtLocation(symbol, decl);
       symbols.push({
         name: raw.name,
+        key: exportKey(raw.name, point.specifier),
         symbol,
         decls,
         decl,
@@ -1065,13 +1076,28 @@ function build(): Built {
     }
   }
   const slugs = assignSlugs(symbols);
-  const slugOf = (name: string): string | undefined => slugs.get(name);
+  // A `{@link name}` goes to the page that holds the bare slug of that name where two
+  // declarations share it, and to the one page otherwise.
+  const linkSlugs = new Map<string, string>();
+  for (const s of symbols) {
+    const slug = slugs.get(s.key)!;
+    const held = linkSlugs.get(s.name);
+    if (!held || slug === slugify(s.name)) linkSlugs.set(s.name, slug);
+  }
+  const slugOf = (name: string): string | undefined => linkSlugs.get(name);
 
   const entries: ApiEntry[] = [];
   const unresolved: string[] = [];
   const seeTagLinksByEntry: { readonly entry: ApiEntry; readonly links: readonly ApiLink[] }[] = [];
   for (const symbol of symbols) {
-    const extracted = extract({ ...symbol, checker, root, tables, slugOf });
+    const extracted = extract({
+      ...symbol,
+      slug: slugs.get(symbol.key)!,
+      checker,
+      root,
+      tables,
+      slugOf,
+    });
     const entry = editorializeEntry(extracted.entry);
     entries.push(entry);
     unresolved.push(...extracted.unresolved);
@@ -1118,7 +1144,8 @@ function editorializeEntry(entry: ApiEntry): ApiEntry {
   }
   if (entry.slug === 'fp64guard') {
     const from = 'No compiler treats a texel as a\ncompile-time constant.';
-    const to = 'The emitted shader reads `_fp64` from a bound texture instead of embedding its texel value as a compile-time constant.';
+    const to =
+      'The emitted shader reads `_fp64` from a bound texture instead of embedding its texel value as a compile-time constant.';
     return {
       ...entry,
       description: editorialSourceText(entry.description, from, to, 'fp64Guard description'),
@@ -1206,14 +1233,15 @@ interface ExtractInput {
   readonly root: string;
   readonly tables: CompilerTables;
   readonly slugOf: (name: string) => string | undefined;
+  /** Its own page's slug. */
+  readonly slug: string;
   /** The specifiers that export it, the first the one its import line shows. */
   readonly modules: readonly string[];
 }
 
 function extract(input: ExtractInput): Extracted {
-  const { name, decls, decl, type, kind, checker, root, tables, slugOf, modules } = input;
+  const { name, decls, decl, type, kind, checker, root, tables, slugOf, modules, slug } = input;
   const callableConst = isCallableConst(decl, type);
-  const slug = slugOf(name) ?? slugify(name);
   const file = path.relative(root, decl.getSourceFile().fileName).split(path.sep).join('/');
   const categorySlug = categoryOf(name, file, decl);
   const category = categorySlug ? categoryBySlug.get(categorySlug) : undefined;
