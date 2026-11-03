@@ -606,7 +606,7 @@ export function operationModel(name: string): OperationModel | undefined {
         output: show(v.some(Boolean)),
         grid: [v],
       })),
-      related: ['all', 'none', 'select'],
+      related: ['all', 'select'],
     },
     all: {
       cases: [
@@ -618,31 +618,7 @@ export function operationModel(name: string): OperationModel | undefined {
         output: show(v.every(Boolean)),
         grid: [v],
       })),
-      related: ['any', 'none', 'select'],
-    },
-    none: {
-      cases: [
-        [1, 2, 3],
-        [-1, 2, 3],
-        [-1, -2, -3],
-      ].map((v) => ({
-        input: `none(array(${v.join(', ')}), (x) => x < 0)`,
-        output: show(!v.some((x) => x < 0)),
-        grid: [v],
-      })),
-      related: ['any', 'all'],
-    },
-    sum: {
-      cases: [
-        [1, 2, 3],
-        [-1, 0, 1],
-        [0, 0, 0],
-      ].map((v) => ({
-        input: `sum(array(${v.join(', ')}))`,
-        output: show(v.reduce((a, b) => a + b, 0)),
-        grid: [v],
-      })),
-      related: ['zip', 'array'],
+      related: ['any', 'select'],
     },
     zip: {
       setup: 'xs = array(1, 2, 3)',
@@ -655,7 +631,7 @@ export function operationModel(name: string): OperationModel | undefined {
         output: show(v.map((x, i) => x * (i + 1))),
         grid: [v.map((x, i) => x * (i + 1))],
       })),
-      related: ['sum', 'array'],
+      related: ['array'],
     },
     select: {
       cases: cases(
@@ -725,7 +701,7 @@ export function operationModel(name: string): OperationModel | undefined {
         ['array(1., 2., 3.)', 'array<f32, 3>()', 'array(vec2(1., 0.), vec2(0., 1.))'],
         ['[1, 2, 3]', '[0, 0, 0]', '[[1, 0], [0, 1]]'],
       ),
-      related: ['fill', 'sum', 'zip'],
+      related: ['fill', 'zip'],
     },
     fill: {
       cases: cases(
@@ -756,15 +732,7 @@ export function operationModel(name: string): OperationModel | undefined {
         ],
         ['2', '[1, 7, 3]', '[0, 2, 3]'],
       ),
-      related: ['uniform', 'arrayLength', 'atomicAdd'],
-    },
-    arrayLength: {
-      setup: 'stride = 4 bytes; array offset = 0',
-      cases: cases(
-        ['binding range = 16 bytes', 'binding range = 32 bytes', 'binding range = 64 bytes'],
-        ['4', '8', '16'],
-      ),
-      related: ['storage', 'array'],
+      related: ['uniform', 'atomicAdd'],
     },
   };
   return fixed[name];

@@ -152,10 +152,6 @@ export const STILLS = [
   { id: 'fp64-deep-zoom', example: 'fp64-deep-zoom-twin', page: '/guide/examples/' },
   { id: 'quick-start-stripes', live: true, page: '/guide/quick-start/' },
   { id: 'gpu-types-disc', live: true, page: '/guide/language/gpu-types/' },
-  // The reference note on `pow` (content/reference/en/function-pow.md).
-  { id: 'reference-pow-curve', live: true, page: '/reference/functions/pow/' },
-  { id: 'reference-pow-negative', live: true, page: '/reference/functions/pow/' },
-  { id: 'reference-pow-specular', live: true, page: '/reference/functions/pow/' },
   ...FUNCTION_DEMOS.map(({ name }) => ({
     id: `reference-function-${name}`,
     live: true,

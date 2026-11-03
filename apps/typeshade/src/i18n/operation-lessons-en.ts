@@ -248,14 +248,6 @@ export const operationLessons = {
     caution:
       'This query requires a multisampled texture. Sample indices start at zero. The compiler has no GLSL ES multisample form.',
   },
-  arrayLength: {
-    meaning:
-      'A runtime-sized storage array gets its usable element count from the bound buffer range.',
-    use: 'Use the count for bounds checks in compute kernels.',
-    try: 'With a fixed element stride, a larger bound buffer range contains more usable elements.',
-    caution:
-      'Query the storage array itself or a trailing array field. Buffer padding and element stride affect the count; a byte count is not an element count.',
-  },
   textureStore: {
     meaning: 'A texture store replaces the value of one integer-addressed texel.',
     use: 'Use it to write a compute result into an image.',
@@ -682,32 +674,18 @@ export const operationLessons = {
       'Components are sign-extended when signed and zero-extended when unsigned. These integer byte operations are WebGPU-only in this compiler.',
   },
   any: {
-    meaning: 'Any is true when at least one tested component or element passes.',
+    meaning: 'Any is true when at least one component of a boolean or a boolean vector is true.',
     use: 'Use it for detecting whether a condition occurs anywhere.',
     try: 'The result is true if any component is true. It is false only when every component is false.',
     caution:
       'A per-component comparison creates a boolean vector; any reduces it to a single boolean.',
   },
   all: {
-    meaning: 'All is true when every tested component or element passes.',
+    meaning: 'All is true when every component of a boolean or a boolean vector is true.',
     use: 'Use it for checking whether every value is valid.',
     try: 'The result is true only when every component is true. One false component makes it false.',
     caution:
       'A per-component comparison creates a boolean vector; all reduces it to a single boolean.',
-  },
-  none: {
-    meaning: 'None is true when no array element passes the test.',
-    use: 'Use it for rejecting a set containing any invalid value.',
-    try: 'The example tests whether each value is negative. The result is true only when the array contains no negative values.',
-    caution:
-      'This operation takes a fixed-size array and predicate. It is the negation of any, not of all.',
-  },
-  sum: {
-    meaning: 'A sum reduces an array of numbers or vectors by addition.',
-    use: 'Use it for accumulating weights or contributions.',
-    try: 'Positive values add to the sum and negative values reduce it. Equal and opposite values cancel.',
-    caution:
-      'Floating-point addition depends on rounding and evaluation order. The example uses small exact values.',
   },
   zip: {
     meaning: 'Zip combines corresponding elements from two equal-length arrays.',

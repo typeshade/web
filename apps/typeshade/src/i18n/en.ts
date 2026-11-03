@@ -742,8 +742,9 @@ export const en = {
         MISSING_DIRECTIVE:
           'A file compiled as TypeShade that has no `"use typeshade"` directive at all.',
         TYPE_MISMATCH:
-          'Two types that do not fit where they meet (an operator, a condition, a declaration, a return or an argument), a read of an optional value (`T | undefined`, `T | null` or `T | null | undefined`) that no test narrowed (Rule 7.10), or a constant the compiler folds that WGSL refuses: a shift amount past 31, a divisor of 0, clamp bounds that cross, an f32 past its range or a builtin call outside its domain, such as `pow(-2., 2.)`.',
-        UNKNOWN_FN: 'A call to a function the file neither declares nor imports.',
+          'Two types that do not fit where they meet (an operator, a condition, a declaration, a return or an argument), a read of an optional value (`T | undefined`, `T | null` or `T | null | undefined`) that no test narrowed (Rule 7.10), or a constant the compiler folds that WGSL refuses: a shift amount past 31, a divisor of 0, clamp bounds that cross, an f32 past its range or a builtin call outside its domain, such as `Math.pow(-2., 2.)`.',
+        UNKNOWN_FN:
+          'A call to a function the file neither declares nor imports, or to a builtin the language removed because ECMAScript spells it, such as `arrayLength(xs)`, whose message names `xs.length` (Rule 9.9).',
         CONST_ASSIGN:
           'An assignment to a name that cannot change, such as a `const` or a read-only resource.',
         LOOP_BOUND:

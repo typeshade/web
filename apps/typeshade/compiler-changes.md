@@ -375,3 +375,9 @@ id first, then the pull request that did the work.
 - 0108: a host view carries the author's JSDoc. No page of this site copies the host-view
   listing of surface §64; the quick start's host setup (en and ko) says that a view carries the
   comment written above each export. Handled in #25.
+- 0112: one spelling. `Math.pow` replaces `pow` in the TS8003 line, the TS8004 line names a
+  removed builtin and Rule 9.9 (en and ko); the function demos, lessons and stills of `log10`,
+  `log1p`, `expm1`, `cbrt` and `hypot`, and the operation lessons of `arrayLength`, `none` and
+  `sum`, go with their reference pages; the reference note on `pow` is retired with its entry
+  (open: a note for `Math.pow` and `**`); typeplot's `pow` calls are read as `**` by
+  `src/lib/typeplot-shaders.ts`. Handled in #25.

@@ -18,7 +18,7 @@ $$
 
 As the compiler's sentence under the name says, a vector is computed one component at a time. The CPU oracle answers {{oracle exp2(3.0)}} for `exp2(3.0)` and {{oracle exp2(-1.0)}} for `exp2(-1.0)` {{assert oracleIsPowerOfTwo}}. The accuracy the compiler states is {{accuracy exp2}}, and {{fact glslTarget}} spells the call {{entry spelling.glsl}}.
 
-An integer argument is refused: {{compile int-argument}}. A float argument keeps the call in the WGSL: {{compile stays}}. `Math.pow` with a base of `2.0` draws the same curve, see {{ref function/pow}}. {{rule 12.7}} holds the editor to the compiler's words. This page was checked at {{pin}}.
+An integer argument is refused: {{compile int-argument}}. A float argument keeps the call in the WGSL: {{compile stays}}. `Math.pow` with a base of `2.0` draws the same curve, see {{ref math/pow}}. {{rule 12.7}} holds the editor to the compiler's words. This page was checked at {{pin}}.
 
 {{code doubled}}
 

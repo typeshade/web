@@ -1,6 +1,6 @@
 ---
 entry: function/exp2
-sources: what-it-computes 6f7e752f40d0, in-typeshade 3072fdbba22f
+sources: what-it-computes 6f7e752f40d0, in-typeshade f4ea5b9147be
 rules: 12.7 Mvr2vY3Krl66Bglu9ejs51aqLb_3vraF1hO4FLdrK48=
 ---
 
@@ -16,7 +16,7 @@ $$
 
 이름 아래 컴파일러 문장대로 벡터는 성분마다 따로 계산합니다. CPU 오라클이 돌려주는 값은 `exp2(3.0)`이 {{oracle exp2(3.0)}}, `exp2(-1.0)`이 {{oracle exp2(-1.0)}}입니다 {{assert oracleIsPowerOfTwo}}. 컴파일러가 밝히는 정확도는 {{accuracy exp2}}이며, {{fact glslTarget}}의 철자는 {{entry spelling.glsl}}입니다.
 
-정수 인자는 거부되며, 그 진단은 {{compile int-argument}}입니다. 실수 인자를 넘기면 WGSL에 호출이 그대로 남고, 그 줄은 {{compile stays}}입니다. 밑이 `2.0`인 `Math.pow`도 같은 곡선을 그립니다. {{ref function/pow}} 항목을 보십시오. 편집기가 컴파일러와 같은 낱말을 쓰게 하는 규칙은 {{rule 12.7}}입니다. 이 페이지는 커밋 {{pin}}에서 확인했습니다.
+정수 인자는 거부되며, 그 진단은 {{compile int-argument}}입니다. 실수 인자를 넘기면 WGSL에 호출이 그대로 남고, 그 줄은 {{compile stays}}입니다. 밑이 `2.0`인 `Math.pow`도 같은 곡선을 그립니다. {{ref math/pow}} 항목을 보십시오. 편집기가 컴파일러와 같은 낱말을 쓰게 하는 규칙은 {{rule 12.7}}입니다. 이 페이지는 커밋 {{pin}}에서 확인했습니다.
 
 {{code doubled}}
 

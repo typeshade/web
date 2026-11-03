@@ -711,7 +711,6 @@ const EXPLAINERS: readonly {
 /** The rule versions the explaining pages were last read against. */
 const READ_AGAINST: Readonly<Record<string, string>> = {
   '1.2': 't6OvP1FlcnvK4mIZKbcPULikBSKQ5LJ59oSe_GWWSio=',
-  '1.3': 'akRqHkhM2TbYRm6Y7TBU24_hbeTbogccAUNSfNjxViY=',
   '2.1': 'nwiyGBq4biNPSwuqSRZQ0n2m5uoSNXdsq3yUaVZj5sQ=',
   '2.2': 'X0g_aM9dhyo0h4x4klnU_hRQiKqok1jFPsVAbMRIgag=',
   '2.3': 'r7XKZw0j-Hb5AH5VaQM8ueWwC512ZArtkVGU0ccfsOE=',
@@ -772,6 +771,7 @@ const READ_AGAINST: Readonly<Record<string, string>> = {
   '8.28': 'V8ipeRbiwYGOQTgzqHmfFLsSBod7WJW41jqlpKUUxJE=',
   '8.29': 'gLh3JC7_BHLfF3wRgTIbyg7QbEEW7nSgKZoXM0-eKZk=',
   '9.2': 'UjdAYZRLzP-1L7XryMHNvYUQDbMNmFmw-YnvSbJL2LU=',
+  '9.9': 'bZ6ZwBx7ZU2mKFFrG6jGHxGcOon-EdTWByDD33elOhk=',
   '10.1': 'd8TWuezE06vSk0zrFfeQ9pKxFXYk_P4q_IC94Ny_CF8=',
   '11.5': 'K5GJo9hNFgdx3uz9sYCSGUVhUfFmjaxdcr223qtGFgE=',
   '11.8': 'wzu0btQuD4fyrfjznkQB6uNlZUpvyjUkISissbmN44I=',
