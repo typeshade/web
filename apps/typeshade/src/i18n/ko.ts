@@ -1376,7 +1376,7 @@ export const ko: Copy = {
       importP:
         'Vite 플러그인을 설정하면 `.shade.ts` 파일을 import할 수 있습니다. export한 헬퍼 함수는 CPU에서 실행됩니다. `@compute` 진입점은 `await entry(bindings, workgroups)`로 호출하며, 지원되는 WebGPU 또는 WebGL2 환경에서 실행한 결과를 읽어 옵니다. 전체 화면 `@fragment` 진입점은 `entry(canvas, bindings)`로 호출합니다. WebGPU, WebGL2, CPU 순서로 사용 가능한 실행 방식을 선택하며, 필요한 디바이스와 파이프라인은 런타임이 생성합니다. 아래 설정은 Git에서 설치한 소스 패키지용입니다.',
       setupP:
-        '설치 후에는 아래의 Vite 플러그인과 호스트 `tsconfig.json` 설정을 추가합니다. 스크립트는 Vite와 설치한 CLI를 `tsx`로 실행합니다. `prepare`는 `tsc`가 읽는 호스트 뷰를 만듭니다. `.gitignore`에 `*.shade.typeshade.ts`를 추가합니다.',
+        '설치 후에는 아래의 Vite 플러그인과 호스트 `tsconfig.json` 설정을 추가합니다. 스크립트는 Vite와 설치한 CLI를 `tsx`로 실행합니다. `prepare`는 `tsc`가 읽는 호스트 뷰를 만듭니다. 뷰에는 모듈의 각 export 위에 쓴 JSDoc 주석이 함께 들어갑니다. `.gitignore`에 `*.shade.typeshade.ts`를 추가합니다.',
       viteLabel: 'Vite 플러그인, vite.config.ts',
       tsconfigLabel: '호스트 설정, tsconfig.json',
       packageLabel: '개발 스크립트, package.json',

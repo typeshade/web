@@ -372,3 +372,6 @@ id first, then the pull request that did the work.
   class) and a fix; the pages generated from Rules 6.7 and 11.22 were read against the rules at
   the pin; `NumericsClass` and the `numerics` member of `FuncDecl` are translated. Handled in
   #25.
+- 0108: a host view carries the author's JSDoc. No page of this site copies the host-view
+  listing of surface §64; the quick start's host setup (en and ko) says that a view carries the
+  comment written above each export. Handled in #25.
