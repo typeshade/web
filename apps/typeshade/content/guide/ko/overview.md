@@ -1,6 +1,6 @@
 ---
 id: overview
-source: f3a25997a2db7a982efddbd70681f2aef5457b12dad818be0f009ca587c0c253
+source: 00a269e14c7a8cd8109417858a7e790d33df075b84bc44651d68aa981a1e3a33
 sourceLine: 1
 ---
 
@@ -10,9 +10,9 @@ sourceLine: 1
 
 ### 작성하는 코드와 그 결과
 
-셰이더는 일반 TypeScript 파일로 작성하며, 첫 문장은 지시문 `"use typeshade"`입니다. 문법은 TypeScript와 같으며 `function`, `const`와 `let`, `if`, `for`, `class`, 연산자와 리터럴을 사용합니다. 타입은 GPU 타입인 `f32`, `u32`, `vec3`, `mat4`, `array<f32, 16>`을 사용합니다. `@fragment` 같은 데코레이터는 GPU가 호출하는 함수를 표시합니다. 타입이나 필드 이름이 틀리면 편집기가 해당 줄에 오류를 표시합니다.
+셰이더는 일반 TypeScript 파일로 작성하며, 첫 문장은 지시문 `"use typeshade"`입니다. 문법은 TypeScript와 같으며 `function`, `const`와 `let`, `if`, `for`, `class`, 연산자와 리터럴을 사용합니다. 타입은 GPU 타입인 `f32`, `u32`, `vec3`, `mat4`, `array<f32, 16>`을 사용합니다. `fragment(f)` 같은 스테이지 호출은 GPU가 호출하는 함수를 표시합니다. 타입이나 필드 이름이 틀리면 편집기가 해당 줄에 오류를 표시합니다.
 
-프로그램의 구조는 진입점, 리소스, 구조체 선언으로 정해집니다. 스테이지 데코레이터(`@vertex`, `@fragment`, `@compute`)가 붙은 최상위 `export function`은 진입점입니다. GPU는 버텍스, 프래그먼트, 컴퓨트 인보케이션마다 진입점을 실행하며, 나머지 함수는 진입점이 호출하는 헬퍼입니다. `uniform<T>`나 `storage<T>` 타입의 `declare const`는 호스트가 바인딩하는 리소스입니다. `class`, `interface`, `type` 별칭은 구조체가 됩니다.
+프로그램의 구조는 진입점, 리소스, 구조체 선언으로 정해집니다. 스테이지 호출(`vertex(f)`, `fragment(f)`, `compute([64], f)`)로 초기화한 최상위 `export const`는 진입점입니다. GPU는 버텍스, 프래그먼트, 컴퓨트 인보케이션마다 진입점을 실행하며, 나머지 함수는 진입점이 호출하는 헬퍼입니다. `uniform<T>`나 `storage<T>` 타입의 `declare const`는 호스트가 바인딩하는 리소스입니다. `class`, `interface`, `type` 별칭은 구조체가 됩니다.
 
 ```ts
 "use typeshade";
@@ -65,7 +65,7 @@ fn ringMask(uv: vec2<f32>, radius: f32) -> f32 {
 
 ### 가져오기
 
-셰이더 파일은 패키지에서 타입이나 함수를 가져오지 않습니다. 타입, 내장 함수, 데코레이터는 언어에 포함되어 있습니다. 호스트 코드는 컴파일러와 컴파일 결과를 읽는 함수를 패키지 루트에서 가져옵니다.
+셰이더 파일은 패키지에서 타입이나 함수를 가져오지 않습니다. 타입, 내장 함수, 스테이지 함수는 언어에 포함되어 있습니다. 호스트 코드는 컴파일러와 컴파일 결과를 읽는 함수를 패키지 루트에서 가져옵니다.
 
 ```ts
 import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typeshade'

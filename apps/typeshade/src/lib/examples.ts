@@ -60,7 +60,7 @@ const wgsl = emitModule(heroModule);
 const glslVertex = emitGlslModule(heroModule, 'vertex');
 const glsl = emitGlslModule(heroModule, 'fragment');
 
-const authored = between(source, '@fragment', '\n}');
+const authored = between(source, 'export const fs_gradient = fragment(', '\n});');
 
 /** The gradient pass: the authored fragment entry and what it emits for each target. */
 export const hero = {

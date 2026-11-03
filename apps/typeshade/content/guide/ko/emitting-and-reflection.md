@@ -1,8 +1,8 @@
 ---
 id: emitting-and-reflection
-source: 16054602f63c26560685461877a2234afca846d4caaf058983c7e55a75acb76a
-sourceLine: 1172
-rules: 6.6 qXyf0FpXuS4xir_HpHadSIsWFZT2WtMx8M-wm9BvJOE=, 12.3 CjhXTenX6H0V0STxt5Bka_Sp7X0GVUeCZR9Mt1IqNvA=
+source: cfdd793c5bd8cf46f17bc581608397f72efa7b09bf00d45ed6a68f0d591d2c9f
+sourceLine: 1231
+rules: 6.6 2moXxSw3cZPNxiaa9uRTWOFZn7M2pZk2ypG0F6f0ymk=, 12.3 CjhXTenX6H0V0STxt5Bka_Sp7X0GVUeCZR9Mt1IqNvA=
 ---
 
 이 페이지는 모듈을 WGSL, GLSL 스테이지 두 개, 호스트 프로그램에 결합할 모듈 조각(module fragment)으로 생성하는 방법을 설명합니다. 바인딩에 필요한 파이프라인 메타데이터를 읽는 방법도 다룹니다.
@@ -21,20 +21,18 @@ interface Uniforms {
 
 declare const u: uniform<Uniforms>;
 
-class VsOut {
-  @builtin("position") pos: vec4;
-  @location(0) uv: vec2;
+interface VsOut {
+  pos: builtin<"position", vec4>;
+  uv: location<0, vec2>;
 }
 
-@vertex
-export function vs(@location(0) xy: vec2): VsOut {
+export const vs = vertex(function vs(xy: location<0, vec2>): VsOut {
   return { pos: vec4(xy, 0., 1.), uv: xy * 0.5 + 0.5 };
-}
+});
 
-@fragment
-export function fs(vo: VsOut): vec4 {
+export const fs = fragment(function fs(vo: VsOut): vec4 {
   return u.tint * (0.5 + 0.5 * sin(u.time + vo.uv.x));
-}
+});
 ```
 
 ### WGSL 생성

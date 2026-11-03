@@ -630,13 +630,14 @@ export const ko: Copy = {
         },
         attribute: {
           name: '어트리뷰트',
-          summary: '진입점을 표시하고 필드를 파이프라인에 연결하는 데코레이터입니다.',
-          description: `컴파일러가 실제로 읽고 처리하는 데코레이터 ${facts.languageAttributes}개입니다. 진입점을 표시하거나, 워크그룹 크기를 정하거나, 필드를 파이프라인에 연결하거나, 스테이지 사이의 값과 출력의 성질을 정하거나, 진입점이 검사 결과를 보고하는 방식을 정합니다.`,
+          summary:
+            '진입점 속성의 데코레이터 형태이며, 스테이지 호출과 속성 타입이 이를 대신합니다.',
+          description: `이전 형태의 데코레이터 ${facts.languageAttributes}개입니다. 컴파일러는 이를 \`TS8028\` 경고와 함께 읽으며, 각각을 대신하는 스테이지 호출이나 속성 타입을 함께 적었습니다.`,
         },
         builtin: {
           name: '내장 값',
-          summary: '파이프라인이 넘겨주는 `@builtin(...)` 아이디와 각각이 속한 스테이지입니다.',
-          description: `파이프라인이 셰이더에 넘겨주거나 셰이더에서 돌려받는 \`@builtin(...)\` 아이디 ${facts.languageBuiltinValues}개입니다. WGSL이 정해 둔 타입과 쓰이는 스테이지를 함께 적었습니다.`,
+          summary: '`builtin<N, T>`가 가리키는 아이디와 각각이 속한 스테이지입니다.',
+          description: `파이프라인이 셰이더에 넘겨주거나 셰이더에서 돌려받는 값을 가리키는 \`builtin<N, T>\`의 아이디 ${facts.languageBuiltinValues}개입니다. WGSL이 정해 둔 타입과 쓰이는 스테이지를 함께 적었습니다.`,
         },
         function: {
           name: '함수',
@@ -668,6 +669,7 @@ export const ko: Copy = {
         f64: '에뮬레이션 배정밀도',
         constructors: '생성자',
         resources: '배열과 바인딩',
+        stages: '스테이지 호출',
       },
     },
     errors: {
@@ -1127,7 +1129,7 @@ export const ko: Copy = {
     },
     galleryLink: '갤러리',
     preludeNote:
-      '이 파일에는 `@vertex` 진입점이 없어서, 화면 전체를 덮는 삼각형 뒤에 놓고 컴파일합니다. 그 삼각형이 프래그먼트 단계에 0에서 1까지 도는 `uv`를 넘깁니다. 탭과 캔버스에는 그렇게 만든 프로그램이 나옵니다.',
+      '이 파일에는 `vertex(f)` 진입점이 없어서, 화면 전체를 덮는 삼각형 뒤에 놓고 컴파일합니다. 그 삼각형이 프래그먼트 단계에 0에서 1까지 도는 `uv`를 넘깁니다. 탭과 캔버스에는 그렇게 만든 프로그램이 나옵니다.',
     emit: {
       title: '생성 옵션',
       optimization: 'WGSL 최적화',
@@ -1315,8 +1317,8 @@ export const ko: Copy = {
         },
         {
           title: '셰이더 단계',
-          code: '@vertex / @fragment / @compute',
-          body: '데코레이터로 버텍스, 프래그먼트, 컴퓨트 진입점을 선언하세요. uniform과 storage 선언으로 애플리케이션의 데이터에 접근할 수 있습니다.',
+          code: 'vertex(f) / fragment(f) / compute([64], f)',
+          body: '스테이지 호출로 버텍스, 프래그먼트, 컴퓨트 진입점을 선언하세요. uniform과 storage 선언으로 애플리케이션의 데이터에 접근할 수 있습니다.',
         },
         {
           title: 'Vite 연동',
@@ -1362,7 +1364,7 @@ export const ko: Copy = {
         '셰이더 코드와 이를 실행하는 애플리케이션 코드는 별도 파일로 작성합니다. 셰이더 파일에는 `"use typeshade"`를 붙이며, GPU에서 사용할 타입과 리소스, 진입점을 정의합니다.',
       boundaryBullets: [
         '`"use typeshade"`는 셰이더 파일을 표시합니다.',
-        'GPU가 진입점에 전달하는 값은 `@builtin(...)`이 붙은 매개변수로 받습니다.',
+        'GPU가 진입점에 전달하는 값은 타입이 `builtin<N, T>`인 매개변수로 받습니다.',
         '`uniform<T>`와 `storage<T>`로 GPU 리소스를 선언합니다.',
       ],
       hostP0:
@@ -1375,7 +1377,7 @@ export const ko: Copy = {
         '이 방식에서는 애플리케이션이 device, pipeline, bind group, buffer, texture, command encoder를 생성하고 관리합니다. TypeShade는 셰이더 코드를 생성합니다.',
       importH: '파일 가져오기',
       importP:
-        'Vite 플러그인을 설정하면 `.shade.ts` 파일을 import할 수 있습니다. export한 헬퍼 함수는 CPU에서 실행됩니다. `@compute` 진입점은 `await entry(bindings, workgroups)`로 호출하며, 지원되는 WebGPU 또는 WebGL2 환경에서 실행한 결과를 읽어 옵니다. 전체 화면 `@fragment` 진입점은 `entry(canvas, bindings)`로 호출합니다. WebGPU, WebGL2, CPU 순서로 사용 가능한 실행 방식을 선택하며, 필요한 디바이스와 파이프라인은 런타임이 생성합니다. 아래 설정은 Git에서 설치한 소스 패키지용입니다.',
+        'Vite 플러그인을 설정하면 `.shade.ts` 파일을 import할 수 있습니다. export한 헬퍼 함수는 CPU에서 실행됩니다. `compute` 진입점은 `await entry(bindings, workgroups)`로 호출하며, 지원되는 WebGPU 또는 WebGL2 환경에서 실행한 결과를 읽어 옵니다. 전체 화면 `fragment` 진입점은 `entry(canvas, bindings)`로 호출합니다. WebGPU, WebGL2, CPU 순서로 사용 가능한 실행 방식을 선택하며, 필요한 디바이스와 파이프라인은 런타임이 생성합니다. 아래 설정은 Git에서 설치한 소스 패키지용입니다.',
       setupP:
         '설치 후에는 아래의 Vite 플러그인과 호스트 `tsconfig.json` 설정을 추가합니다. 스크립트는 Vite와 설치한 CLI를 `tsx`로 실행합니다. `prepare`는 `tsc`가 읽는 호스트 뷰를 만듭니다. 뷰는 각 타입을 `f32`나 `vec3`처럼 셰이더에서 쓰는 이름으로 적고, `typeshade/runtime`이 그 이름들을 타입으로 내보냅니다. 뷰에는 모듈의 각 export 위에 쓴 JSDoc 주석도 함께 들어갑니다. `.gitignore`에 `*.shade.typeshade.ts`를 추가합니다.',
       viteLabel: 'Vite 플러그인, vite.config.ts',
@@ -1407,7 +1409,7 @@ export const ko: Copy = {
     h1: 'Quick Start',
     runLabel: '컴파일러 실행 명령',
     installH: '설치',
-    p0: '셰이더 파일을 만들고 첫 문장에 `"use typeshade"`를 추가하세요. 아래 예제는 반환 타입에 클래스를 사용하고, 데코레이터로 버텍스와 프래그먼트 진입점을 정의합니다.',
+    p0: '셰이더 파일을 만들고 첫 문장에 `"use typeshade"`를 추가하세요. 아래 예제는 반환 타입에 인터페이스를 사용하고, 스테이지 호출 `vertex(f)`와 `fragment(f)`로 버텍스와 프래그먼트 진입점을 정의합니다.',
     p1: `다음 셰이더를 \`${quickStartFile.shader.name}\`로 저장하세요. 유니폼과 버텍스·프래그먼트 함수를 정의하는 코드입니다. 이어서 아래의 호스트 파일을 만들어 [\`compile()\`](apiCompile)을 호출하고 생성된 WGSL을 출력하세요.`,
     p2: '명령을 실행하면 두 셰이더 단계가 컴파일됩니다. 프래그먼트 진입점은 다음과 같습니다.',
     p3: `같은 함수의 ${glsl} 코드와 [\`reflect()\`](apiReflect)로 확인한 유니폼 레이아웃은 [예제 페이지](examples)에 있습니다. 문법과 사용법은 [언어 가이드](guide)에서 설명합니다.`,
@@ -1474,7 +1476,7 @@ export const ko: Copy = {
       familiarP:
         'TypeShade는 TypeScript 문법을 사용하지만, 코드는 셰이더로 실행됩니다. 따라서 사용할 수 있는 타입과 함수, 모듈, 제어 흐름을 컴파일하는 방식이 달라집니다.',
       rows: [
-        ['함수', '함수 선언과 호출', '데코레이터로 셰이더 진입점을 지정합니다.'],
+        ['함수', '함수 선언과 호출', '스테이지 호출로 셰이더 진입점을 지정합니다.'],
         ['타입', '타입 주석과 추론', 'GPU용 스칼라, 벡터, 행렬 타입을 사용합니다.'],
         ['모듈', 'import / export', '셰이더 파일과 import한 셰이더 파일을 함께 컴파일합니다.'],
         ['제어 흐름', 'if / for 등의 문법', '실행 대상에서 지원하는 조건문과 반복문을 사용합니다.'],
@@ -1798,7 +1800,7 @@ export const ko: Copy = {
       [
         '함수',
         '함수는 매개변수, 반환 타입, 본문을 가집니다.',
-        '`@vertex`, `@fragment` 같은 스테이지 데코레이터로 진입점을 표시합니다.',
+        '`vertex(f)`, `fragment(f)` 같은 스테이지 호출로 진입점을 표시합니다.',
       ],
       [
         '모듈',
@@ -1829,7 +1831,7 @@ export const ko: Copy = {
     orderItems: [
       '타입, 함수, 모듈 등 TypeScript의 형태를 익힙니다.',
       '`"use typeshade"`를 추가하고 [GPU 타입](languageGpuTypes)을 익힙니다.',
-      '진입점 데코레이터와 리소스 선언을 추가합니다. [셰이더 스테이지](languageStages)와 [리소스](languageResources)가 이 내용을 다룹니다.',
+      '진입점의 스테이지 호출과 리소스 선언을 추가합니다. [셰이더 스테이지](languageStages)와 [리소스](languageResources)가 이 내용을 다룹니다.',
       'Playground에서 편집하면서 진단과 생성된 WGSL을 확인합니다.',
       '컴파일러와 백엔드의 내부 동작을 살펴봅니다.',
     ],
@@ -1847,7 +1849,7 @@ export const ko: Copy = {
       invocationP:
         '인보케이션은 버텍스, 프래그먼트 또는 컴퓨트 작업 항목을 처리하는 실행 단위입니다. 언어의 메모리와 동기화 규칙에 따라 공유 리소스로 통신할 수 있습니다. 실행 순서가 보장되는 것은 아닙니다.',
       invocationRule:
-        '스테이지 데코레이터는 진입점이 실행될 스테이지를 지정하고, `@builtin(...)` 매개변수는 인보케이션의 위치 등 스테이지가 제공하는 값을 받습니다. 데코레이터는 [셰이더 스테이지](languageStages), 매개변수는 [함수](languageFunctions)에서 설명합니다.',
+        '스테이지 호출은 진입점이 실행될 스테이지를 지정하고, `builtin<N, T>` 매개변수는 인보케이션의 위치 등 스테이지가 제공하는 값을 받습니다. 스테이지 호출은 [셰이더 스테이지](languageStages), 매개변수는 [함수](languageFunctions)에서 설명합니다.',
       memoryH: '메모리',
       memoryP:
         '셰이더는 타입이 정해진 지역 값과 호스트가 바인딩한 리소스를 사용합니다. WGSL과 GLSL ES는 자바스크립트의 일반 객체 힙을 제공하지 않습니다. TypeShade 클래스는 호스트가 바이트를 채우는 GPU 구조체를 설명합니다.',
@@ -1874,7 +1876,7 @@ export const ko: Copy = {
       tableRows: [
         [
           '버텍스, 프래그먼트, 작업 항목마다 진입점을 한 번씩 부릅니다',
-          '진입점에 스테이지 데코레이터를 달고, builtin 입력마다 매개변수를 둡니다',
+          '진입점을 스테이지 호출로 감싸고, builtin 입력마다 매개변수를 둡니다',
           '[셰이더 스테이지](languageStages)',
         ],
         [
@@ -1924,7 +1926,7 @@ export const ko: Copy = {
         ],
         [
           '버텍스 처리',
-          '작성한 `@vertex` 진입점',
+          '작성한 `vertex` 진입점',
           '버텍스마다 한 번 실행되어 클립 공간 위치와 프래그먼트 스테이지가 읽을 값을 돌려줍니다.',
         ],
         [
@@ -1940,7 +1942,7 @@ export const ko: Copy = {
         ],
         [
           '프래그먼트 처리',
-          '작성한 `@fragment` 진입점',
+          '작성한 `fragment` 진입점',
           '프래그먼트마다 그 프래그먼트에 맞게 가중한 버텍스 출력으로 한 번 실행되어 색상 어태치먼트마다 값 하나를 돌려줍니다.',
         ],
         [
@@ -1971,14 +1973,14 @@ export const ko: Copy = {
       ],
       entryH: '진입점',
       entryP:
-        '진입점의 시그니처는 스테이지의 입력과 출력을 정의합니다. `@builtin(...)` 매개변수는 스테이지가 인보케이션에게 건네는 값이며, 버텍스 번호나 프래그먼트 위치가 여기에 해당합니다. 구조체 매개변수는 버텍스 스테이지에서는 버텍스마다의 입력이고, 프래그먼트 스테이지에서는 보간된 값입니다. 반환 타입은 스테이지가 파이프라인에 돌려주는 값이라서, 버텍스 진입점은 위치를 돌려주고 프래그먼트 진입점은 색을 돌려줍니다. 데코레이터와 선언 문법은 [셰이더 스테이지](languageStages)에서 설명합니다.',
+        '진입점의 시그니처는 스테이지의 입력과 출력을 정의합니다. `builtin<N, T>` 매개변수는 스테이지가 인보케이션에게 건네는 값이며, 버텍스 번호나 프래그먼트 위치가 여기에 해당합니다. 구조체 매개변수는 버텍스 스테이지에서는 버텍스마다의 입력이고, 프래그먼트 스테이지에서는 보간된 값입니다. 반환 타입은 스테이지가 파이프라인에 돌려주는 값이라서, 버텍스 진입점은 위치를 돌려주고 프래그먼트 진입점은 색을 돌려줍니다. 스테이지 호출과 선언 문법은 [셰이더 스테이지](languageStages)에서 설명합니다.',
       entryNote:
         '시그니처는 함수가 속한 스테이지와 파이프라인이 공급하는 입력, 파이프라인으로 반환하는 출력을 명시합니다.',
       interpolationH: '보간',
       interpolationP:
         '버텍스 스테이지와 프래그먼트 스테이지 사이에서 래스터라이저가 프리미티브가 덮는 프래그먼트를 가려냅니다. 그리고 프래그먼트마다, 버텍스들이 만든 값을 각 버텍스에서 얼마나 가까운지에 따라 가중해 프래그먼트 스테이지에 건넵니다. 이 과정을 보간이라고 합니다. 버텍스 진입점은 버텍스마다 값을 쓰고 프래그먼트 진입점은 프래그먼트마다 값을 읽으므로, 이름은 같아도 서로 다른 값입니다.',
       interpolationNote:
-        '실수 `@location` 필드는 `@interpolate`로 다른 방식을 지정하지 않는 한 이렇게 가중됩니다. 정수는 가중할 수 없으므로 컴파일러는 따로 적지 않아도 두 타깃 모두 `id`에 `flat` 한정자를 붙이고, 프래그먼트는 프리미티브의 버텍스 하나가 낸 값을 그대로 읽습니다. `tint`에 적은 `@interpolate("flat")`도 같은 처리를 요청합니다. 필드 데코레이터는 [타입](languageTypes)에서 설명합니다.',
+        '실수 `location<n, T>` 필드는 `interpolate` 옵션으로 다른 방식을 지정하지 않는 한 이렇게 가중됩니다. 정수는 가중할 수 없으므로 컴파일러는 따로 적지 않아도 두 타깃 모두 `id`에 `flat` 한정자를 붙이고, 프래그먼트는 프리미티브의 버텍스 하나가 낸 값을 그대로 읽습니다. `tint`에 적은 `{ interpolate: "flat" }`도 같은 처리를 요청합니다. 속성 타입은 [타입](languageTypes)에서 설명합니다.',
       computeH: '컴퓨트',
       computeP:
         '컴퓨트 스테이지 앞에는 래스터라이저가 없고 뒤에는 어태치먼트가 없습니다. 호스트가 작업 항목의 격자를 디스패치하면, 진입점은 그 격자 안의 자기 좌표를 builtin 매개변수로 읽고, 만들어 낸 값은 모두 스토리지 리소스를 거쳐 나갑니다. 쓰기 가능한 리소스의 선언은 [리소스](languageResources)에서 설명합니다.',
@@ -2011,8 +2013,8 @@ export const ko: Copy = {
         ],
         [
           '컴퓨트',
-          '네이티브 `@compute` 스테이지입니다.',
-          `네이티브 컴퓨트 스테이지는 없습니다. TypeShade는 지원하는 \`@compute\` 진입점을 생성된 ${glsl} 패스로 실행하고, 변환할 수 없는 진입점은 매니페스트에 기록합니다.`,
+          '네이티브 `compute` 스테이지입니다.',
+          `네이티브 컴퓨트 스테이지는 없습니다. TypeShade는 지원하는 \`compute\` 진입점을 생성된 ${glsl} 패스로 실행하고, 변환할 수 없는 진입점은 매니페스트에 기록합니다.`,
         ],
         [
           '정밀도',
@@ -2061,7 +2063,7 @@ export const ko: Copy = {
       ],
       importH: '모듈 가져오기',
       importP:
-        '호스트는 `typeshade/vite` 플러그인으로 `.shade.ts`를 자신의 TypeScript에 가져와, 모듈이 내보내는 것을 부를 수도 있습니다. 헬퍼는 CPU에서 실행됩니다. `@compute` 진입점은 `await entry(bindings, workgroups)`로 부릅니다. `workgroups`는 `{ indirect, offset }`일 수도 있습니다. 이때는 앞선 호출이 `Resident<Uint32Array>`의 `offset` 원소에 쓴 개수 세 개를 호출이 실행될 때 읽습니다. 전체 화면 `@fragment` 진입점은 `entry(canvas, bindings)`로 WebGPU, WebGL2, CPU 순서로 그립니다. 이때 위 표에서 애플리케이션이 하던 일은 런타임이 맡습니다. 첫 호출에서 디바이스를 요청해 이후 호출과 함께 쓰고, 진입점마다 파이프라인을 만들며, 호출이 넘긴 객체로 바인딩을 채우고, 컴퓨트 진입점이 쓴 값을 다시 읽어 옵니다.',
+        '호스트는 `typeshade/vite` 플러그인으로 `.shade.ts`를 자신의 TypeScript에 가져와, 모듈이 내보내는 것을 부를 수도 있습니다. 헬퍼는 CPU에서 실행됩니다. `compute` 진입점은 `await entry(bindings, workgroups)`로 부릅니다. `workgroups`는 `{ indirect, offset }`일 수도 있습니다. 이때는 앞선 호출이 `Resident<Uint32Array>`의 `offset` 원소에 쓴 개수 세 개를 호출이 실행될 때 읽습니다. 전체 화면 `fragment` 진입점은 `entry(canvas, bindings)`로 WebGPU, WebGL2, CPU 순서로 그립니다. 이때 위 표에서 애플리케이션이 하던 일은 런타임이 맡습니다. 첫 호출에서 디바이스를 요청해 이후 호출과 함께 쓰고, 진입점마다 파이프라인을 만들며, 호출이 넘긴 객체로 바인딩을 채우고, 컴퓨트 진입점이 쓴 값을 다시 읽어 옵니다.',
       overrideP:
         '컴퓨트 진입점은 `entry(bindings, workgroups, { constants: { WIDTH: width } })`로도 부릅니다. 이름은 모듈에 선언한 override이며, 생략한 값은 기본값을 유지합니다. 선택한 값으로 워크그룹 모양과 공유 배열 길이, CPU 인보케이션 내장 값이 정해집니다. 그룹 개수는 그 모양에 맞춰 계산해야 합니다. 상수를 선택해도 넘긴 개수는 바뀌지 않습니다. 런타임은 업로드 전에 이름과 스칼라 범위, 디바이스 한도를 검사하며, 호출 시점의 상수를 보관합니다.',
       overrideLimitsP:
@@ -2091,7 +2093,7 @@ export const ko: Copy = {
       webgl2P: '같은 소스가 WebGL2용으로도 컴파일되고, 호스트 쪽 모습은 달라집니다.',
       webgl2Items: [
         '바인드 그룹이 없습니다. 유니폼 블록은 링크된 프로그램의 바인딩 지점에 묶이고 샘플러는 유니폼 위치로 설정하므로, 호스트는 같은 리플렉션을 다른 모양으로 씁니다.',
-        `WebGL2에는 네이티브 컴퓨트 스테이지가 없다. TypeShade는 지원하는 \`@compute\` 진입점을 ${glsl} 패스로 변환합니다. 변환할 수 없는 진입점은 매니페스트에 이유를 남깁니다.`,
+        `WebGL2에는 네이티브 컴퓨트 스테이지가 없다. TypeShade는 지원하는 \`compute\` 진입점을 ${glsl} 패스로 변환합니다. 변환할 수 없는 진입점은 매니페스트에 이유를 남깁니다.`,
         `정밀도는 소스의 몫입니다. 생성된 ${glsl} 프로그램은 선언들 위에 기본 정밀도를 적어 두며, WGSL에는 그럴 필요가 없습니다.`,
         'GPU 기능은 호스트가 컨텍스트에 확장을 요청해서 켭니다. 지시문이 있는 확장이라면 생성된 소스도 그 확장을 선언합니다. 컴파일러가 이 두 몫을 어떻게 나누는지는 [컴파일러 내부](internals)가 설명합니다.',
       ],
@@ -2128,7 +2130,7 @@ export const ko: Copy = {
       diffRows: [
         [
           '[셰이더 스테이지](languageStages)',
-          '`@compute` 진입점은 워크그룹 크기를 담은 컴퓨트 셰이더를 생성합니다.',
+          '`compute` 진입점은 워크그룹 크기를 담은 컴퓨트 셰이더를 생성합니다.',
           'WebGL2에는 네이티브 컴퓨트 스테이지가 없습니다. 지원하는 진입점은 GLSL ES 3.00 패스로 변환해 실행합니다.',
         ],
         [
@@ -2170,7 +2172,7 @@ export const ko: Copy = {
       convertItems: [
         `GLSL에서: [GLSL 셰이더 옮기기](internalsGlslShader)는 유니폼 블록, \`#ifdef\`, \`#include\`, \`#extension\`처럼 셰이더 전체에 걸린 것을 다룬다. [${glsl}을 TypeShade로](languageFromGlsl)에는 타입, 유니폼, builtin 변수, 함수가 있습니다.`,
         'WGSL에서: [WGSL을 TypeShade로](languageFromWgsl)에서 WGSL 구성 요소마다 TypeShade 표기를 찾습니다.',
-        'WGSL에만 있는 것: 그런 구성 요소를 쓴 파일도 컴파일됩니다. 스칼라 유니폼, 드로우 안의 `"read_write"` 스토리지 바인딩, `@interpolate("linear")`가 그 예입니다. 이때 `compile()`은 WGSL을 남기고 `glsl`을 undefined로 두며, 그 까닭을 `TS8015` 경고로 알립니다.',
+        'WGSL에만 있는 것: 그런 구성 요소를 쓴 파일도 컴파일됩니다. 스칼라 유니폼, 드로우 안의 `"read_write"` 스토리지 바인딩, `{ interpolate: "linear" }`가 그 예입니다. 이때 `compile()`은 WGSL을 남기고 `glsl`을 undefined로 두며, 그 까닭을 `TS8015` 경고로 알립니다.',
       ],
       furtherH: '더 읽을 자료',
       furtherItems: [
@@ -2204,7 +2206,7 @@ export const ko: Copy = {
       ],
       [
         '자동 완성',
-        '범위 안의 심볼과 키워드, 그리고 문맥에 맞는 TypeShade 항목을 제안합니다. `@` 뒤에는 속성 이름, `@builtin("` 안에는 내장 입력 이름, 타입 자리에는 GPU 타입 이름, 그리고 벡터와 진입 함수의 스니펫입니다.',
+        '범위 안의 심볼과 키워드, 그리고 문맥에 맞는 TypeShade 항목을 제안합니다. `builtin<"` 안에는 내장 입력 이름, 타입 자리에는 GPU 타입 이름, 그리고 벡터와 진입 함수의 스니펫입니다.',
       ],
       [
         '호버',
@@ -2222,7 +2224,7 @@ export const ko: Copy = {
       ],
       [
         '시맨틱 토큰',
-        '문서 순서대로 늘어놓은 토큰입니다. GPU 타입, 진입 함수, 리소스, `@builtin(...)` 안의 이름에는 종류를 표시합니다.',
+        '문서 순서대로 늘어놓은 토큰입니다. GPU 타입, 진입 함수, 리소스, `builtin<...>` 안의 이름에는 종류를 표시합니다.',
       ],
       [
         '컴파일 결과',
@@ -2385,7 +2387,7 @@ export const ko: Copy = {
         'null-values': 'null, undefined와 실제 값',
         'optional-values': '없을 수도 있는 값: T | undefined',
         'optional-fields': '없을 수도 있는 필드, 요소, 매개변수',
-        'reference-parameters': '되돌려 쓰는 매개변수: @inout과 @out',
+        'reference-parameters': '되돌려 쓰는 매개변수: inout<T>와 out<T>',
         'bit-bump': '내장 함수 한 바퀴',
         'bool-select': '불 벡터',
         'ray-class': '클래스 메서드',
@@ -2582,7 +2584,7 @@ export const ko: Copy = {
         'gpu-console':
           '컴퓨트 커널 안에서 `console.log("i =", gid.x, p)`를 부릅니다. 문자열 리터럴은 라벨이 되고, 크기가 정해진 값은 무엇이든 인자로 넘길 수 있습니다.',
         'compute-reduction-twin':
-          '@workgroup_size가 붙은 컴퓨트 커널입니다. 입력 스토리지 버퍼의 한 구간을 reduce()로 접어 출력 원소 하나로 만듭니다.',
+          'workgroup_size로 감싼 컴퓨트 커널입니다. 입력 스토리지 버퍼의 한 구간을 reduce()로 접어 출력 원소 하나로 만듭니다.',
         'workgroup-override':
           '`override<u32>` 하나가 컴퓨트 진입점의 워크그룹 크기와 공유 스크래치 배열의 바깥쪽 길이를 정합니다.',
         'hillshade-twin': '음영 기복.',
@@ -2803,12 +2805,12 @@ export const ko: Copy = {
         ['if / for', 'GPU control flow', '조건과 반복문을 GPU에서 실행할 수 있는지 검사합니다.'],
       ],
       gpuH: '3. GPU 인터페이스',
-      gpuP: '소스에 GPU 인터페이스가 드러납니다. 리소스에는 `declare`, entry point에는 stage decorator, GPU 입력에는 `@builtin(...)` 매개변수를 씁니다.',
+      gpuP: '소스에 GPU 인터페이스가 드러납니다. 리소스에는 `declare`, 진입점에는 스테이지 호출, GPU 입력에는 `builtin<N, T>` 매개변수를 씁니다.',
       gpuNote:
         '`camera`와 `pixels`는 호스트가 전달하는 리소스입니다. 셰이더가 값을 만들지 않습니다. `gid`도 전역 변수가 아니라 함수 매개변수입니다.',
       functionH: '4. 함수와 entry point',
       functionP:
-        '매개변수와 반환 타입은 함수의 입력과 결과를 나타냅니다. Stage decorator와 builtin 매개변수는 entry point의 GPU 역할을 지정합니다.',
+        '매개변수와 반환 타입은 함수의 입력과 결과를 나타냅니다. 스테이지 호출과 builtin 매개변수는 진입점의 GPU 역할을 지정합니다.',
       functionNote:
         '`addBias`는 재사용하는 helper입니다. `paint`는 compute entry point입니다. 둘은 같은 함수 문법을 쓰지만 pipeline에서 맡는 역할이 다릅니다.',
       resourceH: '5. GPU 리소스',
@@ -2818,7 +2820,7 @@ export const ko: Copy = {
         '리소스는 `const`로 선언합니다. `storage<T>`는 읽기 전용이며, `storage<T, "read_write">`는 쓰기도 가능합니다.',
       stageH: '6. 셰이더 스테이지',
       stageP:
-        '`@vertex`, `@fragment`, `@compute`는 entry point의 스테이지를 지정합니다. GPU builtin은 전역 변수로 자동 주입되지 않습니다. 필요한 builtin은 매개변수로 선언합니다.',
+        '`vertex(f)`, `fragment(f)`, `compute([64], f)`는 진입점의 스테이지를 지정합니다. GPU builtin은 전역 변수로 자동 주입되지 않습니다. 필요한 builtin은 매개변수로 선언합니다.',
       completeH: '7. 전체 예제',
       completeP:
         '이 예제는 지시문, GPU struct, 리소스, compute entry point, builtin 매개변수를 하나로 구성합니다.',
@@ -2876,18 +2878,18 @@ export const ko: Copy = {
           'TypeScript의 type과 class 개념을 TypeShade의 GPU 값, 구조체, 필드 레이아웃과 연결하는 방법을 설명합니다.',
         h1: 'Types: TypeScript 타입에서 GPU 값으로',
         intro:
-          'TypeShade는 TypeScript 문법으로 GPU 값의 타입을 정의합니다. TypeScript의 구조적 타이핑과 타입 별칭을 사용하며, GPU 레이아웃 메타데이터가 필요할 때는 클래스와 필드 데코레이터를 사용합니다.',
+          'TypeShade는 TypeScript 문법으로 GPU 값의 타입을 정의합니다. TypeScript의 구조적 타이핑과 타입 별칭을 사용하며, GPU 레이아웃 메타데이터가 필요할 때는 필드의 타입에 적습니다: `builtin<N, T>`, `location<n, T>`.',
         ts: 'TypeScript에서 출발하기',
         tsP: '타입 별칭은 값의 구조에 이름을 붙입니다. TypeShade도 같은 문법을 사용하며, 사용 가능한 타입과 표현식은 셰이더 언어 규칙에 따라 정해집니다.',
         alias: '1. 타입 별칭은 plain data에 사용',
         aliasP:
-          '필드에 데코레이터가 필요 없다면 타입 별칭가 가장 단순한 표현입니다. 여러 함수의 인자나 반환값에서 같은 GPU 값의 구조를 공유할 때도 유용합니다.',
+          '필드에 속성이 필요 없다면 타입 별칭이 가장 단순한 표현입니다. 여러 함수의 인자나 반환값에서 같은 GPU 값의 구조를 공유할 때도 유용합니다.',
         struct: '2. class는 구조체와 그 함수들',
         structP:
-          'TypeShade의 class는 GPU 구조체이면서 그 곁에 쓴 함수들입니다. 필드는 호스트가 채우는 바이트입니다. 생성자와 메서드와 static 함수는 각각 평범한 함수로 내려가서, `new Ray(o, d)`는 `Ray_new`를 부르고, `r.at(t)`는 `r`이 `let`이면 `Ray_at(&r, t)`를 불러 메서드가 객체를 그 자리에서 읽고 쓰며, `const`이면 `Ray_at(r, t)`를 부릅니다(규칙 8.28). 그 사이에 살아 있는 객체는 없습니다. class는 곧 그 구조체와 그 함수들입니다(규칙 8.29). 구조체에 적용되는 모든 규칙은 필드에, 함수에 적용되는 모든 규칙은 생성자, 메서드, 접근자, static 함수에 적용되며, 구조체나 함수가 올 수 있는 모든 자리에서 그렇습니다. 객체를 바꾸는 메서드를 커널 함수 배열의 원소에서 부르면, `@inout` 인자처럼 그 원소에 쓰는 것으로 칩니다.',
-        attrs: '3. 필드 데코레이터는 레이아웃을 설명',
+          'TypeShade의 class는 GPU 구조체이면서 그 곁에 쓴 함수들입니다. 필드는 호스트가 채우는 바이트입니다. 생성자와 메서드와 static 함수는 각각 평범한 함수로 내려가서, `new Ray(o, d)`는 `Ray_new`를 부르고, `r.at(t)`는 `r`이 `let`이면 `Ray_at(&r, t)`를 불러 메서드가 객체를 그 자리에서 읽고 쓰며, `const`이면 `Ray_at(r, t)`를 부릅니다(규칙 8.28). 그 사이에 살아 있는 객체는 없습니다. class는 곧 그 구조체와 그 함수들입니다(규칙 8.29). 구조체에 적용되는 모든 규칙은 필드에, 함수에 적용되는 모든 규칙은 생성자, 메서드, 접근자, static 함수에 적용되며, 구조체나 함수가 올 수 있는 모든 자리에서 그렇습니다. 객체를 바꾸는 메서드를 커널 함수 배열의 원소에서 부르면, `inout<T>` 인자처럼 그 원소에 쓰는 것으로 칩니다.',
+        attrs: '3. 속성 타입은 레이아웃을 설명',
         attrsP:
-          '필드에는 파이프라인의 자리에 연결하는 `@location`과 `@builtin`을 붙이고, 스테이지 사이를 오가는 값이나 출력의 성질을 정하는 `@interpolate`, `@invariant`, `@blend_src`도 붙일 수 있습니다. `@align`은 읽고 나서 거부하며 `@size`, `@offset`, `@ignore`는 컴파일러가 아는 어트리뷰트가 아닙니다. 받아들이는 전체 집합은 `@vertex`, `@fragment`, `@compute`, `@builtin`, `@location`, `@interpolate`, `@invariant`, `@blend_src`, `@diagnostic`이고, 함수의 매개변수에는 `@inout`과 `@out`을 붙입니다.',
+          '진입점 입력이나 출력의 필드는 파이프라인과 어떻게 연결되는지를 타입에 적습니다: `location<n, T>` 또는 `builtin<N, T>`. 세 번째 타입 인자는 스테이지 사이를 오가는 값이나 출력의 성질을 정합니다: `{ interpolate: "flat" }`, `{ invariant: true }`, `{ blend_src: 1 }`. 초기화 식이 없는 class 필드에는 `tsc --strict`가 요구하는 대로 `!`를 붙입니다. 이 타입들이 대신하는 데코레이터 형태(`@location(0)` 등)는 아직 `TS8028` 경고와 함께 컴파일되며, 다음 릴리스에서는 거부됩니다.',
         boundary: '4. TypeScript의 class와 다른 점',
         boundaryItems: [
           '진입점은 최상위 함수이고 메서드가 아닙니다.',
@@ -2895,7 +2897,7 @@ export const ko: Copy = {
           '베이스 타입으로 읽기만 하며 메서드 선택이 같다고 컴파일러가 입증하면 파생 값을 베이스 class 자리에 쓸 수 있습니다. 메서드 재정의, 수신 객체의 변경이나 별칭을 통한 관찰 가능한 변경이 있으면 구체적인 타입을 쓰거나 지원 범위 밖에 남습니다.',
           'getter와 setter는 각각 제 함수로 내려가고, 생성자는 TypeScript처럼 클래스마다 하나입니다.',
           '`new`는 함수 본문 안에서 값을 만들고, 모듈 상수는 객체 리터럴로 씁니다.',
-          '데코레이터가 필요한 필드가 없다면 타입 별칭가 더 명확합니다.',
+          '초기화 식이 필요한 필드가 없다면 타입 별칭이나 인터페이스가 더 명확합니다.',
           '함수 범위의 지역 변수, 매개변수, 반환값, 클래스 필드, 고정 길이 배열 원소는 `T | undefined`, `T | null`, `T | null | undefined`를 담을 수 있습니다(규칙 7.10, 8.8). 엄격한 비교는 null과 undefined를 구분하고, `!= null`은 둘 다 제외합니다. 바인딩, 모듈/static 데이터, 진입점 IO, 커널 인터페이스에는 이 타입을 사용할 수 없습니다. 이를 사용하는 내보낸 헬퍼는 호스트 값이 없습니다(규칙 8.21).',
         ],
         mapping: '5. 개념 대응표',
@@ -2906,7 +2908,7 @@ export const ko: Copy = {
           ['class method', '구조체를 첫 매개변수로 받는 함수'],
           ['`new`', '만들어진 생성자 함수 호출'],
           ['`extends` with `super`', '베이스 필드를 이어 붙이고 본문을 다시 내림'],
-          ['데코레이터 메타데이터', 'GPU 레이아웃 / 스테이지 메타데이터'],
+          ['속성 타입과 스테이지 호출', 'GPU 레이아웃 / 스테이지 메타데이터'],
           ['런타임 객체', '해당하지 않음'],
           ['structural compatibility', '셰이더 타입 검사 범위에서 적용'],
         ],
@@ -2937,12 +2939,12 @@ export const ko: Copy = {
           ['`: vec4`', '호출자에게 반환할 GPU 값의 구조입니다.'],
         ],
         paramsRefP:
-          '`@inout`으로 선언한 매개변수는 호출자의 변수 자체입니다. 호출은 그 변수를 아무 표시 없이 넘기고, 매개변수나 그 필드, 성분, 요소에 대입하면 호출자의 변수에 값이 들어갑니다. `@out`으로 선언한 매개변수는 값 없이 시작합니다. 함수는 이 매개변수를 읽기 전에 쓰고, 모든 경로에서 쓴다(`TS8075`). 그래서 호출자는 아직 값이 없는 `let`을 넘길 수 있습니다. 함수가 둘 중 하나라도 쓴다면, 호출 하나가 같은 변수를 이런 매개변수 둘에 넘길 수는 없다(`TS8074`). 한정자는 파일 최상위나 네임스페이스에 선언한 함수에만 붙고, 메서드와 진입점과 지역 함수는 값을 받는다(`TS8073`). 다만 한정자가 붙은 함수 안의 지역 함수는 바깥의 다른 변수처럼 그 매개변수를 읽고 씁니다. 구조체, 배열 요소, 행렬의 열을 같은 방식으로 넘기는 모습은 [되돌려 쓰는 매개변수](shadeReferenceParameters) 예제에 있습니다.',
+          '타입이 `inout<T>`인 매개변수는 호출자의 변수 자체입니다. 호출은 그 변수를 아무 표시 없이 넘기고, 매개변수나 그 필드, 성분, 요소에 대입하면 호출자의 변수에 값이 들어갑니다. 타입이 `out<T>`인 매개변수는 값 없이 시작합니다. 함수는 이 매개변수를 읽기 전에 쓰고, 모든 경로에서 씁니다(`TS8075`). 그래서 호출자는 `let s!: f32`처럼 아직 값이 없는 `let`을 넘길 수 있습니다. 함수가 둘 중 하나라도 쓴다면, 호출 하나가 같은 변수를 이런 매개변수 둘에 넘길 수는 없다(`TS8074`). 한정자는 파일 최상위나 네임스페이스에 선언한 함수에만 붙고, 메서드와 진입점과 지역 함수는 값을 받는다(`TS8073`). 다만 한정자가 붙은 함수 안의 지역 함수는 바깥의 다른 변수처럼 그 매개변수를 읽고 씁니다. 구조체, 배열 요소, 행렬의 열을 같은 방식으로 넘기는 모습은 [되돌려 쓰는 매개변수](shadeReferenceParameters) 예제에 있습니다.',
         helper: '3. Helper function',
         helperP:
-          '스테이지 데코레이터가 없는 최상위 함수은 다른 셰이더 함수에서 호출할 수 있는 헬퍼입니다. 반복되는 계산을 이름 있는 함수로 분리하면 셰이더를 읽고 검증하기 쉬워집니다.',
+          '스테이지 호출로 감싸지 않은 최상위 함수는 다른 셰이더 함수에서 호출할 수 있는 헬퍼입니다. 반복되는 계산을 이름 있는 함수로 분리하면 셰이더를 읽고 검증하기 쉬워집니다.',
         helperNote:
-          '헬퍼는 파이프라인 진입점이 아니므로 스테이지 데코레이터가 없습니다. 이 구조는 계산을 작은 단위로 나누고 진입점의 역할을 읽기 쉽게 만듭니다.',
+          '헬퍼는 파이프라인 진입점이 아니므로 스테이지 호출이 없습니다. 이 구조는 계산을 작은 단위로 나누고 진입점의 역할을 읽기 쉽게 만듭니다.',
         call: '4. 함수 호출',
         callP:
           '함수 호출은 일반적인 TypeScript 호출과 같은 문법을 사용합니다. 호출 대상과 인수에는 TypeShade의 GPU 타입 규칙이 적용되며, 일반 JavaScript API를 호출할 수는 없습니다.',
@@ -2950,26 +2952,26 @@ export const ko: Copy = {
           '호출은 일반 함수 호출처럼 보이지만, `addBias`의 입력과 반환값은 TypeShade가 이해하는 GPU 타입이어야 합니다.',
         entry: '5. Shader 진입점 함수',
         entryP:
-          '파이프라인이 실행을 시작하는 함수는 top-level `export function`에 스테이지 데코레이터를 붙여 선언합니다. `@compute`, `@vertex`, `@fragment`가 각각 GPU 실행 단계와 연결됩니다.',
+          '파이프라인이 실행을 시작하는 함수는 최상위 `export const`로 선언하며, 그 값은 함수를 감싼 스테이지 호출입니다. `compute([64], f)`, `vertex(f)`, `fragment(f)`가 각각 함수를 GPU 실행 단계와 연결합니다.',
         entryNote:
-          '`export`는 TypeScript 모듈 개념과 함께 진입점을 컴파일러가 발견할 수 있게 합니다. 스테이지 데코레이터는 그 내보낸 함수이 어느 파이프라인 스테이지인지 추가로 설명합니다.',
+          '`export`는 TypeScript 모듈 개념과 함께 진입점을 컴파일러가 발견할 수 있게 합니다. 스테이지 호출은 그 내보낸 함수가 어느 파이프라인 스테이지인지 추가로 설명합니다.',
         builtin: '6. Builtin은 매개변수로 받습니다',
         builtinP:
           'GPU가 제공하는 스테이지 입력은 숨겨진 전역 변수가 아니라 함수 시그니처에 명시합니다. 이렇게 하면 함수의 입력이 코드만 읽어도 드러나고 헬퍼와 진입점의 경계도 분명해집니다.',
         builtinTable: [
           ['표현', '의미'],
-          ['`@builtin("global_invocation_id")`', 'GPU가 제공하는 compute 입력을 지정합니다.'],
-          ['`gid: vec3u`', '그 입력의 TypeShade 타입과 지역 이름입니다.'],
+          ['`builtin<"global_invocation_id", vec3u>`', 'GPU가 제공하는 compute 입력을 지정합니다.'],
+          ['`gid`', '그 입력의 지역 이름이며, 타입은 `vec3u`입니다.'],
           ['`gid.x`', '현재 인보케이션의 x 성분를 읽습니다.'],
         ],
         compute: '7. Compute 진입점을 읽는 법',
         computeP:
-          '`@compute([64, 1, 1])`는 워크그룹 크기를 선언하고, `gid`는 `global_invocation_id` builtin을 받는 매개변수입니다. `gid.x`를 통해 현재 인보케이션의 x 좌표를 읽습니다.',
+          '`compute([64, 1, 1], f)`는 워크그룹 크기를 선언하고, `gid`는 `global_invocation_id` builtin을 받는 매개변수입니다. `gid.x`를 통해 현재 인보케이션의 x 좌표를 읽습니다.',
         computeNote:
-          '이 함수의 데코레이터는 스테이지와 워크그룹 크기를 지정합니다. 매개변수는 GPU 입력을 선언하고, 본문은 해당 입력으로 수행할 계산을 정의합니다.',
+          '이 함수를 감싼 스테이지 호출은 스테이지와 워크그룹 크기를 지정합니다. 매개변수는 GPU 입력을 선언하고, 본문은 해당 입력으로 수행할 계산을 정의합니다.',
         graphics: '8. Vertex와 fragment 진입점',
         graphicsP:
-          'vertex와 fragment도 같은 함수 모델을 사용합니다. 스테이지 데코레이터가 실행 단계를 결정하고 매개변수와 반환 타입이 파이프라인 인터페이스를 설명합니다.',
+          'vertex와 fragment도 같은 함수 모델을 사용합니다. 스테이지 호출이 실행 단계를 결정하고 매개변수와 반환 타입이 파이프라인 인터페이스를 설명합니다.',
         graphicsNote:
           'vertex의 `vid`와 `vin`은 서로 다른 입력입니다. 하나는 GPU builtin이고 다른 하나는 사용자 정의 구조체 입력입니다. fragment의 `pid` 역시 시그니처에 명시되어 있으므로 함수만 읽어도 필요한 입력을 알 수 있습니다.',
         scope: '9. 함수와 스코프',
@@ -3024,9 +3026,9 @@ export const ko: Copy = {
           '커널 함수는 컴파일러가 GPU에서 돌릴 수 있는 루프를 담은 함수입니다. 아래에서 커널 함수의 조건, GPU에서 도는 루프, 워크그룹 크기, 컴파일러의 보고를 차례로 설명합니다.',
         kernelFunction: '커널 함수의 정의',
         kernelFunctionP:
-          '진입점이 아니면서 크기가 없는 배열 `array<T>`나 2D 스토리지 텍스처 `texture_storage_2d<F, A>`를 받는 내보낸 함수는 커널 함수입니다(규칙 8.22). 샘플링하는 텍스처만 받는 함수는 커널 함수가 아닙니다. 그런 텍스처를 읽는 내보낸 함수는 헬퍼로 남습니다. 배열이나 텍스처는 호출한 쪽의 것이며, 함수는 그 자리에서 읽고 씁니다. 객체를 바꾸는 메서드를 배열의 원소에서 부르면, 루프 증명에서는 `@inout` 인자처럼 그 원소에 쓰는 것으로 칩니다(규칙 8.29).',
+          '진입점이 아니면서 크기가 없는 배열 `array<T>`나 2D 스토리지 텍스처 `texture_storage_2d<F, A>`를 받는 내보낸 함수는 커널 함수입니다(규칙 8.22). 샘플링하는 텍스처만 받는 함수는 커널 함수가 아닙니다. 그런 텍스처를 읽는 내보낸 함수는 헬퍼로 남습니다. 배열이나 텍스처는 호출한 쪽의 것이며, 함수는 그 자리에서 읽고 씁니다. 객체를 바꾸는 메서드를 배열의 원소에서 부르면, 루프 증명에서는 `inout<T>` 인자처럼 그 원소에 쓰는 것으로 칩니다(규칙 8.29).',
         kernelCallP:
-          '본문 최상위의 `for`는 저마다 컴파일러가 GPU에서 반복 하나당 호출 하나로 돌릴 수 있는 루프이고, 호스트 파일은 다른 가져오기처럼 이 함수를 await로 호출합니다. `@compute`나 바인딩, `global_invocation_id`는 쓰지 않습니다.',
+          '본문 최상위의 `for`는 저마다 컴파일러가 GPU에서 반복 하나당 호출 하나로 돌릴 수 있는 루프이고, 호스트 파일은 다른 가져오기처럼 이 함수를 await로 호출합니다. `compute` 호출이나 바인딩, `global_invocation_id`는 쓰지 않습니다.',
         kernelProof: 'GPU에서 도는 루프',
         kernelShapeP:
           '컴파일러는 어떤 반복도 다른 반복이 건드리는 것을 건드리지 않는다고 증명할 때 루프를 GPU에서 돌립니다. 루프는 상수만큼 나아가는 카운트 `for`나 `for...of`여야 하고, 안에서 반환하거나 빠져나가는 곳이 없어야 합니다.',
@@ -3036,7 +3038,7 @@ export const ko: Copy = {
           '루프는 자신이 쓰는 배열을 쓰는 자리에서만 읽습니다. 합치는 변수, 덧붙이는 배열, 값을 넣는 `Map`과 `Set`은 읽지 않습니다. 모듈 변수나 바인딩을 쓰는 함수를 부르지 않고, 배리어와 워크그룹 메모리, `console` 호출이 없어야 합니다.',
         workgroupSize: '워크그룹 크기',
         workgroupSizeP:
-          '함수 앞에 `@workgroup_size([128])`를 쓰면 WebGPU에서 그 루프들의 워크그룹 크기가 정해지며, 쓰지 않으면 64입니다. 리덕션을 하는 루프는 언제나 256 크기의 워크그룹으로 돕니다. 그래서 그런 루프가 있는 함수에 이 어트리뷰트를 쓰면 거부됩니다(`TS8077`).',
+          '`export const scale = workgroup_size([128], function scale(…) { … })`처럼 함수를 감싸면 WebGPU에서 그 루프들의 워크그룹 크기가 정해지며, 감싸지 않으면 64입니다. 리덕션을 하는 루프는 언제나 256 크기의 워크그룹으로 돕니다. 그래서 그런 루프가 있는 함수를 `workgroup_size`로 감싸면 거부됩니다(`TS8077`).',
         lastWorkgroup: '마지막 워크그룹',
         lastWorkgroupP:
           '디스패치의 마지막 워크그룹에는 루프의 마지막 반복을 지나는 레인이 들어 있는데, 그 레인은 일찍 return하지 않습니다. 끝을 완전히 지난 워크그룹은 하나로 return합니다. 마지막 반복이 든 워크그룹에서는 그런 레인이 모든 쓰기를 막은 채 그 반복을 한 번 더 실행합니다. 그래서 한 워크그룹의 모든 레인이 같은 제어 흐름을 따릅니다. 이 형태는 이른 return이 멈추던 D3D12 장치에서 완주한 형태입니다.',
@@ -3074,7 +3076,7 @@ export const ko: Copy = {
           '호스트는 커널 호출 여러 개를 계획 하나로 실행할 수 있습니다. 아래에서 호출을 합치는 방법, 리포트의 내용, 워크그룹 개수와 상수를 정하는 방법, 계획이 쓰는 리소스, 라이브러리가 제공하는 커널을 차례로 설명합니다.',
         fuseCalls: '호출 합치기',
         fuseP:
-          '호스트는 등록용 import 없이 `device.fuse()` 안에서 커널 함수 여러 개를 부를 수 있습니다(규칙 11.13). 기본 소유자를 사용하는 `typeshade/fuse`의 `fuse()`도 계속 지원합니다. 이 컴파일러 버전에서는 합칠 수 있는 호출을 분석하는 정보를 얻으려면 여전히 `typeshade({ fuse: true })`로 빌드해야 합니다. WebGPU에서는 바로 앞 호출이 같은 인덱스에 쓴 값을 읽는 호출들이 제출 하나 안의 디스패치 하나로 실행됩니다. 객체를 바꾸는 메서드를 배열의 원소에서 부르면, 계획이 읽는 사실에서는 `@inout` 인자처럼 그 원소에 쓰는 것으로 칩니다(규칙 8.29).',
+          '호스트는 등록용 import 없이 `device.fuse()` 안에서 커널 함수 여러 개를 부를 수 있습니다(규칙 11.13). 기본 소유자를 사용하는 `typeshade/fuse`의 `fuse()`도 계속 지원합니다. 이 컴파일러 버전에서는 합칠 수 있는 호출을 분석하는 정보를 얻으려면 여전히 `typeshade({ fuse: true })`로 빌드해야 합니다. WebGPU에서는 바로 앞 호출이 같은 인덱스에 쓴 값을 읽는 호출들이 제출 하나 안의 디스패치 하나로 실행됩니다. 객체를 바꾸는 메서드를 배열의 원소에서 부르면, 계획이 읽는 사실에서는 `inout<T>` 인자처럼 그 원소에 쓰는 것으로 칩니다(규칙 8.29).',
         fuseReport: 'fuse 리포트',
         fuseReportP:
           '스코프가 돌려주는 리포트는 그룹마다 이름을 대고, 두 호출이 따로 실행되는 이유를 알려 줍니다. 본문 안의 진입점 호출은 혼자 그룹을 이루며, 배열에 값을 덧붙이는 루프도 그렇습니다. `Map`이나 `Set`을 받는 호출도 별도 그룹이며, 리포트는 `b takes a Map or a Set`이나 CPU에서 실행하는 이유를 표시합니다. 각 그룹은 자신이 실행된 `tier`도 표시하며, 계획보다 뒤의 tier에서 실행된 그룹은 그 이유를 `b runs on the CPU, …`처럼 `why`에 적습니다. `FuseReport`와, 여러 리포트를 하나로 합치면서 그룹마다 `tier`를 유지하는 `mergeReports`는 `typeshade/runtime`에서도 가져올 수 있습니다. 그래서 리포트를 읽기만 하는 호스트는 플래너를 싣지 않습니다.',
@@ -3161,7 +3163,7 @@ export const ko: Copy = {
           '리소스 슬롯은 파일의 declare 순서와 연결됩니다. 실제 바인딩 번호를 코드에 흩뿌리기보다 컴파일러와 호스트의 reflection 결과를 계약으로 사용하는 방향이 기본입니다.',
         workgroup: '5. 워크그룹 메모리',
         workgroupP:
-          '`workgroup<T>` 값은 한 워크그룹의 인보케이션들이 함께 씁니다. 내부 배열의 길이는 `@compute`와 같은 override로 정할 수 있습니다. 호스트는 파이프라인을 만들 때 그 값을 선택합니다.',
+          '`workgroup<T>` 값은 한 워크그룹의 인보케이션들이 함께 씁니다. 내부 배열의 길이는 `compute`와 같은 override로 정할 수 있습니다. 호스트는 파이프라인을 만들 때 그 값을 선택합니다.',
         invalid: '6. 자주 하는 실수',
         invalidItems: [
           '`declare const x: f32`처럼 `uniform<T>`나 `storage<T>` 없이 선언하지 않습니다.',
@@ -3177,21 +3179,21 @@ export const ko: Copy = {
           'TypeScript 함수와 모듈 개념에서 출발해 compute, vertex, fragment 진입점와 명시적인 builtin 매개변수를 이해합니다.',
         h1: 'Shader stages: GPU 실행 지점을 명시하기',
         intro:
-          'TypeShade의 진입점은 class가 아니라 내보낸 최상위 함수입니다. 데코레이터가 함수의 셰이더 스테이지와 필요한 메타데이터를 표시합니다.',
+          'TypeShade의 진입점은 class가 아니라 내보낸 최상위 함수이며, 저마다 스테이지 호출로 감쌉니다. 그 호출이 셰이더 스테이지와 필요한 메타데이터를 표시합니다.',
         mapping: '1. TypeScript 함수와 모듈에서 출발하기',
         mappingP:
-          'TypeScript에서 `export function`은 모듈의 공개 함수입니다. TypeShade에서는 여기에 스테이지 데코레이터를 더하면 파이프라인 진입점라는 GPU 의미가 생깁니다. 데코레이터가 없는 함수는 재사용 가능한 헬퍼로 남습니다.',
+          'TypeScript에서 `export function`은 모듈의 공개 함수입니다. TypeShade에서는 함수를 `export const fs = fragment(function fs(…) { … })`처럼 스테이지 호출로 감싸면 파이프라인 진입점이라는 GPU 의미가 생깁니다. 스테이지 호출로 감싸지 않은 함수는 재사용 가능한 헬퍼로 남습니다.',
         compute: '2. Compute',
         computeP:
-          'compute 진입점의 `@compute` 차원에는 `override<u32>` 이름을 쓸 수 있습니다. 숫자로 적던 차원도 계속 쓸 수 있습니다. `global_invocation_id` 같은 builtin은 명시적인 매개변수로 받습니다.',
+          'compute 진입점의 `compute` 차원에는 `override<u32>` 이름을 쓸 수 있습니다. 숫자로 적던 차원도 계속 쓸 수 있습니다. `global_invocation_id` 같은 builtin은 명시적인 매개변수로 받습니다.',
         computeHostP:
           '일반 TypeScript에서 크기를 고른 뒤 `program.compute()`의 이름 있는 상수로 넘깁니다. 디스패치 수는 `pipeline.workgroupShape`에서 계산합니다. 가져온 진입점은 `entry(bindings, groups, { constants: { WG_SIZE: selected } })`로 부르며, `device.fuse()` 안에서도 같습니다. 선택한 크기에 맞춰 `groups`를 계산하고, 마지막 그룹에서 입력을 벗어난 인보케이션은 셰이더에서 걸러냅니다. WebGL2는 기본 워크그룹 모양을 사용해야 합니다. [host-compute 예제](exampleHostCompute)에 전체 호스트와 셰이더가 있습니다.',
         graphics: '3. Vertex와 fragment',
         graphicsP:
-          '`@vertex`와 `@fragment`는 그래픽스 파이프라인의 진입점을 표현합니다. 입력과 출력은 TypeShade 값 타입과 명시적인 builtin 매개변수로 선언합니다. 스테이지마다 무엇을 건네받고 무엇을 돌려주는지는 [셰이더 파이프라인](conceptsPipeline)이 설명합니다.',
+          '`vertex(f)`와 `fragment(f)`는 그래픽스 파이프라인의 진입점을 표현합니다. 입력과 출력은 TypeShade 값 타입과 명시적인 builtin 매개변수로 선언합니다. 스테이지마다 무엇을 건네받고 무엇을 돌려주는지는 [셰이더 파이프라인](conceptsPipeline)이 설명합니다.',
         helper: '4. Helper function',
         helperP:
-          '데코레이터가 없는 함수는 진입점이 아니라 헬퍼입니다. 진입점을 class method로 만들거나 `this`를 파이프라인 객체로 취급하지 않습니다.',
+          '스테이지 호출로 감싸지 않은 함수는 진입점이 아니라 헬퍼입니다. 진입점을 class method로 만들거나 `this`를 파이프라인 객체로 취급하지 않습니다.',
         next: '다음: 문자열 키와 Record',
       },
       algorithms: {
@@ -3473,19 +3475,19 @@ export const ko: Copy = {
           },
           mutableParameter: {
             name: '매개변수 재대입',
-            p: '입력값을 지역 복사본에 담습니다. 다시 대입해도 호출자의 값은 바뀌지 않으며, 호출자의 값을 바꾸려면 매개변수를 `@inout`으로 선언합니다.',
+            p: '입력값을 지역 복사본에 담습니다. 다시 대입해도 호출자의 값은 바뀌지 않으며, 호출자의 값을 바꾸려면 매개변수의 타입을 `inout<T>`로 선언합니다.',
           },
           referenceParameter: {
-            name: '`@inout` 매개변수',
-            p: `\`@inout\`으로 선언한 매개변수는 호출자의 변수 자체이고, 호출은 그 변수를 아무 표시 없이 넘긴다. \`this\`에 값을 넣는 메서드처럼 WGSL은 포인터를, ${glsl}은 \`inout\` 매개변수를 쓴다. [reference-parameters](shadeReferenceParameters)`,
+            name: '`inout<T>` 매개변수',
+            p: `타입이 \`inout<T>\`인 매개변수는 호출자의 변수 자체이고, 호출은 그 변수를 아무 표시 없이 넘긴다. \`this\`에 값을 넣는 메서드처럼 WGSL은 포인터를, ${glsl}은 \`inout\` 매개변수를 쓴다. [reference-parameters](shadeReferenceParameters)`,
           },
           outParameter: {
-            name: '`@out` 매개변수',
-            p: '함수는 이 매개변수를 읽기 전에 쓰고, 모든 경로에서 씁니다. 그래서 인자로 아직 값이 없는 `let`을 넘길 수 있습니다. 두 타깃 모두 `@inout`과 같은 방식으로 하향 변환합니다.',
+            name: '`out<T>` 매개변수',
+            p: '함수는 이 매개변수를 읽기 전에 쓰고, 모든 경로에서 씁니다. 그래서 인자로 아직 값이 없는 `let`을 넘길 수 있습니다. 두 타깃 모두 `inout<T>`와 같은 방식으로 하향 변환합니다.',
           },
           referenceAlias: {
             name: '한 변수를 가리키는 참조 둘',
-            p: `호출 하나가 값을 쓰는 \`@inout\`이나 \`@out\` 매개변수 둘에 같은 변수를 넘길 수 없다. WGSL은 이런 포인터 별칭을 거부하고, ${glsl}은 두 값을 정해지지 않은 순서로 되돌려 씁니다.`,
+            p: `호출 하나가 값을 쓰는 \`inout<T>\`나 \`out<T>\` 매개변수 둘에 같은 변수를 넘길 수 없다. WGSL은 이런 포인터 별칭을 거부하고, ${glsl}은 두 값을 정해지지 않은 순서로 되돌려 씁니다.`,
           },
           lexicalShadow: {
             name: '모듈 값과 같은 이름',
@@ -3764,13 +3766,13 @@ export const ko: Copy = {
           '`@group`이나 `@binding`은 적지 않습니다. 슬롯 번호는 파일 안 `declare`의 등장 순서이고, 위의 WGSL이 그 결과입니다. 텍스처와 샘플러도 같은 방식으로 다음 슬롯을 가져갑니다.',
         stagesH: '진입점과 속성',
         stagesP:
-          '스테이지 속성은 export한 함수에 붙이는 데코레이터입니다. 셋 중 아무것도 붙지 않은 함수는 헬퍼입니다. `@compute` 차원은 숫자나 이름 있는 override로 적습니다. 숫자로 적던 방식도 계속 쓸 수 있습니다.',
+          '스테이지는 export한 함수를 감싸는 호출, `vertex(f)`, `fragment(f)`, `compute([…], f)`입니다. 스테이지 호출로 감싸지 않은 함수는 헬퍼입니다. `compute` 차원은 숫자나 이름 있는 override로 적습니다. 숫자로 적던 방식도 계속 쓸 수 있습니다.',
         stagesOverrideP:
           'WGSL에서는 모듈 수준 `override`로 값을 선언하고 `@workgroup_size`에서 이름을 씁니다. TypeShade에서는 같은 override로 워크그룹 배열의 바깥쪽 길이도 정할 수 있습니다.',
         returnsP:
-          '버텍스 진입점은 반드시 위치를 만들어 내야 합니다. 반환 타입이 `vec4`이면 그 자체가 position builtin을 답니다. 구조체를 반환하면 위치는 필드 하나가 나르고, 프로그램이 원하는 만큼 `@location` varying을 덧붙입니다. position 필드가 없는 구조체 반환, `void` 반환, `vec4`가 아닌 단일 타입은 각각 거부되며 어떤 필드나 타입을 적어야 하는지 함께 알려 줍니다.',
+          '버텍스 진입점은 반드시 위치를 만들어 내야 합니다. 반환 타입이 `vec4`이면 그 자체가 position builtin을 답니다. 구조체를 반환하면 위치는 필드 하나가 나르고, 프로그램이 원하는 만큼 `location<n, T>` varying을 덧붙입니다. position 필드가 없는 구조체 반환, `void` 반환, `vec4`가 아닌 단일 타입은 각각 거부되며 어떤 필드나 타입을 적어야 하는지 함께 알려 줍니다.',
         builtinValuesH: 'builtin 값',
-        builtinValuesP: `\`@builtin(...)\` 이름 ${facts.wgslBuiltinIds}개는 WGSL에서 온 것으로, 문자열 그대로 전달됩니다. 따라서 WGSL 속성에는 같은 이름을 따옴표 없이 씁니다. 매개변수 타입은 이 이름만 허용하는 유니온이므로 오타가 있으면 작성한 줄에서 \`tsc\` 오류가 납니다. WGSL은 한 id를 제외한 모든 타입을 정하므로 타입 열에는 해당 속성에 필요한 타입이 표시됩니다.`,
+        builtinValuesP: `\`builtin<N, T>\`의 이름 ${facts.wgslBuiltinIds}개는 WGSL에서 온 것으로, 문자열 그대로 전달됩니다. 따라서 WGSL 속성에는 같은 이름을 따옴표 없이 씁니다. 타입 인자는 이 이름만 허용하는 유니온이므로 오타가 있으면 작성한 줄에서 \`tsc\` 오류가 납니다. WGSL은 한 id를 제외한 모든 타입을 정하므로 타입 열에는 해당 속성에 필요한 타입이 표시됩니다.`,
         clipDistancesP: '타입이 고정되지 않은 유일한 id입니다. 배열 길이는 작성자가 정합니다.',
         absentH: 'WGSL에 없는 이름',
         absentP:
@@ -3789,11 +3791,10 @@ export const ko: Copy = {
           'vectors.vec3d': 'WGSL에는 64비트 벡터도 없어서 같은 패스가 이것도 바꿔 놓습니다.',
         },
         notes: {
-          'stages.vertex': '진입점 하나에 스테이지 데코레이터 하나를 export한 함수에 붙입니다.',
+          'stages.vertex': '진입점 하나마다 export한 함수를 스테이지 호출 하나로 감쌉니다.',
           'stages.fragment':
             '프래그먼트 진입점은 아무것도 반환하지 않아도 됩니다. 스토리지 바인딩에만 쓰는 프로그램이 그런 모양입니다.',
-          'stages.compute':
-            '목록은 워크그룹 크기입니다. 목록이 없는 `@compute`는 `[64, 1, 1]`을 사용합니다.',
+          'stages.compute': '목록은 워크그룹 크기이며, 크기를 한 개에서 세 개까지 적습니다.',
           'stages.location': 'location은 진입점 매개변수와 클래스 필드와 반환 자리에 붙습니다.',
           'stages.vertexBare':
             '반환 타입이 `vec4`이면 그 자체가 position builtin을 답니다. 그래서 가장 작은 버텍스 셰이더에는 구조체도 매개변수도 필요 없습니다.',
@@ -3819,7 +3820,7 @@ export const ko: Copy = {
           'statements.discard': '같은 낱말이고 같은 문입니다.',
           'statements.struct':
             'WGSL 구조체는 클래스입니다. 객체 모양의 타입 별칭과 인터페이스도 같은 선언에 닿습니다.',
-          'statements.fn': '스테이지 데코레이터가 붙지 않은 함수는 모듈의 헬퍼입니다.',
+          'statements.fn': '스테이지 호출로 감싸지 않은 함수는 모듈의 헬퍼입니다.',
         },
       },
       fromGlsl: {
@@ -3886,14 +3887,14 @@ export const ko: Copy = {
           '유니폼 바인딩은 구조체이고, 생성기는 이것을 std140 블록으로 생성합니다. 스토리지 버퍼는 GLSL에 아예 형태가 없어서, 그런 모듈은 기능 게이트가 돌기 전에 데이터 텍스처에서 읽도록 다시 쓰입니다.',
         varyingsH: 'varying',
         varyingsP:
-          '버텍스 스테이지에서 프래그먼트 스테이지로 넘어가는 값은 양쪽 모두에서 `@location(n)` 필드입니다. GLSL은 그 둘을 이름으로 잇고 WebGPU는 번호로 이으므로, 생성된 GLSL에서 맞아야 하는 것은 필드 이름입니다.',
+          '버텍스 스테이지에서 프래그먼트 스테이지로 넘어가는 값은 양쪽 모두에서 `location<n, T>` 필드입니다. GLSL은 그 둘을 이름으로 잇고 WebGPU는 번호로 이으므로, 생성된 GLSL에서 맞아야 하는 것은 필드 이름입니다.',
         capabilitiesH: '확장과 기능',
         capabilitiesP: `\`#extension\` 지시문과 호스트의 \`getExtension\` 호출이 함께 GPU 확장을 사용 설정합니다. GLSL 프로파일에는 ${facts.glslCapabilities}개 항목이 있으며, 그중 하나는 소스에 지시문을 넣습니다. 항목이 없는 기능을 쓰면 GLSL 코드를 생성하기 전에 모듈을 거부합니다.`,
         enablesP:
-          '`"use typeshade"` 파일에는 이 네 가지를 적을 방법이 없습니다. `"enable ..."`은 WGSL 확장 이름을 받는데 넷 중 어느 것도 WGSL 확장이 아니므로, 호스트가 필요한 기능을 컴파일된 모듈의 `enables`에 적는다: `{ ...compile(source).module, enables: [...] }`. 스토리지 바인딩, 컴퓨트 진입점, `@builtin("clip_distances")`처럼 모듈의 모양에서 따라오는 기능은 파일에서 도출되며, 그중 어느 것도 이 표에 행이 없습니다.',
+          '`"use typeshade"` 파일에는 이 네 가지를 적을 방법이 없습니다. `"enable ..."`은 WGSL 확장 이름을 받는데 넷 중 어느 것도 WGSL 확장이 아니므로, 호스트가 필요한 기능을 컴파일된 모듈의 `enables`에 적는다: `{ ...compile(source).module, enables: [...] }`. 스토리지 바인딩, 컴퓨트 진입점, `builtin<"clip_distances", T>`처럼 모듈의 모양에서 따라오는 기능은 파일에서 도출되며, 그중 어느 것도 이 표에 행이 없습니다.',
         variablesH: 'builtin 변수',
         variablesP:
-          '`gl_*` 전역 변수는 매개변수나 클래스 필드나 반환 자리에 붙는 `@builtin(...)` 속성입니다. 어떤 값인지는 속성이 말하고 그것이 어느 전역 변수가 될지는 생성기가 정합니다. 파일 하나가 두 타깃에 모두 닿는 방식이 이것입니다.',
+          '`gl_*` 전역 변수는 매개변수나 필드나 반환 자리의 `builtin<N, T>` 타입입니다. 어떤 값인지는 타입이 말하고 그것이 어느 전역 변수가 될지는 생성기가 정합니다. 파일 하나가 두 타깃에 모두 닿는 방식이 이것입니다.',
         absentH: '어느 생성기도 받지 않는 변수',
         absentP:
           '둘은 이 인터페이스에 이름이 없습니다. 프런트엔드가 선언 자리에서 그 표기를 거부하며, 아래 문장은 같은 이름에 대해 WGSL 백엔드가 내는 말이고 대신 무엇을 쓰면 되는지 알려 줍니다.',
@@ -4147,7 +4148,7 @@ export const ko: Copy = {
           purpose:
             'forward는 각 이미지의 784개 픽셀과 10개 클래스 가중치를 곱해 더하고 편향을 더해 로짓(logit)을 만듭니다.',
           explanation:
-            'gid.x는 처리할 이미지의 행 번호입니다. 각 클래스 c에 대해 z = bias[c] + sum pixels[p]×weights[p×10+c]를 계산합니다. @compute([64])는 작업 그룹의 호출 크기이며 이미지 수가 작업 그룹 크기와 반드시 같다는 뜻은 아닙니다. 마지막 배치의 범위를 검사합니다.',
+            'gid.x는 처리할 이미지의 행 번호입니다. 각 클래스 c에 대해 z = bias[c] + sum pixels[p]×weights[p×10+c]를 계산합니다. compute([64], f)는 작업 그룹의 호출 크기이며 이미지 수가 작업 그룹 크기와 반드시 같다는 뜻은 아닙니다. 마지막 배치의 범위를 검사합니다.',
         },
         {
           title: '손실과 오차 신호: 왜 학습이 필요한지 계산',

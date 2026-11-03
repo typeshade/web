@@ -104,7 +104,8 @@ function build(): WgslGlslNames {
     .map((s) => emitted(s).wgsl)
     .join('\n');
   const variables = glslMapping().tables.variables.map((r): NameRow => {
-    const name = /@builtin\("([a-z_]+)"\)/.exec(r.source ?? '')?.[1];
+    // `builtin<"position", vec4>` since compiler change 0111, `@builtin("position")` before it.
+    const name = /(?:@builtin\(|builtin<)"([a-z_]+)"/.exec(r.source ?? '')?.[1];
     const spelled = name ? new RegExp(`@builtin\\(${name}\\)`).exec(wgslText)?.[0] : undefined;
     if (!spelled)
       throw new Error(`[wgsl-glsl-names] the WGSL emit has no builtin for '${r.source}'`);

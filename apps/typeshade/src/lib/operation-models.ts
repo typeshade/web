@@ -708,10 +708,50 @@ export function operationModel(name: string): OperationModel | undefined {
         ['fill<f32, 3>(0.)', 'fill<f32, 3>(2.)', 'fill<vec2, 2>(vec2(1., 2.))'],
         ['[0, 0, 0]', '[2, 2, 2]', '[[1, 2], [1, 2]]'],
       ),
-      related: ['array', 'sum'],
+      related: ['array'],
+    },
+    // The stage calls of compiler change 0111 and the numerical contract of change 0107.
+    vertex: {
+      setup: 'export const vs = vertex(function vs(i: builtin<"vertex_index", u32>): vec4 { … });',
+      cases: cases(['i = 0', 'i = 1', 'i = 2'], ['first corner', 'second corner', 'third corner']),
+      related: ['fragment', 'compute'],
+    },
+    fragment: {
+      setup: 'export const fs = fragment(function fs(uv: location<0, vec2>): vec4 { … });',
+      cases: cases(
+        ['uv = (0, 0)', 'uv = (0.5, 0.5)', 'uv = (1, 0)'],
+        ['colour at (0, 0)', 'colour at (0.5, 0.5)', 'colour at (1, 0)'],
+      ),
+      related: ['vertex', 'compute'],
+    },
+    compute: {
+      setup:
+        'export const main = compute([64], function main(gid: builtin<"global_invocation_id", vec3u>): void { … });',
+      cases: cases(
+        ['gid.x = 0', 'gid.x = 63', 'gid.x = 64'],
+        ['workgroup 0, lane 0', 'workgroup 0, lane 63', 'workgroup 1, lane 0'],
+      ),
+      related: ['workgroup_size', 'storage'],
+    },
+    workgroup_size: {
+      setup:
+        'export const scale = workgroup_size([128], function scale(xs: array<f32>): void { … });',
+      cases: cases(
+        ['no workgroup_size', 'workgroup_size([128], f)', 'a loop that reduces'],
+        ['64', '128', '256'],
+      ),
+      related: ['compute', 'numerics'],
+    },
+    numerics: {
+      setup: 'const f = numerics(["finite-math"], function f(x: f32): f32 { return x * 0.; });',
+      cases: cases(
+        ['no contract', 'numerics(["finite-math"], f)', 'the CPU oracle'],
+        ['x * 0. is kept', 'x * 0. folds to 0.', 'x * 0. is kept'],
+      ),
+      related: ['workgroup_size', 'compute'],
     },
     uniform: {
-      setup: 'class Params { scale: f32; }\ndeclare const u: uniform<Params>;',
+      setup: 'class Params { scale!: f32; }\ndeclare const u: uniform<Params>;',
       cases: cases(
         [
           'host: u.scale = 1; shader: u.scale',

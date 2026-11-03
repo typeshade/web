@@ -375,6 +375,14 @@ id first, then the pull request that did the work.
 - 0108: a host view carries the author's JSDoc. No page of this site copies the host-view
   listing of surface §64; the quick start's host setup (en and ko) says that a view carries the
   comment written above each export. Handled in #25.
+- 0111: an entry and its inputs and outputs in plain TypeScript. Every `"use typeshade"`
+  program the site holds (guide and concept samples, error-code triggers and fixes, mapping
+  snippets, Playground starters, the live-shader prelude, the front page) is rewritten with the
+  compiler's `migrateSource`; the copy in both dictionaries names stage calls and attribute
+  types; the language reference gains a Stage calls family and reads the attribute types; the
+  Korean guide sections the new `AUTHORING.md` changed are translated again. typeplot v0.2.1's
+  shader files are read through the same codemod until a typeplot release writes the new form
+  (`src/lib/typeplot-shaders.ts`). Handled in #25.
 - 0112: one spelling. `Math.pow` replaces `pow` in the TS8003 line, the TS8004 line names a
   removed builtin and Rule 9.9 (en and ko); the function demos, lessons and stills of `log10`,
   `log1p`, `expm1`, `cbrt` and `hypot`, and the operation lessons of `arrayLength`, `none` and

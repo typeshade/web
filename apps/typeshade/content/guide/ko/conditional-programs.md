@@ -1,7 +1,7 @@
 ---
 id: conditional-programs
-source: d19efbaf735c59350ca903ccffb0775c6015e3b78a9cad962de988ea42e3432d
-sourceLine: 2056
+source: f9aac38fefeb954e14521f645eb450a7b6857b645a44db31deb6867e13568684
+sourceLine: 2127
 ---
 
 조건부 프로그램은 한 코드베이스에서 필요한 변형을 선택해 생성하는 방식입니다. 이 페이지는 프로그램 구조가 다른 변형, 상수만 다른 변형, 호스트가 선택하는 변형을 구분하고, 변형별 캐시 키를 구성하는 방법을 설명합니다.
@@ -28,10 +28,9 @@ export function shadeHeight(h: f32): vec4 {
 
 import { shadeHeight } from "./terrain.shade.ts";
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return shadeHeight(0.);
-}
+});
 
 // terrain-dem.shade.ts
 "use typeshade";
@@ -41,10 +40,9 @@ import { shadeHeight } from "./terrain.shade.ts";
 declare const dem: texture_2d<f32>;
 declare const demSampler: sampler;
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return shadeHeight(textureSample(dem, demSampler, uv).x);
-}
+});
 ```
 
 파일은 호스트가 고릅니다.
@@ -81,10 +79,9 @@ export function shade(base: f32): f32 {
   return acc;
 }
 
-@fragment
-export function fs(@location(0) v: f32): vec4 {
+export const fs = fragment(function fs(v: location<0, f32>): vec4 {
   return vec4(shade(v), 0., 0., 1.);
-}
+});
 ```
 
 WGSL은 `override quality: f32 = 1.0;`을 생성하고, 호스트는 파이프라인의 `constants`로 값을

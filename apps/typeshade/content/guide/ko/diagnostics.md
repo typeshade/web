@@ -1,8 +1,8 @@
 ---
 id: diagnostics
-source: 80bc39adb1481ce36f7c47155425b2cd3f8965b80e87a65b18cf8ba140bb834d
-sourceLine: 1786
-rules: 12.2 i81jajIqKPFQCmZ8J1MOkejuMSPX2dkEGKTlWS3-yBQ=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 6.2 X1TddP_Ob7b4QaR9Qbuoo1UgPCngNA5JdtbbWwd_lOc=, 6.10 suiaQZS1y-SaWxDmJXHL21Qzp_yYkddUlpCNV8AsLVc=, 8.13 aNXyjNJvi1bR7zPmCgF2WJ0PmaP_Qk6WWqXOOuEbzCg=, 8.14 SP-Fa9DtpBru_e2Zuh3x8ZUFrqweaTrNrJs-c8RHbE0=, 8.17 iy_UhoCMHYdgpfUXu8eRAllyZo67mQ2c6BRfQtMcIYY=, 6.6 qXyf0FpXuS4xir_HpHadSIsWFZT2WtMx8M-wm9BvJOE=, 12.3 CjhXTenX6H0V0STxt5Bka_Sp7X0GVUeCZR9Mt1IqNvA=
+source: 3f961c358d0e0f6e48b3677f0a93cb67738c444a24356ffb9f613d86fcb32cd7
+sourceLine: 1969
+rules: 12.2 i81jajIqKPFQCmZ8J1MOkejuMSPX2dkEGKTlWS3-yBQ=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 6.2 X1TddP_Ob7b4QaR9Qbuoo1UgPCngNA5JdtbbWwd_lOc=, 6.10 suiaQZS1y-SaWxDmJXHL21Qzp_yYkddUlpCNV8AsLVc=, 8.13 aNXyjNJvi1bR7zPmCgF2WJ0PmaP_Qk6WWqXOOuEbzCg=, 8.14 SP-Fa9DtpBru_e2Zuh3x8ZUFrqweaTrNrJs-c8RHbE0=, 8.17 iy_UhoCMHYdgpfUXu8eRAllyZo67mQ2c6BRfQtMcIYY=, 6.6 2moXxSw3cZPNxiaa9uRTWOFZn7M2pZk2ypG0F6f0ymk=, 12.3 CjhXTenX6H0V0STxt5Bka_Sp7X0GVUeCZR9Mt1IqNvA=
 ---
 
 진단은 컴파일 오류와 경고, 모듈 검사 결과를 전달합니다. 이 페이지는 진단 코드에 따른 분기, 전체 진단 보고서, 소스 위치 추적을 설명합니다.
@@ -45,7 +45,7 @@ try {
 }
 ```
 
-varying이 `@interpolate("linear")`인 모듈은 GLSL ES 3.00에 대응하는 형태가 없습니다. 이 모듈로
+varying이 `location<n, T, { interpolate: "linear" }>`인 모듈은 GLSL ES 3.00에 대응하는 형태가 없습니다. 이 모듈로
 호출하면 코드가 `SD0030`인 `UnsupportedFeatureError`가 이 메시지와 함께 던져집니다.
 
 ```
