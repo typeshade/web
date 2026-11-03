@@ -454,18 +454,18 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
     },
     {
       id: 'referenceParameter',
-      ts: 'function swap(@inout a: f32, @inout b: f32): void {\n  const t = a\n  a = b\n  b = t\n}\nexport function order(x: f32, y: f32): f32 {\n  let lo = x\n  let hi = y\n  if (lo > hi) {\n    swap(lo, hi)\n  }\n  return hi - lo\n}',
+      ts: 'function swap(a: inout<f32>, b: inout<f32>): void {\n  const t = a\n  a = b\n  b = t\n}\nexport function order(x: f32, y: f32): f32 {\n  let lo = x\n  let hi = y\n  if (lo > hi) {\n    swap(lo, hi)\n  }\n  return hi - lo\n}',
       pick: ['swap', 'order'],
     },
     {
       id: 'outParameter',
-      ts: 'function add(a: f32, b: f32, @out c: f32): void {\n  c = a + b\n}\nexport function sum(x: f32, y: f32): f32 {\n  let s: f32\n  add(x, y, s)\n  return s\n}',
+      ts: 'function add(a: f32, b: f32, c: out<f32>): void {\n  c = a + b\n}\nexport function sum(x: f32, y: f32): f32 {\n  let s!: f32\n  add(x, y, s)\n  return s\n}',
       pick: ['add', 'sum'],
     },
     {
       id: 'referenceAlias',
       before:
-        'function swap(@inout a: f32, @inout b: f32): void {\n  const t = a\n  a = b\n  b = t\n}',
+        'function swap(a: inout<f32>, b: inout<f32>): void {\n  const t = a\n  a = b\n  b = t\n}',
       ts: 'export function twice(x: f32): f32 {\n  let v = x\n  swap(v, v)\n  return v\n}',
       refused: true,
     },
@@ -510,13 +510,13 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
       id: 'callStatement',
       before:
         'declare const dst: storage<array<f32>, "read_write">\n\nfunction store(i: u32, v: f32): void {\n  dst[i] = v\n}',
-      ts: '@compute([64, 1, 1])\nexport function main_k(\n  @builtin("global_invocation_id") gid: vec3u\n): void {\n  store(gid.x, 1.)\n}',
+      ts: 'export const main_k = compute([64, 1, 1], function main_k(\n  gid: builtin<"global_invocation_id", vec3u>\n): void {\n  store(gid.x, 1.)\n});',
       pick: ['main_k'],
     },
     {
       id: 'phonyAssign',
       before: 'declare const hits: storage<array<atomic<u32>>, "read_write">',
-      ts: '@compute([64, 1, 1])\nexport function main_k(\n  @builtin("global_invocation_id") gid: vec3u\n): void {\n  atomicAdd(hits[gid.x], 1)\n}',
+      ts: 'export const main_k = compute([64, 1, 1], function main_k(\n  gid: builtin<"global_invocation_id", vec3u>\n): void {\n  atomicAdd(hits[gid.x], 1)\n});',
       pick: ['main_k'],
     },
     {
@@ -670,7 +670,7 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
     },
     {
       id: 'discardRow',
-      ts: '@fragment\nexport function fs(\n  @builtin("position") frag: vec4\n): vec4 {\n  if (frag.x < 0.5) {\n    discard\n  }\n  return vec4(1.)\n}',
+      ts: 'export const fs = fragment(function fs(\n  frag: builtin<"position", vec4>\n): vec4 {\n  if (frag.x < 0.5) {\n    discard\n  }\n  return vec4(1.)\n});',
       pick: ['fs'],
     },
   ],
@@ -795,7 +795,7 @@ const SPECS: Record<LoweringSectionKey, readonly RowSpec[]> = {
     },
     {
       id: 'f64Varying',
-      ts: '@fragment\nexport function fs(\n  @location(0) depth: f64\n): vec4 {\n  return vec4(f32(depth))\n}',
+      ts: 'export const fs = fragment(function fs(\n  depth: location<0, f64>\n): vec4 {\n  return vec4(f32(depth))\n});',
       refused: true,
     },
   ],

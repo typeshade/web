@@ -154,7 +154,7 @@ export function demoSource(demo: FunctionDemo): string {
 
 import { PlotUniforms, plot2D, plot3D } from "./function-plot.shade.ts";
 
-${demo.k ? 'class Uniforms extends PlotUniforms { k: f32; }' : 'class Uniforms extends PlotUniforms {}'}
+${demo.k ? 'class Uniforms extends PlotUniforms { k!: f32; }' : 'class Uniforms extends PlotUniforms {}'}
 declare const u: uniform<Uniforms>;
 
 // Inputs outside the mathematical domain are omitted, including after pan or zoom.
@@ -167,13 +167,12 @@ function trajectory(t: f32): vec3 {
   return vec3(t, sample(t), 0.);
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const flat = plot2D(sample, uv, u, ${jumps});
   if (u.plotBlend <= 0.) { return flat; }
   const space = plot3D(trajectory, uv, u, ${jumps});
   return mix(flat, space, clamp(u.plotBlend, 0., 1.));
-}
+});
 `;
 }
 

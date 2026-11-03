@@ -73,14 +73,13 @@ const FUNCTIONS: readonly string[] = [
 ];
 
 // One fragment shader for the operators. Each line is picked from both emits by its name.
-const OPERATORS = `@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+const OPERATORS = `export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   const below: vec2b = uv < vec2(0.5, 0.25)
   const floorMod = mod(uv.x, 0.5)
   const truncMod = uv.x % 0.5
   const even = round(uv.x)
   return vec4(floorMod + f32(below.x), truncMod, even, 1.)
-}
+});
 `;
 
 /** The right-hand side of an emitted `let name = …;` or `type name = …;` line. */

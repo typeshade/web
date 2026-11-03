@@ -38,7 +38,7 @@ const headings = [...learningHeadings, ...[c.invocationH, c.memoryH, c.callsH, c
   <section>
     <h2 id={slugify(c.invocationH)}>{c.invocationH}</h2>
     <p>{c.invocationP}</p>
-    <TypeShadeCode code={`@compute([64, 1, 1])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  pixels[gid.x] = camera.pos.x\n}`} />
+    <TypeShadeCode code={`export const paint = compute([64, 1, 1], function paint(gid: builtin<"global_invocation_id", vec3u>) {\n  pixels[gid.x] = camera.pos.x\n});`} />
     <p><Rich text={c.invocationRule} locale={locale} /></p>
   </section>
 

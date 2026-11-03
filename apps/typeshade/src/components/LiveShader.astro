@@ -27,8 +27,8 @@ interface Props {
   /** What the canvas is showing, for the accessible name. From the dictionaries. */
   title: string;
   /** The sample: a whole file, the way a Book of Shaders page shows a whole `.frag`. A sample
-   *  that declares no `@vertex` entry is compiled behind the fullscreen-triangle vertex half
-   *  (src/lib/live-shader-contract.ts) and takes `uv` as a `@location(0)` parameter; one that
+   *  that declares no `vertex(f)` entry is compiled behind the fullscreen-triangle vertex half
+   *  (src/lib/live-shader-contract.ts) and takes `uv` as a `location<0, vec2>` parameter; one that
    *  declares both stages is compiled as written. Code is not copy, so it stays on the page
    *  that uses it. */
   code: string;

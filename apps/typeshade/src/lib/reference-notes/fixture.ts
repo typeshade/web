@@ -8,16 +8,15 @@ import type { NoteRecord, NoteStill } from './index.ts';
 const curve = `"use typeshade"
 
 class Uniforms {
-  k: f32
+  k!: f32
 }
 declare const u: uniform<Uniforms>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const y = exp2(u.k * uv.x) / exp2(u.k)
   const inside = step(uv.y, y)
   return vec4(mix(vec3(0.94), vec3(0.09, 0.47, 1.0), inside), 1.)
-}
+});
 `;
 
 /** The oracle's exp2 against JavaScript's power of two, on whole exponents, where both are

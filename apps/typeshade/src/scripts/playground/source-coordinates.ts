@@ -53,7 +53,7 @@ export function compose(source: string): {
   if (
     !directive ||
     sampleShape(source) === 'module' ||
-    !/@fragment\b/.test(code) ||
+    !/=\s*fragment\s*\(|@fragment\b/.test(code) ||
     PRELUDE_DECLARES.test(code)
   ) {
     return { text: source, at: 0, lines: 0 };

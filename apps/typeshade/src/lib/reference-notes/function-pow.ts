@@ -12,7 +12,7 @@ const curve = `"use typeshade"
 
 import { PlotViewport, plotFilled } from "./function-plot.shade.ts";
 
-class Uniforms extends PlotViewport { k: f32; }
+class Uniforms extends PlotViewport { k!: f32; }
 declare const u: uniform<Uniforms>;
 
 // At k = 2, pow(0.5, 2.) = 0.25. The imported renderer draws the reference diagonal y = x.
@@ -24,17 +24,16 @@ function sample(x: f32): f32 {
   return y;
 }
 
-@fragment
-export function curve(@location(0) uv: vec2): vec4 {
+export const curve = fragment(function curve(uv: location<0, vec2>): vec4 {
   return plotFilled(sample, uv, u);
-}
+});
 `;
 
 const negative = `"use typeshade"
 
 import { PlotViewport, plotComparison } from "./function-plot.shade.ts";
 
-class Uniforms extends PlotViewport { k: f32; }
+class Uniforms extends PlotViewport { k!: f32; }
 declare const u: uniform<Uniforms>;
 
 function signedCurve(x: f32): f32 {
@@ -49,24 +48,22 @@ function rawCurve(x: f32): f32 {
   return bare;
 }
 
-@fragment
-export function plot(@location(0) uv: vec2): vec4 {
+export const plot = fragment(function plot(uv: location<0, vec2>): vec4 {
   return plotComparison(signedCurve, rawCurve, uv, u);
-}
+});
 `;
 
 const specular = `"use typeshade"
 
 class Uniforms {
-  resolution: vec2
-  light: vec2
-  shininess: f32
+  resolution!: vec2
+  light!: vec2
+  shininess!: f32
 }
 
 declare const u: uniform<Uniforms>
 
-@fragment
-export function sphere(@location(0) uv: vec2): vec4 {
+export const sphere = fragment(function sphere(uv: location<0, vec2>): vec4 {
   // A sphere of radius 1 at the centre. x is scaled by the aspect so the sphere stays round.
   const p = (uv - 0.5) * vec2(u.resolution.x / u.resolution.y, 1.) * 2.4
   const r2 = dot(p, p)
@@ -83,7 +80,7 @@ export function sphere(@location(0) uv: vec2): vec4 {
   // The last pixel inside the outline blends into the background, so the edge is smooth.
   const edge = smoothstep(1. - fwidth(r2), 1., r2)
   return vec4(r2 < 1. ? mix(ball, background, edge) : background, 1.)
-}
+});
 `;
 
 /** A small function of `x` and `y` with `body` returning an f32. */

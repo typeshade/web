@@ -421,46 +421,43 @@ const brightness = (colour) => {
 // `parens: 'minimal'` has parentheses left to drop. The default sample folds to constants.
 const UNFOLDABLE = `"use typeshade";
 
-class VsOut {
-  @builtin("position") pos: vec4;
-  @location(0) uv: vec2;
+interface VsOut {
+  pos: builtin<"position", vec4>;
+  uv: location<0, vec2>;
 }
 
-class Color {
-  @location(0) color: vec4;
+interface Color {
+  color: location<0, vec4>;
 }
 
-@fragment
-export function fs(v: VsOut): Color {
+export const fs = fragment(function fs(v: VsOut): Color {
   const a = v.uv.x * 2. + v.uv.y * 3. - 1.;
   const b = a * a + a * 2.;
   return { color: vec4(b, a - b * 3., a * b + 1., 1.) };
-}
+});
 `;
 
 // A float the f32 mode can shorten: 0.30000001192092896 is the f64 printout of the f32
 // nearest 0.3, so `.3` loads the same bits and the lossless mode has to keep every digit.
 const LONG_LITERAL = `"use typeshade";
 
-class Clip {
-  @builtin("position") pos: vec4;
+interface Clip {
+  pos: builtin<"position", vec4>;
 }
 
-class Color {
-  @location(0) color: vec4;
+interface Color {
+  color: location<0, vec4>;
 }
 
-@vertex
-export function vs(@builtin("vertex_index") i: u32): Clip {
+export const vs = vertex(function vs(i: builtin<"vertex_index", u32>): Clip {
   const k = 0.30000001192092896;
   const x = i === 1 ? k : -k;
   return { pos: vec4(x, k, 0., 1.) };
-}
+});
 
-@fragment
-export function fs(): Color {
+export const fs = fragment(function fs(): Color {
   return { color: vec4(0.30000001192092896, 0., 0., 1.) };
-}
+});
 `;
 
 // A fragment program and nothing else: no vertex entry, so the page compiles it behind the
@@ -468,15 +465,14 @@ export function fs(): Color {
 // mistake below is on its line 9, which is where the diagnostics have to land.
 const FRAGMENT_ONLY = `"use typeshade"
 
-class Color {
-  @location(0) color: vec4
+interface Color {
+  color: location<0, vec4>
 }
 
-@fragment
-export function fs(@location(0) uv: vec2): Color {
+export const fs = fragment(function fs(uv: location<0, vec2>): Color {
   const stripe = fract(uv.x * 8.);
   return { color: vec4(stripe, uv.y, 1. - stripe, 1.) };
-}
+});
 `;
 
 /** A page that reports what the CDN did, and fetches through Node when asked to. The shared
@@ -841,35 +837,33 @@ const slide = (page, selector, value) =>
 const TWO_BLOCKS = `"use typeshade"
 
 class Look {
-  tint: vec4
-  gain: f32
+  tint!: vec4
+  gain!: f32
 }
 
 class Clock {
-  time: f32
-  speed: f32
+  time!: f32
+  speed!: f32
 }
 
 declare const look: uniform<Look>
 declare const clock: uniform<Clock>
 
-class VsOut {
-  @builtin("position") pos: vec4
-  @location(0) uv: vec2
+interface VsOut {
+  pos: builtin<"position", vec4>
+  uv: location<0, vec2>
 }
 
-@vertex
-export function vs(@builtin("vertex_index") idx: u32): VsOut {
+export const vs = vertex(function vs(idx: builtin<"vertex_index", u32>): VsOut {
   const x = f32(idx & 1) * 4. - 1.
   const y = f32(idx >> 1) * 4. - 1.
   return { pos: vec4(x, y, 0., 1.), uv: vec2(x, y) * 0.5 + vec2(0.5, 0.5) }
-}
+});
 
-@fragment
-export function fs(v: VsOut): vec4 {
+export const fs = fragment(function fs(v: VsOut): vec4 {
   const wave = 0.5 + 0.5 * sin(clock.time * clock.speed + v.uv.x * 12.)
   return vec4(look.tint.rgb * wave * look.gain, 1.)
-}
+});
 `;
 
 /** The canvas's pixels as one string, for telling two frames apart. */
@@ -948,26 +942,25 @@ async function checkUniformBlocks(page, problems) {
 const NESTED_UNIFORM = `"use typeshade"
 
 class Light {
-  dir: vec3
-  colour: vec3
+  dir!: vec3
+  colour!: vec3
 }
 
 class Scene {
-  key: Light
-  fills: array<Light, 2>
-  ambient: f32
+  key!: Light
+  fills!: array<Light, 2>
+  ambient!: f32
 }
 
 declare const scene: uniform<Scene>
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   const n = normalize(vec3(uv * 2. - 1., 1.))
   let c = scene.key.colour * max(dot(n, normalize(scene.key.dir)), 0.)
   c = c + scene.fills[0].colour * max(dot(n, normalize(scene.fills[0].dir)), 0.)
   c = c + scene.fills[1].colour * max(dot(n, normalize(scene.fills[1].dir)), 0.)
   return vec4(c + vec3(scene.ambient, scene.ambient, scene.ambient), 1.)
-}
+});
 `;
 
 /** A uniform struct of structs: a control for every leaf, a frame on every engine, and a
@@ -1213,7 +1206,7 @@ async function checkPixelConsole(page, problems) {
   const source = (await sourceOf(page))
     .replace(
       'export function fs(): Color {',
-      'export function fs(@builtin("position") p: vec4): Color {\n  console.log("at", p.x, p.y);',
+      'export function fs(p: builtin<"position", vec4>): Color {\n  console.log("at", p.x, p.y);',
     )
     .replace('let x = -0.8;', 'console.log("vertex", i);\n  let x = -0.8;');
   await typeSource(page, source);
@@ -1312,13 +1305,12 @@ async function checkPixelConsole(page, problems) {
 async function checkFrameConsole(page, problems) {
   const grid = (every) => `"use typeshade";
 
-@fragment
-export function main(@location(0) uv: vec2, @builtin("position") p: vec4): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>, p: builtin<"position", vec4>): vec4 {
   if (i32(p.x) % ${every} === 0 && i32(p.y) % ${every} === 0) {
     console.log("grid", p.x, p.y);
   }
   return vec4(uv, 0.5, 1.);
-}
+});
 `;
   const record = async () => {
     await openTab(page, 'console');
@@ -2197,7 +2189,7 @@ async function checkRoute(browser, origin, route) {
         );
       // And one with no directive still gets the page's own sentence about the directive,
       // which supplying a directive for the reader would hide.
-      await typeSource(page, 'class Color {\n  @location(0) color: vec4\n}\n');
+      await typeSource(page, 'class Color {\n  color!: location<0, vec4>\n}\n');
       const noDirective = (await page.innerText('[data-diagnostics]')).trim();
       if (!/use typeshade/.test(noDirective))
         problems.push(

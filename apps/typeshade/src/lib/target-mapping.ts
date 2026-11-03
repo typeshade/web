@@ -262,7 +262,7 @@ export const INTEGER_TEXTURES: readonly TypeProbe[] = [
 
 // ── the snippets the declaration and statement rows are read from ──
 
-const RESOURCE_SNIPPET = `class Camera { view: mat4 }
+const RESOURCE_SNIPPET = `class Camera { view!: mat4 }
 declare const camera: uniform<Camera>
 declare const src: storage<array<f32>>
 declare const dst: storage<array<f32>, "read_write">
@@ -272,34 +272,30 @@ const tint: override<f32> = 0.85
 let tile: workgroup<array<f32, 64>>
 let seed: u32 = 7
 
-@compute([64, 1, 1])
-export function k(@builtin("global_invocation_id") gid: vec3u): void {
+export const k = compute([64, 1, 1], function k(gid: builtin<"global_invocation_id", vec3u>): void {
   tile[gid.x] = src[gid.x] * camera.view[0].x
   seed = seed * 1664525
   dst[gid.x] = tile[gid.x] + f32(seed) * tint + textureLoad(tex, vec2i(i32(gid.x), 0), 0).x
-}
+});
 `;
 
-const ENTRY_SNIPPET = `class VsIn { @location(0) pos: vec3 }
-class VsOut { @builtin("position") pos: vec4; @location(0) uv: vec2 }
+const ENTRY_SNIPPET = `interface VsIn { pos: location<0, vec3> }
+interface VsOut { pos: builtin<"position", vec4>; uv: location<0, vec2> }
 
-@vertex
-export function vs(@builtin("vertex_index") vi: u32, vin: VsIn): VsOut {
+export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>, vin: VsIn): VsOut {
   return { pos: vec4(vin.pos, f32(vi)), uv: vin.pos.xy }
-}
+});
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `;
 
 const COMPUTE_SNIPPET = `declare const dst: storage<array<f32>, "read_write">
 
-@compute([64, 1, 1])
-export function k(@builtin("global_invocation_id") gid: vec3u): void {
+export const k = compute([64, 1, 1], function k(gid: builtin<"global_invocation_id", vec3u>): void {
   dst[gid.x] = 1.
-}
+});
 `;
 
 const STATEMENT_SNIPPET = `declare const dst: storage<array<f32>, "read_write">
@@ -308,8 +304,7 @@ function bump(i: u32): void {
   dst[i] = dst[i] + 1.
 }
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   const a = uv.x * 2.
   let b = uv.y
   b = b + a
@@ -335,105 +330,92 @@ export function fs(@location(0) uv: vec2): vec4 {
     discard
   }
   return vec4(b, c, 0., 1.)
-}
+});
 `;
 
 const PHONY_SNIPPET = `declare const counter: storage<atomic<u32>, "read_write">
 declare const dst: storage<array<f32>, "read_write">
 
-@compute([64, 1, 1])
-export function k(@builtin("global_invocation_id") gid: vec3u): void {
+export const k = compute([64, 1, 1], function k(gid: builtin<"global_invocation_id", vec3u>): void {
   atomicAdd(counter, 1)
   dst[gid.x] = 1.
-}
+});
 `;
 
-const F64_SNIPPET = `class U { a: f32 }
+const F64_SNIPPET = `class U { a!: f32 }
 declare const u: uniform<U>
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   const d: f64 = f64(uv.x) * f64(u.a)
   return vec4(f32(d), 0., 0., 1.)
-}
+});
 `;
 
 const SHADOW_SNIPPET = `declare const shadowMap: texture_depth_2d
 declare const shadowSmp: sampler_comparison
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(textureSampleCompare(shadowMap, shadowSmp, uv, 0.5), 0., 0., 1.)
-}
+});
 `;
 
 const LOOSE_UNIFORM_SNIPPET = `declare const s: uniform<f32>
 
-@fragment
-export function fs(): vec4 {
+export const fs = fragment(function fs(): vec4 {
   return vec4(s, 0., 0., 1.)
-}
+});
 `;
 
 const OVERRIDE_SNIPPET = `const tint: override<f32> = 0.85
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv * tint, 0., 1.)
-}
+});
 `;
 
 const STORAGE_READ_SNIPPET = `declare const src: storage<array<f32>>
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(src[i32(uv.x)], 0., 0., 1.)
-}
+});
 `;
 
-const BARE_VERTEX_SNIPPET = `@vertex
-export function vs(@builtin("vertex_index") vi: u32): vec4 {
+const BARE_VERTEX_SNIPPET = `export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): vec4 {
   return vec4(f32(vi), 0., 0., 1.)
-}
+});
 
-@fragment
-export function fs(): vec4 {
+export const fs = fragment(function fs(): vec4 {
   return vec4(1., 0., 0., 1.)
-}
+});
 `;
 
-const FRAGCOORD_SNIPPET = `@fragment
-export function fs(@builtin("position") p: vec4): vec4 {
+const FRAGCOORD_SNIPPET = `export const fs = fragment(function fs(p: builtin<"position", vec4>): vec4 {
   return p
-}
+});
 `;
 
-const VERTEX_ID_SNIPPET = `@vertex
-export function vs(@builtin("vertex_index") vi: u32, @builtin("instance_index") ii: u32): vec4 {
+const VERTEX_ID_SNIPPET = `export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>, ii: builtin<"instance_index", u32>): vec4 {
   return vec4(f32(vi), f32(ii), 0., 1.)
-}
+});
 
-@fragment
-export function fs(): vec4 {
+export const fs = fragment(function fs(): vec4 {
   return vec4(1., 0., 0., 1.)
-}
+});
 `;
 
-const FRONT_FACING_SNIPPET = `class Out { @builtin("frag_depth") depth: f32; @location(0) color: vec4 }
+const FRONT_FACING_SNIPPET = `interface Out { depth: builtin<"frag_depth", f32>; color: location<0, vec4> }
 
-@fragment
-export function fs(@builtin("front_facing") facing: bool): Out {
+export const fs = fragment(function fs(facing: builtin<"front_facing", bool>): Out {
   return { depth: 0.5, color: vec4(f32(facing), 0., 0., 1.) }
-}
+});
 `;
 
-const UBO_SNIPPET = `class Block { scale: f32; tint: vec3 }
+const UBO_SNIPPET = `class Block { scale!: f32; tint!: vec3 }
 declare const u: uniform<Block>
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv * u.scale, u.tint.x, 1.)
-}
+});
 `;
 
 // ── the WGSL page ──
@@ -546,19 +528,19 @@ function buildWgsl(): WgslMapping {
       ),
     ],
     stages: [
-      row('vertex', pick(entries, '@vertex', 'entry snippet'), '@vertex'),
-      row('fragment', pick(entries, '@fragment', 'entry snippet'), '@fragment'),
-      row('compute', pick(computeEntry, '@compute', 'compute snippet'), '@compute([64, 1, 1])'),
+      row('vertex', pick(entries, '@vertex', 'entry snippet'), 'vertex(f)'),
+      row('fragment', pick(entries, '@fragment', 'entry snippet'), 'fragment(f)'),
+      row('compute', pick(computeEntry, '@compute', 'compute snippet'), 'compute([64, 1, 1], f)'),
       row(
         'location',
         pick(entries, '@location(0) uv: vec2<f32>,', 'entry snippet').replace(/,$/, ''),
-        '@location(0) uv: vec2',
+        'uv: location<0, vec2>',
       ),
       row('vertexBare', returnOf(pick(bareVertex, 'fn vs(', 'bare vertex snippet')), ': vec4'),
       row(
         'vertexStruct',
         pick(entries, '@builtin(position) pos:', 'entry snippet').replace(/,$/, ''),
-        '@builtin("position") pos: vec4',
+        'pos: builtin<"position", vec4>',
       ),
       row('fragmentReturn', returnOf(pick(entries, 'fn fs(', 'entry snippet')), ': vec4'),
     ],
@@ -585,7 +567,7 @@ function buildWgsl(): WgslMapping {
       row(
         'struct',
         pickBlock(emitted(ENTRY_SNIPPET).wgsl, 'struct VsIn {', '}', 'entry snippet'),
-        'class VsIn { @location(0) pos: vec3 }',
+        'interface VsIn { pos: location<0, vec3> }',
       ),
       row('fn', pick(statements, 'fn bump(', 'statement snippet'), 'function bump(i: u32): void'),
     ],
@@ -596,7 +578,7 @@ function buildWgsl(): WgslMapping {
     return {
       id: name,
       wgsl: `@builtin(${name})`,
-      source: `@builtin("${name}")`,
+      source: `builtin<"${name}", T>`,
       type: fixed ? wgslBackend.typeName(fixed) : null,
     };
   });
