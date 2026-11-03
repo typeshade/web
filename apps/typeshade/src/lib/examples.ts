@@ -453,7 +453,7 @@ export const facts = {
 // asks for a copy decision. Comparing them only at the commit the copy was written at left
 // the check inert from the next pin on, which is when it has something to catch.
 const pinned = {
-  commit: 'cdb12dc0',
+  commit: 'e30bbe57',
   shadeExamples: 102,
   shadeRenderable: 76,
   fp64Examples: 12,
@@ -465,29 +465,26 @@ const pinned = {
   constructRows: 74,
   wgslBuiltinIds: 18,
   glslCapabilities: 5,
-  languageEntries: 340,
-  languageTypes: 65,
+  languageEntries: 334,
+  languageTypes: 69,
   languageAttributes: 12,
   languageBuiltinValues: 18,
-  languageFunctions: 196,
-  languageConstants: 8,
+  languageFunctions: 192,
+  languageConstants: 2,
   languageMathMembers: 41,
-  errorCodesTs: 51,
+  errorCodesTs: 52,
   errorCodesSd: 36,
   errorCodesRetired: 2,
-  rules: 132,
-  rulesTest: 121,
+  rules: 134,
+  rulesTest: 123,
   rulesCode: 2,
   rulesPending: 0,
   rulesReview: 9,
-  rulesSurfaceSections: 51,
-  // The pin before this one on main is 3e1e8420: this pin advances across the intermediate
-  // pins the bot's branch carried (03aedde, 8c088df), and the displayed rule history counts
-  // every rule added and changed since 3e1e8420, as main's first-parent history reads it. A
-  // build of the branch itself sees the intermediate pin and smaller counts.
-  rulesAdded: 7,
+  rulesSurfaceSections: 52,
+  // The rule history counts the rules added and changed since cdb12dc0, the pin before this one.
+  rulesAdded: 2,
   rulesRemoved: 0,
-  rulesChanged: 23,
+  rulesChanged: 14,
 };
 const drift: string[] = [];
 if (facts.shadeExamples !== pinned.shadeExamples)
