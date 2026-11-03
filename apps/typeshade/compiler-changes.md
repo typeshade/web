@@ -386,3 +386,6 @@ id first, then the pull request that did the work.
   declarations (`f32` of the IR builder and of the runtime) gets a page for each; no page copies
   the §64 host values table, and the quick start (en and ko) says that a view spells each type
   with the shader's own name. Handled in #25.
+- 0118: each fuse group names its tier. The control-flow page's fuse report paragraph (en and
+  ko) says each group names its `tier` and why it ran on a later tier than the plan's, and the
+  `FuseReport` reference and its Korean translation read the new field. Handled in #25.
