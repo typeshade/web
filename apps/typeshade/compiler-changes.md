@@ -366,3 +366,9 @@ id first, then the pull request that did the work.
   example joins the compute group, the Playground picker and the stills' no-GLSL list with its
   Korean title and description; the three new exports are translated. Handled in #14. The
   unified benchmark's four fixed WGSL cases become TypeShade source in #22, which waits on this pin.
+- 0107: a function's numerical contract, `numerics([...], f)` and a stage call's `numerics`
+  option. The language reference lists `numerics` with the stage calls (en and ko), read from
+  the compiler's `STAGE_CALL_DOCS`; `TS8078` has an error-code page with a trigger (an unknown
+  class) and a fix; the pages generated from Rules 6.7 and 11.22 were read against the rules at
+  the pin; `NumericsClass` and the `numerics` member of `FuncDecl` are translated. Handled in
+  #25.
