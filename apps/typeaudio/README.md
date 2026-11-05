@@ -75,3 +75,37 @@ the older all-site setup workflow, which deliberately disables operations.
 
 Rollback uses the captured Worker version. Re-enable the old publisher only after
 disabling new publishing; two repositories must not deploy this Worker together.
+
+## Video sound studio
+
+Open `/studio/video/`, choose a local video or explicitly load a YouTube reference,
+and pause on an action. Select a preset or saved designer patch and add a cue at
+that position. Edit cue time, level, pitch, note hold and release in the inspector;
+duplicate, mute, audition or delete cues as needed. **Use sound with video** in the sound
+designer passes the current patch to the studio. Each cue retains its own patch.
+
+- Up to 24 cues; each scene range spans at most 60 seconds within the first hour.
+  Original video and added effects have independent listening levels.
+- Cue audio uses the existing finite CPU renderer and cached PCM. Live LFO
+  modulation is excluded. Editing a cue pauses playback while its sound prepares.
+- Local video uses an object URL and is never uploaded. Projects store references
+  and patch settings, not media bytes. Re-select local media after reopening.
+- YouTube uses the [official IFrame API](https://developers.google.com/youtube/iframe_api_reference)
+  only after Load YouTube. Embedded playback depends on the video and network.
+  Synchronization is approximate; this is not a frame-accurate video editor.
+- Preview follows the media clock, stops cues when playback pauses or buffers,
+  and reschedules at seeks, loops, rate changes and clock drift. Local video also
+  needs device-level latency measurement; no sample-accurate sync is claimed.
+- Export effects WAV writes the selected range as mono 48 kHz, 16-bit PCM, with
+  silence between cues and tails cropped at the boundaries. It excludes original
+  video audio. Overlapping samples clamp at full scale, with a clipping notice.
+  No video muxing, YouTube downloading or original-audio extraction is performed.
+- Browser storage autosaves one scene. Export/open JSON preserves the project;
+  invalid files are rejected before replacing the current scene. Undo retains
+  up to 30 scene snapshots and resets when media is replaced or a project opens.
+
+`test:browser` runs both designer and video checks. Video coverage uses an actual
+four-second VP8/WebM fixture generated with FFmpeg's `testsrc2` source (160×90,
+12 fps, 40 kbps; no third-party media). The YouTube adapter test is deterministic
+and mocked, including blocked API recovery; it does not establish external video
+availability. Desktop and mobile screenshots are written to ignored `artifacts/`.

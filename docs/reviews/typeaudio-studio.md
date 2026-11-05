@@ -59,3 +59,33 @@ The owner approved publication and the repository transition. The studio is live
 from the web repository; [the cutover record](../repository-migration.md#typeaudio-production-transfer-completed)
 contains workflow runs, version IDs and external browser validation. The earlier
 prepared-state statements in this review describe the original PR stage.
+
+## Video scene studio — 2026-11-05
+
+Added `/studio/video/` with local video, explicitly loaded YouTube references,
+24 patch-backed cues, a 60-second scene range, playback/seek/loop controls,
+independent listening levels, cue editing and audition, undo, browser autosave,
+JSON project exchange and effects-only WAV export. The existing designer sends
+its current patch to this page; saved patches and six presets are also available.
+The engine pin, original source worktree and hosting configuration are unchanged.
+
+Reviewed the new English page, input labels, empty/error states, source privacy
+text, project persistence instructions, export limits and designer navigation.
+The UI discloses finite CPU rendering without live LFO, approximate YouTube sync,
+local media re-selection and exclusion of original audio/video from WAV export.
+The scope remains English-only. This is a cue workspace, not a full video editor.
+
+Validation: shader/TypeScript check, 19 unit tests and production build pass.
+The existing full designer browser suite passes, including actual CPU/WebGPU PCM
+agreement within 1/32768 and continuous AudioWorklet edits. New browser checks
+exercise real CPU cue PCM, leading silence and muted WAV output, undo and cue
+edits, project rejection/round trip/persistence, designer patch transfer, actual
+WebM playback, range/end-of-video looping, pause stopping scheduled audio nodes,
+volume controls, and 320/390px overflow checks. Desktop and mobile screenshots
+were inspected; a mobile aspect-ratio overflow was fixed. The deterministic
+YouTube adapter transport and blocked-API recovery tests pass; those tests use a
+mock API and do not prove external video availability or device latency.
+
+An external YouTube IFrame API load was also attempted from the execution
+environment; the connection failed and the page displayed its recovery message.
+External YouTube playback is therefore unverified, separately from adapter tests.

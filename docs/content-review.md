@@ -107,3 +107,7 @@ TypeShade, TypeNN and TypeCV. Follow-up revision checks are recorded separately.
 The new TypeAudio application has a bounded English UI review and local audio/browser
 validation recorded in [TypeAudio studio integration](reviews/typeaudio-studio.md).
 The original three-site review and production ownership above are unchanged.
+
+The video scene studio follow-up has a separate bounded English UI review and
+actual local-video/PCM browser checks in the same TypeAudio review record. No
+new translated or full imported-document review is claimed by this addition.

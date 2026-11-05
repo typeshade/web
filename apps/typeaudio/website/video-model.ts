@@ -1,0 +1,163 @@
+import { validatePatch, type Patch } from "./designer.ts";
+export const MAX_CUES = 24;
+export interface Cue {
+  id: string;
+  name: string;
+  time: number;
+  gain: number;
+  muted: boolean;
+  patch: Patch;
+}
+export interface Scene {
+  version: 1;
+  name: string;
+  media: { kind: "none" | "file" | "youtube"; name: string; id?: string };
+  start: number;
+  end: number;
+  loop: boolean;
+  original: number;
+  effects: number;
+  cues: Cue[];
+}
+export const emptyScene = (): Scene => ({
+  version: 1,
+  name: "Untitled scene",
+  media: { kind: "none", name: "" },
+  start: 0,
+  end: 10,
+  loop: true,
+  original: 0.5,
+  effects: 0.7,
+  cues: [],
+});
+function number(value: unknown, min: number, max: number): number {
+  if (
+    typeof value !== "number" ||
+    !Number.isFinite(value) ||
+    value < min ||
+    value > max
+  )
+    throw new Error(`Expected a number between ${min} and ${max}.`);
+  return value;
+}
+function label(value: unknown): string {
+  if (typeof value !== "string" || value.length > 100)
+    throw new Error("Names must be at most 100 characters.");
+  return value;
+}
+export function youtubeId(value: string): string {
+  const url = new URL(value);
+  if (!["https:", "http:"].includes(url.protocol))
+    throw new Error("Enter a YouTube video URL.");
+  let id: string | null = null;
+  if (["youtu.be", "www.youtu.be"].includes(url.hostname))
+    id = url.pathname.slice(1);
+  else if (
+    [
+      "youtube.com",
+      "www.youtube.com",
+      "m.youtube.com",
+      "www.youtube-nocookie.com",
+    ].includes(url.hostname)
+  ) {
+    id =
+      url.pathname === "/watch"
+        ? url.searchParams.get("v")
+        : (url.pathname.match(/^\/(?:embed|shorts)\/([^/]+)\/?$/)?.[1] ?? null);
+  }
+  if (!id || !/^[-\w]{11}$/.test(id))
+    throw new Error("Use a YouTube watch, Shorts or share URL for one video.");
+  return id;
+}
+export function validateScene(raw: unknown): Scene {
+  if (!raw || typeof raw !== "object") throw new Error("Invalid scene.");
+  const s = raw as Scene;
+  if (s.version !== 1 || !Array.isArray(s.cues) || s.cues.length > MAX_CUES)
+    throw new Error("Use a version-1 scene with at most 24 cues.");
+  if (!s.media || !["none", "file", "youtube"].includes(s.media.kind))
+    throw new Error("Invalid media reference.");
+  const media: Scene["media"] = {
+    kind: s.media.kind,
+    name: label(s.media.name),
+  };
+  if (media.kind === "youtube") {
+    if (typeof s.media.id !== "string" || !/^[-\w]{11}$/.test(s.media.id))
+      throw new Error("Invalid YouTube ID.");
+    media.id = s.media.id;
+  }
+  const start = number(s.start, 0, 3600),
+    end = number(s.end, 0.05, 3600);
+  if (end <= start || end - start > 60)
+    throw new Error(
+      "Choose a scene range longer than zero and no longer than 60 seconds.",
+    );
+  if (typeof s.loop !== "boolean") throw new Error("Invalid loop setting.");
+  const ids = new Set<string>();
+  const cues = s.cues.map((c) => {
+    if (
+      !c ||
+      typeof c.id !== "string" ||
+      !/^[-\w]{1,50}$/.test(c.id) ||
+      ids.has(c.id) ||
+      typeof c.muted !== "boolean"
+    )
+      throw new Error("Invalid or duplicate cue.");
+    ids.add(c.id);
+    return {
+      id: c.id,
+      name: label(c.name),
+      time: number(c.time, 0, 3600),
+      gain: number(c.gain, 0, 1),
+      muted: c.muted,
+      patch: validatePatch(c.patch),
+    };
+  });
+  return {
+    version: 1,
+    name: label(s.name),
+    media,
+    start,
+    end,
+    loop: s.loop,
+    original: number(s.original, 0, 1),
+    effects: number(s.effects, 0, 1),
+    cues,
+  };
+}
+/** Used by both preview and WAV export, including tails crossing the range start. */
+export function cueWindow(
+  cue: Cue,
+  duration: number,
+  from: number,
+  to: number,
+): { at: number; offset: number; duration: number } | undefined {
+  const at = Math.max(from, cue.time),
+    end = Math.min(to, cue.time + duration);
+  if (cue.muted || end <= at) return;
+  return { at, offset: at - cue.time, duration: end - at };
+}
+export function mixScene(
+  scene: Scene,
+  samples: Map<string, Float32Array>,
+  rate: number,
+): { pcm: Float32Array; peak: number } {
+  const pcm = new Float32Array(Math.ceil((scene.end - scene.start) * rate));
+  for (const cue of scene.cues) {
+    const data = samples.get(cue.id);
+    if (!data || cue.muted) continue;
+    const shift = Math.round((cue.time - scene.start) * rate),
+      gain = cue.gain * scene.effects;
+    for (
+      let i = Math.max(0, -shift);
+      i < data.length && i + shift < pcm.length;
+      i++
+    )
+      pcm[i + shift]! += data[i]! * gain;
+  }
+  let peak = 0;
+  for (let i = 0; i < pcm.length; i++) {
+    peak = Math.max(peak, Math.abs(pcm[i]!));
+    pcm[i] = Math.max(-1, Math.min(1, pcm[i]!));
+  }
+  return { pcm, peak };
+}

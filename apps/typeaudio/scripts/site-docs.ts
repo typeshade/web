@@ -7,7 +7,7 @@ const escape = (s: string): string => s.replaceAll('&', '&amp;').replaceAll('"',
 const index = await readFile(`${out}/index.html`, 'utf8');
 const css = index.match(/<link[^>]+rel="stylesheet"[^>]*>/g)?.join('\n') ?? '';
 const nav = names.map(n => `<a href="/docs/${n}/">${n.replaceAll('-', ' ')}</a>`).join('');
-const urls = ['https://audio.typeshade.dev/'];
+const urls = ['https://audio.typeshade.dev/', 'https://audio.typeshade.dev/studio/video/'];
 for (const name of names) {
   const markdown = await readFile(`../../sources/typeaudio/docs/${name}.md`, 'utf8');
   let body = await marked.parse(markdown);

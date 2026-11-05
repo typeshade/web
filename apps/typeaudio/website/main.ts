@@ -361,3 +361,5 @@ function moveTone(event:PointerEvent):void{
 pad.addEventListener('pointerdown',event=>{if(event.button!==0||padPointer!==undefined)return;padPointer=event.pointerId;pad.setPointerCapture(event.pointerId);moveTone(event);});
 pad.addEventListener('pointermove',event=>{if(event.pointerId===padPointer)moveTone(event);});
 for(const name of ['pointerup','pointercancel','lostpointercapture'])pad.addEventListener(name,()=>{if(padPointer!==undefined){padPointer=undefined;remember();}});
+
+button('use-in-video').addEventListener('click',()=>{try{localStorage.setItem('typeaudio.video.designer-patch.v1',JSON.stringify({name:field('patch-name').value,patch}));location.href='/studio/video/';}catch{libraryMessage('Browser storage is unavailable. Export this patch or use a preset in Video studio.');}});
