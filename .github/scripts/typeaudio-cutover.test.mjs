@@ -22,7 +22,7 @@ test('setup creates only TypeAudio, restricts main and disables its idle publish
 });
 test('existing environment is preserved and repeated setup is idempotent',async()=>{
   const f=fixture({exists:true,rules:[{name:'main',type:'branch'}],state:'disabled_manually'});
-  await cutover('setup',f.api,env);assert.deepEqual(f.calls.filter(x=>x.method!=='GET').map(x=>x.path),['repos/typeshade/typeaudio/actions/workflows/407704055/disable']);
+  await cutover('setup',f.api,env);assert.deepEqual(f.calls.filter(x=>x.method!=='GET').map(x=>x.path),[]);
 });
 test('active old runs prevent setup before any write',async()=>{
   const f=fixture({active:true});await assert.rejects(cutover('setup',f.api,env),/runs/);assert.ok(f.calls.every(x=>x.method==='GET'));
