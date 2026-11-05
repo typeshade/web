@@ -110,3 +110,9 @@ shared CSS, persisted theme switching, and TypeNN CPU matrix results. Full app
 regression commands remain in each app's package.json and scripts directories.
 Large datasets and generated builds are ignored. Existing tracked fonts and
 example images remain with their sites; dataset hosting remains external.
+
+## TypeAudio
+
+The sound studio is in [`apps/typeaudio`](apps/typeaudio/README.md). It uses a pinned
+TypeAudio source submodule and has its own build/browser checks. Production publishing
+has not yet transferred from the TypeAudio repository.

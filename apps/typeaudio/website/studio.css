@@ -1,0 +1,24 @@
+/* Shared tokens keep spacing and control radii aligned with the web workspace. */
+.studio-intro {display:flex;align-items:center;justify-content:space-between;gap:24px;padding:36px 0 24px}
+.studio-intro h1 {font-size:clamp(28px,3vw,42px);letter-spacing:-1.5px;margin-bottom:12px}
+.studio-intro .eyebrow {margin-bottom:10px}
+.studio-intro p:not(.eyebrow) {max-width:650px;color:#53625d;margin-bottom:0}
+.studio-intro>a {flex-shrink:0}
+.designer-section {padding-top:24px}
+.performance-deck {display:grid;grid-template-columns:1fr 1fr;gap:var(--ui-space-6);margin:24px 0}
+.performance-pad,.snapshot-panel {background:#fff;border:1px solid #d3ddd5;border-radius:var(--ui-radius-panel);padding:var(--ui-space-6)}
+#xy-pad {height:180px;position:relative;overflow:hidden;touch-action:none;cursor:crosshair;border-radius:var(--ui-radius-control);background:linear-gradient(90deg,#24403a,#48796a);border:1px solid #456d60}
+#xy-pad::before {content:'';position:absolute;inset:0;background-image:linear-gradient(#ffffff14 1px,transparent 1px),linear-gradient(90deg,#ffffff14 1px,transparent 1px);background-size:25% 25%}
+.xy-caption {position:absolute;left:16px;bottom:12px;color:#d1e9df;font:11px/1.8 var(--ui-font-mono);pointer-events:none}
+#xy-point {position:absolute;width:18px;height:18px;border-radius:50%;border:2px solid white;background:#75e3bd;box-shadow:0 0 0 7px #75e3bd22;transform:translate(-50%,-50%);pointer-events:none}
+.snapshot-row {display:flex;align-items:center;gap:8px;margin:12px 0;min-width:0}
+.snapshot-row button {padding:7px 12px;font-size:13px;white-space:nowrap}
+.snapshot-row output {font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.snapshot-panel label {display:flex;justify-content:space-between;font-size:13px;margin-top:16px}
+.snapshot-panel>input {width:100%;accent-color:#176449}
+#explore-actions {display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+#explore-actions button {padding:6px 12px;font-size:12px}
+.lfo-module {grid-column:1/-1}
+.lfo-module .module-note {margin:0 0 16px}
+@media(max-width:700px){.studio-intro{display:block}.studio-intro>a{display:inline-block;margin-top:14px}.performance-deck{grid-template-columns:1fr;gap:14px}.performance-pad,.snapshot-panel{padding:18px}#xy-pad{height:150px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
