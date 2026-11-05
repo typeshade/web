@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import type { Editor, SavedSound } from "../useEditor.ts";
 import { Panel, Icon } from "./Panel.tsx";
+import { AudioLibraryPanel } from "./AudioLibraryPanel.tsx";
 import { download } from "../model.ts";
 import {
   openContext,
@@ -12,7 +13,10 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
   function actions(value: SavedSound): MenuItem[] {
     return [
       {
-        label: e.selected ? "Load into selected layer" : "Load sound",
+        label:
+          e.selected && !e.selected.audio
+            ? "Load into selected layer"
+            : "Load source sound",
         action: () => e.patch(value.patch, value.name),
       },
       {
@@ -44,7 +48,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
       },
     ];
   }
-  const [tab, setTab] = useState<"project" | "sounds">("sounds"),
+  const [tab, setTab] = useState<"project" | "sounds" | "audio">("sounds"),
     [search, setSearch] = useState("");
   const file = e.videoInput,
     patchFile = e.patchInput;
@@ -82,6 +86,9 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
         >
           Sounds
         </button>
+        <button aria-pressed={tab === "audio"} onClick={() => setTab("audio")}>
+          Audio
+        </button>
         <button
           aria-pressed={tab === "project"}
           onClick={() => setTab("project")}
@@ -89,6 +96,22 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
           Media
         </button>
       </div>
+      <input
+        id="audio-file"
+        type="file"
+        accept="audio/*,.wav,.mp3,.ogg,.flac"
+        hidden
+        ref={e.audioInput}
+        disabled={e.audioImporting}
+        onChange={(event) => {
+          const f = event.target.files?.[0];
+          event.target.value = "";
+          if (f) {
+            setTab("audio");
+            void e.importAudio(f);
+          }
+        }}
+      />
       <input
         hidden={tab !== "sounds"}
         className="asset-search"
@@ -187,6 +210,8 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
             Drag a sound onto the timeline.
           </p>
         </>
+      ) : tab === "audio" ? (
+        <AudioLibraryPanel editor={e} />
       ) : (
         <div className="media-assets">
           <button className="asset-row" onClick={() => e.workspace("picture")}>
@@ -206,7 +231,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
       )}
       <div className="project-bottom">
         <label>
-          Sound name
+          {e.selected?.audio ? "Source sound name" : "Sound name"}
           <input
             id="patch-name"
             maxLength={40}

@@ -14,6 +14,13 @@ import {
   type Cue,
   type Scene,
 } from "../video-model.ts";
+import { decodeAudioFile } from "../audio-import.ts";
+import {
+  MAX_PROJECT_BYTES,
+  packAudio,
+  unpackAudioAssets,
+  type AudioAssetRef,
+} from "../audio-asset.ts";
 import { BLANK, RECIPES } from "../sound-recipes.ts";
 import { needsLiveRenderer, soundLength } from "../sound-design.ts";
 import { wav } from "../audio.ts";
@@ -112,7 +119,12 @@ export function useEditor() {
     [ready, setReady] = useState(false),
     [samples, setSamples] = useState(new Map<string, Float32Array>());
   const videoInput = useRef<HTMLInputElement>(null),
-    patchInput = useRef<HTMLInputElement>(null);
+    patchInput = useRef<HTMLInputElement>(null),
+    audioInput = useRef<HTMLInputElement>(null);
+  const [audioAssets, setAudioAssets] = useState<AudioAssetRef[]>([]),
+    [audioRevision, setAudioRevision] = useState(0),
+    [audioImporting, setAudioImporting] = useState(false);
+  const audioRequest = useRef(0);
   const [youtubeRequest, setYouTubeRequest] = useState<{
     url: string;
     id: number;
@@ -125,8 +137,11 @@ export function useEditor() {
   const mediaEpoch = useRef(0);
   const transport = useRef<SceneTransport>(null!);
   transport.current ??= new SceneTransport();
-  const cueKey = JSON.stringify(state.scene.cues.map((c) => [c.id, c.patch]));
+  const cueKey = JSON.stringify(
+    state.scene.cues.map((c) => [c.id, c.audio ?? c.patch]),
+  );
   const preparedKey = useRef("");
+  const assetLibrary = transport.current.audio.assets;
   const sceneReady = ready && preparedKey.current === cueKey;
   const latest = useRef({ state, samples, ready: sceneReady, repeat, dry });
   latest.current = { state, samples, ready: sceneReady, repeat, dry };
@@ -195,6 +210,12 @@ export function useEditor() {
     }
   }, [state.scene, state.source, state.selected, state.selection]);
   useEffect(() => {
+    void assetLibrary
+      .list()
+      .then(setAudioAssets)
+      .catch((error) => setNotice(String(error)));
+  }, [assetLibrary, audioRevision]);
+  useEffect(() => {
     sound.current.update(state.patch, repeat, dry);
   }, [state.patch, repeat, dry]);
   useEffect(() => {
@@ -217,7 +238,7 @@ export function useEditor() {
     return () => {
       active = false;
     };
-  }, [cueKey, state.workspace, stopScene]);
+  }, [cueKey, state.workspace, stopScene, audioRevision]);
   useEffect(() => {
     transport.current.level(state.scene);
   }, [state.scene.original, state.scene.effects]);
@@ -430,6 +451,7 @@ export function useEditor() {
     setNotice("Sound clip added at playhead.");
   }
   function sourceDuration(c: Cue) {
+    if (c.audio) return c.audio.frames / SAMPLE_RATE;
     const current = latest.current;
     return current.ready && current.samples.has(c.id)
       ? current.samples.get(c.id)!.length / SAMPLE_RATE
@@ -747,20 +769,202 @@ export function useEditor() {
     const current = () =>
       request === projectRequest.current && version === editVersion.current;
     try {
-      if (file.size > 1000000)
-        throw new Error("Project files must be smaller than 1 MB.");
-      const next = validateScene(JSON.parse(await file.text()));
+      if (file.size > MAX_PROJECT_BYTES)
+        throw new Error(
+          "Project files must be smaller than 40 MB, including embedded audio.",
+        );
+      const raw = JSON.parse(await file.text()),
+        next = validateScene(raw);
+      const assets = await unpackAudioAssets(
+        raw.audioAssets,
+        next.cues.flatMap((c) => (c.audio ? [c.audio] : [])),
+      );
+      if (!current()) return;
+      await assetLibrary.put(assets);
       if (!current()) return;
       detach();
       dispatch({ type: "open", scene: next });
+      setAudioRevision((n) => n + 1);
       transport.current.seek(next.start);
       setNotice(
         next.media.kind === "none"
           ? "Project opened."
-          : `Project opened. Re-select media: ${next.media.name}`,
+          : `Project opened. Re-select video: ${next.media.name}`,
       );
     } catch (error) {
       if (current()) setNotice(`Import failed: ${String(error)}`);
+    }
+  }
+  async function exportProject() {
+    const snapshot = latest.current.state.scene;
+    try {
+      const refs = [
+        ...new Map(
+          snapshot.cues.flatMap((c) =>
+            c.audio ? [[c.audio.id, c.audio] as const] : [],
+          ),
+        ).values(),
+      ];
+      const audioAssets = [];
+      for (const ref of refs)
+        audioAssets.push(
+          packAudio({ ...ref, pcm: await assetLibrary.read(ref) }),
+        );
+      const data = JSON.stringify(
+        { ...snapshot, ...(audioAssets.length ? { audioAssets } : {}) },
+        null,
+        2,
+      );
+      download(
+        new Blob([data], { type: "application/json" }),
+        "typeaudio-scene.json",
+      );
+      setNotice(
+        audioAssets.length
+          ? "Exported project with its source audio. Re-select video when reopening."
+          : "Project exported.",
+      );
+    } catch (error) {
+      setNotice(`Export failed: ${String(error)}`);
+    }
+  }
+  function addAudioCue(audio: AudioAssetRef, at = transport.current.current()) {
+    if (latest.current.state.scene.cues.length >= MAX_CUES) {
+      setNotice("A composition can contain up to 24 sound layers.");
+      return;
+    }
+    const id = crypto.randomUUID(),
+      time = Math.max(
+        0,
+        Math.min(3600, Math.round(at * SAMPLE_RATE) / SAMPLE_RATE),
+      );
+    workspace("picture");
+    dispatch({
+      type: "edit",
+      edit: (d) =>
+        d.scene.cues.length >= MAX_CUES
+          ? d
+          : {
+              ...d,
+              selected: id,
+              selection: [id],
+              scene: {
+                ...d.scene,
+                cues: [
+                  ...d.scene.cues,
+                  {
+                    id,
+                    name: audio.name,
+                    time,
+                    gain: 1,
+                    muted: false,
+                    patch: { ...DEFAULT },
+                    audio,
+                  },
+                ],
+              },
+            },
+    });
+    setNotice(
+      "Audio clip added. Drag its edges to trim; use the top handles for fades.",
+    );
+  }
+  async function importAudio(file: File, at = transport.current.current()) {
+    const request = ++audioRequest.current,
+      version = editVersion.current;
+    setAudioImporting(true);
+    setNotice("Importing audio…");
+    try {
+      const asset = await decodeAudioFile(file);
+      if (request !== audioRequest.current) return;
+      await assetLibrary.put([asset]);
+      setAudioRevision((n) => n + 1);
+      if (request !== audioRequest.current) return;
+      if (latest.current.state.scene.cues.some((c) => c.audio?.id === asset.id))
+        setNotice(
+          "Audio source available. Existing clips keep their edits; add another copy from the Audio library.",
+        );
+      else if (editVersion.current === version)
+        addAudioCue(
+          { id: asset.id, name: asset.name, frames: asset.frames },
+          at,
+        );
+      else
+        setNotice(
+          "Audio saved in the Audio library. The composition changed during import; add the clip when ready.",
+        );
+    } catch (error) {
+      if (request === audioRequest.current)
+        setNotice(`Audio import failed: ${String(error)}`);
+    } finally {
+      if (request === audioRequest.current) setAudioImporting(false);
+    }
+  }
+  function audioInUse(id: string) {
+    const s = latest.current.state;
+    return [
+      s,
+      ...s.past,
+      ...s.future,
+      ...(s.checkpoint ? [s.checkpoint] : []),
+    ].some((d) => d.scene.cues.some((c) => c.audio?.id === id));
+  }
+  async function removeAudio(id: string) {
+    if (audioInUse(id)) {
+      setNotice("This audio is used by the composition or its undo history.");
+      return;
+    }
+    try {
+      await assetLibrary.remove(id);
+      setAudioRevision((n) => n + 1);
+      setNotice("Audio removed from this browser's library.");
+    } catch (error) {
+      setNotice(String(error));
+    }
+  }
+  async function auditionAudio(ref: AudioAssetRef) {
+    stopSound();
+    stopScene();
+    const generation = sceneAction.current;
+    try {
+      await transport.current.audio.unlock();
+      const pcm = await assetLibrary.read(ref);
+      if (generation !== sceneAction.current) return;
+      const id = "audio-preview";
+      transport.current.audio.schedule(
+        {
+          ...latest.current.state.scene,
+          start: 0,
+          end: pcm.length / SAMPLE_RATE,
+          cues: [
+            {
+              id,
+              name: ref.name,
+              time: 0,
+              gain: 1,
+              muted: false,
+              patch: { ...DEFAULT },
+              audio: ref,
+            },
+          ],
+        },
+        new Map([[id, pcm]]),
+        0,
+      );
+      setNotice(`Auditioning ${ref.name}.`);
+    } catch (error) {
+      if (generation === sceneAction.current) setNotice(String(error));
+    }
+  }
+  async function exportAudio(ref: AudioAssetRef) {
+    try {
+      const pcm = await assetLibrary.read(ref);
+      download(
+        new Blob([wav(pcm, SAMPLE_RATE)], { type: "audio/wav" }),
+        ref.name.replace(/\.[^.]+$/, "") + "-mono.wav",
+      );
+    } catch (error) {
+      setNotice(String(error));
     }
   }
   function savePatch() {
@@ -855,6 +1059,16 @@ export function useEditor() {
     mediaEpoch,
     videoInput,
     patchInput,
+    audioInput,
+    audioAssets,
+    audioImporting,
+    importAudio,
+    addAudioCue,
+    auditionAudio,
+    exportAudio,
+    removeAudio,
+    audioInUse,
+    exportProject,
     youtubeRequest,
     loadYouTube: (url: string) => setYouTubeRequest({ url, id: Date.now() }),
     state,

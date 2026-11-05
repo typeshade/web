@@ -117,7 +117,8 @@ oscillators, unison, filter, envelope, effects, LFO and automation. Select a lay
 before changing modules. Additional layers start up to five seconds later; mute,
 duplicate and delete commands operate on the selected layer. Base mute is saved
 with the sound. Layers sum directly: lower their output levels if export reports
-clipping. There is no arbitrary routing graph or sample-file source in this pass.
+clipping. Imported recordings are available as Picture clips (see below); they
+are not oscillator sources in this rack. Effect routing remains fixed.
 
 Automation edits pitch (semitones), cutoff (octaves) and post-effects layer level.
 Curves have 2–16 points spanning the layer's hold and release; the final value holds
@@ -175,8 +176,10 @@ disabling new publishing; two repositories must not deploy this Worker together.
 
 The UI is a React application under `website/editor/`. Both `/` (Sound) and
 `/studio/video/` (Picture) load the same editor. Switching workspaces retains the
-project, selected layer and in-memory local video. A selected layer's sound is
-edited directly in Sound and immediately updates that layer's patch.
+project, selected layer and in-memory local video. A selected procedural layer's
+sound is edited directly in Sound and immediately updates that layer's patch.
+When an imported audio clip is selected, Sound edits the independent source draft;
+Use in Picture adds that draft as a new procedural layer.
 
 - `model.ts` holds the shared document, selection and undo/redo reducer. History
   keeps 30 document snapshots; opening a project or replacing media resets it.
@@ -188,9 +191,12 @@ edited directly in Sound and immediately updates that layer's patch.
 - `components/WorkspaceShell` owns workspace tabs, document tools, File commands,
   transport, tool selection, export and status. `Panel` and `Splitter` provide
   shared panel structure and keyboard/pointer resizing.
-- `ProjectPanel` browses/imports sounds and media. `SoundEditor`, `SoundMonitor`,
-  `TonePad` and `Variations` compose the sound workspace. `Composition`, `Timeline`
-  and `Inspector` compose Picture; `Mixer` handles the listening levels.
+- `ProjectPanel` browses/imports sounds, audio files and video. `AudioLibraryPanel`
+  exposes audition, drag/drop, export and removal; `audio-library.ts` stores decoded
+  PCM in IndexedDB separately from document/history references. `SoundEditor`,
+  `SoundMonitor`, `TonePad` and `Variations` compose the sound workspace.
+  `Composition`, `Timeline` and `Inspector` compose Picture; `Mixer` handles the
+  listening levels.
 - `workspace.css` defines the compact neutral-gray panel system, restrained blue
   selection color, document tabs, tool rail and desktop/mobile arrangements.
   Generated engine documents use their own `docs.css`.
@@ -224,11 +230,35 @@ Space plays/pauses; V/H select the selection/hand tools; Ctrl/Cmd Z and Shift Z
 undo/redo. A group move or drag is one history entry; Escape cancels an active
 pointer edit. Shortcuts yield to text/number inputs.
 
+Project → Audio or File → Import audio adds a recording at the playhead. Drop a
+file onto a timeline row to place it at that time. WAV, MP3, Ogg and FLAC support
+depends on the browser decoder. Files must be mono or stereo, between 10 ms and
+30 seconds, and no larger than 25 MiB. Imports are resampled to 48 kHz; stereo is
+averaged to mono. The browser library holds up to 24 distinct files and 120 seconds
+of source audio. Identical decoded audio shares one stored source.
+
+Click an Audio library item to audition it; double-click, drag it or use its plus
+button to add another clip. Right-click or press Shift+F10 for file actions. Imported
+clips support the same timing, trim, fade, split, gain, mute and group edits as
+procedural clips. These edits reuse the decoded source without running synthesis.
+The Sound rack's filters, modulation and effects do not process imported clips.
+
+Files stay in this browser. Export project embeds the composition's referenced
+audio as lossless float PCM, so another browser can open the same composition.
+Project JSON is limited to 40 MiB. Re-select video separately. Missing audio blocks
+preview/WAV export with a recovery message; importing the original file or reopening
+a project with embedded audio restores the source while retaining clip edits.
+If the composition changes during a file import, the file is saved to the library
+without adding a clip. A failed decode, validation or storage write leaves the
+document unchanged. Removal is disabled for audio referenced by the composition
+or its undo/redo history; reloading or opening another project resets that history.
+
 - Up to 24 cues; ranges span at most 60 seconds within the first hour.
-- Clips use finite CPU renders including LFO, automation and source layers. Changing
-  clip sound prepares new PCM. Original video and effects have independent listening levels.
-- Local video uses an object URL and is never uploaded. JSON stores references and
-  patches, not media. Re-select footage after reopening or reloading the project.
+- Procedural clips use finite CPU renders including LFO, automation and source layers.
+  Changing their sound prepares new PCM. Imported clips read stored PCM. Original
+  video and the effects composition have independent listening levels.
+- Local media is never uploaded. Video uses an object URL and is excluded from project
+  JSON. Re-select footage after reopening or reloading the project.
 - YouTube uses the [official IFrame API](https://developers.google.com/youtube/iframe_api_reference)
   only on explicit load. Embedded availability depends on the video and network;
   cue synchronization is approximate.
@@ -236,17 +266,21 @@ pointer edit. Shortcuts yield to text/number inputs.
   and trimmed source ranges, fades and cropped tails. Preview uses the same source
   windows and linear fade envelopes. Original audio and video are excluded. Clipping is reported.
   Sound WAV is a finite render with modulation. Export take saves a recorded performance.
-- Scene JSON and saved patch keys remain compatible with the previous studio.
+- Existing version-1 scenes and saved patches remain readable. New audio references
+  are optional scene fields; embedded PCM is excluded from local document history.
   A standalone source draft is retained locally; save/export named sounds to keep
   or share them. Session A/B snapshots are not included in patch exports.
 
-`test:browser` runs the workspace, state, device-loss, interaction, sound-design
-and timeline browser suites. They cover actual live processing,
+`test:browser` runs the workspace, state, device-loss, interaction, sound-design,
+timeline and audio-import browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
 transport and video loops, mobile layout and mocked YouTube recovery. Timeline
 checks compare split WAVs sample-for-sample and replay captured preview source
-offsets/gain automation in an OfflineAudioContext against the exported WAV. The local
+offsets/gain automation in an OfflineAudioContext against the exported WAV. Audio
+import checks use a real stereo WAV and verify resampling/downmix, mixed PCM,
+IndexedDB reload, portable projects in an empty browser, missing/corrupt files,
+intervening edits, storage failure and history-protected deletion. The local
 four-second VP8/WebM fixture uses FFmpeg `testsrc2` (160×90, 12 fps, 40 kbps).
 YouTube adapter tests do not establish external video availability. Browser/device
 latency and physical GPU headroom are not established by these checks.

@@ -25,7 +25,9 @@ export function Inspector({ editor: e }: { editor: Editor }) {
                 <small>
                   {e.selectedIds.length > 1
                     ? `Active clip · ${e.selectedIds.length} selected`
-                    : "Audio layer"}
+                    : c.audio
+                      ? "Imported audio"
+                      : "Audio layer"}
                 </small>
               </span>
             </div>
@@ -42,6 +44,28 @@ export function Inspector({ editor: e }: { editor: Editor }) {
                 }}
               />
             </label>
+            {c.audio && (
+              <div className="property-section">
+                <h3>Audio source</h3>
+                <p className="audio-source-name">{c.audio.name}</p>
+                <p className="panel-hint">
+                  Mono · 48 kHz · Source audio is included when you export the
+                  project.
+                </p>
+                {!e.audioAssets.some((a) => a.id === c.audio!.id) && (
+                  <p className="panel-hint">
+                    Source unavailable in this browser. Import the original file
+                    or reopen a project with embedded audio.
+                  </p>
+                )}
+                <button
+                  disabled={e.audioImporting}
+                  onClick={() => e.audioInput.current?.click()}
+                >
+                  Import audio…
+                </button>
+              </div>
+            )}
             <div className="property-section">
               <h3>Timing</h3>
               <label className="inline-property">
@@ -72,8 +96,8 @@ export function Inspector({ editor: e }: { editor: Editor }) {
               </button>
               <p className="panel-hint">
                 {range!.duration.toFixed(3)} s from a{" "}
-                {e.sourceDuration(c).toFixed(3)} s source, including effect
-                tails.
+                {e.sourceDuration(c).toFixed(3)} s source
+                {c.audio ? "." : ", including effect tails."}
               </p>
             </div>
             <div className="property-section">
@@ -180,16 +204,20 @@ export function Inspector({ editor: e }: { editor: Editor }) {
                 />
                 Mute layer
               </label>
-              <button
-                id="edit-cue-sound"
-                className="full"
-                onClick={() => e.workspace("sound")}
-              >
-                Edit sound <Icon name="sound" />
-              </button>
-              <p className="panel-hint">
-                Edits in Sound workspace update this layer.
-              </p>
+              {!c.audio && (
+                <>
+                  <button
+                    id="edit-cue-sound"
+                    className="full"
+                    onClick={() => e.workspace("sound")}
+                  >
+                    Edit sound <Icon name="sound" />
+                  </button>
+                  <p className="panel-hint">
+                    Edits in Sound workspace update this layer.
+                  </p>
+                </>
+              )}
             </div>
             {e.selectedIds.length > 1 && (
               <p className="panel-hint">

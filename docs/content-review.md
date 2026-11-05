@@ -133,3 +133,7 @@ record identifies implemented behavior, synthesis limits and compute-only eviden
 The timeline editing follow-up records source trim/fade controls, split continuity,
 multiple selection, context actions and shortcuts. Its bounded English review and
 preview/WAV validation are in the same component workspace record.
+
+The audio-file follow-up covers the Audio library, imported clip properties,
+portable project files and recovery messages. Its bounded English review and real
+file/storage/PCM checks are recorded in the component workspace review.

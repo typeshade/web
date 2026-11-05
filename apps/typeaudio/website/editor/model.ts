@@ -237,8 +237,8 @@ export function projectDocument(doc: Document): Document {
     ...doc,
     selected: cue?.id || "",
     selection: ids,
-    patch: cue?.patch || doc.source.patch,
-    patchName: cue?.name || doc.source.name,
+    patch: cue && !cue.audio ? cue.patch : doc.source.patch,
+    patchName: cue && !cue.audio ? cue.name : doc.source.name,
   };
 }
 export function updateScene(
@@ -255,7 +255,8 @@ export function updatePatch(
   const current = projectDocument(doc),
     patch = validatePatch({ ...current.patch, ...changes }),
     nextName = name ?? current.patchName;
-  return current.selected
+  return current.selected &&
+    !current.scene.cues.find((c) => c.id === current.selected)?.audio
     ? projectDocument({
         ...current,
         scene: {

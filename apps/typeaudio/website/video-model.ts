@@ -1,4 +1,9 @@
 import { SAMPLE_RATE, validatePatch, type Patch } from "./designer.ts";
+import {
+  MAX_LIBRARY_FRAMES,
+  validateAudioRef,
+  type AudioAssetRef,
+} from "./audio-asset.ts";
 export const MAX_CUES = 24;
 export interface Cue {
   id: string;
@@ -7,6 +12,7 @@ export interface Cue {
   gain: number;
   muted: boolean;
   patch: Patch;
+  audio?: AudioAssetRef;
   sourceIn?: number;
   sourceOut?: number | null;
   fadeIn?: number;
@@ -99,6 +105,7 @@ export function validateScene(raw: unknown): Scene {
     );
   if (typeof s.loop !== "boolean") throw new Error("Invalid loop setting.");
   const ids = new Set<string>();
+  const audioFrames = new Map<string, number>();
   const cues = s.cues.map((c) => {
     if (
       !c ||
@@ -117,6 +124,13 @@ export function validateScene(raw: unknown): Scene {
       muted: c.muted,
       patch: validatePatch(c.patch),
     };
+    if (c.audio !== undefined) {
+      cue.audio = validateAudioRef(c.audio);
+      const frames = audioFrames.get(cue.audio.id);
+      if (frames !== undefined && frames !== cue.audio.frames)
+        throw new Error("Audio source references disagree about their length.");
+      audioFrames.set(cue.audio.id, cue.audio.frames);
+    }
     if (c.sourceIn !== undefined) cue.sourceIn = number(c.sourceIn, 0, 60);
     if (c.sourceOut !== undefined)
       cue.sourceOut = c.sourceOut === null ? null : number(c.sourceOut, 0, 60);
@@ -134,6 +148,8 @@ export function validateScene(raw: unknown): Scene {
     }
     return cue;
   });
+  if ([...audioFrames.values()].reduce((n, v) => n + v, 0) > MAX_LIBRARY_FRAMES)
+    throw new Error("A project can contain up to 120 seconds of source audio.");
   return {
     version: 1,
     name: label(s.name),

@@ -1,6 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import type { Editor } from "../useEditor.ts";
-import { download } from "../model.ts";
 import { Icon } from "./Panel.tsx";
 import { useInteractions, type MenuItem } from "../interactions.tsx";
 import { useWorkspaceLayout } from "../layout.tsx";
@@ -115,12 +114,7 @@ export function WorkspaceShell({
     return () => window.removeEventListener("keydown", handler);
   });
   function save() {
-    download(
-      new Blob([JSON.stringify(e.state.scene, null, 2)], {
-        type: "application/json",
-      }),
-      "typeaudio-scene.json",
-    );
+    void e.exportProject();
     menus.closeMenu();
   }
   function showMenu(name: "File" | "Edit" | "Window", origin: HTMLElement) {
@@ -148,6 +142,11 @@ export function WorkspaceShell({
               action: save,
             },
             { separator: true },
+            {
+              label: "Import audio…",
+              disabled: e.audioImporting,
+              action: () => e.audioInput.current?.click(),
+            },
             {
               label: "Import video…",
               action: () => e.videoInput.current?.click(),
@@ -343,14 +342,20 @@ export function WorkspaceShell({
           ) : (
             <span>
               {e.state.patchName}
-              {e.selected ? " / Selected layer" : ""}
+              {e.selected && !e.selected.audio ? " / Selected layer" : ""}
             </span>
           )}
           <span className="document-dot" title="Saved in this browser" />
         </div>
         <span className="document-status">
           {picture ? "Composition" : "Sound source"} ·{" "}
-          {e.selected ? "Linked layer" : "Local project"}
+          {e.selected?.audio
+            ? picture
+              ? "Imported audio"
+              : "Source sound"
+            : e.selected
+              ? "Linked layer"
+              : "Local project"}
         </span>
       </div>
       <div className="options-bar">
@@ -536,7 +541,7 @@ export function WorkspaceShell({
               id="use-in-video"
               onClick={() => {
                 e.workspace("picture");
-                if (!e.selected) e.addCue();
+                if (!e.selected || e.selected.audio) e.addCue();
               }}
             >
               Use in Picture
