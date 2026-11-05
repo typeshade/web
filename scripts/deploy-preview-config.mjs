@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 export const DEPLOY_SITES = Object.freeze(['typeshade', 'typenn', 'typecv']);
 
 export function validateProductionTarget(site, ref) {
-  if (!DEPLOY_SITES.includes(site)) throw new Error(`Unknown site '${site}'`);
+  if (![...DEPLOY_SITES, 'typeaudio'].includes(site)) throw new Error(`Unknown site '${site}'`);
   if (ref !== 'refs/heads/main') {
     throw new Error(`Production deployments must be dispatched from refs/heads/main, got '${ref}'`);
   }

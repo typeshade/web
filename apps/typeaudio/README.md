@@ -57,8 +57,21 @@ latency still require measurement on the user's hardware.
 ## Publishing
 
 The TypeAudio CI workflow checks and builds this application. Its artifact is
-`website/dist`. Production publishing still belongs to `typeshade/typeaudio`;
-this PR does not change the existing manual production workflows for the other
-three sites. A reviewed TypeAudio cutover must retire the old publisher before
-adding this app to the production selector. Do not let both repositories publish
-`typeaudio-site` concurrently.
+`dist`. Production deploy supports `typeaudio` on `main` and uses the existing
+`typeaudio-site` Worker and `audio.typeshade.dev` custom domain.
+
+After the approved cutover, run **TypeAudio production cutover** once. It creates
+only `typeaudio-production`, restricts it to main, verifies that the original
+TypeAudio publisher is idle and disables that publisher. Existing protections
+and all other sites' settings are retained. It uses the repository's existing
+`DEPLOYMENT_ADMIN_TOKEN` Actions secret. The inherited `CLOUDFLARE_API_TOKEN`
+remains in the protected deployment job; no credentials enter the browser build.
+
+Then dispatch **Production deploy** with `site=typeaudio` from main. The workflow
+checks the environment and old publisher before building, runs the studio tests,
+captures the previous version and verifies the new version receives all traffic.
+The existing `WEBSITE_OPERATIONS_ENABLED` switch must remain enabled. Do not rerun
+the older all-site setup workflow, which deliberately disables operations.
+
+Rollback uses the captured Worker version. Re-enable the old publisher only after
+disabling new publishing; two repositories must not deploy this Worker together.

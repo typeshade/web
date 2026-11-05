@@ -5,6 +5,7 @@ const allowedUrls = new Set([
   'https://typeshade.dev/',
   'https://nn.typeshade.dev/',
   'https://cv.typeshade.dev/',
+  'https://audio.typeshade.dev/',
   'https://gallery.typeshade.dev/',
 ]);
 const attempts = 12;

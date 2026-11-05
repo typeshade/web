@@ -93,3 +93,9 @@ test('TypeCV production bindings must be provisioned before deployment', async (
   config.r2_buckets = config.r2_buckets.filter((binding) => binding.binding !== 'SAMPLES');
   assert.throws(() => validateTypeCvProductionConfig(config), /typecv-samples/);
 });
+
+test('TypeAudio is a main-only production target without enabling its previews', () => {
+  assert.deepEqual(validateProductionTarget('typeaudio','refs/heads/main'), {site:'typeaudio',environment:'typeaudio-production'});
+  assert.throws(()=>validateProductionTarget('typeaudio','refs/heads/feature'));
+  assert.equal(DEPLOY_SITES.includes('typeaudio'),false);
+});
