@@ -11,6 +11,8 @@ on:
 
 permissions:
   contents: read
+  deployments: read
+  actions: read
 
 concurrency:
   group: deploy-${{ inputs.site }}
