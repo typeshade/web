@@ -1,0 +1,35 @@
+name: TypeAudio studio
+on:
+  pull_request:
+    paths: ['apps/typeaudio/**', 'sources/typeaudio', 'packages/ui/**', 'pnpm-lock.yaml', 'package.json', '.gitmodules', '.github/workflows/typeaudio.yml']
+  push:
+    branches: [main]
+    paths: ['apps/typeaudio/**', 'sources/typeaudio', 'packages/ui/**', 'pnpm-lock.yaml', 'package.json', '.gitmodules', '.github/workflows/typeaudio.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  studio:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: git submodule update --init sources/typeaudio
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check:typeaudio
+      - run: pnpm test:typeaudio
+      - run: pnpm build:typeaudio
+      - run: pnpm --filter typeaudio-site exec playwright-core install --with-deps chromium
+      - run: pnpm --filter typeaudio-site test:browser
+      - uses: actions/upload-artifact@v4
+        with:
+          name: typeaudio-studio
+          path: apps/typeaudio/website/dist

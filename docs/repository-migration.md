@@ -390,3 +390,14 @@ upstream browser run passed its public UI/width checks but was stopped during De
 to rebuild these styles, so it is not a complete suite pass.
 The restored 131-page build passes the new EN/KO desktop/mobile smoke and contrast checks,
 all stylesheet-ownership checks, frame navigation (1/1) and GPU preparation (2/2).
+
+## TypeAudio application prepared (2026-11-05)
+
+`apps/typeaudio` imports the existing AudioWorklet studio and adds sound exploration
+controls. Its engine is pinned at TypeAudio `575b42b`; website provenance and checks
+are recorded in [the integration review](reviews/typeaudio-studio.md). The original
+TypeAudio source working tree is unchanged. This app has a separate CI artifact;
+production publishing has not transferred. Before adding TypeAudio to the production
+selector, review the cutover, capture the current `typeaudio-site` deployment, and
+retire the original TypeAudio publisher. This addition does not authorize the earlier
+three-site setup workflow to be rerun.

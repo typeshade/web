@@ -101,3 +101,9 @@ TypeShade, TypeNN and TypeCV. Follow-up revision checks are recorded separately.
   passed, as did the benchmark/regression catalogs and final TypeScript check.
 - No vendor source or dependency pin was changed. The shared Shiki dependency was added
   explicitly, and installation passed with pnpm 10.28.2 and the frozen lockfile.
+
+## TypeAudio studio addition
+
+The new TypeAudio application has a bounded English UI review and local audio/browser
+validation recorded in [TypeAudio studio integration](reviews/typeaudio-studio.md).
+The original three-site review and production ownership above are unchanged.

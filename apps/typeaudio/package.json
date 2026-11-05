@@ -1,0 +1,31 @@
+{
+  "name": "typeaudio-site",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A GPU audio engine written in TypeScript, on TypeShade.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/typeshade/typeaudio"
+  },
+  "scripts": {
+    "dev": "node scripts/prepare.mjs && bun --bun vite --config website/vite.config.ts",
+    "build": "node scripts/prepare.mjs && bun --bun vite build --config website/vite.config.ts && bun scripts/site-docs.ts",
+    "check": "node scripts/prepare.mjs && bun --bun tshc sync && bun --bun tshc check website && tsc -p website/tsconfig.json",
+    "test": "node scripts/prepare.mjs && bun --bun vitest run",
+    "test:browser": "bun website/check-browser.ts"
+  },
+  "devDependencies": {
+    "@types/node": "25.6.0",
+    "marked": "17.0.1",
+    "playwright-core": "1.64.1",
+    "typescript": "5.6.3",
+    "typeshade": "https://github.com/typeshade/typeshade/archive/87af4eb0d9d15f02b66b8341b72cab0944290472.tar.gz",
+    "vite": "7.3.7",
+    "vitest": "5.0.5"
+  },
+  "dependencies": {
+    "@typeshade/site-ui": "workspace:*"
+  }
+}

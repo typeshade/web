@@ -25,7 +25,11 @@
     "test:controls": "node packages/ui/scripts/test-controls.mjs apps/ui/dist",
     "test:patterns": "node packages/ui/scripts/test-patterns.mjs apps/ui/dist",
     "test:code": "node --test packages/ui/code/highlight.test.mjs",
-    "test:styles": "node scripts/check-style-ownership.mjs"
+    "test:styles": "node scripts/check-style-ownership.mjs",
+    "dev:typeaudio": "pnpm --filter typeaudio-site dev",
+    "build:typeaudio": "pnpm --filter typeaudio-site build",
+    "check:typeaudio": "pnpm --filter typeaudio-site check",
+    "test:typeaudio": "pnpm --filter typeaudio-site test"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

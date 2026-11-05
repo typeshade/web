@@ -18,3 +18,6 @@ apps/typecv/public/robots.txt
 apps/typecv/public/sitemap.xml
 apps/typenn/public/data/
 apps/typenn/src/vendor/typenn/*.js
+
+*.shade.typeshade.ts
+apps/typeaudio/artifacts/
