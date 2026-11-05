@@ -73,14 +73,13 @@ const FUNCTIONS: readonly string[] = [
 ];
 
 // One fragment shader for the operators. Each line is picked from both emits by its name.
-const OPERATORS = `@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+const OPERATORS = `export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   const below: vec2b = uv < vec2(0.5, 0.25)
   const floorMod = mod(uv.x, 0.5)
   const truncMod = uv.x % 0.5
   const even = round(uv.x)
   return vec4(floorMod + f32(below.x), truncMod, even, 1.)
-}
+});
 `;
 
 /** The right-hand side of an emitted `let name = …;` or `type name = …;` line. */
@@ -105,7 +104,8 @@ function build(): WgslGlslNames {
     .map((s) => emitted(s).wgsl)
     .join('\n');
   const variables = glslMapping().tables.variables.map((r): NameRow => {
-    const name = /@builtin\("([a-z_]+)"\)/.exec(r.source ?? '')?.[1];
+    // `builtin<"position", vec4>` since compiler change 0111, `@builtin("position")` before it.
+    const name = /(?:@builtin\(|builtin<)"([a-z_]+)"/.exec(r.source ?? '')?.[1];
     const spelled = name ? new RegExp(`@builtin\\(${name}\\)`).exec(wgslText)?.[0] : undefined;
     if (!spelled)
       throw new Error(`[wgsl-glsl-names] the WGSL emit has no builtin for '${r.source}'`);

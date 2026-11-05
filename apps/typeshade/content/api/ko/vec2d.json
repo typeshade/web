@@ -1,0 +1,7 @@
+{
+  "slug": "vec2d",
+  "source": "480b8aad7d24b684d063c47d712bd7980a1343f8cffa56f47c2141ebb71c48e6",
+  "texts": {
+    "summary": "vec2d는 vec2f64의 짧은 표기이며, 같은 타입입니다."
+  }
+}

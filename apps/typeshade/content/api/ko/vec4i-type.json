@@ -1,0 +1,7 @@
+{
+  "slug": "vec4i-type",
+  "source": "65255dfd80bc61d731017daacfe611f4242514eaa2f58f81649eecbc1c4f06e8",
+  "texts": {
+    "summary": "호스트 값으로서의 vec4i입니다. i32 네 개로 된 readonly 튜플입니다."
+  }
+}

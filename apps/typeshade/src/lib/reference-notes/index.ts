@@ -11,7 +11,6 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { ControlProp } from '../live-shader-contract.ts';
 import { FIXTURE_STILLS, fixtureExp2 } from './fixture.ts';
-import { functionPow } from './function-pow.ts';
 
 /** A sample a `{{code <id>}}` token draws: a whole `"use typeshade"` file. */
 export interface NoteSample {
@@ -64,8 +63,10 @@ export interface NoteStill {
   readonly page: string;
 }
 
-/** The notes the site publishes, by entry id. */
-export const NOTES: Readonly<Record<string, NoteRecord>> = { 'function/pow': functionPow };
+/** The notes the site publishes, by entry id. The note on `pow` was retired with the pin that
+ *  removed `pow` (compiler change 0112, Rule 9.9): its entry, `function/pow`, is gone, and the
+ *  note is in this repository's history for the page that takes its place. */
+export const NOTES: Readonly<Record<string, NoteRecord>> = {};
 
 /** Where the published notes live. */
 export const NOTE_ROOT = 'content/reference';

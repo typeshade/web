@@ -1,0 +1,7 @@
+{
+  "slug": "mat2x4",
+  "source": "8aad5793a4cce56258843c38c0292057b77ca4657d328aadd019a5d5637d4fd3",
+  "texts": {
+    "summary": "2열 4행인 mat2x4을 호스트 값으로 나타냅니다. 성분 8개를 열 우선 순서로 담은 readonly 튜플입니다."
+  }
+}

@@ -18,12 +18,12 @@ const headings = [
 <Docs locale={locale} path={links.languageStages.href} title={content.title} description={content.description} headings={headings} editHref={editCopy(locale, 'language')}>
   <h1>{content.h1}</h1><p>{content.intro}</p>
   <h2 id="mapping">{content.mapping}</h2><p><Rich text={content.mappingP} locale={locale} /></p>
-  <TypeShadeCode code={`const WG_SIZE: override<u32> = 64;\n\nfunction addBias(value: f32): f32 {\n  return value + 0.1;\n}\n\n@compute([WG_SIZE])\nexport function paint(@builtin("global_invocation_id") gid: vec3u) {\n  pixels[gid.x] = addBias(camera.pos.x);\n}`} />
+  <TypeShadeCode code={`const WG_SIZE: override<u32> = 64;\n\nfunction addBias(value: f32): f32 {\n  return value + 0.1;\n}\n\nexport const paint = compute([WG_SIZE], function paint(gid: builtin<"global_invocation_id", vec3u>) {\n  pixels[gid.x] = addBias(camera.pos.x);\n});`} />
   <h2 id="compute">{content.compute}</h2><p><Rich text={content.computeP} locale={locale} /></p>
   <p><Rich text={content.computeHostP} locale={locale} /></p>
   <TypeShadeCode code={`const selected = input.length >= 256 ? 256 : 64;\nconst pipeline = await program.compute('paint', { constants: { WG_SIZE: selected } });\nconst [workgroupSize] = pipeline.workgroupShape;\npipeline.dispatch(encoder, bindings, [Math.ceil(input.length / workgroupSize), 1, 1]);`} />
   <h2 id="graphics">{content.graphics}</h2><p><Rich text={content.graphicsP} locale={locale} /></p>
-  <TypeShadeCode code={`@vertex\nexport function vs(\n  @builtin("vertex_index") vid: u32,\n  vin: VsIn\n): vec4 {\n  return camera.view * vec4(vin.position, 1)\n}\n\n@fragment\nexport function fs(): vec4 {\n  return vec4(1, 0, 0, 1)\n}`} />
+  <TypeShadeCode code={`export const vs = vertex(function vs(\n  vid: builtin<"vertex_index", u32>,\n  vin: VsIn\n): vec4 {\n  return camera.view * vec4(vin.position, 1)\n});\n\nexport const fs = fragment(function fs(): vec4 {\n  return vec4(1, 0, 0, 1)\n});`} />
   <h2 id="helper">{content.helper}</h2><p><Rich text={content.helperP} locale={locale} /></p>
   <TypeShadeCode code={`function saturate(x: f32): f32 {\n  return clamp(x, 0.0, 1.0)\n}`} />
   <p><a href={localePath(locale, links.languageStringKeys.href)}>{content.next}</a></p>

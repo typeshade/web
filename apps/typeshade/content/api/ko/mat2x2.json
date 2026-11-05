@@ -1,0 +1,8 @@
+{
+  "slug": "mat2x2",
+  "source": "8acec2b36881df3a9be2dc9b22a983fe11d2ec8df64f9c57e8f4806cca237dc2",
+  "texts": {
+    "summary": "호스트 값으로서의 mat2x2입니다. 성분 4개를 열 우선 순서로 담은 readonly 튜플입니다.",
+    "description": "`mat2x2<f64>`는 `f64` 성분을 담습니다(규칙 4.4)."
+  }
+}

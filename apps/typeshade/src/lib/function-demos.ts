@@ -1,6 +1,6 @@
 // One plotting program for the mathematical function catalogue. Every page compiles the
 // actual function call to both backends through LiveShader, including the highlighted point.
-import { plotShaderFiles } from 'typeplot/shaders';
+import { typeplotShaderFiles } from './typeplot-shaders.ts';
 import { FUNCTION_DEMOS, type FunctionDemo } from './function-demo-catalog.mjs';
 import type { ControlProps } from './live-shader-contract.ts';
 import { compile, compileModule } from '../../vendor/shader-dsl/src/index.ts';
@@ -8,7 +8,7 @@ import { compile, compileModule } from '../../vendor/shader-dsl/src/index.ts';
 export { FUNCTION_DEMOS };
 
 /** Real shader dependencies, kept as separate documents through compilation and editing. */
-export const FUNCTION_PLOT_FILES: Readonly<Record<string, string>> = plotShaderFiles;
+export const FUNCTION_PLOT_FILES: Readonly<Record<string, string>> = typeplotShaderFiles;
 
 export const functionDemo = (name: string): FunctionDemo | undefined =>
   FUNCTION_DEMOS.find((demo) => demo.name === name);
@@ -154,7 +154,7 @@ export function demoSource(demo: FunctionDemo): string {
 
 import { PlotUniforms, plot2D, plot3D } from "./function-plot.shade.ts";
 
-${demo.k ? 'class Uniforms extends PlotUniforms { k: f32; }' : 'class Uniforms extends PlotUniforms {}'}
+${demo.k ? 'class Uniforms extends PlotUniforms { k!: f32; }' : 'class Uniforms extends PlotUniforms {}'}
 declare const u: uniform<Uniforms>;
 
 // Inputs outside the mathematical domain are omitted, including after pan or zoom.
@@ -167,13 +167,12 @@ function trajectory(t: f32): vec3 {
   return vec3(t, sample(t), 0.);
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const flat = plot2D(sample, uv, u, ${jumps});
   if (u.plotBlend <= 0.) { return flat; }
   const space = plot3D(trajectory, uv, u, ${jumps});
   return mix(flat, space, clamp(u.plotBlend, 0., 1.));
-}
+});
 `;
 }
 

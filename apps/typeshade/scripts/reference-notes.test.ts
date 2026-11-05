@@ -326,13 +326,13 @@ describe('the page', () => {
         .join('\n');
     const en = md('en');
     expect(en).toContain('answers `8` for `exp2(3.0)`');
-    expect(en).toContain('<a href="/reference/functions/pow/"><code>pow</code></a>');
+    expect(en).toContain('<a href="/reference/math/pow/"><code>Math.pow</code></a>');
     expect(en).toContain('`TS8036` exp2 takes an f32');
     // The diagnostic's own full stop gives way to the sentence's.
     expect(en).toContain('got i32</span>. A float argument');
     expect(en).not.toContain('{{');
     const ko = md('ko');
-    expect(ko).toContain('<a href="/ko/reference/functions/pow/"><code>pow</code></a>');
+    expect(ko).toContain('<a href="/ko/reference/math/pow/"><code>Math.pow</code></a>');
     expect(ko).toContain('<a href="/ko/reference/rules/12-7/">');
   });
   test('an entry page whose note is stale stops the build', () => {

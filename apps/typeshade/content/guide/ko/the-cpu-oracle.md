@@ -1,8 +1,8 @@
 ---
 id: the-cpu-oracle
-source: 0a224eaa9ccd465cd4aa68ea7c576d6ff52f953f985959fd180f849cee768c6d
-sourceLine: 1438
-rules: 8.22 KZX4br5aY4KJfRtQvkYd5jJ4drnkFSbO1ngvskHPhJw=, 7.2 iYJ344Wi-VTSCnmajhMO7u7f1ogRHO4F_dzJhuFXUZU=, 3.9 3B2rlXJXA0GupXGpH-mhQpicZan-WehN8Xf4nhFST6Q=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 8.25 kf3cBLjGMs8IwKcbQz-CZKCza4XRYOMQfRhX4ueQFq0=, 7.6 kyzs2Ws4Mk2xUgP_v9ZM_z6jm_3zIWP2-BekxmeHpC8=, 12.7 Mvr2vY3Krl66Bglu9ejs51aqLb_3vraF1hO4FLdrK48=
+source: 687daaaa57f0e4c4c462c3d0698c280b5db9459cf3a05f623167d4ff43c987cd
+sourceLine: 1441
+rules: 8.22 tU4KW4DgphHYhjdPzBs7vzpMXCfL1pXKA33p31nrIpE=, 7.2 aMOE9178T8VwoRmUdH2Du74apGdNk0pkL7kvkijCD1I=, 3.9 3B2rlXJXA0GupXGpH-mhQpicZan-WehN8Xf4nhFST6Q=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=, 8.25 YA_aCQVarZYOhnVQ93ZZ3Z2VnLmSKkB70xDcX8W9rZM=, 7.6 GMsX5wNgIEXEAZ7s8jNra2oroSJknOZi_ucTQ2GzOgQ=, 12.7 Mvr2vY3Krl66Bglu9ejs51aqLb_3vraF1hO4FLdrK48=
 ---
 
 이 페이지는 같은 모듈을 CPU에서 배정밀도로 실행하고 GPU 결과와 비교하는 방법을 설명합니다.
@@ -134,10 +134,9 @@ CPU tier의 메모리에 있는 텍스처는 예외입니다. `device.texture()`
 declare const tex: texture_2d<f32>;
 declare const smp: sampler;
 
-@fragment
-export function shade(@location(0) uv: vec2): vec4 {
+export const shade = fragment(function shade(uv: location<0, vec2>): vec4 {
   return textureSample(tex, smp, uv);
-}
+});
 ```
 
 ```ts
@@ -219,7 +218,7 @@ compileModule(r.module).fns[r.name](0.5, 2, 1) // → { x: …, k: … }
 설정하면 평범한 `.ts` 파일이 `.shade.ts`를 가져와 그 파일이 내보내는 헬퍼 함수를 부릅니다.
 호출마다 그 함수의 코드가 GPU가 아니라 **CPU에서** 실행되며, GPU가 반올림하는 방식대로
 `f32` 정밀도로 계산합니다. 높이 조회나 피킹 검사, 단위 테스트처럼 호스트 코드가 셰이더의 계산을
-함께 쓸 때 이 방법을 씁니다. 같은 방식으로 가져온 `@compute` 진입점은 반대로 GPU에서 실행됩니다.
+함께 쓸 때 이 방법을 씁니다. 같은 방식으로 가져온 컴퓨트 진입점은 반대로 GPU에서 실행됩니다.
 `await entry(bindings, workgroups)`는 진입점을 WebGPU에서 디스패치하고 진입점이 쓴 값을 배열로
 다시 읽어 옵니다. `entry(bindings, workgroups, { constants: { WIDTH: 32 } })`는
 `program.compute`와 같은 검증으로 선언된 오버라이드를 선택합니다. 실행 계획은 기존 제출을
@@ -256,7 +255,7 @@ const h = height([0.5, 0.5], [1, 0.5, 2, 0.25]) // a number
 맞지 않는 인자가 있으면 매개변수 이름을 포함한 `TypeError`를 던집니다. 반환값은 새로 생성한
 값이며 호출은 동기적으로 완료됩니다.
 
-호스트가 호출할 수 있는 함수는 내보낸 헬퍼 중 진입점이나 제네릭이 아니고, 함수 인자를 받지 않으며, 바인딩이나 GPU 전용 내장 함수에 도달하지 않는 함수입니다. 나머지 내보내기는 이유와 함께 `never` 타입으로 표시되며 호출 위치에서 타입 오류가 발생합니다. 기존 Vite 프로젝트에서 `npx tshc init`을 실행하면 플러그인, 호스트 뷰, 동기화 스크립트가 설정됩니다(변경 0085). 이 명령은 관련 없는 설정과 JSONC 주석을 보존하고, 충돌이 있으면 파일을 쓰기 전에 거부합니다. 초기화를 반복해도 파일은 바뀌지 않습니다. 수동 설정과 `tshc sync`도 계속 지원됩니다. 셰이더 검사는 공용 `tshc check` 진단을 사용하며, 일반 `tsc`는 여전히 셰이더 데코레이터를 거부합니다. 설정과 호스트 값은 `docs/use-typeshade-surface.md` §64에 있습니다.
+호스트가 호출할 수 있는 함수는 내보낸 헬퍼 중 진입점이나 제네릭이 아니고, 함수 인자를 받지 않으며, 바인딩이나 GPU 전용 내장 함수에 도달하지 않는 함수입니다. 나머지 내보내기는 이유와 함께 `never` 타입으로 표시되며 호출 위치에서 타입 오류가 발생합니다. 기존 Vite 프로젝트에서 `npx tshc init`을 실행하면 플러그인, 호스트 뷰, 동기화 스크립트가 설정됩니다(변경 0085). 이 명령은 관련 없는 설정과 JSONC 주석을 보존하고, 충돌이 있으면 파일을 쓰기 전에 거부합니다. 초기화를 반복해도 파일은 바뀌지 않습니다. 수동 설정과 `tshc sync`도 계속 지원됩니다. 셰이더 검사는 공용 `tshc check` 진단을 사용합니다. 일반 `tsc`는 진입점 형태(스테이지 호출과 속성 타입)를 받아들이지만, 벡터 산술은 받아들이지 않습니다. TypeScript에는 연산자 오버로딩이 없기 때문입니다. 설정과 호스트 값은 `docs/use-typeshade-surface.md` §64에 있습니다.
 
 ### 배열을 도는 루프
 
@@ -267,8 +266,9 @@ const h = height([0.5, 0.5], [1, 0.5, 2, 0.25]) // a number
 평평한 루프 하나 `for (let i: u32 = 0; i < w * h; i++)`로 쓰고, 인덱스에서 `x = i % w`와
 `y = i / w`를 구합니다.
 
-커널 함수는 `@workgroup_size([128])`로 루프의 워크그룹 크기를 정할 수 있습니다. 배열에 정수 하나를
-쓰며, `@compute([128])`가 진입점의 크기를 정하는 방식과 같다(`docs/use-typeshade-surface.md`
+커널 함수는 스테이지 호출 `export const k = workgroup_size([128], function k(xs: array<f32>) { … })`로
+루프의 워크그룹 크기를 정할 수 있습니다. 배열에 정수 하나를 쓰며, `compute([128], f)`가 진입점의
+크기를 정하는 방식과 같습니다(`docs/use-typeshade-surface.md`
 §3, §65). 리덕션을 하는 루프는 언제나 256 크기의 워크그룹으로 돌기 때문에, 이런 함수 안의
 리덕션은 `TS8077`로 거부됩니다. 리덕션은 따로 함수를 만들어 옮깁니다.
 
@@ -336,7 +336,7 @@ const y = await out.read()
 
 호출 체인의 병합에는 세 가지 작성 방식이 관련됩니다. 첫째, 함수마다 루프 하나를 사용하고 모든 배열은 같은 카운터로 인덱싱한다(`out[i] = a[i] + b[i]`). 바로 앞 호출이 같은 인덱스에 쓴 값을 읽는 호출은 병합됩니다. 둘째, 중간값은 호스트가 읽는 `resident` 대신 `scope.scratch(n)` 스크래치 배열에 둡니다. 병합 그룹은 이를 지역 변수로 유지하므로 위의 `t`와 `u`는 버퍼를 만들지 않고, 해당 `read()`는 오류입니다. 셋째, 합계가 필요하면 리덕션으로 체인을 끝냅니다. 스코프의 마지막 호출 `total(u)`는 앞선 호출을 자신의 루프에 포함하며, 리덕션 뒤의 호출은 그룹에 병합되지 않습니다.
 
-본문 안의 진입점 호출(`@compute`)도 기록됩니다. 이 호출은 본문이 만든 순서대로 혼자 디스패치
+본문 안의 진입점 호출(컴퓨트 진입점)도 기록됩니다. 이 호출은 본문이 만든 순서대로 혼자 디스패치
 하나로 실행됩니다. 어떤 커널 호출도 이 호출에 합쳐지지 않고, 이 호출도 다른 그룹에 합쳐지지
 않습니다. 크기가 없는 스토리지 배열에는 `resident(...)` 값을 넘기며, 그 자리에 호스트 배열을 넘기면
 `TypeError`입니다.
@@ -415,27 +415,27 @@ const { wgsl, diagnostics } = compile(read('src/clouds.shade.ts')!, {
 
 ### 호출한 쪽의 변수를 바꾸는 함수
 
-일반 매개변수는 전달한 값의 복사본이므로 대입해도 호출한 쪽의 변수는 바뀌지 않습니다. 호출한 쪽의 변수를 변경하려면 GLSL 한정자 `@inout`을 붙인 매개변수에 변수를 직접 전달해야 합니다. 함수 안에서는 원래 변수처럼 읽거나 대입하며, 메서드에서 `this`의 필드에 접근하듯 필드에도 접근합니다. 쓰기 전용 매개변수는 `@out`으로 선언합니다. 이 매개변수는 초깃값이 없으므로 읽기 전에 반드시 대입해야 하며, 모든 실행 경로에서 대입해야 합니다.
+일반 매개변수는 전달한 값의 복사본이므로 대입해도 호출한 쪽의 변수는 바뀌지 않습니다. 호출한 쪽의 변수를 변경하려면 매개변수의 타입을 GLSL 한정자와 같은 이름인 `inout<T>`로 적고 변수 자체를 넘깁니다. 함수 안에서는 원래 변수처럼 읽거나 대입하며, 메서드에서 `this`의 필드에 접근하듯 필드에도 접근합니다. 쓰기 전용 매개변수는 `out<T>`로 선언합니다. 이 매개변수는 초깃값이 없으므로 읽기 전에 반드시 대입해야 하며, 모든 실행 경로에서 대입해야 합니다. 이런 호출이 먼저 채우는 지역 변수는 `let s!: f32;`로 선언하며, 일반 `tsc --strict`도 이 선언을 받아들입니다. 이전 릴리스의 데코레이터를 붙인 매개변수 `@inout a: f32`와 `@out c: f32`는 마이그레이션 릴리스 다음 릴리스까지 계속 받아들입니다.
 
 ```ts
 "use typeshade";
 
 class Ray {
-  origin: vec3;
-  dir: vec3;
+  origin!: vec3;
+  dir!: vec3;
 }
 
-function swap(@inout a: f32, @inout b: f32): void {
+function swap(a: inout<f32>, b: inout<f32>): void {
   const t = a;
   a = b;
   b = t;
 }
 
-function add(a: f32, b: f32, @out c: f32): void {
+function add(a: f32, b: f32, c: out<f32>): void {
   c = a + b;
 }
 
-function advance(@inout r: Ray, t: f32): void {
+function advance(r: inout<Ray>, t: f32): void {
   r.origin = r.origin + r.dir * t;
 }
 
@@ -443,7 +443,7 @@ export function demo(): f32 {
   let x: f32 = 1.;
   let y: f32 = 2.;
   swap(x, y); // x is 2. and y is 1.
-  let s: f32;
+  let s!: f32;
   add(x, y, s); // s is 3.
   let r = new Ray();
   r.dir = vec3(1., 0., 0.);
@@ -457,7 +457,7 @@ WGSL은 포인터를 받아 `swap(&x, &y)`로 부르고 본문에서 `*a = *b`�
 인자로는 `let`, 모듈 변수, `read_write` 스토리지 바인딩의 요소, 그리고 이들의 필드나 요소를 넘길 수
 있습니다. 값, 리터럴, 벡터의 성분을 넘기면 `TS8073`으로 거부됩니다. 함수가 값을 쓰는 변수 하나를
 호출 하나가 두 번 참조로 넘기는 `swap(x, x)`는 `TS8074`가 됩니다. 대입하기 전에 변수를 읽거나
-`@out` 매개변수를 쓰기 전에 읽으면 `TS8075`가 됩니다. 한정자는 파일이나 네임스페이스에 선언한
+`out<T>` 매개변수를 쓰기 전에 읽으면 `TS8075`가 됩니다. 한정자는 파일이나 네임스페이스에 선언한
 함수에만 붙일 수 있고, 메서드와 진입점, 지역 함수는 값을 받습니다. 다만 한정자가 붙은 함수 안의
 지역 함수는 바깥의 다른 변수처럼 그 매개변수를 읽고 쓸 수 있습니다. `@in`은 없습니다. 한정자를 붙이지 않은
 매개변수가 곧 GLSL의 `in`입니다. 모든 규칙과 거부되는 경우는 `docs/use-typeshade-surface.md`

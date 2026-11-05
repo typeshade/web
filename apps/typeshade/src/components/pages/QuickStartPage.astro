@@ -37,20 +37,19 @@ const stripes = `"use typeshade"
 const TAU: f32 = 6.2831853
 
 class Uniforms {
-  time: f32
-  bands: f32
-  low: vec3
-  high: vec3
+  time!: f32
+  bands!: f32
+  low!: vec3
+  high!: vec3
 }
 
 declare const u: uniform<Uniforms>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const phase = (uv.x * u.bands + u.time) * TAU
   const wave = sin(phase) * 0.5 + 0.5
   return vec4(mix(u.low, u.high, wave), 1.)
-}
+});
 `;
 
 // The import setup and a host file that draws the sample above. Code, so it stays here too.

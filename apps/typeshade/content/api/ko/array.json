@@ -1,0 +1,8 @@
+{
+  "slug": "array",
+  "source": "06c0ec421e8a0fa954d3fc391b3007d38f6c16852cdf03c220369342e624460c",
+  "texts": {
+    "summary": "크기가 없는 array<T>를 호스트 값으로 나타내며, 커널 함수의 배열이 받는 타입입니다(규칙 8.21). T의 스칼라에 맞는 타입 배열이고, 벡터 T도 성분을 차례로 이어 담아 같은 타입 배열이 됩니다. 구조체나 행렬 같은 다른 T는 readonly T[]입니다. 어느 경우든 그 값의 Resident도 받습니다.",
+    "description": "크기가 있는 배열 `array<T, N>`은 값 `N`개를 담은 `readonly T[]`입니다(결정 D4).\n\nresident 배열을 담는 변수는 `Resident` 표기를 그대로 씁니다: `Resident<Float32Array>`."
+  }
+}

@@ -12,13 +12,13 @@ import { heroShader } from '../src/lib/hero-shader.ts';
 import type { ShaderLayout } from '../src/lib/shader-runtime.ts';
 
 const source = `"use typeshade";
-class Uniforms { value: f32; }
+class Uniforms { value!: f32; }
 declare const u: uniform<Uniforms>;
 declare const quality: override<f32> = 1.0;
-@vertex function vertex(@builtin("vertex_index") index: u32): vec4f {
+const vertex = vertex(function vertex(index: builtin<"vertex_index", u32>): vec4f {
   return vec4f(f32(index), 0.0, 0.0, 1.0);
-}
-@fragment function fragment(): vec4f { return vec4f(u.value * quality, 0.0, 0.0, 1.0); }
+});
+const fragment = fragment(function fragment(): vec4f { return vec4f(u.value * quality, 0.0, 0.0, 1.0); });
 `;
 const compiled = compile(source);
 const manifest = packModule(compiled.module, { emit: { level: 'O1', parens: 'minimal' } });
@@ -109,7 +109,7 @@ test('hero and edited live payloads carry their emitted program manifest', () =>
   const live = compileLive(
     'test',
     'test',
-    `@fragment export function main(@location(0) uv: vec2): vec4 { return vec4(uv, 0.0, 1.0); }
+    `export const main = fragment(function main(uv: location<0, vec2>): vec4 { return vec4(uv, 0.0, 1.0); });
 `,
   );
   expect(live.diagnostics.filter((d) => d.category === 'error')).toEqual([]);

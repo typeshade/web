@@ -72,7 +72,7 @@ test('an integer-written local without a declared integer demand keeps the f32 d
 
 test('TS8018 still rejects assignment to a temporary component', () => {
   const source =
-    '"use typeshade";\n@fragment export function main(@location(0) uv: vec2): vec4 { vec2(uv).x = 1.0; return vec4(uv, 0.0, 1.0); }';
+    '"use typeshade";\nexport const main = fragment(function main(uv: location<0, vec2>): vec4 { vec2(uv).x = 1.0; return vec4(uv, 0.0, 1.0); });';
   const result = compile(source);
   expect(result.diagnostics.some((d) => d.code === 'TS8018')).toBe(true);
   expect(result.wgsl).toBeUndefined();

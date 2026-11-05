@@ -1,7 +1,7 @@
 ---
 id: functions-and-entry-points
-source: 4b9834e22864d0da600a9234914602a8b484d1793574a61ac66cc3aef4a18a92
-sourceLine: 514
+source: baf1a21ca41afe66ace7943d2c2c2f6f5f665d974e52bb4a06d764532eeba6b8
+sourceLine: 574
 ---
 
 헬퍼 함수는 다른 함수에서 호출하며, 진입점은 버텍스·프래그먼트·컴퓨트 스테이지에서 실행합니다. 이 페이지는 함수 선언, 호출, 진입점, 모듈 구성을 설명합니다.
@@ -70,9 +70,11 @@ WGSL에는 호출 스택이 없으므로 재귀는 거부됩니다.
 
 ### 진입점
 
-진입점은 스테이지 데코레이터 `@vertex`, `@fragment`, `@compute` 가운데 하나를 붙인 최상위
-`export function`입니다. 컴퓨트 진입점은 워크그룹 크기를 데코레이터에 `@compute([64])`나
-`@compute([8, 8])`처럼 적습니다. 아무 인자 없는 `@compute`는 기본값 64를 씁니다.
+진입점은 함수를 감싸는 스테이지 호출 `vertex(f)`, `fragment(f)`, `compute([…], f)` 가운데
+하나로 초기화한 최상위 `export const`입니다. 감싸는 함수는 상수와 이름이 같은 함수 표현식이거나
+화살표 함수입니다. 컴퓨트 진입점은 워크그룹 크기를 첫 번째 인자로 `compute([64], f)`나
+`compute([8, 8], f)`처럼 적습니다. 이전 릴리스의 데코레이터 형태(`@compute([64]) export function main(…)`)는
+마이그레이션 릴리스 다음 릴리스까지 계속 받아들입니다.
 
 ```ts
 "use typeshade";
@@ -83,8 +85,7 @@ declare const params: uniform<vec4u>;
 declare const input: storage<array<f32>>;
 declare const output: storage<array<f32>, "read_write">;
 
-@compute([64])
-export function reduceWindows(@builtin("global_invocation_id") gid: vec3u): void {
+export const reduceWindows = compute([64], function reduceWindows(gid: builtin<"global_invocation_id", vec3u>): void {
   const idx = gid.x;
   if (idx >= params.x) {
     return;
@@ -95,7 +96,7 @@ export function reduceWindows(@builtin("global_invocation_id") gid: vec3u): void
     acc += input[base + k];
   }
   output[idx] = acc;
-}
+});
 ```
 
 가드는 평범한 `return`으로 마지막 문장 전에 함수를 빠져나갑니다. 조기 반환은
@@ -107,21 +108,21 @@ export function reduceWindows(@builtin("global_invocation_id") gid: vec3u): void
 `entry(bindings, groups, { constants })`로 전달합니다. 프로그램 파이프라인은 확정된
 `pipeline.workgroupShape`를 반환합니다. `device.fuse()` 안을 포함한 진입점 호출은 선택한
 모양을 사용하며, 전달한 워크그룹 개수는 변경하지 않습니다. 소스 형태, 제한, 호스트 호출은
-[`docs/use-typeshade-surface.md` §3](docs/use-typeshade-surface.md#3-entries--function-decorators-and-explicit-builtins),
+[`docs/use-typeshade-surface.md` §3](docs/use-typeshade-surface.md#3-entries--stage-calls-and-explicit-builtins),
 [`§15`](docs/use-typeshade-surface.md#15-textures-samplers-and-overrides),
 [`§24`](docs/use-typeshade-surface.md#24-module-variables),
 [`§69`](docs/use-typeshade-surface.md#69-running-a-compiled-program)에 설명되어 있습니다.
 
 ### 스테이지 매개변수
 
-스테이지는 속성이 붙은 매개변수로 입력을 받습니다. `@builtin("id")`는 하드웨어가 제공하는 `"vertex_index"`, `"position"`, `"global_invocation_id"` 같은 값을 선언합니다. `@location(n)`은 스테이지 사이에서 데이터를 전달하는 번호가 붙은 슬롯을 선언합니다. 같은 두 속성을 두 스테이지가 공유하는 IO 구조체 클래스의 필드에도 사용합니다. 보간 모드는 [레이아웃과 리소스](/guide/authoring/layouts-and-resources/)에서 설명합니다.
+스테이지는 타입에 속성을 담은 매개변수로 입력을 받습니다. `builtin<"id", T>`는 하드웨어가 제공하는 `"vertex_index"`, `"position"`, `"global_invocation_id"` 같은 값을 선언합니다. `location<n, T>`는 스테이지 사이에서 데이터를 전달하는 번호가 붙은 슬롯을 선언합니다. 두 타입 모두 값은 `T`입니다. 같은 두 타입을 두 스테이지가 공유하는 IO 구조체, 곧 인터페이스나 클래스의 필드에도 사용합니다. 보간 모드는 [레이아웃과 리소스](/guide/authoring/layouts-and-resources/)에서 설명합니다.
 
 ```ts
 "use typeshade";
 
-class VsOut {
-  @builtin("position") pos: vec4;
-  @location(0) uv: vec2;
+interface VsOut {
+  pos: builtin<"position", vec4>;
+  uv: location<0, vec2>;
 }
 
 interface Gradient {
@@ -132,8 +133,7 @@ interface Gradient {
 
 declare const u: uniform<Gradient>;
 
-@vertex
-export function vsFull(@builtin("vertex_index") idx: u32): VsOut {
+export const vsFull = vertex(function vsFull(idx: builtin<"vertex_index", u32>): VsOut {
   let pos = vec2(-1., -1.);
   if (idx == 1) {
     pos = vec2(3., -1.);
@@ -141,18 +141,17 @@ export function vsFull(@builtin("vertex_index") idx: u32): VsOut {
     pos = vec2(-1., 3.);
   }
   return { pos: vec4(pos, 0., 1.), uv: vec2((pos.x + 1.) * 0.5, (pos.y + 1.) * 0.5) };
-}
+});
 
-@fragment
-export function fsGradient(vo: VsOut): vec4 {
+export const fsGradient = fragment(function fsGradient(vo: VsOut): vec4 {
   const t = vo.uv.y + u.mixBias;
   const rgb = mix(u.bottom.rgb, u.top.rgb, t);
   return vec4(rgb, 1.);
-}
+});
 ```
 
 구조체 없이 값만 돌려주는 프래그먼트 진입점은 따로 적지 않아도 첫 번째 색상 어태치먼트인
-`@location(0)`을 받습니다. 구조체 없이 `vec4`만 돌려주는 버텍스 진입점은 위치를 반환합니다.
+location 0을 받습니다. 구조체 없이 `vec4`만 돌려주는 버텍스 진입점은 위치를 반환합니다.
 구조체를 돌려주는 진입점은 구조체 필드에 속성을 붙입니다.
 
 ### 모듈 조립하기
@@ -177,10 +176,9 @@ export function hash(p: vec2): f32 {
 
 import { hash } from "./noise.shade.ts";
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(hash(uv), hash(uv * 2.), 0., 1.);
-}
+});
 ```
 
 이런 프로그램을 컴파일하는 호스트 호출은

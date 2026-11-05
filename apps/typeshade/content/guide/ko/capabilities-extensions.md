@@ -1,7 +1,7 @@
 ---
 id: capabilities-extensions
-source: c46215d10a002f7f11ed6a962519feb804c7fef18348d698198ad27406292667
-sourceLine: 2291
+source: 780c2ec4698fb1dba99abe6939568fe391522911bd4dd46ac8010a9fa46a76b2
+sourceLine: 2293
 rules: 11.21 NGIrnrXEAXjbu_CT68JK1XC6NGSjxGH7XAQK99t8d5Q=
 ---
 
@@ -11,8 +11,8 @@ rules: 11.21 NGIrnrXEAXjbu_CT68JK1XC6NGSjxGH7XAQK99t8d5Q=
 
 ### 기능 선언
 
-대부분의 기능은 스스로 선언됩니다. `@builtin("clip_distances")`, `@builtin("primitive_index")`,
-서브그룹 내장 값, `@blend_src(n)`을 쓰면 그 쓰임에 필요한 기능이 파생됩니다. 스토리지 바인딩,
+대부분의 기능은 스스로 선언됩니다. `builtin<"clip_distances", T>`, `builtin<"primitive_index", u32>`,
+서브그룹 내장 값, `blend_src` 옵션을 쓰면 그 쓰임에 필요한 기능이 파생됩니다. 스토리지 바인딩,
 컴퓨트 진입점, 한 타깃에 없는 종류의 텍스처도 마찬가지입니다. 어떤 쓰임으로도 파생되지 않는 확장은
 `"use typeshade"` 옆에 문자열 지시문으로 활성화합니다. 지시문은 한 줄에 하나씩, WGSL의 이름 그대로
 적습니다.
@@ -21,9 +21,8 @@ rules: 11.21 NGIrnrXEAXjbu_CT68JK1XC6NGSjxGH7XAQK99t8d5Q=
 "use typeshade";
 "enable subgroups";
 
-@compute([64])
-export function k(@builtin("global_invocation_id") gid: vec3u) {
-}
+export const k = compute([64], function k(gid: builtin<"global_invocation_id", vec3u>) {
+});
 ```
 
 기능 이름은 고정되어 있고 타깃과 독립적이므로, 소스에 `EXT_*`나 `OVR_*` 같은 확장 문자열을 직접 적지 않습니다. 기능 게이트(capability gate)는 생성기가 모듈을 처리하기 전에 각 id를 검사합니다. 기능을 표현할 수 없는 백엔드는 해당 기능 이름을 포함한 `UnsupportedFeatureError`(`SD0030`)를 던집니다. 이 실패 방식은 드라이버가 거부할 소스를 생성하는 대신 컴파일 단계에서 실패하는 fail closed 방식입니다.
@@ -60,8 +59,8 @@ id별 요구 사항은 _호스트 기능_(host feature)과 _소스 지시문_(so
 | `bgra8unormStorage`  | 미지원, fail closed로 실패                                       | 호스트 기능 `bgra8unorm-storage`, 파생                             |
 | `packed4x8Dot`       | 미지원, fail closed로 실패                                       | 코어 사양, 파생. 언어 기능 하나를 확인해야 함                      |
 
-아래쪽 여섯 행은 아무도 직접 선언하지 않는 기능입니다. `@builtin("clip_distances")`,
-`@builtin("primitive_index")`, `@builtin("subgroup_id")`, `@blend_src(n)`을 적으면 해당
+아래쪽 여섯 행은 아무도 직접 선언하지 않는 기능입니다. `builtin<"clip_distances", T>`,
+`builtin<"primitive_index", u32>`, `builtin<"subgroup_id", u32>`, `blend_src` 옵션을 적으면 해당
 기능이 파생됩니다. WGSL은 이들을 저마다 짝이 맞는 `enable` 없이는 거부하기 때문입니다.
 `"bgra8unorm"` 스토리지 텍스처, packed 4x8 계열 함수 호출, 서브그룹 내장 함수 호출
 (`subgroupAdd(x)`, 변경 0117)도 각각 바인딩과 호출에서 기능을 끌어냅니다. 어떤 사용으로도
@@ -100,8 +99,8 @@ capabilityMatrix([wgslBackend, glslEs300Backend])
   `multiview`를 선언한 모듈은 지시문만 생성하고 여전히 단일 뷰로 렌더링합니다. 나머지 네 기능은
   쓸 수 있습니다. `clipDistances`, `primitiveIndex`, `dualSourceBlending`은 각 속성에
   필요한 기능입니다. `subgroups`는 컴퓨트나 프래그먼트 진입점에
-  `@builtin("subgroup_invocation_id")`이나 `@builtin("subgroup_size")`를 적거나, 컴퓨트
-  진입점에 `@builtin("subgroup_id")`이나 `@builtin("num_subgroups")`를 적거나, 서브그룹 내장
+  `builtin<"subgroup_invocation_id", u32>`나 `builtin<"subgroup_size", u32>`를 적거나, 컴퓨트
+  진입점에 `builtin<"subgroup_id", u32>`나 `builtin<"num_subgroups", u32>`를 적거나, 서브그룹 내장
   함수 21개 가운데 하나(`subgroupAdd` 등, 변경 0117)를 부르면 쓰게 됩니다. GLSL ES 3.00에서는
   비용이 없습니다. 거기서는 서브그룹이 인보케이션 하나이므로(규칙 11.21) 접은 값은 레인
   자신의 값이고 `subgroup_size`는 `1u`입니다. 어떤 어댑터가 이 네 기능 가운데 하나를 실제로 갖추었는지 알려면
@@ -171,7 +170,7 @@ const m = ok ? fancy : plain // two modules, one decision, made once
 
 ### 이식 가능한 컴퓨트 커널
 
-`"use typeshade"` 컴퓨트 진입점은 두 백엔드 모두에서 실행됩니다. WebGPU에서는 `@compute`
+`"use typeshade"` 컴퓨트 진입점은 두 백엔드 모두에서 실행됩니다. WebGPU에서는 컴퓨트
 진입점입니다. 컴퓨트 스테이지가 없는 WebGL2에서는 패스 프로그램으로 실행됩니다. 패스 프로그램은
 패스마다 텍스처에 전체 화면을 그리는 드로이며, 컴파일러가 이를 작성하고 매니페스트가 담아
 전달한다(변경 제안 0054). 어느 단계로 실행할지는 프로그램 런타임이 고르므로, 호스트 코드는 두
@@ -183,14 +182,13 @@ const m = ok ? fancy : plain // two modules, one decision, made once
 declare const field: storage<array<f32>>;
 declare const outColor: storage<array<u32>, "read_write">;
 
-@compute([64])
-export function evalField(@builtin("global_invocation_id") gid: vec3u): void {
+export const evalField = compute([64], function evalField(gid: builtin<"global_invocation_id", vec3u>): void {
   const i = gid.x;
-  if (i >= arrayLength(field)) {
+  if (i >= field.length) {
     return;
   }
   outColor[i] = pack4x8unorm(vec4(field[i], 0., 0., 1.));
-}
+});
 ```
 
 ```ts

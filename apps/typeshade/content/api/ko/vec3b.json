@@ -1,0 +1,7 @@
+{
+  "slug": "vec3b",
+  "source": "220095021af3cd94351c692bb3c3898c06536ed50e02b385697b9247b655d1e7",
+  "texts": {
+    "summary": "호스트 값으로서의 vec3b입니다. bool 세 개로 된 readonly 튜플입니다."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "slug": "vec3-type",
+  "source": "07f515f7a755d34261e76a6b8c5db5eef6cb76f48a6822d877280f24a92f263c",
+  "texts": {
+    "summary": "f32 세 개로 된 벡터 vec3을 호스트 값으로 나타냅니다. f32 세 개로 된 readonly 튜플입니다."
+  }
+}

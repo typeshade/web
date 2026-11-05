@@ -3,7 +3,8 @@ import { compose, createSourceCoordinates } from '../src/scripts/playground/sour
 import { registerEditorProviders } from '../src/scripts/playground/editor-providers.ts';
 
 describe('editor and compiler source coordinates', () => {
-  const fragment = '"use typeshade";\n@fragment\nfunction main(): vec4 { return vec4(1.0); }\n';
+  const fragment =
+    '"use typeshade";\nconst main = fragment(function main(): vec4 { return vec4(1.0); });\n';
 
   test('maps diagnostics back through the inserted vertex prelude', () => {
     const source = compose(fragment);
@@ -29,14 +30,14 @@ describe('editor and compiler source coordinates', () => {
     first.setPrelude(compose(fragment));
     expect(first.intoDocument(2)).toBeGreaterThan(2);
     expect(second.intoDocument(2)).toBe(2);
-    first.setPrelude(compose('"use typeshade";\n@compute\nfunction main() {}'));
+    first.setPrelude(compose('"use typeshade";\nconst main = compute([64], function main() {});'));
     expect(first.intoDocument(2)).toBe(2);
   });
 
   test('preserves files with no directive, a vertex entry, or a prelude name', () => {
     for (const source of [
       fragment.replace('"use typeshade";\n', ''),
-      fragment + '\n@vertex\nfunction vertex() {}',
+      fragment + '\nconst vertex = vertex(function vertex() {});',
       fragment + '\nclass VsOut {}',
     ]) {
       expect(compose(source)).toEqual({ text: source, at: 0, lines: 0 });

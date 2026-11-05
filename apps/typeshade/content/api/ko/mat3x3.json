@@ -1,0 +1,8 @@
+{
+  "slug": "mat3x3",
+  "source": "fec36b8c9c0a0261676d8ba3f8cf5656ba3a6d47a2cb3fc3b9705c993b8bf8ce",
+  "texts": {
+    "summary": "호스트 값으로서의 mat3x3입니다. 성분 9개를 열 우선 순서로 담은 readonly 튜플입니다.",
+    "description": "`mat3x3<f64>`는 `f64` 성분을 담습니다(규칙 4.4)."
+  }
+}

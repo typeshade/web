@@ -366,3 +366,34 @@ id first, then the pull request that did the work.
   example joins the compute group, the Playground picker and the stills' no-GLSL list with its
   Korean title and description; the three new exports are translated. Handled in #14. The
   unified benchmark's four fixed WGSL cases become TypeShade source in #22, which waits on this pin.
+- 0107: a function's numerical contract, `numerics([...], f)` and a stage call's `numerics`
+  option. The language reference lists `numerics` with the stage calls (en and ko), read from
+  the compiler's `STAGE_CALL_DOCS`; `TS8078` has an error-code page with a trigger (an unknown
+  class) and a fix; the pages generated from Rules 6.7 and 11.22 were read against the rules at
+  the pin; `NumericsClass` and the `numerics` member of `FuncDecl` are translated. Handled in
+  #25.
+- 0108: a host view carries the author's JSDoc. No page of this site copies the host-view
+  listing of surface §64; the quick start's host setup (en and ko) says that a view carries the
+  comment written above each export. Handled in #25.
+- 0111: an entry and its inputs and outputs in plain TypeScript. Every `"use typeshade"`
+  program the site holds (guide and concept samples, error-code triggers and fixes, mapping
+  snippets, Playground starters, the live-shader prelude, the front page) is rewritten with the
+  compiler's `migrateSource`; the copy in both dictionaries names stage calls and attribute
+  types; the language reference gains a Stage calls family and reads the attribute types; the
+  Korean guide sections the new `AUTHORING.md` changed are translated again. typeplot v0.2.1's
+  shader files are read through the same codemod until a typeplot release writes the new form
+  (`src/lib/typeplot-shaders.ts`). Handled in #25.
+- 0112: one spelling. `Math.pow` replaces `pow` in the TS8003 line, the TS8004 line names a
+  removed builtin and Rule 9.9 (en and ko); the function demos, lessons and stills of `log10`,
+  `log1p`, `expm1`, `cbrt` and `hypot`, and the operation lessons of `arrayLength`, `none` and
+  `sum`, go with their reference pages; the reference note on `pow` is retired with its entry
+  (open: a note for `Math.pow` and `**`); typeplot's `pow` calls are read as `**` by
+  `src/lib/typeplot-shaders.ts`. Handled in #25.
+- 0116: the host type family. The 48 host types of `typeshade/runtime` are API reference pages in
+  the Runtime category, with Korean translations, and a name two entry points give to two
+  declarations (`f32` of the IR builder and of the runtime) gets a page for each; no page copies
+  the §64 host values table, and the quick start (en and ko) says that a view spells each type
+  with the shader's own name. Handled in #25.
+- 0118: each fuse group names its tier. The control-flow page's fuse report paragraph (en and
+  ko) says each group names its `tier` and why it ran on a later tier than the plan's, and the
+  `FuseReport` reference and its Korean translation read the new field. Handled in #25.

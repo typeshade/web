@@ -1,0 +1,7 @@
+{
+  "slug": "vec2u-type",
+  "source": "9253ba85ee5d7f081942d531e0cb0d046234b9755fef560e265a9c9a4bce5220",
+  "texts": {
+    "summary": "호스트 값으로서의 vec2u입니다. u32 두 개로 된 readonly 튜플입니다."
+  }
+}

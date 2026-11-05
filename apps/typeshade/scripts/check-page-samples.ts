@@ -24,7 +24,7 @@ const SHARED: readonly { uses: RegExp; declares: RegExp; source: string }[] = [
   {
     uses: /\bCamera\b|\bcamera\b/,
     declares: /\bclass Camera\b/,
-    source: 'class Camera {\n  view: mat4\n  pos: vec3\n}\n',
+    source: 'class Camera {\n  view!: mat4\n  pos!: vec3\n}\n',
   },
   {
     uses: /\bcamera\b/,
@@ -38,8 +38,8 @@ const SHARED: readonly { uses: RegExp; declares: RegExp; source: string }[] = [
   },
   {
     uses: /\bVsIn\b/,
-    declares: /\bclass VsIn\b/,
-    source: 'class VsIn {\n  @location(0) position: vec3\n  @location(1) uv: vec2\n}\n',
+    declares: /\b(?:class|interface) VsIn\b/,
+    source: 'interface VsIn {\n  position: location<0, vec3>\n  uv: location<1, vec2>\n}\n',
   },
   {
     uses: /\bpositions\b/,
@@ -83,7 +83,7 @@ for (const page of PAGES) {
       continue;
     }
     const wrapped = STATEMENTS[page]?.includes(index)
-      ? `@compute([64, 1, 1])\nexport function fragment(@builtin("global_invocation_id") gid: vec3u) {\n${code.replace(/^/gm, '  ')}\n}`
+      ? `export const main = compute([64, 1, 1], function main(gid: builtin<"global_invocation_id", vec3u>) {\n${code.replace(/^/gm, '  ')}\n});`
       : code;
     const body = wrapped.startsWith(DIRECTIVE.trim())
       ? wrapped.slice(wrapped.indexOf('\n') + 1)
@@ -97,7 +97,11 @@ for (const page of PAGES) {
       requireDirective: true,
       emit: false,
     });
-    const errors = result.diagnostics.filter((d) => d.category === 'error');
+    // An error fails the sample, and so does the warning on the decorated form of an entry
+    // (TS8028, compiler change 0111): a page shows the form the compiler keeps.
+    const errors = result.diagnostics.filter(
+      (d) => d.category === 'error' || (d.category === 'warning' && d.code === 'TS8028'),
+    );
     if (errors.length > 0) {
       failures += 1;
       console.error(

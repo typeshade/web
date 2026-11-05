@@ -40,10 +40,9 @@ export const bothTargets = emitBothTargets();
 /** The first sample on /guide/typescript-and-webgpu/, a whole `"use typeshade"` file. */
 export const bridgeSample = `"use typeshade";
 
-@vertex
-export function main(): vec4 {
+export const main = vertex(function main(): vec4 {
   return vec4(0., 0., 0., 1.);
-}`;
+});`;
 
 /** The WGSL the pinned compiler writes for one whole file. A file that does not compile stops
  *  the build with the diagnostics an author would see, and so does one that emits nothing. */

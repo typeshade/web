@@ -1,0 +1,7 @@
+{
+  "slug": "vec2-type",
+  "source": "05000b337af6d8b8baa294da3694f3292783a0ddcd0e3e55f9a0b8cac94b3228",
+  "texts": {
+    "summary": "f32 두 개로 된 벡터 vec2을 호스트 값으로 나타냅니다. f32 두 개로 된 readonly 튜플입니다."
+  }
+}

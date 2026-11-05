@@ -1,0 +1,7 @@
+{
+  "slug": "vec3d",
+  "source": "5df5f8a0623a71fe557c20150a24376f223e671c1f522b136ff5f750e7031a06",
+  "texts": {
+    "summary": "vec3d는 vec3f64의 짧은 표기이며, 같은 타입입니다."
+  }
+}

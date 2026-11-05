@@ -1,0 +1,7 @@
+{
+  "slug": "vec3i-type",
+  "source": "859fc4400a64dc6401a31101589ee91dee5ca7e04af9330d3e5c9f105108cb29",
+  "texts": {
+    "summary": "호스트 값으로서의 vec3i입니다. i32 세 개로 된 readonly 튜플입니다."
+  }
+}

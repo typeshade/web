@@ -129,28 +129,6 @@ export const functionLessons = {
     caution:
       'Use positive inputs. Clamping an invalid input changes the meaning of the calculation.',
   },
-  log10: {
-    meaning: 'The decimal logarithm expresses a positive value as a decimal exponent.',
-    use: 'Use it for orders of magnitude and decimal logarithmic scales.',
-    try: 'Compare the centre and edges of the positive input range.',
-    caution: 'Zero and negative values have no finite real logarithm.',
-  },
-  log1p: {
-    meaning:
-      'This function computes the natural logarithm after adding the unit value to its input.',
-    use: 'Use it for logarithmic transforms that should map the origin to the origin.',
-    try: 'Move x across the origin and compare the two sides.',
-    caution:
-      'The shifted logarithm still has a domain boundary. A shader implementation may evaluate the direct formula with finite-precision rounding.',
-  },
-  expm1: {
-    meaning:
-      'This function subtracts the unit value from the natural exponential, so its curve passes through the origin.',
-    use: 'Use it in exponential transforms that should have no constant offset.',
-    try: 'Compare small inputs around the origin with larger positive inputs.',
-    caution:
-      'The mathematical formula does not guarantee a cancellation-resistant implementation on every shader target.',
-  },
   sqrt: {
     meaning: 'The square root returns the nonnegative value whose square equals the input.',
     use: 'Use it to recover lengths from squared distances.',
@@ -164,13 +142,6 @@ export const functionLessons = {
     try: 'Move x toward the left edge and observe the rising output.',
     caution:
       'Use strictly positive inputs. A zero-length vector needs a separate normalization policy.',
-  },
-  cbrt: {
-    meaning: 'The cube root returns a signed value whose cube equals the input.',
-    use: 'Use it for signed cubic scale conversions and volume-to-length calculations.',
-    try: 'Move x through the origin and compare opposite inputs.',
-    caution:
-      'A fractional power of a negative base is not a portable substitute in shader languages.',
   },
   abs: {
     meaning: 'Absolute value removes the sign and keeps the magnitude.',
@@ -303,12 +274,6 @@ export const functionLessons = {
     try: "Change the integer-valued k and watch the line's slope change.",
     caution: 'The exponent is an integer. Extreme exponents can overflow or underflow the result.',
   },
-  hypot: {
-    meaning: 'The hypotenuse function returns the length formed by perpendicular components.',
-    use: 'Use it to turn Cartesian components into a distance from the origin.',
-    try: 'Change k, the fixed perpendicular component, and observe the minimum length.',
-    caution: 'A distance has no sign. Numerical overflow handling depends on the implementation.',
-  },
   length: {
     meaning: "Vector length measures a vector's magnitude.",
     use: 'Use it for distances from an origin and speed from velocity components.',
@@ -334,13 +299,5 @@ export const functionLessons = {
     try: 'The graph shows the horizontal component after normalizing a vector with a fixed vertical component.',
     caution:
       'A zero vector has no unique direction. This example keeps the vertical component nonzero.',
-  },
-  pow: {
-    meaning:
-      'A power raises a base to an exponent. On $[0,1]$, the exponent controls how a ramp bends.',
-    use: 'Use it for easing curves, specular highlights, and power-law transforms.',
-    try: 'Compare an exponent below the unit value with one above it in the graph.',
-    caution:
-      'Real-number mathematics and shader input rules need separate attention. Shader pow does not define negative bases, even for integer-valued exponents.',
   },
 } satisfies Record<string, FunctionLesson>;

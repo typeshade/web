@@ -1,0 +1,7 @@
+{
+  "slug": "vec2f",
+  "source": "56ae65efc2944b9241f08af9b60a736b75964638bca1c72b4c5fced1481d3672",
+  "texts": {
+    "summary": "WGSL의 vec2f이며, vec2과 같은 타입입니다."
+  }
+}

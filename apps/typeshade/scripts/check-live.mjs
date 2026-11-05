@@ -35,21 +35,6 @@ const ROUTES = [
   { route: '/guide/quick-start/', id: 'quick-start-stripes' },
   { route: '/guide/quick-start/?forcegl2=1', id: 'quick-start-stripes', backend: 'webgl2' },
   { route: '/ko/guide/language/gpu-types/', id: 'gpu-types-disc' },
-  // The three live examples of the reference note on `pow`, on each backend.
-  { route: '/reference/functions/pow/', id: 'reference-pow-curve' },
-  { route: '/reference/functions/pow/', id: 'reference-pow-negative' },
-  { route: '/reference/functions/pow/', id: 'reference-pow-specular' },
-  { route: '/reference/functions/pow/?forcegl2=1', id: 'reference-pow-curve', backend: 'webgl2' },
-  {
-    route: '/reference/functions/pow/?forcegl2=1',
-    id: 'reference-pow-negative',
-    backend: 'webgl2',
-  },
-  {
-    route: '/reference/functions/pow/?forcegl2=1',
-    id: 'reference-pow-specular',
-    backend: 'webgl2',
-  },
 ];
 /** A script larger than this is the compiler; nothing else the site ships comes close. */
 const SMALL_SCRIPT = 200_000;

@@ -1,19 +1,21 @@
 import assert from "node:assert/strict";
 
 // A real language-worker round trip verifies the boundary between the reader's
-// fragment file and the compiler's inserted vertex prelude.
+// fragment file and the compiler's inserted vertex prelude. The sources are written in the
+// entry form of compiler change 0111 (stage calls and attribute types): the decorated form
+// draws a TS8028 warning marker, and the check waits for a file with no marker.
 export async function checkEditorCoordinates(page) {
   const source = `"use typeshade"
 
-class Color {
-  @location(0) color: vec4
+interface Color {
+  color: location<0, vec4>
 }
 
-@fragment
-export function fs(@location(0) uv: vec2): Color {
+// Eight stripes across the canvas.
+export const fs = fragment(function fs(uv: location<0, vec2>): Color {
   const stripe = fract(uv.x * 8.);
   return { color: vec4(stripe, uv.y, 1. - stripe, 1.) };
-}
+});
 `;
   await page.evaluate(
     (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
@@ -189,10 +191,9 @@ export function fs(@location(0) uv: vec2): Color {
     (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
     `"use typeshade"
 
-@fragment
-export function main(@builtin("position") p: vec4): vec4 {
+export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
   return vec4(fract(p.x / 32.), 0.5, 0.5, 1.);
-}
+});
 `,
   );
   await page.waitForFunction(

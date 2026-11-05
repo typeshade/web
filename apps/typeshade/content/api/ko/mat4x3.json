@@ -1,0 +1,7 @@
+{
+  "slug": "mat4x3",
+  "source": "5a3be79df551d315196aa3b88de4719932b136bc3971f7d4ad9e3c2d26313ff0",
+  "texts": {
+    "summary": "4열 3행인 mat4x3을 호스트 값으로 나타냅니다. 성분 12개를 열 우선 순서로 담은 readonly 튜플입니다."
+  }
+}

@@ -248,14 +248,6 @@ export const operationLessons = {
     caution:
       'This query requires a multisampled texture. Sample indices start at zero. The compiler has no GLSL ES multisample form.',
   },
-  arrayLength: {
-    meaning:
-      'A runtime-sized storage array gets its usable element count from the bound buffer range.',
-    use: 'Use the count for bounds checks in compute kernels.',
-    try: 'With a fixed element stride, a larger bound buffer range contains more usable elements.',
-    caution:
-      'Query the storage array itself or a trailing array field. Buffer padding and element stride affect the count; a byte count is not an element count.',
-  },
   textureStore: {
     meaning: 'A texture store replaces the value of one integer-addressed texel.',
     use: 'Use it to write a compute result into an image.',
@@ -357,6 +349,47 @@ export const operationLessons = {
     try: 'Compare the shared workgroup case with independent workgroups. Only invocations in the same workgroup rendezvous.',
     caution:
       'Every invocation of the workgroup must reach the barrier in uniform control flow. It is not a device-wide barrier. These compiler calls are compute-only and WebGPU-only.',
+  },
+  // The stage calls of compiler change 0111, and the numerical contract of change 0107.
+  vertex: {
+    meaning:
+      'vertex(f) makes f the entry point of the vertex stage. The GPU calls it once per vertex of a draw.',
+    use: 'Use it for the function that places each vertex in clip space and passes values on to the fragment stage.',
+    try: 'Compare the three vertices of one triangle. Each call reads its own vertex index and returns its own position.',
+    caution:
+      'Write it as a top-level export const whose name the function expression repeats. A vertex entry must produce a position: a vec4 return, or a struct field typed builtin<"position", vec4>.',
+  },
+  fragment: {
+    meaning:
+      'fragment(f) makes f the entry point of the fragment stage. The GPU calls it once per covered pixel sample.',
+    use: 'Use it for the function that computes the colour of each pixel from the values the vertex stage interpolated.',
+    try: 'Compare three pixels of one triangle. Each call reads the interpolated uv of its own pixel and returns its own colour.',
+    caution:
+      'Write it as a top-level export const. A bare return goes to location 0, the first colour attachment; a struct return takes one location<n, T> field per attachment.',
+  },
+  compute: {
+    meaning:
+      'compute([x, y?, z?], f) makes f a compute entry point and gives its workgroup size, one to three extents.',
+    use: 'Use it for general GPU work over buffers and textures, outside any draw.',
+    try: 'Compare three invocations of one dispatch. Each reads its own global_invocation_id and writes its own element.',
+    caution:
+      'The size comes first and the function second. The host chooses how many workgroups a dispatch runs; the size says how many invocations each one holds.',
+  },
+  workgroup_size: {
+    meaning:
+      'workgroup_size([n], f) sets the workgroup size the loops of the kernel function f run in on WebGPU.',
+    use: 'Use it when the loops of a kernel function should run in workgroups of another size than the default of 64.',
+    try: 'Compare a loop under the default, under 128 and a loop that reduces. The reducing loop runs at 256 whatever is written.',
+    caution:
+      'It takes one extent, and only a kernel function takes it. A kernel function with a loop that reduces refuses it (TS8077).',
+  },
+  numerics: {
+    meaning:
+      'numerics(classes, f) opts the function f into floating-point rewrites that the default optimizer refuses.',
+    use: 'Use it for a function whose operands you know are finite, so x * 0 may fold to 0 and the arithmetic may be reordered.',
+    try: 'Compare the same expression with no contract, under finite-math and under reassociate. The CPU oracle keeps the exact meaning in every case.',
+    caution:
+      'A rewrite applies only inside the function that opted in. An unknown class, or the call written anywhere but around a function of the file, is TS8078.',
   },
   storageBarrier: {
     meaning:
@@ -682,32 +715,18 @@ export const operationLessons = {
       'Components are sign-extended when signed and zero-extended when unsigned. These integer byte operations are WebGPU-only in this compiler.',
   },
   any: {
-    meaning: 'Any is true when at least one tested component or element passes.',
+    meaning: 'Any is true when at least one component of a boolean or a boolean vector is true.',
     use: 'Use it for detecting whether a condition occurs anywhere.',
     try: 'The result is true if any component is true. It is false only when every component is false.',
     caution:
       'A per-component comparison creates a boolean vector; any reduces it to a single boolean.',
   },
   all: {
-    meaning: 'All is true when every tested component or element passes.',
+    meaning: 'All is true when every component of a boolean or a boolean vector is true.',
     use: 'Use it for checking whether every value is valid.',
     try: 'The result is true only when every component is true. One false component makes it false.',
     caution:
       'A per-component comparison creates a boolean vector; all reduces it to a single boolean.',
-  },
-  none: {
-    meaning: 'None is true when no array element passes the test.',
-    use: 'Use it for rejecting a set containing any invalid value.',
-    try: 'The example tests whether each value is negative. The result is true only when the array contains no negative values.',
-    caution:
-      'This operation takes a fixed-size array and predicate. It is the negation of any, not of all.',
-  },
-  sum: {
-    meaning: 'A sum reduces an array of numbers or vectors by addition.',
-    use: 'Use it for accumulating weights or contributions.',
-    try: 'Positive values add to the sum and negative values reduce it. Equal and opposite values cancel.',
-    caution:
-      'Floating-point addition depends on rounding and evaluation order. The example uses small exact values.',
   },
   zip: {
     meaning: 'Zip combines corresponding elements from two equal-length arrays.',

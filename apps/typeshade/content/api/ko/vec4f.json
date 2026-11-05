@@ -1,0 +1,7 @@
+{
+  "slug": "vec4f",
+  "source": "1aec12d4e4aae8a62e7cebcc5feca784c40a1ea42334bcbd5361c553f6aed63c",
+  "texts": {
+    "summary": "WGSL의 vec4f이며, vec4과 같은 타입입니다."
+  }
+}
