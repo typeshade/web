@@ -135,7 +135,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
             id="patch-name"
             maxLength={40}
             value={e.state.patchName}
-            onChange={(event) => e.patch(e.state.patch, event.target.value)}
+            onChange={(event) => e.patch({}, event.target.value)}
           />
         </label>
         <div className="button-row">

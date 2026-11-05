@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Editor } from "../useEditor.ts";
 import { LIMITS, SHAPES, envelopeAt, type Patch } from "../../designer.ts";
 
@@ -117,9 +116,7 @@ export function Parameter({
           id={name}
           type="checkbox"
           checked={value}
-          onChange={(event) =>
-            e.patch({ ...e.state.patch, [name]: event.target.checked })
-          }
+          onChange={(event) => e.patch({ [name]: event.target.checked })}
         />
         {labels[name] || name}
       </label>
@@ -149,9 +146,7 @@ export function Parameter({
         <select
           id={name}
           value={value}
-          onChange={(event) =>
-            e.patch({ ...e.state.patch, [name]: Number(event.target.value) })
-          }
+          onChange={(event) => e.patch({ [name]: Number(event.target.value) })}
         >
           {options.map((option, i) => (
             <option value={i} key={option}>
@@ -173,7 +168,7 @@ export function Parameter({
             value={value}
             disabled={name === "lfoRate" && e.state.patch.lfoSync}
             onChange={(event) =>
-              e.patch({ ...e.state.patch, [name]: Number(event.target.value) })
+              e.patch({ [name]: Number(event.target.value) })
             }
           />
         </>
@@ -203,7 +198,6 @@ export function SoundEditor({
               checked={e.state.patch[config.toggle]}
               onChange={(event) =>
                 e.patch({
-                  ...e.state.patch,
                   [config.toggle]: event.target.checked,
                 })
               }
@@ -228,10 +222,7 @@ export function SoundEditor({
             A3: 220,
             C4: 261.63,
           }).map(([note, frequency]) => (
-            <button
-              key={note}
-              onClick={() => e.patch({ ...e.state.patch, frequency })}
-            >
+            <button key={note} onClick={() => e.patch({ frequency })}>
               {note}
             </button>
           ))}
@@ -277,7 +268,6 @@ export function TonePad({ editor: e }: { editor: Editor }) {
         Math.min(1, 1 - (event.clientY - rect.top) / rect.height),
       );
     e.patch({
-      ...e.state.patch,
       cutoff: Math.round(80 * Math.pow(200, x)),
       blend: Math.round(y * 100) / 100,
     });
@@ -303,7 +293,7 @@ export function TonePad({ editor: e }: { editor: Editor }) {
   );
 }
 export function Variations({ editor: e }: { editor: Editor }) {
-  const [morph, setMorph] = useState(0);
+  const morph = e.morphAmount;
   return (
     <div className="variation-controls">
       <div className="button-row">
@@ -326,17 +316,18 @@ export function Variations({ editor: e }: { editor: Editor }) {
       </div>
       <label className="parameter">
         <span>A / B blend</span>
-        <output>{Math.round(morph * 100)}%</output>
+        <output>
+          {morph === undefined ? "Custom" : `${Math.round(morph * 100)}%`}
+        </output>
         <input
           id="morph"
           type="range"
           min="0"
           max="1"
           step=".01"
-          value={morph}
+          value={morph ?? 0.5}
           onChange={(event) => {
             const v = Number(event.target.value);
-            setMorph(v);
             e.morph(v);
           }}
         />

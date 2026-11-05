@@ -7,6 +7,7 @@ export interface Document {
   patch: Patch;
   patchName: string;
   selected: string;
+  source: { patch: Patch; name: string };
 }
 export interface EditorState extends Document {
   past: Document[];
@@ -15,6 +16,7 @@ export interface EditorState extends Document {
   tool: Tool;
 }
 export const SCENE_KEY = "typeaudio.video.scene.v1";
+export const DOCUMENT_KEY = "typeaudio.editor.document.v1";
 export const PATCH_KEY = "typeaudio.designer.saved.v1";
 export function initialDocument(): Document {
   let scene = emptyScene();
@@ -33,13 +35,32 @@ export function initialDocument(): Document {
       };
     }
   } catch {}
-  const cue = scene.cues[0];
-  return {
+  // Prefer one atomic document; retain legacy scene/source migration.
+  let selected = scene.cues[0]?.id || "";
+  try {
+    const raw = localStorage.getItem(DOCUMENT_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      if (saved.version !== 1) throw new Error("Unsupported document");
+      const nextScene = validateScene(saved.scene);
+      const nextSource = {
+        patch: validatePatch(saved.source.patch),
+        name: String(saved.source.name).slice(0, 40),
+      };
+      scene = nextScene;
+      source = nextSource;
+      selected = scene.cues.some((c) => c.id === saved.selected)
+        ? saved.selected
+        : "";
+    }
+  } catch {}
+  return projectDocument({
     scene,
-    patch: { ...(cue?.patch || source.patch) },
-    patchName: cue?.name || source.name,
-    selected: cue?.id || "",
-  };
+    source,
+    selected,
+    patch: source.patch,
+    patchName: source.name,
+  });
 }
 export type Action =
   | { type: "edit"; edit: (doc: Document) => Document; record?: boolean }
@@ -48,34 +69,34 @@ export type Action =
   | { type: "select"; id: string }
   | { type: "workspace"; workspace: Workspace }
   | { type: "tool"; tool: Tool }
-  | { type: "open"; scene: Scene };
+  | { type: "open"; scene: Scene }
+  | { type: "media"; media: Scene["media"] };
 function snapshotDocument(s: Document): Document {
   return {
     scene: s.scene,
     patch: s.patch,
     patchName: s.patchName,
     selected: s.selected,
+    source: s.source,
   };
 }
 export function reducer(s: EditorState, a: Action): EditorState {
   if (a.type === "workspace") return { ...s, workspace: a.workspace };
   if (a.type === "tool") return { ...s, tool: a.tool };
-  if (a.type === "select") {
-    const c = s.scene.cues.find((c) => c.id === a.id);
+  if (a.type === "select")
+    return { ...s, ...projectDocument({ ...s, selected: a.id }) };
+  if (a.type === "media")
     return {
       ...s,
-      selected: a.id,
-      ...(c ? { patch: { ...c.patch }, patchName: c.name } : {}),
+      ...updateScene(s, (scene) => ({ ...scene, media: a.media })),
+      past: [],
+      future: [],
     };
-  }
   if (a.type === "open") {
-    const scene = validateScene(a.scene),
-      cue = scene.cues[0];
+    const scene = validateScene(a.scene);
     return {
       ...s,
-      scene,
-      selected: cue?.id || "",
-      ...(cue ? { patch: { ...cue.patch }, patchName: cue.name } : {}),
+      ...projectDocument({ ...s, scene, selected: scene.cues[0]?.id || "" }),
       past: [],
       future: [],
     };
@@ -85,7 +106,7 @@ export function reducer(s: EditorState, a: Action): EditorState {
     return prev
       ? {
           ...s,
-          ...prev,
+          ...projectDocument(prev),
           past: s.past.slice(0, -1),
           future: [snapshotDocument(s), ...s.future].slice(0, 30),
         }
@@ -96,13 +117,14 @@ export function reducer(s: EditorState, a: Action): EditorState {
     return next
       ? {
           ...s,
-          ...next,
+          ...projectDocument(next),
           past: [...s.past, snapshotDocument(s)].slice(-30),
           future: s.future.slice(1),
         }
       : s;
   }
-  const next = a.edit(snapshotDocument(s));
+  const next = projectDocument(a.edit(snapshotDocument(s)));
+  if (JSON.stringify(snapshotDocument(s)) === JSON.stringify(next)) return s;
   return {
     ...s,
     ...next,
@@ -111,23 +133,41 @@ export function reducer(s: EditorState, a: Action): EditorState {
     future: [],
   };
 }
-export function updatePatch(
-  doc: Document,
-  patch: Patch,
-  name = doc.patchName,
-): Document {
-  patch = validatePatch(patch);
+/** patch/patchName are the selected sound projection, never a second source of truth. */
+export function projectDocument(doc: Document): Document {
+  const cue = doc.scene.cues.find((c) => c.id === doc.selected);
   return {
     ...doc,
-    patch,
-    patchName: name,
-    scene: {
-      ...doc.scene,
-      cues: doc.scene.cues.map((c) =>
-        c.id === doc.selected ? { ...c, patch: { ...patch }, name } : c,
-      ),
-    },
+    selected: cue?.id || "",
+    patch: cue?.patch || doc.source.patch,
+    patchName: cue?.name || doc.source.name,
   };
+}
+export function updateScene(
+  doc: Document,
+  edit: (scene: Scene) => Scene,
+): Document {
+  return projectDocument({ ...doc, scene: validateScene(edit(doc.scene)) });
+}
+export function updatePatch(
+  doc: Document,
+  changes: Partial<Patch>,
+  name?: string,
+): Document {
+  const current = projectDocument(doc),
+    patch = validatePatch({ ...current.patch, ...changes }),
+    nextName = name ?? current.patchName;
+  return current.selected
+    ? projectDocument({
+        ...current,
+        scene: {
+          ...current.scene,
+          cues: current.scene.cues.map((c) =>
+            c.id === current.selected ? { ...c, patch, name: nextName } : c,
+          ),
+        },
+      })
+    : projectDocument({ ...current, source: { patch, name: nextName } });
 }
 export function download(data: Blob, name: string): void {
   const url = URL.createObjectURL(data),

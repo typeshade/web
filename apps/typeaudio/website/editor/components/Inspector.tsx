@@ -20,9 +20,10 @@ export function Inspector({ editor: e }: { editor: Editor }) {
                 id="cue-name"
                 value={c.name}
                 maxLength={100}
-                onChange={(event) =>
-                  e.cue((c) => ({ ...c, name: event.target.value }))
-                }
+                onChange={(event) => {
+                  const name = event.target.value;
+                  e.cue((c) => ({ ...c, name }));
+                }}
               />
             </label>
             <div className="property-section">
@@ -69,9 +70,10 @@ export function Inspector({ editor: e }: { editor: Editor }) {
                   max="1"
                   step=".01"
                   value={c.gain}
-                  onChange={(event) =>
-                    e.cue((c) => ({ ...c, gain: Number(event.target.value) }))
-                  }
+                  onChange={(event) => {
+                    const gain = Number(event.target.value);
+                    e.cue((c) => ({ ...c, gain }));
+                  }}
                 />
               </label>
               <label className="check">
@@ -79,9 +81,10 @@ export function Inspector({ editor: e }: { editor: Editor }) {
                   id="cue-muted"
                   type="checkbox"
                   checked={c.muted}
-                  onChange={(event) =>
-                    e.cue((c) => ({ ...c, muted: event.target.checked }))
-                  }
+                  onChange={(event) => {
+                    const muted = event.target.checked;
+                    e.cue((c) => ({ ...c, muted }));
+                  }}
                 />
                 Mute layer
               </label>
@@ -157,9 +160,10 @@ export function Mixer({ editor: e }: { editor: Editor }) {
             max="1"
             step=".01"
             value={e.state.scene[key]}
-            onChange={(event) =>
-              e.scene({ ...e.state.scene, [key]: Number(event.target.value) })
-            }
+            onChange={(event) => {
+              const value = Number(event.target.value);
+              e.scene((current) => ({ ...current, [key]: value }), true, false);
+            }}
           />
         </label>
       ))}
