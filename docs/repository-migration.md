@@ -411,3 +411,42 @@ GitHub connection cannot create environments (HTTP 403); setup uses the existing
 Actions `DEPLOYMENT_ADMIN_TOKEN` instead. Previous live version captured before
 cutover: `7895f067-b7d5-4f2a-a012-40e9ae090cb2` at 100% traffic. Execution results
 will be recorded after the deployment is verified.
+
+### TypeAudio production transfer completed
+
+The approved transition is complete as of 2026-11-05 at 05:51 UTC. PRs
+[#27](https://github.com/typeshade/web/pull/27),
+[#28](https://github.com/typeshade/web/pull/28) and
+[#29](https://github.com/typeshade/web/pull/29) are merged. This status supersedes
+the prepared-state notes above for TypeAudio.
+
+- The `typeaudio-production` environment exists with exactly one allowed branch,
+  `main`. Other production environments and operation switches were preserved.
+- The initial setup run created the environment but could not disable the old
+  publisher with its Actions admin credential (HTTP 403). The authorized executor
+  credential disabled it after verifying no queued, running, pending, waiting or
+  requested runs. The corrected idempotent setup then passed in
+  [41976291248](https://github.com/typeshade/web/actions/runs/41976291248).
+- The old `typeshade/typeaudio` workflow `.github/workflows/deploy.yml` (ID
+  `407704055`) is `disabled_manually`. Its source files and open PRs are retained;
+  the library repository remains active. Production preflight checks this stopped
+  publisher and the protected environment on every TypeAudio deployment.
+- [Production deploy 41976250483](https://github.com/typeshade/web/actions/runs/41976250483)
+  passed from web revision `c93f75b7fea06e53d73efc67fe61d60de15b2cb6`, including
+  shader/TypeScript checks, 13 audio tests and the complete Chromium studio suite.
+  The later setup idempotence fix does not change the built application.
+- Cloudflare's deployment API independently confirms version
+  `14fd1c8d-bfac-4b61-afad-8fbb460374bf` receives **100%** of traffic. The previous
+  rollback version is `7895f067-b7d5-4f2a-a012-40e9ae090cb2`. The Worker name and
+  custom domain remain `typeaudio-site` and `audio.typeshade.dev`.
+- GitHub's HTTP probe received Cloudflare's browser challenge and recorded it as
+  blocked. An external Chromium session then verified HTTP 200, actual continuous
+  AudioWorklet playback, XY input, A/B recall, logarithmic morphing and tempo-synced
+  LFO edits on one worklet node without offline worker requests. CPU and WebGPU
+  finite renders passed and displayed the live-modulation exclusion notice.
+  Mobile layout, four documentation routes and the 404 response passed, with no
+  application runtime errors. No browser-protection settings were changed.
+
+The TypeAudio CI and production workflow now use `apps/typeaudio/dist`. Other
+sites' broader CI results are independent of these focused deployment checks.
+The studio remains English-only; device speaker latency was not measured.

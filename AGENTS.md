@@ -2,7 +2,7 @@
 
 ## Current owner direction
 
-This repository manages the TypeShade, TypeNN and TypeCV websites and their shared UI.
+This repository manages the TypeShade, TypeNN, TypeCV and TypeAudio websites and their shared UI.
 **All published content on all sites is in editorial review scope.** Do not limit the work to
 home pages or the last example the owner pointed out. Include documentation, imported and
 generated reference, example descriptions, UI controls, errors, accessibility labels and SEO

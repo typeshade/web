@@ -1,6 +1,6 @@
 # TypeShade web
 
-Websites and shared UI for TypeShade, TypeNN and TypeCV. Node 24, pnpm 10.28.2
+Websites and shared UI for TypeShade, TypeNN, TypeCV and TypeAudio. Node 24, pnpm 10.28.2
 and Bun 1.4.3 are used by CI. Each website builds and deploys independently.
 
 | Workspace        | Domain           | Source                                                |
@@ -8,6 +8,7 @@ and Bun 1.4.3 are used by CI. Each website builds and deploys independently.
 | `apps/typeshade` | typeshade.dev    | compiler pinned at `apps/typeshade/vendor/shader-dsl` |
 | `apps/typenn`    | nn.typeshade.dev | library pinned at `sources/typenn`                    |
 | `apps/typecv`    | cv.typeshade.dev | library and documentation pinned at `sources/typecv`  |
+| `apps/typeaudio` | audio.typeshade.dev | library pinned at `sources/typeaudio` |
 | `packages/ui`    | shared           | `@typeshade/site-ui`, linked with `workspace:*`       |
 
 ## Content and agent handoff
@@ -115,4 +116,5 @@ example images remain with their sites; dataset hosting remains external.
 
 The sound studio is in [`apps/typeaudio`](apps/typeaudio/README.md). It uses a pinned
 TypeAudio source submodule and has its own build/browser checks. Production publishing
-has not yet transferred from the TypeAudio repository.
+uses this repository’s **Production deploy** workflow with `site=typeaudio`. The legacy
+TypeAudio publisher is disabled; [the cutover record](docs/repository-migration.md#typeaudio-production-transfer-completed) includes deployment and rollback versions.

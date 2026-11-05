@@ -52,3 +52,10 @@ English-only site, as before this change.
 These checks do not measure physical speaker latency or low-end device headroom.
 Live modulation is not included in Render-mode WAV files; the UI explains this.
 Production cutover and a production URL verification remain separate work.
+
+## Production follow-through
+
+The owner approved publication and the repository transition. The studio is live
+from the web repository; [the cutover record](../repository-migration.md#typeaudio-production-transfer-completed)
+contains workflow runs, version IDs and external browser validation. The earlier
+prepared-state statements in this review describe the original PR stage.
