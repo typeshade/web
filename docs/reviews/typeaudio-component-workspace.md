@@ -197,3 +197,12 @@ recovery. A third browser check forces device loss during a real GPU submission
 through a wrapper around the production worker. It verifies error delivery, a new
 GPU device on retry, and retention of the independent CPU device. The delayed
 render fixture now echoes request IDs so it still exercises patch revision checks.
+
+The first production build was gated by a browser-fixture failure after the PR
+checks passed. The paused-display test discarded RAF callbacks; if an application
+loop reached that stub, restoring the native function did not restart the loop.
+An explicit 80 ms pause reproduced the later timeline scheduling timeout on Chrome
+156. The fixture now retains/cancels paused callbacks and resumes them with the
+native scheduler restored. Its assertion polls independently of RAF. The same
+80 ms pause and full browser suite pass with this correction. No application or
+audio-processing code changed for this fixture repair.

@@ -119,9 +119,32 @@ try {
   assert.ok((await page.evaluate(()=>(window as any).patchMessages))-messageCount<=3,'Control bursts must be coalesced before posting to the worklet');
   // Control delivery must not depend on display frames (background tabs, a
   // stalled visualizer, or a game rendering more slowly than its audio).
-  await page.evaluate(()=>{const w=window as any;w.savedRAF=requestAnimationFrame;window.requestAnimationFrame=()=>-1;const input=document.querySelector('#frequency') as HTMLInputElement;Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!.call(input,'440');input.dispatchEvent(new Event('input',{bubbles:true}));});
-  try{await page.waitForFunction(()=>(window as any).lastPatch?.frequency===440,undefined,{timeout:2000});}
-  finally{await page.evaluate(()=>{window.requestAnimationFrame=(window as any).savedRAF;});}
+  await page.evaluate(()=>{
+    const w=window as any;
+    w.savedRAF=requestAnimationFrame;w.savedCancelRAF=cancelAnimationFrame;
+    w.pausedFrames=new Map<number,FrameRequestCallback>();let next=-1;
+    window.requestAnimationFrame=callback=>{const id=next--;w.pausedFrames.set(id,callback);return id;};
+    window.cancelAnimationFrame=id=>{if(id<0)w.pausedFrames.delete(id);else w.savedCancelRAF(id);};
+    const input=document.querySelector('#frequency') as HTMLInputElement;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!.call(input,'440');
+    input.dispatchEvent(new Event('input',{bubbles:true}));
+  });
+  try{
+    // Let existing display loops reach the paused scheduler. Poll independently
+    // of RAF, so the assertion itself cannot wait for a display callback.
+    await page.waitForTimeout(80);
+    await page.waitForFunction(()=>(window as any).lastPatch?.frequency===440,undefined,{timeout:2000,polling:10});
+  } finally {
+    await page.evaluate(()=>{
+      const w=window as any;
+      window.requestAnimationFrame=w.savedRAF;
+      // Resume retained callbacks synchronously with RAF restored. Their loops
+      // acquire real handles again; keep cancellation active during this flush.
+      const now=performance.now();
+      for(const [id,callback] of w.pausedFrames){w.pausedFrames.delete(id);callback(now);}
+      window.cancelAnimationFrame=w.savedCancelRAF;
+    });
+  }
   await range(page, "frequency", 880);
   await range(page, "voices", 8);
   await module(page, "filter");
