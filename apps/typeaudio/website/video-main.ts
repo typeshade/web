@@ -687,6 +687,7 @@ field("project-file").addEventListener("change", async () => {
     save();
     draw();
     await prepare();
+    if (!ready) return;
     status(
       scene.media.kind === "none"
         ? "Project opened."

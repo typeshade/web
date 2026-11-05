@@ -57,12 +57,16 @@ try {
     (window as any).activeCueNodes = active;
     const start = AudioBufferSourceNode.prototype.start;
     const stop = AudioBufferSourceNode.prototype.stop;
-    AudioBufferSourceNode.prototype.start = function (...args: Parameters<typeof start>) {
+    AudioBufferSourceNode.prototype.start = function (
+      ...args: Parameters<typeof start>
+    ) {
       active.add(this);
-      this.addEventListener('ended', () => active.delete(this));
+      this.addEventListener("ended", () => active.delete(this));
       start.apply(this, args);
     };
-    AudioBufferSourceNode.prototype.stop = function (...args: Parameters<typeof stop>) {
+    AudioBufferSourceNode.prototype.stop = function (
+      ...args: Parameters<typeof stop>
+    ) {
       active.delete(this);
       stop.apply(this, args);
     };
@@ -116,7 +120,10 @@ try {
       ) > 0,
   );
   await page.locator("#pause").click();
-  assert.equal(await page.evaluate(() => (window as any).activeCueNodes.size), 0);
+  assert.equal(
+    await page.evaluate(() => (window as any).activeCueNodes.size),
+    0,
+  );
   const paused = Number(
     (await page.locator("#clock").textContent())!.split(" ")[0],
   );
@@ -134,13 +141,11 @@ try {
   const project = await download(page, "save-project");
   const snapshot = JSON.parse(project.toString());
   assert.equal(snapshot.cues.length, 1);
-  await page
-    .locator("#project-file")
-    .setInputFiles({
-      name: "bad.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"version":2}'),
-    });
+  await page.locator("#project-file").setInputFiles({
+    name: "bad.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"version":2}'),
+  });
   await page.waitForFunction(() =>
     document.querySelector("#status")!.textContent!.startsWith("Import failed"),
   );
@@ -208,13 +213,11 @@ try {
     /fit inside/,
   );
   assert.equal(await page.locator("#range-out").inputValue(), "4");
-  await page
-    .locator("#project-file")
-    .setInputFiles({
-      name: "scene.json",
-      mimeType: "application/json",
-      buffer: project,
-    });
+  await page.locator("#project-file").setInputFiles({
+    name: "scene.json",
+    mimeType: "application/json",
+    buffer: project,
+  });
   await ready(page);
   await page.waitForFunction(() =>
     document.querySelector("#status")!.textContent!.includes("Project opened"),
@@ -248,6 +251,41 @@ try {
     "PASS designer bridge, real CPU cue PCM, range WAV, mute/undo, duplicate/delete, project validation/round trip/persistence, local video playback and end/range loops, levels, mobile layout",
   );
 
+  const failedRender = await browser.newPage();
+  await failedRender.addInitScript(() => {
+    (window as any).Worker = class {
+      onmessage?: (event: { data: { error: string } }) => void;
+      postMessage() {
+        setTimeout(
+          () => this.onmessage?.({ data: { error: "Test render failure" } }),
+          0,
+        );
+      }
+      terminate() {}
+    };
+  });
+  await failedRender.goto(base + "/studio/video/");
+  await ready(failedRender);
+  await failedRender
+    .locator("#project-file")
+    .setInputFiles({
+      name: "scene.json",
+      mimeType: "application/json",
+      buffer: project,
+    });
+  await failedRender.waitForFunction(() =>
+    document
+      .querySelector("#status")!
+      .textContent!.includes("Test render failure"),
+  );
+  assert.equal(await failedRender.locator("#play").isDisabled(), true);
+  assert.equal(
+    await failedRender
+      .locator("#status")
+      .evaluate((e) => e.classList.contains("error")),
+    true,
+  );
+  await failedRender.close();
   const yt = await browser.newPage();
   yt.on("pageerror", (e) => errors.push(e.message));
   // The deterministic adapter test is deliberately separate from actual YouTube availability.

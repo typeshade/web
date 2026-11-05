@@ -85,3 +85,7 @@ volume controls, and 320/390px overflow checks. Desktop and mobile screenshots
 were inspected; a mobile aspect-ratio overflow was fixed. The deterministic
 YouTube adapter transport and blocked-API recovery tests pass; those tests use a
 mock API and do not prove external video availability or device latency.
+
+An external YouTube IFrame API load was also attempted from the execution
+environment; the connection failed and the page displayed its recovery message.
+External YouTube playback is therefore unverified, separately from adapter tests.
