@@ -1,0 +1,176 @@
+import type { Editor } from "../useEditor.ts";
+import { Panel, Icon } from "./Panel.tsx";
+export function Inspector({ editor: e }: { editor: Editor }) {
+  const c = e.selected;
+  return (
+    <>
+      <Panel title="Properties" className="clip-properties">
+        {c ? (
+          <>
+            <div className="selected-object">
+              <Icon name="sound" />
+              <span>
+                {c.name}
+                <small>Audio layer</small>
+              </span>
+            </div>
+            <label>
+              Name
+              <input
+                id="cue-name"
+                value={c.name}
+                maxLength={100}
+                onChange={(event) =>
+                  e.cue((c) => ({ ...c, name: event.target.value }))
+                }
+              />
+            </label>
+            <div className="property-section">
+              <h3>Timing</h3>
+              <label className="inline-property">
+                Start
+                <input
+                  id="cue-time"
+                  type="number"
+                  min="0"
+                  max="3600"
+                  step=".01"
+                  value={c.time}
+                  onChange={(event) => {
+                    const v = Number(event.target.value);
+                    if (v >= 0 && v <= 3600) e.cue((c) => ({ ...c, time: v }));
+                  }}
+                />
+              </label>
+              <button
+                id="cue-to-playhead"
+                onClick={() =>
+                  e.cue((c) => ({
+                    ...c,
+                    time: Math.round(e.position * 1000) / 1000,
+                  }))
+                }
+              >
+                Move to playhead
+              </button>
+              <p className="panel-hint">
+                {((e.samples.get(c.id)?.length || 0) / 48000).toFixed(2)} s
+                including rendered effect tails.
+              </p>
+            </div>
+            <div className="property-section">
+              <h3>Audio</h3>
+              <label className="parameter">
+                Level<output>{Math.round(c.gain * 100)}%</output>
+                <input
+                  id="cue-gain"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step=".01"
+                  value={c.gain}
+                  onChange={(event) =>
+                    e.cue((c) => ({ ...c, gain: Number(event.target.value) }))
+                  }
+                />
+              </label>
+              <label className="check">
+                <input
+                  id="cue-muted"
+                  type="checkbox"
+                  checked={c.muted}
+                  onChange={(event) =>
+                    e.cue((c) => ({ ...c, muted: event.target.checked }))
+                  }
+                />
+                Mute layer
+              </label>
+              <button
+                id="edit-cue-sound"
+                className="full"
+                onClick={() => e.workspace("sound")}
+              >
+                Edit sound <Icon name="sound" />
+              </button>
+              <p className="panel-hint">
+                Edits in Sound workspace update this layer.
+              </p>
+            </div>
+            <div className="button-row">
+              <button
+                id="audition"
+                disabled={!e.ready}
+                onClick={async () => {
+                  e.stopScene();
+                  try {
+                    await e.transport.audio.unlock();
+                    const pcm = e.samples.get(c.id);
+                    if (pcm)
+                      e.transport.audio.schedule(
+                        {
+                          ...e.state.scene,
+                          start: 0,
+                          end: pcm.length / 48000,
+                          cues: [{ ...c, time: 0, muted: false }],
+                        },
+                        e.samples,
+                        0,
+                      );
+                    e.setNotice("Auditioning selected clip.");
+                  } catch (error) {
+                    e.setNotice(String(error));
+                  }
+                }}
+              >
+                Audition
+              </button>
+              <button id="duplicate" onClick={e.duplicate}>
+                Duplicate
+              </button>
+              <button id="delete-cue" onClick={e.deleteCue}>
+                Delete
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="inspector-empty">
+            <Icon name="select" />
+            <p>Select a sound layer to edit its properties.</p>
+          </div>
+        )}
+      </Panel>
+      <Mixer editor={e} />
+    </>
+  );
+}
+export function Mixer({ editor: e }: { editor: Editor }) {
+  return (
+    <Panel title="Audio mix" className="mixer-panel">
+      {(["original", "effects"] as const).map((key) => (
+        <label className="parameter" key={key}>
+          {key === "original" ? "Original video" : "Sound effects"}
+          <output>{Math.round(e.state.scene[key] * 100)}%</output>
+          <input
+            id={`${key}-volume`}
+            type="range"
+            min="0"
+            max="1"
+            step=".01"
+            value={e.state.scene[key]}
+            onChange={(event) =>
+              e.scene({ ...e.state.scene, [key]: Number(event.target.value) })
+            }
+          />
+        </label>
+      ))}
+      <details>
+        <summary>Export settings</summary>
+        <p className="panel-hint">
+          WAV contains added effects in the selected range. Original video audio
+          is excluded. This does not export a video file.
+        </p>
+        <p className="panel-hint">Mono · 48 kHz · 16-bit PCM</p>
+      </details>
+    </Panel>
+  );
+}
