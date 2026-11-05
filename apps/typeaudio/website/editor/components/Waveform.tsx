@@ -5,9 +5,11 @@ import { SAMPLE_RATE, spectrum as fft } from "../../designer.ts";
 export function ClipWaveform({
   samples,
   offset = 0,
+  frames,
 }: {
   samples?: Float32Array;
   offset?: number;
+  frames?: number;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -21,10 +23,15 @@ export function ClipWaveform({
     for (let x = 0; x < canvas.width; x++) {
       let peak = 0;
       const a = Math.floor(
-          offset + ((samples.length - offset) * x) / canvas.width,
+          offset +
+            (Math.min(samples.length - offset, frames ?? samples.length) * x) /
+              canvas.width,
         ),
         b = Math.floor(
-          offset + ((samples.length - offset) * (x + 1)) / canvas.width,
+          offset +
+            (Math.min(samples.length - offset, frames ?? samples.length) *
+              (x + 1)) /
+              canvas.width,
         );
       for (let i = a; i < b; i += Math.max(1, Math.floor((b - a) / 30)))
         peak = Math.max(peak, Math.abs(samples[i] || 0));
@@ -33,7 +40,7 @@ export function ClipWaveform({
       g.lineTo(x, canvas.height / 2 + height);
     }
     g.stroke();
-  }, [samples, offset]);
+  }, [samples, offset, frames]);
   return <canvas ref={ref} width={700} height={50} aria-hidden="true" />;
 }
 export function SoundMonitor({ editor: e }: { editor: Editor }) {
@@ -191,7 +198,7 @@ export function SoundMonitor({ editor: e }: { editor: Editor }) {
         <summary>Execution report</summary>
         <pre>
           {e.rendered?.report ||
-            "Live audio runs continuously on the CPU audio thread. Render prepares a finite CPU or WebGPU clip; live modulation is excluded from its WAV."}
+            "Live audio runs continuously on the CPU audio thread. Render prepares a finite clip with modulation and automation. Layered and procedural sounds render on CPU."}
         </pre>
       </details>
     </div>

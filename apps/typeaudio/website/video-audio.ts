@@ -1,5 +1,10 @@
 import { SAMPLE_RATE, type Patch } from "./designer.ts";
-import { cueWindow, type Scene } from "./video-model.ts";
+import {
+  cueWindow,
+  cueEnvelope,
+  fadePoints,
+  type Scene,
+} from "./video-model.ts";
 export class CueAudio {
   context: AudioContext | undefined;
   private cache = new Map<string, Float32Array>();
@@ -106,6 +111,8 @@ export class CueAudio {
     this.bus = ctx.createGain();
     this.bus.gain.value = scene.effects;
     this.bus.connect(this.limiter!);
+    const now = ctx.currentTime,
+      origin = Math.round(at * SAMPLE_RATE) / SAMPLE_RATE;
     for (const cue of scene.cues) {
       const pcm = samples.get(cue.id);
       if (!pcm) continue;
@@ -122,17 +129,27 @@ export class CueAudio {
         gain = ctx.createGain();
       source.buffer = buffer;
       source.playbackRate.value = rate;
-      gain.gain.value = cue.gain;
+      const when = now + (window.at - origin) / rate;
+      const points = fadePoints(
+        cueEnvelope(cue, pcm.length / SAMPLE_RATE),
+        window.offset,
+        window.offset + window.duration,
+      );
+      // A source can start on the sample immediately before a fractional timestamp.
+      // Initialize the gain too, so that sample cannot use GainNode's default 1.
+      gain.gain.value = points[0]!.value * cue.gain;
+      for (let i = 0; i < points.length; i++) {
+        const point = points[i]!,
+          time = when + (point.time - window.offset) / rate;
+        if (i === 0) gain.gain.setValueAtTime(point.value * cue.gain, time);
+        else gain.gain.linearRampToValueAtTime(point.value * cue.gain, time);
+      }
       source.connect(gain).connect(this.bus);
       source.onended = () => {
         source.disconnect();
         gain.disconnect();
       };
-      source.start(
-        ctx.currentTime + (window.at - at) / rate,
-        window.offset,
-        window.duration,
-      );
+      source.start(when, window.offset, window.duration);
       this.nodes.push(source);
       this.scheduled++;
     }

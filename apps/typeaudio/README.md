@@ -206,8 +206,23 @@ Project → Media. Add a sound at the playhead, double-click one in the sound li
 or drag one into the timeline. Select a layer to change timing, gain and mute;
 **Edit sound** opens that layer's patch in Sound. Drag waveform clips to position
 them, use arrow keys for 0.01-second moves (Shift: 0.1), and zoom/pan the timeline.
-Space plays/pauses; V/H select the selection/hand tools; Delete removes a selected
-layer; Ctrl/Cmd Z and Shift Z undo/redo. Shortcuts yield to text/number inputs.
+Drag either clip edge to trim the original source, or use Source in/out in
+Properties. The top handles set linear fade-in/out; Properties accepts exact
+seconds. Reset trim restores the full source, and Reset fades removes the envelope.
+Trims are retained if a sound changes length; a clip outside its shorter source
+stays silent until you reset or adjust the trim.
+
+Ctrl/Cmd-click toggles layer selection; Shift-click selects a range. Drag, Alt-drag,
+Duplicate and Delete operate on the selected group, keeping relative timing.
+Properties edits the active clip. Ctrl/Cmd A selects all layers, Ctrl/Cmd D copies
+them, and Ctrl/Cmd Shift D splits selected clips at the playhead. A split continues
+the original source and fades without retriggering synthesis. Adjusting a fade
+anchors a new envelope to that piece. Each piece must be at least 10 ms long;
+splits and copies respect the 24-layer limit.
+
+Space plays/pauses; V/H select the selection/hand tools; Ctrl/Cmd Z and Shift Z
+undo/redo. A group move or drag is one history entry; Escape cancels an active
+pointer edit. Shortcuts yield to text/number inputs.
 
 - Up to 24 cues; ranges span at most 60 seconds within the first hour.
 - Clips use finite CPU renders including LFO, automation and source layers. Changing
@@ -218,17 +233,20 @@ layer; Ctrl/Cmd Z and Shift Z undo/redo. Shortcuts yield to text/number inputs.
   only on explicit load. Embedded availability depends on the video and network;
   cue synchronization is approximate.
 - Effects WAV is mono 48 kHz, 16-bit PCM for the selected range, including silence
-  and cropped tails. Original audio and video are excluded. Clipping is reported.
+  and trimmed source ranges, fades and cropped tails. Preview uses the same source
+  windows and linear fade envelopes. Original audio and video are excluded. Clipping is reported.
   Sound WAV is a finite render with modulation. Export take saves a recorded performance.
 - Scene JSON and saved patch keys remain compatible with the previous studio.
   A standalone source draft is retained locally; save/export named sounds to keep
   or share them. Session A/B snapshots are not included in patch exports.
 
-`test:browser` runs the workspace, state, device-loss, interaction and sound-design
-browser suites. They cover actual live processing,
+`test:browser` runs the workspace, state, device-loss, interaction, sound-design
+and timeline browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
-transport and video loops, mobile layout and mocked YouTube recovery. The local
+transport and video loops, mobile layout and mocked YouTube recovery. Timeline
+checks compare split WAVs sample-for-sample and replay captured preview source
+offsets/gain automation in an OfflineAudioContext against the exported WAV. The local
 four-second VP8/WebM fixture uses FFmpeg `testsrc2` (160×90, 12 fps, 40 kbps).
 YouTube adapter tests do not establish external video availability. Browser/device
 latency and physical GPU headroom are not established by these checks.

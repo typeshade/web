@@ -129,3 +129,7 @@ timeline manipulation. Its English review is limited to those changed surfaces.
 The procedural sound pass adds reviewed English for source layers, FM/noise/custom
 waves, automation, live recording and the CPU render boundary. Its component review
 record identifies implemented behavior, synthesis limits and compute-only evidence.
+
+The timeline editing follow-up records source trim/fade controls, split continuity,
+multiple selection, context actions and shortcuts. Its bounded English review and
+preview/WAV validation are in the same component workspace record.

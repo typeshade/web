@@ -15,7 +15,7 @@
     "build": "node scripts/prepare.mjs && bun --bun vite build --config website/vite.config.ts && bun scripts/site-docs.ts",
     "check": "node scripts/prepare.mjs && bun --bun tshc sync && bun --bun tshc check website && tsc -p website/tsconfig.json",
     "test": "node scripts/prepare.mjs && bun --bun vitest run",
-    "test:browser": "bun website/check-workspace-browser.ts && bun website/check-state-browser.ts && bun website/check-render-device-loss.ts && bun website/check-interactions-browser.ts && bun website/check-sound-design-browser.ts",
+    "test:browser": "bun website/check-workspace-browser.ts && bun website/check-state-browser.ts && bun website/check-render-device-loss.ts && bun website/check-interactions-browser.ts && bun website/check-sound-design-browser.ts && bun website/check-timeline-browser.ts",
     "bench:live": "bun website/check-live-performance.ts",
     "bench:render": "bun website/check-render-performance.ts"
   },
