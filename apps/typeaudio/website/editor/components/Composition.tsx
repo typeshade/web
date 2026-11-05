@@ -15,7 +15,7 @@ export function Composition({ editor: e }: { editor: Editor }) {
     return () => {
       generation.current++;
     };
-  }, [e.transport]);
+  }, [e.transport, e.mediaUrl]);
   useEffect(() => {
     if (e.mediaKind !== "youtube") {
       generation.current++;
@@ -35,6 +35,9 @@ export function Composition({ editor: e }: { editor: Editor }) {
       }
       e.detach();
       const token = ++generation.current;
+      const epoch = e.mediaEpoch.current;
+      const current = () =>
+        token === generation.current && epoch === e.mediaEpoch.current;
       setLoading(true);
       e.setMediaKind("youtube");
       host.current!.replaceChildren();
@@ -46,18 +49,18 @@ export function Composition({ editor: e }: { editor: Editor }) {
           mount,
           id,
           () => {
-            if (token !== generation.current) return;
+            if (!current()) return;
             const e = latest.current;
             if (e.transport.youtube?.getPlayerState() === 0) e.finishScene();
           },
           (message) => {
-            if (token === generation.current) {
+            if (current()) {
               e.stopScene();
               e.setNotice(message);
             }
           },
         );
-        if (token !== generation.current) {
+        if (!current()) {
           player.destroy();
           return;
         }
@@ -67,15 +70,15 @@ export function Composition({ editor: e }: { editor: Editor }) {
         const media = { kind: "youtube" as const, name: id, id };
         if (player.getDuration() > 0)
           e.fitDuration(player.getDuration(), media);
-        else e.scene({ ...latest.current.state.scene, media });
+        else e.scene((current) => ({ ...current, media }));
         e.setNotice("YouTube ready. Use Play to enable sound clips.");
       } catch (error) {
-        if (token === generation.current) {
+        if (current()) {
           e.detach();
           e.setNotice(String(error));
         }
       } finally {
-        if (token === generation.current) setLoading(false);
+        if (current()) setLoading(false);
       }
     };
     void load();
@@ -92,13 +95,16 @@ export function Composition({ editor: e }: { editor: Editor }) {
     >
       <div className="composition-view">
         <video
+          key={e.mediaUrl}
           id="video"
           ref={video}
           src={e.mediaUrl || undefined}
           hidden={e.mediaKind !== "file"}
           playsInline
           preload="metadata"
-          onLoadedMetadata={() => {
+          onLoadedMetadata={(event) => {
+            if (e.mediaKind !== "file" || video.current !== event.currentTarget)
+              return;
             e.transport.kind = "file";
             e.fitDuration(video.current!.duration);
             e.setNotice(

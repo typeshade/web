@@ -207,9 +207,10 @@ export function WorkspaceShell({
               aria-label="Project name"
               value={e.state.scene.name}
               maxLength={100}
-              onChange={(event) =>
-                e.scene({ ...e.state.scene, name: event.target.value })
-              }
+              onChange={(event) => {
+                const name = event.target.value;
+                e.scene((current) => ({ ...current, name }));
+              }}
             />
           ) : (
             <span>

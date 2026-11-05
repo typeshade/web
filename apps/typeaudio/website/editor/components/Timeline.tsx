@@ -75,7 +75,7 @@ export function Timeline({ editor: e }: { editor: Editor }) {
               step=".01"
               value={scene.start}
               onChange={(event) =>
-                e.setRange(Number(event.target.value), scene.end)
+                e.setRange({ start: Number(event.target.value) })
               }
             />
           </label>
@@ -89,7 +89,7 @@ export function Timeline({ editor: e }: { editor: Editor }) {
               step=".01"
               value={scene.end}
               onChange={(event) =>
-                e.setRange(scene.start, Number(event.target.value))
+                e.setRange({ end: Number(event.target.value) })
               }
             />
           </label>
@@ -98,9 +98,10 @@ export function Timeline({ editor: e }: { editor: Editor }) {
               id="loop"
               type="checkbox"
               checked={scene.loop}
-              onChange={(event) =>
-                e.scene({ ...scene, loop: event.target.checked })
-              }
+              onChange={(event) => {
+                const loop = event.target.checked;
+                e.scene((current) => ({ ...current, loop }));
+              }}
             />
             Loop
           </label>
@@ -297,25 +298,16 @@ function Clip({
       onKeyDown={(event) => {
         if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
           event.preventDefault();
-          e.scene({
-            ...scene,
-            cues: scene.cues.map((c) =>
-              c.id === cue.id
-                ? {
-                    ...c,
-                    time: Math.max(
-                      0,
-                      Math.min(
-                        3600,
-                        c.time +
-                          (event.key === "ArrowRight" ? 1 : -1) *
-                            (event.shiftKey ? 0.1 : 0.01),
-                      ),
-                    ),
-                  }
-                : c,
-            ),
-          });
+          const delta =
+            (event.key === "ArrowRight" ? 1 : -1) *
+            (event.shiftKey ? 0.1 : 0.01);
+          e.cue(
+            (c) => ({
+              ...c,
+              time: Math.max(0, Math.min(3600, c.time + delta)),
+            }),
+            cue.id,
+          );
         }
       }}
       onPointerDown={(event) => {
@@ -349,13 +341,7 @@ function Clip({
         const d = drag.current;
         drag.current = undefined;
         setDraft(undefined);
-        if (d?.moved)
-          e.scene({
-            ...scene,
-            cues: scene.cues.map((c) =>
-              c.id === cue.id ? { ...c, time: d.next } : c,
-            ),
-          });
+        if (d?.moved) e.cue((c) => ({ ...c, time: d.next }), cue.id);
       }}
       onPointerCancel={() => {
         drag.current = undefined;

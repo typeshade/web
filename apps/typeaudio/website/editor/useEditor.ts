@@ -21,6 +21,9 @@ import {
   SCENE_KEY,
   PATCH_KEY,
   updatePatch,
+  updateScene,
+  DOCUMENT_KEY,
+  type Action,
   download,
   type Workspace,
 } from "./model.ts";
@@ -31,7 +34,7 @@ export interface SavedSound {
   patch: Patch;
 }
 export function useEditor() {
-  const [state, dispatch] = useReducer(reducer, undefined, () => ({
+  const [state, rawDispatch] = useReducer(reducer, undefined, () => ({
     ...initialDocument(),
     past: [],
     future: [],
@@ -40,6 +43,16 @@ export function useEditor() {
       : ("sound" as const),
     tool: "select" as const,
   }));
+  const editVersion = useRef(0),
+    projectRequest = useRef(0),
+    patchRequest = useRef(0);
+  const dispatch = useCallback((action: Action) => {
+    if (
+      ["edit", "open", "media", "undo", "redo", "select"].includes(action.type)
+    )
+      editVersion.current++;
+    rawDispatch(action);
+  }, []);
   const [notice, setNotice] = useState(
     "Ready. Choose a preset or import a video.",
   );
@@ -59,12 +72,20 @@ export function useEditor() {
     [backend, setBackend] = useState<"cpu" | "webgpu">("cpu");
   const [live, setLive] = useState(false),
     [busy, setBusy] = useState(false),
-    [rendered, setRendered] = useState<Rendered>(),
+    [renderCache, setRendered] = useState<Rendered & { patchKey: string }>(),
     [dry, setDry] = useState(false),
     [spectrum, setSpectrum] = useState(false),
     [repeat, setRepeat] = useState(true),
     [auto, setAuto] = useState(false),
     [renderLoop, setRenderLoop] = useState(false);
+  const patchKey = JSON.stringify(state.patch);
+  const rendered = renderCache?.patchKey === patchKey ? renderCache : undefined;
+  const [morphState, setMorphState] = useState<{
+    value: number;
+    key: string;
+  }>();
+  const morphAmount =
+    morphState?.key === patchKey ? morphState.value : undefined;
   const [meter, setMeter] = useState({ frames: 0, revision: 0 }),
     [playing, setPlaying] = useState(false),
     [position, setPosition] = useState(0),
@@ -81,10 +102,14 @@ export function useEditor() {
     [mediaKind, setMediaKind] = useState<"none" | "file" | "youtube">("none");
   const sound = useRef<SoundEngine>(null!);
   sound.current ??= new SoundEngine();
+  const mediaEpoch = useRef(0);
   const transport = useRef<SceneTransport>(null!);
   transport.current ??= new SceneTransport();
-  const latest = useRef({ state, samples, ready });
-  latest.current = { state, samples, ready };
+  const cueKey = JSON.stringify(state.scene.cues.map((c) => [c.id, c.patch]));
+  const preparedKey = useRef("");
+  const sceneReady = ready && preparedKey.current === cueKey;
+  const latest = useRef({ state, samples, ready: sceneReady });
+  latest.current = { state, samples, ready: sceneReady };
   const soundGeneration = useRef(0),
     looping = useRef(false),
     snapshots = useRef({ a: { ...DEFAULT }, b: { ...DEFAULT } });
@@ -125,26 +150,30 @@ export function useEditor() {
   }, [stopSound, stopScene]);
   useEffect(() => {
     try {
+      localStorage.setItem(
+        DOCUMENT_KEY,
+        JSON.stringify({
+          version: 1,
+          scene: state.scene,
+          source: state.source,
+          selected: state.selected,
+        }),
+      );
+      // Compatibility mirrors are not used to restore a partially written document.
       localStorage.setItem(SCENE_KEY, JSON.stringify(state.scene));
+      localStorage.setItem(
+        "typeaudio.editor.source.v1",
+        JSON.stringify(state.source),
+      );
     } catch {
       setNotice(
         "Browser storage is unavailable. Export your project to keep it.",
       );
     }
-  }, [state.scene]);
+  }, [state.scene, state.source, state.selected]);
   useEffect(() => {
     sound.current.update(state.patch, repeat, dry);
   }, [state.patch, repeat, dry]);
-  useEffect(() => {
-    if (!state.selected)
-      try {
-        localStorage.setItem(
-          "typeaudio.editor.source.v1",
-          JSON.stringify({ name: state.patchName, patch: state.patch }),
-        );
-      } catch {}
-  }, [state.patch, state.patchName, state.selected]);
-  const cueKey = JSON.stringify(state.scene.cues.map((c) => [c.id, c.patch]));
   useEffect(() => {
     let active = true;
     stopScene();
@@ -154,6 +183,7 @@ export function useEditor() {
       .prepare(state.scene)
       .then((next) => {
         if (active) {
+          preparedKey.current = cueKey;
           setSamples(next);
           setReady(true);
         }
@@ -230,90 +260,84 @@ export function useEditor() {
       transport.current.close();
     };
   }, []);
-  function patch(next: Patch, name = state.patchName) {
-    dispatch({ type: "edit", edit: (d) => updatePatch(d, next, name) });
+  function patch(changes: Partial<Patch>, name?: string) {
+    setMorphState(undefined);
+    dispatch({ type: "edit", edit: (d) => updatePatch(d, changes, name) });
   }
-  function scene(next: Scene, record = true) {
-    if (
-      next.cues !== state.scene.cues ||
-      next.start !== state.scene.start ||
-      next.end !== state.scene.end ||
-      next.loop !== state.scene.loop
-    )
-      stopScene();
+  function scene(edit: (current: Scene) => Scene, record = true, pause = true) {
+    if (pause) stopScene();
+    dispatch({ type: "edit", edit: (d) => updateScene(d, edit), record });
+  }
+  function cue(edit: (cue: Cue) => Cue, id = state.selected) {
+    scene((current) => ({
+      ...current,
+      cues: current.cues.map((c) => (c.id === id ? edit(c) : c)),
+    }));
+  }
+  function addCue(value?: SavedSound) {
+    const id = crypto.randomUUID(),
+      time =
+        Math.round(Math.min(3600, transport.current.current()) * 1000) / 1000;
+    stopScene();
     dispatch({
       type: "edit",
       edit: (d) => {
-        const scene = validateScene(next),
-          c = scene.cues.find((c) => c.id === d.selected);
+        if (d.scene.cues.length >= MAX_CUES) return d;
+        const source = value || { name: d.patchName, patch: d.patch };
         return {
           ...d,
-          scene,
-          ...(c ? { patch: { ...c.patch }, patchName: c.name } : {}),
+          selected: id,
+          scene: {
+            ...d.scene,
+            cues: [
+              ...d.scene.cues,
+              {
+                id,
+                name: source.name,
+                patch: { ...source.patch },
+                gain: 0.7,
+                muted: false,
+                time,
+              },
+            ],
+          },
         };
       },
-      record,
     });
-  }
-  function cue(edit: (cue: Cue) => Cue) {
-    scene({
-      ...state.scene,
-      cues: state.scene.cues.map((c) =>
-        c.id === state.selected ? edit(c) : c,
-      ),
-    });
-  }
-  function addCue(
-    value: SavedSound = { name: state.patchName, patch: state.patch },
-  ) {
-    if (state.scene.cues.length >= MAX_CUES) {
-      setNotice("A composition can contain at most 24 clips.");
-      return;
-    }
-    const id = crypto.randomUUID();
-    const next = {
-      ...state.scene,
-      cues: [
-        ...state.scene.cues,
-        {
-          id,
-          name: value.name,
-          patch: { ...value.patch },
-          gain: 0.7,
-          muted: false,
-          time:
-            Math.round(Math.min(3600, transport.current.current()) * 1000) /
-            1000,
-        },
-      ],
-    };
-    scene(next);
-    dispatch({ type: "select", id });
     setNotice("Sound clip added at playhead.");
   }
   function deleteCue() {
-    scene({
-      ...state.scene,
-      cues: state.scene.cues.filter((c) => c.id !== state.selected),
-    });
-    dispatch({ type: "select", id: "" });
+    const id = state.selected;
+    scene((current) => ({
+      ...current,
+      cues: current.cues.filter((c) => c.id !== id),
+    }));
   }
   function duplicate() {
-    const c = state.scene.cues.find((c) => c.id === state.selected);
-    if (!c) return;
-    if (state.scene.cues.length >= MAX_CUES) {
-      setNotice("A composition can contain at most 24 clips.");
-      return;
-    }
     const id = crypto.randomUUID();
-    scene({
-      ...state.scene,
-      cues: [
-        ...state.scene.cues,
-        { ...structuredClone(c), id, time: Math.min(3600, c.time + 0.25) },
-      ],
+    stopScene();
+    dispatch({
+      type: "edit",
+      edit: (d) => {
+        const c = d.scene.cues.find((c) => c.id === d.selected);
+        if (!c || d.scene.cues.length >= MAX_CUES) return d;
+        return {
+          ...d,
+          selected: id,
+          scene: {
+            ...d.scene,
+            cues: [
+              ...d.scene.cues,
+              {
+                ...structuredClone(c),
+                id,
+                time: Math.min(3600, c.time + 0.25),
+              },
+            ],
+          },
+        };
+      },
     });
-    dispatch({ type: "select", id });
   }
   async function startLive() {
     stopSound();
@@ -350,7 +374,12 @@ export function useEditor() {
     try {
       const result = await sound.current.render(state.patch, backend);
       if (generation !== soundGeneration.current) return;
-      setRendered(result);
+      if (JSON.stringify(latest.current.state.patch) !== patchKey) {
+        setBusy(false);
+        setNotice("Sound changed. Render again to hear the current settings.");
+        return;
+      }
+      setRendered({ ...result, patchKey });
       setBusy(false);
       setNotice(
         state.patch.lfoDepth
@@ -393,14 +422,14 @@ export function useEditor() {
     setPosition(at);
     if (was) void playScene();
   }
-  function setRange(start: number, end: number) {
+  function setRange(changes: Partial<Pick<Scene, "start" | "end">>) {
     try {
-      if (
-        transport.current.duration() > 0 &&
-        end > transport.current.duration()
-      )
+      const duration = transport.current.duration();
+      const next = { ...latest.current.state.scene, ...changes };
+      if (duration > 0 && next.end > duration)
         throw new Error("The range must fit inside the video.");
-      scene({ ...state.scene, start, end });
+      validateScene(next);
+      scene((current) => ({ ...current, ...changes }));
     } catch (error) {
       setNotice(String(error));
     }
@@ -412,16 +441,17 @@ export function useEditor() {
       );
       return;
     }
-    const old = latest.current.state.scene;
-    let start = old.start,
-      end = old.end;
-    if (start >= duration) {
-      start = 0;
-      end = Math.min(10, duration);
-    } else end = Math.min(end, duration);
-    scene({ ...old, start, end, media: media || old.media });
+    scene((current) => {
+      const start = current.start >= duration ? 0 : current.start;
+      const end =
+        current.start >= duration
+          ? Math.min(10, duration)
+          : Math.min(current.end, duration);
+      return { ...current, start, end, media: media || current.media };
+    });
   }
   function detach() {
+    mediaEpoch.current++;
     stopScene();
     transport.current.detach();
     setMediaUrl("");
@@ -436,11 +466,8 @@ export function useEditor() {
     transport.current.kind = "file";
     setMediaLabel(file.name);
     dispatch({
-      type: "open",
-      scene: {
-        ...state.scene,
-        media: { kind: "file", name: file.name.slice(0, 100) },
-      },
+      type: "media",
+      media: { kind: "file", name: file.name.slice(0, 100) },
     });
   }
   useEffect(
@@ -450,10 +477,15 @@ export function useEditor() {
     [mediaUrl],
   );
   async function openProject(file: File) {
+    const request = ++projectRequest.current,
+      version = editVersion.current;
+    const current = () =>
+      request === projectRequest.current && version === editVersion.current;
     try {
       if (file.size > 100000)
         throw new Error("Project files must be smaller than 100 KB.");
       const next = validateScene(JSON.parse(await file.text()));
+      if (!current()) return;
       detach();
       dispatch({ type: "open", scene: next });
       transport.current.seek(next.start);
@@ -463,7 +495,7 @@ export function useEditor() {
           : `Project opened. Re-select media: ${next.media.name}`,
       );
     } catch (error) {
-      setNotice(`Import failed: ${String(error)}`);
+      if (current()) setNotice(`Import failed: ${String(error)}`);
     }
   }
   function savePatch() {
@@ -485,10 +517,15 @@ export function useEditor() {
     }
   }
   async function importPatch(file: File) {
+    const request = ++patchRequest.current,
+      version = editVersion.current;
+    const current = () =>
+      request === patchRequest.current && version === editVersion.current;
     try {
       if (file.size > 20000)
         throw new Error("Patch files must be smaller than 20 KB.");
       const p = JSON.parse(await file.text());
+      if (!current()) return;
       if (p.version !== 1) throw new Error("Unsupported patch version.");
       patch(
         validatePatch(p.patch),
@@ -496,10 +533,11 @@ export function useEditor() {
       );
       setNotice("Patch imported.");
     } catch (error) {
-      setNotice(`Import failed: ${String(error)}`);
+      if (current()) setNotice(`Import failed: ${String(error)}`);
     }
   }
   function exportScene() {
+    if (!sceneReady) return;
     const result = mixScene(state.scene, samples, SAMPLE_RATE);
     download(
       new Blob([wav(result.pcm, SAMPLE_RATE)], { type: "audio/wav" }),
@@ -538,10 +576,17 @@ export function useEditor() {
     if (action === "store") {
       snapshots.current[slot] = { ...state.patch };
       setNotice(`Stored variation ${slot.toUpperCase()}.`);
-    } else patch({ ...snapshots.current[slot] });
+    } else {
+      patch({ ...snapshots.current[slot] });
+      setMorphState({
+        value: slot === "a" ? 0 : 1,
+        key: JSON.stringify(snapshots.current[slot]),
+      });
+    }
   }
   const selected = state.scene.cues.find((c) => c.id === state.selected);
   return {
+    mediaEpoch,
     videoInput,
     patchInput,
     youtubeRequest,
@@ -571,7 +616,7 @@ export function useEditor() {
     meter,
     playing,
     position,
-    ready,
+    ready: sceneReady,
     samples,
     mediaUrl,
     mediaLabel,
@@ -606,8 +651,12 @@ export function useEditor() {
     randomize,
     snapshot,
     selected,
-    morph: (t: number) =>
-      patch(morphPatch(snapshots.current.a, snapshots.current.b, t)),
+    morphAmount,
+    morph: (t: number) => {
+      const next = morphPatch(snapshots.current.a, snapshots.current.b, t);
+      patch(next);
+      setMorphState({ value: t, key: JSON.stringify(next) });
+    },
     undo: () => {
       stopScene();
       dispatch({ type: "undo" });

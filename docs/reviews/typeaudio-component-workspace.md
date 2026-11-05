@@ -55,3 +55,27 @@ retained media across workspaces. Desktop and 320/390px layout checks pass; rend
 screenshots were inspected. Missing WebGPU, mocked YouTube transport and blocked
 API recovery pass with no application runtime errors. External YouTube availability
 and physical device latency are not established by this suite.
+
+## Tone state rollback correction
+
+A regression was reproduced on the deployed component workspace: after setting
+an independent source to 440 Hz, editing a selected clip at 660 Hz, deselecting
+and returning to Sound showed 660 Hz for the source. The source draft and selected
+clip shared a mutable projection. Whole-scene/whole-patch writes also allowed an
+older callback snapshot to overwrite unrelated newer edits.
+
+The document now retains an independent source and derives the visible sound from
+selection. Field changes merge against the reducer's current document; clip moves
+change only their target cue. Media replacement keeps selection/source. One atomic
+browser document stores source, scene and selection, with legacy migration and
+compatibility mirrors. No-op edits preserve undo/redo. Delayed project/patch imports
+are discarded after newer edits or load requests, and obsolete media callbacks
+cannot attach to a replacement session. Render/PCM results are associated with
+the patch they were prepared for. A/B position survives panel changes and is marked
+Custom when it no longer describes the current patch.
+
+Focused browser regression covers source/clip Tone across selection, workspace
+switches and reload, same-turn field edits, delayed imports after edits, latest
+project-open precedence and A/B continuity. The same source/clip scenario failed
+on the previous deployed version and passes on the correction. Existing audio,
+CPU/WebGPU, timeline, project and video regression coverage is retained.
