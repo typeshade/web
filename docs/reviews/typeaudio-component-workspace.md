@@ -382,3 +382,10 @@ Local shader/TypeScript checks, 52 unit tests, production build, global CSS and
 scope checks pass. All six browser suites pass, including the existing source/clip
 Tone persistence and CPU/WebGPU/device-loss regressions. Clip gestures and their
 context menu live in separate components/helpers from the timeline layout.
+
+Production verification of release `40dd573` passes the workspace, state,
+interaction, sound-design and timeline browser suites. The offline comparison
+pauses the transport and snapshots one scheduling batch before replaying it, so
+later drift reschedules cannot be counted twice while the asynchronous render runs.
+The deployed preview commands remain within 1 LSB of the exported WAV at all three
+clock positions tested.

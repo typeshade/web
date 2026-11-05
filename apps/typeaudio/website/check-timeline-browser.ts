@@ -249,10 +249,13 @@ try {
     (window as any).schedules = [];
   });
   await p.locator("#play").click();
-  await p.waitForFunction(() => (window as any).schedules.length === 2);
+  await p.waitForFunction(() => (window as any).schedules.length >= 2);
+  await p.locator("#pause").click();
   const metrics = await p.evaluate(
     async (expected) => {
-      const schedules = (window as any).schedules as any[],
+      // Transport drift can reschedule while an offline render is awaiting completion.
+      // Capture one complete scheduling batch before replaying it at several clocks.
+      const schedules = (window as any).schedules.slice(0, 2) as any[],
         origin = schedules[0].when - 1;
       let maxError = 0,
         comparedFrames = 0;
@@ -313,7 +316,6 @@ try {
   );
   assert.ok(metrics.maxError <= 2, JSON.stringify(metrics));
   assert.deepEqual(metrics.offsets, [0.1, 0.3]);
-  await p.locator("#pause").click();
   await p.mouse.click(
     ruler2.x + (ruler2.width * 1.35) / 6,
     ruler2.y + ruler2.height / 2,
@@ -322,7 +324,7 @@ try {
     (window as any).schedules = [];
   });
   await p.locator("#play").click();
-  await p.waitForFunction(() => (window as any).schedules.length === 1);
+  await p.waitForFunction(() => (window as any).schedules.length >= 1);
   const seek = await p.evaluate(() => {
     const s = (window as any).schedules[0];
     return {
