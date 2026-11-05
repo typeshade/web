@@ -1512,9 +1512,7 @@
     min-height: 50px;
   }
   .studio-app .status-bar {
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
+    position: static;
     min-height: 26px;
   }
   .studio-app .workspace-tabs button {
@@ -1761,5 +1759,11 @@
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .time-ruler > span:not(:nth-child(5n + 1)) {
+    display: none;
   }
 }

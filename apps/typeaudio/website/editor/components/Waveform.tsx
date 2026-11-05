@@ -40,6 +40,7 @@ export function SoundMonitor({ editor: e }: { editor: Editor }) {
   const ref = useRef<HTMLCanvasElement>(null),
     peak = useRef<HTMLOutputElement>(null);
   useEffect(() => {
+    if (e.state.workspace !== "sound") return;
     let frame = 0;
     const canvas = ref.current!,
       g = canvas.getContext("2d")!;
@@ -89,6 +90,7 @@ export function SoundMonitor({ editor: e }: { editor: Editor }) {
         if (peak.current && !e.spectrum)
           peak.current.textContent = max.toFixed(3);
       } else {
+        if (peak.current) peak.current.textContent = "0.000";
         g.moveTo(0, canvas.height / 2);
         g.lineTo(canvas.width, canvas.height / 2);
       }
@@ -97,7 +99,7 @@ export function SoundMonitor({ editor: e }: { editor: Editor }) {
     }
     draw();
     return () => cancelAnimationFrame(frame);
-  }, [e.sound, e.rendered, e.dry, e.spectrum]);
+  }, [e.sound, e.rendered, e.dry, e.spectrum, e.state.workspace]);
   return (
     <div className="sound-view">
       <div className="viewer-toolbar">

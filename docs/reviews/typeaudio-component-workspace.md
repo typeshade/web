@@ -46,6 +46,12 @@ Physical device latency and hardware GPU throughput are not measured here.
 
 Shader/TypeScript check, production build and 23 unit tests pass, including four
 new document tests for shared selected-layer edits, source isolation, undo/redo,
-history bounds and project validation. Browser validation is recorded with the PR
-and includes actual audio output, local video, project exchange, timeline editing,
-workspace continuity, responsive layout and recovery paths.
+history bounds and project validation. The production-build Chromium suite passes: actual one-node eight-voice live audio
+without render-worker requests, CPU/WebGPU WAV agreement within 1/32768 with
+query-bearing worker URLs, effects/dry comparison, patch/project exchange, shared
+selected-layer editing, clip drag and keyboard moves, undo/redo, panel resizing,
+timeline zoom/hand pan, native library drag/drop, actual WebM range/end loops and
+retained media across workspaces. Desktop and 320/390px layout checks pass; rendered
+screenshots were inspected. Missing WebGPU, mocked YouTube transport and blocked
+API recovery pass with no application runtime errors. External YouTube availability
+and physical device latency are not established by this suite.
