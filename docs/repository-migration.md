@@ -401,3 +401,13 @@ production publishing has not transferred. Before adding TypeAudio to the produc
 selector, review the cutover, capture the current `typeaudio-site` deployment, and
 retire the original TypeAudio publisher. This addition does not authorize the earlier
 three-site setup workflow to be rerun.
+
+### Approved TypeAudio cutover
+
+The owner approved PR #27 and production transfer on 2026-11-05. The cutover
+configuration adds TypeAudio to Production deploy and uses a dedicated setup
+workflow so the existing three-site operations switch is not reset. The executor's
+GitHub connection cannot create environments (HTTP 403); setup uses the existing
+Actions `DEPLOYMENT_ADMIN_TOKEN` instead. Previous live version captured before
+cutover: `7895f067-b7d5-4f2a-a012-40e9ae090cb2` at 100% traffic. Execution results
+will be recorded after the deployment is verified.

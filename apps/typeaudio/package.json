@@ -24,7 +24,8 @@
     "typescript": "5.6.3",
     "typeshade": "https://github.com/typeshade/typeshade/archive/87af4eb0d9d15f02b66b8341b72cab0944290472.tar.gz",
     "vite": "7.3.7",
-    "vitest": "5.0.5"
+    "vitest": "5.0.5",
+    "wrangler": "4.151.0"
   },
   "dependencies": {
     "@typeshade/site-ui": "workspace:*"

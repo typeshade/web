@@ -1,6 +1,6 @@
 import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { marked } from 'marked';
-const out = 'website/dist';
+const out = 'dist';
 const names = ['vision', 'architecture', 'experiments', 'compiler-asks'];
 const source = 'https://github.com/typeshade/typeaudio/blob/575b42baa13ee666cc050b25da1e63720dfbf6e4/docs/';
 const escape = (s: string): string => s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
