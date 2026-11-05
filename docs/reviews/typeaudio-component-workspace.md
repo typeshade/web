@@ -172,8 +172,9 @@ Repeated WebGPU render time fell about 94% and 91% respectively. These are
 SwiftShader software-adapter observations, not hardware GPU results or Live
 latency measurements. The default patch has filter/drive on and delay/reverb/LFO
 off. The outputs contain 40,800 and 208,800 mono frames. The manual runner records
-adapter/browser metadata and phase timings; hardware GPU mode is the default,
-and forcing software requires `TYPEAUDIO_BENCH_SOFTWARE_GPU=1`.
+adapter/browser metadata and phase timings. By default it uses the browser's
+selected adapter; inspect each run's device metadata to identify hardware or
+fallback execution. Forcing software requires `TYPEAUDIO_BENCH_SOFTWARE_GPU=1`.
 
 CPU repeated medians were 28.9 → 21.7 ms for one voice and 433.4 → 462.2 ms for
 eight voices. The latter was about 7% slower in this run; its trial range overlaps
