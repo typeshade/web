@@ -54,6 +54,11 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
       value,
       kind: "Preset",
     })),
+    ...Object.entries(e.recipes).map(([id, value]) => ({
+      id,
+      value,
+      kind: "Recipe",
+    })),
     ...e.saved.map((value, i) => ({ id: `saved-${i}`, value, kind: "Saved" })),
   ];
   return (
@@ -124,6 +129,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
                   key={id}
                   className="asset-row"
                   data-preset={kind === "Preset" ? id : undefined}
+                  data-recipe={kind === "Recipe" ? id : undefined}
                   aria-pressed={
                     e.state.patchName === value.name &&
                     Object.entries(value.patch).every(

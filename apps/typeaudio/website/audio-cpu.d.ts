@@ -5,5 +5,6 @@ declare module "*live-kernel.shade.ts?audio-cpu" {
     clock: Uint32Array,
     params: Float32Array,
     frames: number,
+    wave: Float32Array,
   ): void;
 }

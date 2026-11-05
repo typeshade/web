@@ -5,6 +5,8 @@ import { openContext, useInteractions } from "../interactions.tsx";
 import type { Editor } from "../useEditor.ts";
 import { LIMITS, SHAPES, envelopeAt, type Patch } from "../../designer.ts";
 
+import { WaveEditor } from "./WaveEditor.tsx";
+import { CurveEditor } from "./CurveEditor.tsx";
 import { Panel } from "./Panel.tsx";
 export const MODULES = [
   {
@@ -19,6 +21,9 @@ export const MODULES = [
       "detune",
       "voices",
       "spread",
+      "fmRatio",
+      "fmIndex",
+      "seed",
     ],
   },
   {
@@ -50,9 +55,14 @@ export const MODULES = [
     name: "Modulation",
     keys: ["lfoTarget", "lfoShape", "lfoRate", "lfoDepth", "lfoSync", "tempo"],
   },
+  { id: "wave", name: "Wave", keys: [] },
+  { id: "automation", name: "Automation", keys: [] },
   { id: "output", name: "Output", keys: ["volume"] },
 ] as const;
 const labels: Record<string, string> = {
+  fmRatio: "FM ratio",
+  fmIndex: "FM index",
+  seed: "Noise seed",
   shapeA: "Oscillator A",
   shapeB: "Oscillator B",
   frequency: "Pitch",
@@ -97,6 +107,11 @@ const units: Record<string, string> = {
   tempo: "BPM",
 };
 const HELP: Partial<Record<keyof Patch, string>> = {
+  fmRatio:
+    "Modulator frequency relative to oscillator A. Non-integer ratios add inharmonic partials.",
+  fmIndex:
+    "FM depth for oscillator A. Zero disables FM. Noise sources ignore FM.",
+  seed: "Deterministic noise seed. The same sound renders the same noise again.",
   shapeA: "Waveform for oscillator A. Blend balances it with oscillator B.",
   shapeB: "Waveform for oscillator B. Transpose and detune adjust its pitch.",
   frequency: "Base pitch of the oscillators. Tune it while Live runs.",
@@ -112,7 +127,7 @@ const HELP: Partial<Record<keyof Patch, string>> = {
   decay: "Time to fall from the attack peak to the sustain level.",
   sustain: "Amplitude held after the decay stage.",
   release: "Time to fade after the note hold.",
-  duration: "Note hold before release. Live with Repeat off keeps sustaining.",
+  duration: "Note hold before release. Turn Repeat off to play the sound once.",
   drive: "Input gain for soft clipping. Enable Drive to hear it.",
   delayTime: "Time between echoes. Edits preserve the running delay tail.",
   feedback: "Amount of each echo returned to the delay.",
@@ -120,14 +135,13 @@ const HELP: Partial<Record<keyof Patch, string>> = {
   room: "Reverb room size. Enable Reverb to hear it.",
   reverbMix: "Balance of the dry signal and reverb tail.",
   lfoTarget:
-    "Parameter controlled by the live LFO: cutoff, pitch or oscillator blend.",
-  lfoShape: "Sine or triangle modulation for the live LFO.",
+    "Parameter controlled by the LFO: cutoff, pitch or oscillator blend.",
+  lfoShape: "Sine or triangle modulation.",
   lfoSync: "Follow the composition BPM instead of the free modulation rate.",
   tempo:
     "Composition BPM. With Beat sync enabled, the LFO cycles once per beat.",
-  lfoDepth:
-    "Strength of live modulation. Finite renders exclude this modulation.",
-  lfoRate: "Live modulation cycles per second. Beat sync follows BPM instead.",
+  lfoDepth: "Strength of modulation in Live and CPU renders.",
+  lfoRate: "Modulation cycles per second. Beat sync follows BPM instead.",
   volume: "Output level for Live and exported sound.",
 };
 export function Parameter({
@@ -135,7 +149,7 @@ export function Parameter({
   name,
 }: {
   editor: Editor;
-  name: keyof Patch;
+  name: Exclude<keyof Patch, "wave" | "curves" | "layers">;
 }) {
   const gesture = useRef(false),
     { openMenu } = useInteractions();
@@ -168,6 +182,7 @@ export function Parameter({
     "transpose",
     "lfoTarget",
     "lfoShape",
+    "seed",
   ].includes(name);
   const step = integer
     ? 1
@@ -297,15 +312,17 @@ export function Parameter({
 export function SoundEditor({
   editor: e,
   module,
+  sourceName,
 }: {
   editor: Editor;
   module: string;
+  sourceName?: string;
 }) {
   const config = MODULES.find((m) => m.id === module) || MODULES[0];
   const enabled = !("toggle" in config) || e.state.patch[config.toggle];
   return (
     <Panel
-      title={`${config.name} / ${e.selected ? "Selected clip" : "Sound"}`}
+      title={`${config.name} / ${sourceName || (e.selected ? "Selected clip" : "Sound")}`}
       className="sound-properties"
       actions={
         "toggle" in config ? (
@@ -325,6 +342,8 @@ export function SoundEditor({
         ) : undefined
       }
     >
+      {config.id === "wave" && <WaveEditor editor={e} />}
+      {config.id === "automation" && <CurveEditor editor={e} />}
       {config.id === "envelope" && <Envelope patch={e.state.patch} />}
       <div className={`parameter-grid ${!enabled ? "bypassed" : ""}`}>
         {config.keys.map((name) => (
@@ -348,8 +367,8 @@ export function SoundEditor({
       )}
       {config.id === "modulation" && (
         <p className="panel-hint">
-          Modulation runs in Live mode. Finite renders and timeline clips
-          exclude live LFO.
+          Modulation is included in Live, CPU renders and timeline clips. Use
+          Record live to capture parameter changes during playback.
         </p>
       )}
     </Panel>

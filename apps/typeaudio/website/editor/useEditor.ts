@@ -13,6 +13,8 @@ import {
   type Cue,
   type Scene,
 } from "../video-model.ts";
+import { BLANK, RECIPES } from "../sound-recipes.ts";
+import { needsLiveRenderer } from "../sound-design.ts";
 import { wav } from "../audio.ts";
 import { morphPatch } from "../exploration.ts";
 import {
@@ -71,7 +73,9 @@ export function useEditor() {
     }
   });
   const [mode, setModeState] = useState<"live" | "render">("live"),
-    [backend, setBackend] = useState<"cpu" | "webgpu">("cpu");
+    [preferredBackend, setBackend] = useState<"cpu" | "webgpu">("cpu");
+  const cpuRenderRequired = needsLiveRenderer(state.patch),
+    backend = cpuRenderRequired ? "cpu" : preferredBackend;
   const [live, setLive] = useState(false),
     [busy, setBusy] = useState(false),
     [renderCache, setRendered] = useState<Rendered & { patchKey: string }>(),
@@ -80,6 +84,8 @@ export function useEditor() {
     [repeat, setRepeat] = useState(true),
     [auto, setAuto] = useState(false),
     [renderLoop, setRenderLoop] = useState(false);
+  const [recording, setRecording] = useState(false),
+    [recorded, setRecorded] = useState<Float32Array>();
   const patchKey = JSON.stringify(state.patch);
   const rendered = renderCache?.patchKey === patchKey ? renderCache : undefined;
   const [morphState, setMorphState] = useState<{
@@ -269,6 +275,104 @@ export function useEditor() {
   function patch(changes: Partial<Patch>, name?: string) {
     dispatch({ type: "edit", edit: (d) => updatePatch(d, changes, name) });
   }
+  function editLayer(id: string, changes: Partial<Patch>) {
+    dispatch({
+      type: "edit",
+      edit: (d) =>
+        updatePatch(d, {
+          layers: d.patch.layers.map((l) =>
+            l.id === id
+              ? { ...l, patch: validatePatch({ ...l.patch, ...changes }) }
+              : l,
+          ),
+        }),
+    });
+  }
+  function changeLayer(
+    id: string,
+    changes: { name?: string; offset?: number; muted?: boolean },
+  ) {
+    dispatch({
+      type: "edit",
+      edit: (d) =>
+        updatePatch(d, {
+          layers: d.patch.layers.map((l) =>
+            l.id === id ? { ...l, ...changes } : l,
+          ),
+        }),
+    });
+  }
+  function addLayer(copy?: string) {
+    const id = crypto.randomUUID();
+    dispatch({
+      type: "edit",
+      edit: (d) => {
+        if (d.patch.layers.length >= 3) return d;
+        const original =
+          copy === "base"
+            ? d.patch
+            : d.patch.layers.find((l) => l.id === copy)?.patch;
+        return updatePatch(d, {
+          layers: [
+            ...d.patch.layers,
+            {
+              id,
+              name: copy ? "Layer copy" : "New layer",
+              offset: 0,
+              muted: false,
+              patch: validatePatch({
+                ...(original || BLANK),
+                layers: [],
+                baseMuted: false,
+              }),
+            },
+          ],
+        });
+      },
+    });
+    return id;
+  }
+  function removeLayer(id: string) {
+    dispatch({
+      type: "edit",
+      edit: (d) =>
+        updatePatch(d, { layers: d.patch.layers.filter((l) => l.id !== id) }),
+    });
+  }
+  function newSound() {
+    stopSound();
+    dispatch({ type: "select", id: "" });
+    patch({ ...BLANK }, "Untitled sound");
+    workspace("sound");
+    setNotice(
+      "New sound. Choose a source, add layers and shape its automation.",
+    );
+  }
+  async function recordLive() {
+    const live = sound.current.live;
+    if (!live || recording) return;
+    setRecording(true);
+    setNotice("Recording live output, up to 30 seconds.");
+    try {
+      const pcm = await live.record();
+      if (!pcm.length) throw new Error("Recording was empty.");
+      setRecorded(pcm);
+      setNotice(
+        `Recorded ${(pcm.length / SAMPLE_RATE).toFixed(2)} s. Export the take to keep it.${pcm.some((v) => Math.abs(v) > 1) ? " Clipping detected; lower layer output levels." : ""}`,
+      );
+    } catch (error) {
+      setNotice(String(error));
+    } finally {
+      setRecording(false);
+    }
+  }
+  function exportTake() {
+    if (recorded)
+      download(
+        new Blob([wav(recorded, SAMPLE_RATE)], { type: "audio/wav" }),
+        "typeaudio-take.wav",
+      );
+  }
   function scene(edit: (current: Scene) => Scene, record = true, pause = true) {
     if (pause) stopScene();
     dispatch({ type: "edit", edit: (d) => updateScene(d, edit), record });
@@ -425,9 +529,9 @@ export function useEditor() {
       setRendered({ ...result, patchKey });
       setBusy(false);
       setNotice(
-        state.patch.lfoDepth
-          ? "Render complete. Live modulation is excluded from this WAV."
-          : "Render complete.",
+        result.peak > 1
+          ? "Render complete. Clipping detected; lower layer output levels."
+          : "Render complete. Modulation and automation are included.",
       );
       if (autoplay)
         await sound.current.play(
@@ -525,8 +629,8 @@ export function useEditor() {
     const current = () =>
       request === projectRequest.current && version === editVersion.current;
     try {
-      if (file.size > 100000)
-        throw new Error("Project files must be smaller than 100 KB.");
+      if (file.size > 1000000)
+        throw new Error("Project files must be smaller than 1 MB.");
       const next = validateScene(JSON.parse(await file.text()));
       if (!current()) return;
       detach();
@@ -644,6 +748,18 @@ export function useEditor() {
     setMode,
     backend,
     setBackend,
+    cpuRenderRequired,
+    recording,
+    recorded,
+    recordLive,
+    stopRecording: () => sound.current.live?.stopRecording(),
+    exportTake,
+    newSound,
+    editLayer,
+    changeLayer,
+    addLayer,
+    removeLayer,
+    recipes: RECIPES,
     live,
     busy,
     rendered,

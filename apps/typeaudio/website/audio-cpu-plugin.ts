@@ -50,6 +50,7 @@ export function audioCpu(): Plugin {
         "fract",
         "max",
         "f32",
+        "u32",
         "arrayLength",
       ]);
       for (const declaration of generated.decls) {

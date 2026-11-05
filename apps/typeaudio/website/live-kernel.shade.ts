@@ -9,6 +9,7 @@ export function liveBlock(
   clock: array<u32>,
   p: array<f32>,
   frames: u32,
+  wave: array<f32>,
 ): void {
   const w: f32 = (6.283185307179586 * p[12]) / 48000;
   const cw: f32 = cos(w);
@@ -38,6 +39,10 @@ export function liveBlock(
   const gate: f32 = p[10];
   const repeat: u32 = u32(p[11]);
   let age: u32 = clock[0];
+  let random: u32 = clock[1];
+  let phaseFm: f32 = state[4];
+  const fmIndex: f32 = p[14];
+  const incFm: f32 = p[15];
   // The release starts from the envelope's value at the gate.
   let heldGate: f32 = sustain;
   if (gate < attack) {
@@ -51,13 +56,27 @@ export function liveBlock(
     }
     const time: f32 = f32(age) / 48000;
     age++;
-    let a: f32 = phaseA * 2 - 1;
+    let carrier: f32 = phaseA;
+    if (fmIndex > 0) { carrier = fract(phaseA + sin(phaseFm * 6.283185307179586) * fmIndex / 6.283185307179586); }
+    phaseFm = fract(phaseFm + incFm);
+    let a: f32 = carrier * 2 - 1;
     if (shapeA == 0) {
-      a = sin(phaseA * 6.283185307179586);
+      a = sin(carrier * 6.283185307179586);
     } else if (shapeA == 2) {
-      a = select(-1, 1, phaseA < 0.5);
+      a = select(-1, 1, carrier < 0.5);
     } else if (shapeA == 3) {
-      a = 1 - 4 * abs(phaseA - 0.5);
+      a = 1 - 4 * abs(carrier - 0.5);
+    }
+    if (shapeA == 4) {
+      random = random ^ (random << 13);
+      random = random ^ (random >> 17);
+      random = random ^ (random << 5);
+      a = f32(random) / 2147483648 - 1;
+    } else if (shapeA == 5) {
+      const position: f32 = carrier * 64;
+      const index: u32 = u32(position);
+      const mix: f32 = position - f32(index);
+      a = wave[index] * (1 - mix) + wave[(index + 1) % 64] * mix;
     }
     let b: f32 = phaseB * 2 - 1;
     if (shapeB == 0) {
@@ -66,6 +85,17 @@ export function liveBlock(
       b = select(-1, 1, phaseB < 0.5);
     } else if (shapeB == 3) {
       b = 1 - 4 * abs(phaseB - 0.5);
+    }
+    if (shapeB == 4) {
+      random = random ^ (random << 13);
+      random = random ^ (random >> 17);
+      random = random ^ (random << 5);
+      b = f32(random) / 2147483648 - 1;
+    } else if (shapeB == 5) {
+      const position: f32 = phaseB * 64;
+      const index: u32 = u32(position);
+      const mix: f32 = position - f32(index);
+      b = wave[index] * (1 - mix) + wave[(index + 1) % 64] * mix;
     }
     phaseA = fract(phaseA + incA);
     phaseB = fract(phaseB + incB);
@@ -79,7 +109,7 @@ export function liveBlock(
     } else if (time < attack + decay) {
       env = 1 - ((1 - sustain) * (time - attack)) / decay;
     }
-    if (repeat == 1 && time >= gate) {
+    if (repeat >= 1 && time >= gate) {
       env = heldGate * max(0, 1 - (time - gate) / release);
     }
     out[i] = (mixed * (1 - filterBlend) + filtered * filterBlend) * env;
@@ -89,4 +119,6 @@ export function liveBlock(
   state[1] = phaseB;
   state[2] = z1;
   state[3] = z2;
+  state[4] = phaseFm;
+  clock[1] = random;
 }
