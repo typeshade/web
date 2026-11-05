@@ -138,6 +138,14 @@ try {
   await livePage.locator('#mode-render').click();assert.equal(await livePage.locator('#render').isVisible(),true);
   assert.deepEqual(errors,[]);
   await livePage.close();
+  const touch=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
+  const touchPage=await touch.newPage();await touchPage.goto('http://127.0.0.1:4178/');
+  await touchPage.locator('#xy-pad').tap({position:{x:30,y:30}});
+  assert.ok(Number(await touchPage.locator('#cutoff').inputValue())<500);
+  await touchPage.locator('#cutoff').focus();const keyboardBefore=Number(await touchPage.locator('#cutoff').inputValue());
+  await touchPage.keyboard.press('ArrowRight');assert.ok(Number(await touchPage.locator('#cutoff').inputValue())>keyboardBefore);
+  assert.equal(await touchPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await touch.close();console.log('PASS mobile touch pad and keyboard slider alternative');
   console.log('PASS continuous AudioWorklet output, 8 voices, live edits without node replacement or render worker, live spectrum, stop/restart, and mode switch');
 
 } finally {

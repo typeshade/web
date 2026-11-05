@@ -42,7 +42,8 @@ English-only site, as before this change.
   stop/restart and actual eight-voice live AudioWorklet processing.
 - New browser coverage exercises captured XY dragging, A/B recall, logarithmic
   morphing, tempo sync and stored LFO settings while verifying one worklet node
-  and no offline-render worker requests during live edits.
+  and no offline-render worker requests during live edits. Mobile touch input and
+  the keyboard slider alternative also pass.
 - Desktop (1440px) and mobile (390px) screenshots were inspected. No horizontal
   overflow or application runtime errors were observed.
 - Six existing scope-selection tests pass. TypeAudio uses its own path-filtered
