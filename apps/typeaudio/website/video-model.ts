@@ -1,4 +1,4 @@
-import { validatePatch, type Patch } from "./designer.ts";
+import { SAMPLE_RATE, validatePatch, type Patch } from "./designer.ts";
 export const MAX_CUES = 24;
 export interface Cue {
   id: string;
@@ -7,6 +7,12 @@ export interface Cue {
   gain: number;
   muted: boolean;
   patch: Patch;
+  sourceIn?: number;
+  sourceOut?: number | null;
+  fadeIn?: number;
+  fadeOut?: number;
+  /** Original source range whose fades survive a non-destructive split. */
+  fadeAnchor?: [number, number];
 }
 export interface Scene {
   version: 1;
@@ -103,7 +109,7 @@ export function validateScene(raw: unknown): Scene {
     )
       throw new Error("Invalid or duplicate cue.");
     ids.add(c.id);
-    return {
+    const cue: Cue = {
       id: c.id,
       name: label(c.name),
       time: number(c.time, 0, 3600),
@@ -111,6 +117,22 @@ export function validateScene(raw: unknown): Scene {
       muted: c.muted,
       patch: validatePatch(c.patch),
     };
+    if (c.sourceIn !== undefined) cue.sourceIn = number(c.sourceIn, 0, 60);
+    if (c.sourceOut !== undefined)
+      cue.sourceOut = c.sourceOut === null ? null : number(c.sourceOut, 0, 60);
+    if (cue.sourceOut != null && cue.sourceOut <= (cue.sourceIn ?? 0))
+      throw new Error("Source out must be after source in.");
+    if (c.fadeIn !== undefined) cue.fadeIn = number(c.fadeIn, 0, 60);
+    if (c.fadeOut !== undefined) cue.fadeOut = number(c.fadeOut, 0, 60);
+    if (c.fadeAnchor !== undefined) {
+      if (!Array.isArray(c.fadeAnchor) || c.fadeAnchor.length !== 2)
+        throw new Error("Invalid fade anchor.");
+      const start = number(c.fadeAnchor[0], 0, 60),
+        end = number(c.fadeAnchor[1], 0, 60);
+      if (end <= start) throw new Error("Invalid fade anchor range.");
+      cue.fadeAnchor = [start, end];
+    }
+    return cue;
   });
   return {
     version: 1,
@@ -124,35 +146,112 @@ export function validateScene(raw: unknown): Scene {
     cues,
   };
 }
-/** Used by both preview and WAV export, including tails crossing the range start. */
+/** Source and timeline edits are rounded to the PCM sample clock. */
+export function cueRange(cue: Cue, duration: number, rate = SAMPLE_RATE) {
+  const total = Math.round(duration * rate),
+    start = Math.min(
+      total,
+      Math.max(0, Math.round((cue.sourceIn ?? 0) * rate)),
+    ),
+    end = Math.max(
+      start,
+      Math.min(total, Math.round((cue.sourceOut ?? duration) * rate)),
+    );
+  return {
+    start: start / rate,
+    end: end / rate,
+    duration: (end - start) / rate,
+  };
+}
+export interface FadeEnvelope {
+  start: number;
+  end: number;
+  fadeIn: number;
+  fadeOut: number;
+}
+export function cueEnvelope(
+  cue: Cue,
+  duration: number,
+  rate = SAMPLE_RATE,
+): FadeEnvelope {
+  const range = cueRange(cue, duration, rate);
+  return {
+    start: cue.fadeAnchor?.[0] ?? range.start,
+    end: cue.fadeAnchor?.[1] ?? range.end,
+    fadeIn: cue.fadeIn ?? 0,
+    fadeOut: cue.fadeOut ?? 0,
+  };
+}
+export function fadeAt(envelope: FadeEnvelope, time: number): number {
+  return Math.max(
+    0,
+    Math.min(
+      1,
+      envelope.fadeIn ? (time - envelope.start) / envelope.fadeIn : 1,
+      envelope.fadeOut ? (envelope.end - time) / envelope.fadeOut : 1,
+    ),
+  );
+}
+/** Linear breakpoints for AudioParam scheduling; the same envelope is used by WAV. */
+export function fadePoints(envelope: FadeEnvelope, from: number, to: number) {
+  const e = envelope;
+  const times = [
+    from,
+    to,
+    e.start,
+    e.start + e.fadeIn,
+    e.end - e.fadeOut,
+    e.end,
+  ];
+  if (e.fadeIn && e.fadeOut)
+    times.push(
+      (e.fadeIn * e.end + e.fadeOut * e.start) / (e.fadeIn + e.fadeOut),
+    );
+  return [...new Set(times.filter((t) => t >= from && t <= to))]
+    .sort((a, b) => a - b)
+    .map((time) => ({ time, value: fadeAt(e, time) }));
+}
+/** Used by both preview and WAV export, including seeking into a trimmed clip. */
 export function cueWindow(
   cue: Cue,
   duration: number,
   from: number,
   to: number,
+  rate = SAMPLE_RATE,
 ): { at: number; offset: number; duration: number } | undefined {
-  const at = Math.max(from, cue.time),
-    end = Math.min(to, cue.time + duration);
+  const range = cueRange(cue, duration, rate),
+    begin = Math.round(cue.time * rate),
+    at = Math.max(Math.round(from * rate), begin),
+    end = Math.min(
+      Math.round(to * rate),
+      begin + Math.round(range.duration * rate),
+    );
   if (cue.muted || end <= at) return;
-  return { at, offset: at - cue.time, duration: end - at };
+  return {
+    at: at / rate,
+    offset: range.start + (at - begin) / rate,
+    duration: (end - at) / rate,
+  };
 }
 export function mixScene(
   scene: Scene,
   samples: Map<string, Float32Array>,
   rate: number,
 ): { pcm: Float32Array; peak: number } {
-  const pcm = new Float32Array(Math.ceil((scene.end - scene.start) * rate));
+  const origin = Math.round(scene.start * rate),
+    pcm = new Float32Array(Math.round(scene.end * rate) - origin);
   for (const cue of scene.cues) {
     const data = samples.get(cue.id);
     if (!data || cue.muted) continue;
-    const shift = Math.round((cue.time - scene.start) * rate),
-      gain = cue.gain * scene.effects;
-    for (
-      let i = Math.max(0, -shift);
-      i < data.length && i + shift < pcm.length;
-      i++
-    )
-      pcm[i + shift]! += data[i]! * gain;
+    const range = cueRange(cue, data.length / rate, rate),
+      start = Math.round(range.start * rate),
+      length = Math.round(range.duration * rate),
+      shift = Math.round(cue.time * rate) - origin,
+      gain = cue.gain * scene.effects,
+      envelope = cueEnvelope(cue, data.length / rate, rate);
+    for (let i = Math.max(0, -shift); i < length && i + shift < pcm.length; i++)
+      pcm[i + shift]! +=
+        data[start + i]! * gain * fadeAt(envelope, (start + i) / rate);
   }
   let peak = 0;
   for (let i = 0; i < pcm.length; i++) {

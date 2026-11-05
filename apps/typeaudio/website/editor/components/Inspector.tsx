@@ -1,8 +1,11 @@
+import { cueRange } from "../../video-model.ts";
+import { trimClip, MIN_CLIP } from "../clip-edit.ts";
 import type { Editor } from "../useEditor.ts";
 import { useEffect, useRef } from "react";
 import { Panel, Icon } from "./Panel.tsx";
 export function Inspector({ editor: e }: { editor: Editor }) {
   const c = e.selected;
+  const range = c ? cueRange(c, e.sourceDuration(c)) : undefined;
   const name = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (e.renameRequest?.id === c?.id) {
@@ -19,7 +22,11 @@ export function Inspector({ editor: e }: { editor: Editor }) {
               <Icon name="sound" />
               <span>
                 {c.name}
-                <small>Audio layer</small>
+                <small>
+                  {e.selectedIds.length > 1
+                    ? `Active clip · ${e.selectedIds.length} selected`
+                    : "Audio layer"}
+                </small>
               </span>
             </div>
             <label>
@@ -64,9 +71,85 @@ export function Inspector({ editor: e }: { editor: Editor }) {
                 Move to playhead
               </button>
               <p className="panel-hint">
-                {((e.samples.get(c.id)?.length || 0) / 48000).toFixed(2)} s
-                including rendered effect tails.
+                {range!.duration.toFixed(3)} s from a{" "}
+                {e.sourceDuration(c).toFixed(3)} s source, including effect
+                tails.
               </p>
+            </div>
+            <div className="property-section">
+              <h3>Trim & fades</h3>
+              {(["in", "out"] as const).map((edge) => (
+                <label className="inline-property" key={edge}>
+                  Source {edge}
+                  <input
+                    id={`cue-source-${edge}`}
+                    type="number"
+                    min={edge === "in" ? 0 : range!.start + MIN_CLIP}
+                    max={
+                      edge === "in"
+                        ? range!.end - MIN_CLIP
+                        : e.sourceDuration(c)
+                    }
+                    step=".01"
+                    value={Number(
+                      (edge === "in" ? range!.start : range!.end).toFixed(5),
+                    )}
+                    onChange={(event) => {
+                      const value = Number(event.target.value);
+                      if (Number.isFinite(value))
+                        e.cue((current) =>
+                          trimClip(
+                            current,
+                            edge,
+                            current.time +
+                              value -
+                              cueRange(current, e.sourceDuration(current))
+                                .start,
+                            e.sourceDuration(current),
+                          ),
+                        );
+                    }}
+                  />
+                </label>
+              ))}
+              {(["fadeIn", "fadeOut"] as const).map((key) => (
+                <label className="inline-property" key={key}>
+                  {key === "fadeIn" ? "Fade in" : "Fade out"}
+                  <input
+                    id={`cue-${key}`}
+                    type="number"
+                    min="0"
+                    max={60}
+                    step=".01"
+                    value={Number((c[key] ?? 0).toFixed(5))}
+                    onChange={(event) => {
+                      const value = Number(event.target.value);
+                      if (Number.isFinite(value) && value >= 0)
+                        e.cue((current) => ({
+                          ...current,
+                          [key]: Math.min(60, value),
+                          fadeAnchor: undefined,
+                        }));
+                    }}
+                  />
+                </label>
+              ))}
+              <p className="panel-hint">
+                Times are in seconds. Trimming keeps the original sound
+                available.
+              </p>
+              {c.fadeAnchor && (
+                <p className="panel-hint">
+                  Fades continue across the split. Adjust a fade to start a new
+                  envelope on this piece.
+                </p>
+              )}
+              <div className="button-row">
+                <button onClick={() => e.resetTrim([c.id])}>Reset trim</button>
+                <button onClick={() => e.resetFades([c.id])}>
+                  Reset fades
+                </button>
+              </div>
             </div>
             <div className="property-section">
               <h3>Audio</h3>
@@ -108,6 +191,12 @@ export function Inspector({ editor: e }: { editor: Editor }) {
                 Edits in Sound workspace update this layer.
               </p>
             </div>
+            {e.selectedIds.length > 1 && (
+              <p className="panel-hint">
+                Properties above edit the active clip. Duplicate and Delete
+                apply to all {e.selectedIds.length} selected layers.
+              </p>
+            )}
             <div className="button-row">
               <button
                 id="audition"
@@ -116,7 +205,11 @@ export function Inspector({ editor: e }: { editor: Editor }) {
               >
                 Audition
               </button>
-              <button id="duplicate" onClick={e.duplicate}>
+              <button
+                id="duplicate"
+                disabled={e.state.scene.cues.length + e.selectedIds.length > 24}
+                onClick={e.duplicate}
+              >
                 Duplicate
               </button>
               <button id="delete-cue" onClick={e.deleteCue}>

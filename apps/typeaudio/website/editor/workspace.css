@@ -1296,7 +1296,7 @@
   cursor: grab;
   touch-action: none;
 }
-.studio-app .audio-clip[aria-pressed="true"] {
+.studio-app .audio-clip[data-selected="true"] {
   border-color: #c1d9ff;
   outline: 1px solid #9cbbe3;
   outline-offset: 0;
@@ -1845,3 +1845,19 @@
 .studio-app .render-path-hint { color: var(--muted); font-size: 10px; }
 .studio-app button.recording { color: #ffd6cf; border-color: #9f5954; background: #633531; }
 @media (max-width: 1200px) { .studio-app .options-bar { gap: 5px; } .studio-app .options-bar .transport-buttons { gap: 5px; } }
+
+/* Timeline handles keep editing hit areas separate from the clip body. */
+.audio-clip:focus-visible { outline:2px solid #dbe9ff; outline-offset:1px; }
+.audio-clip > span { left:12px; }
+.clip-envelope { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; opacity:.65; }
+.clip-envelope polyline { fill:none; stroke:#f6d89c; stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.studio-app .clip-handle { position:absolute; min-width:0; min-height:0; padding:0; margin:0; z-index:3; border:0; border-radius:1px; touch-action:none; }
+.studio-app .trim-handle { top:16px; bottom:0; width:7px; transform:translateX(-50%); background:#c5d9f533; cursor:ew-resize; }
+.studio-app .handle-in { transform:none; }
+.studio-app .handle-out { transform:translateX(-100%); }
+.studio-app .fade-handle { top:0; width:10px; height:10px; transform:translateX(-50%); background:#efd19b; border:1px solid #685135; cursor:ew-resize; }
+.studio-app .handle-fadeIn { margin-left:5px; }
+.studio-app .handle-fadeOut { margin-left:-5px; }
+.studio-app .clip-handle:hover,.studio-app .clip-handle:focus-visible { background:#fff0cf; outline:1px solid #fff; }
+.audio-clip .clip-drag-readout { z-index:4; top:auto; bottom:2px; }
+@media (pointer:coarse) { .studio-app .trim-handle { width:14px; } .studio-app .fade-handle { width:16px; height:16px; } }

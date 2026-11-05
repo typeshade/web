@@ -334,3 +334,51 @@ guarantee. The runner now includes recipes and the layered stress case.
 Local validation passes shader/TypeScript checks, 47 unit tests, production build,
 style/scope checks and all five browser suites. The last cleanup also checks the
 new source-layer keyboard menu and the completed recording/export flow.
+
+## Timeline editing follow-up — 2026-11-05
+
+Picture now supports source trimming, linear clip fades, splitting at the playhead
+and multiple selected layers. Clip-edge handles and Source in/out fields retain
+the original PCM. Top handles and numeric fade fields control the envelope. A
+split creates two layers sharing the source window and original fade coordinates,
+so it does not retrigger synthesis or restart a fade. Editing a fade or trim
+anchors the envelope to that piece. Reset trim restores the source window; Reset
+fades removes the envelope. A source shortened below its saved trim remains silent
+until the trim is adjusted or reset. The 24-layer and 60-second scene limits remain;
+splits leave at least 10 ms in each piece.
+
+Ctrl/Cmd-click toggles selection, Shift-click selects a range and Ctrl/Cmd A selects
+all layers. Group moves preserve relative timing at the timeline bounds. Alt-drag,
+Duplicate, Delete and the corresponding context actions operate on the selection;
+Properties identifies and edits the active clip. Ctrl/Cmd D duplicates and Ctrl/Cmd
+Shift D splits. Pointer edits commit once on release, Escape cancels them, and
+Undo/Redo restores the entire edit and its selection. Selection persists in the
+atomic local document; scene JSON remains version 1 with optional trim/fade fields.
+
+Preview and WAV use the same sample-clock source windows and linear fade envelope.
+Raw PCM stays cached across timing and fade edits. Audio scheduling initializes a
+clip's gain before its automation events, avoiding a default-gain sample when a
+source begins just before a fractional timestamp. Waveforms show only the visible
+source segment; the envelope is drawn over the waveform. The stale hints excluding
+LFO from finite exports were corrected to match the preceding implementation.
+
+The bounded English review includes changed menus, handles, tooltips, properties,
+shortcuts, validation errors and README instructions. Desktop and 390 px layouts
+were visually inspected. This is not a review of imported engine documentation or
+translations. The editor still places one clip per layer; independent track routing,
+free docking and arbitrary DSP programs are outside this change.
+
+Validation adds trim/seek, split phase and fade continuity, malformed project,
+selection/history and movement-boundary unit coverage. The browser suite covers
+group edits, cancellation and Undo, persistence, actual handle dragging, splitting
+inside a fade, sample-identical split WAVs, project round trips and mobile bounds.
+Captured AudioBufferSource offsets and gain automation are replayed in an
+OfflineAudioContext at three clock positions and compared with exported PCM. The
+observed maximum difference is 1 LSB in 16-bit output; a mid-fade seek also preserves
+its source offset and gain. This verifies scheduling data and offline audio output,
+not physical audio-device latency or a hard real-time guarantee.
+
+Local shader/TypeScript checks, 52 unit tests, production build, global CSS and
+scope checks pass. All six browser suites pass, including the existing source/clip
+Tone persistence and CPU/WebGPU/device-loss regressions. Clip gestures and their
+context menu live in separate components/helpers from the timeline layout.

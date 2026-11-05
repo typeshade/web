@@ -8,16 +8,20 @@ import {
 } from "../designer.ts";
 import {
   MAX_CUES,
+  cueRange,
   mixScene,
   validateScene,
   type Cue,
   type Scene,
 } from "../video-model.ts";
 import { BLANK, RECIPES } from "../sound-recipes.ts";
-import { needsLiveRenderer } from "../sound-design.ts";
+import { needsLiveRenderer, soundLength } from "../sound-design.ts";
 import { wav } from "../audio.ts";
 import { morphPatch } from "../exploration.ts";
 import {
+  selectionIds,
+  selectDocument,
+  type SelectionMode,
   initialDocument,
   reducer,
   SCENE_KEY,
@@ -31,6 +35,7 @@ import {
 } from "./model.ts";
 import { SoundEngine, type Rendered } from "./engine/SoundEngine.ts";
 import { SceneTransport } from "./engine/SceneTransport.ts";
+import { moveDelta, splitClip } from "./clip-edit.ts";
 export interface SavedSound {
   name: string;
   patch: Patch;
@@ -50,9 +55,16 @@ export function useEditor() {
     patchRequest = useRef(0);
   const dispatch = useCallback((action: Action) => {
     if (
-      ["edit", "open", "media", "undo", "redo", "select", "cancel"].includes(
-        action.type,
-      )
+      [
+        "edit",
+        "open",
+        "media",
+        "undo",
+        "redo",
+        "select",
+        "selectMany",
+        "cancel",
+      ].includes(action.type)
     )
       editVersion.current++;
     rawDispatch(action);
@@ -167,6 +179,7 @@ export function useEditor() {
           scene: state.scene,
           source: state.source,
           selected: state.selected,
+          selection: state.selection,
         }),
       );
       // Compatibility mirrors are not used to restore a partially written document.
@@ -180,7 +193,7 @@ export function useEditor() {
         "Browser storage is unavailable. Export your project to keep it.",
       );
     }
-  }, [state.scene, state.source, state.selected]);
+  }, [state.scene, state.source, state.selected, state.selection]);
   useEffect(() => {
     sound.current.update(state.patch, repeat, dry);
   }, [state.patch, repeat, dry]);
@@ -396,6 +409,7 @@ export function useEditor() {
         return {
           ...d,
           selected: id,
+          selection: [id],
           scene: {
             ...d.scene,
             cues: [
@@ -415,37 +429,141 @@ export function useEditor() {
     });
     setNotice("Sound clip added at playhead.");
   }
-  function deleteCueById(id: string) {
+  function sourceDuration(c: Cue) {
+    const current = latest.current;
+    return current.ready && current.samples.has(c.id)
+      ? current.samples.get(c.id)!.length / SAMPLE_RATE
+      : soundLength(c.patch);
+  }
+  function clipDuration(c: Cue) {
+    return cueRange(c, sourceDuration(c)).duration;
+  }
+  function selectCue(id: string, mode?: SelectionMode) {
+    const next = selectDocument(latest.current.state, id, mode);
+    dispatch({ type: "select", id, mode });
+    return selectionIds(next);
+  }
+  function deleteClips(ids = selectionIds(latest.current.state)) {
     scene((current) => ({
       ...current,
-      cues: current.cues.filter((c) => c.id !== id),
+      cues: current.cues.filter((c) => !ids.includes(c.id)),
     }));
   }
-  function duplicateCue(target: string, at?: number) {
-    const id = crypto.randomUUID();
+  function moveClips(ids: string[], delta: number, copy = false) {
+    if (
+      copy &&
+      latest.current.state.scene.cues.length + ids.length > MAX_CUES
+    ) {
+      setNotice("A composition can contain up to 24 sound layers.");
+      return;
+    }
+    const copies = new Map(ids.map((id) => [id, crypto.randomUUID()]));
     stopScene();
     dispatch({
       type: "edit",
       edit: (d) => {
-        const c = d.scene.cues.find((c) => c.id === target);
-        if (!c || d.scene.cues.length >= MAX_CUES) return d;
+        const targets = d.scene.cues.filter((c) => ids.includes(c.id)),
+          shift = moveDelta(targets, delta);
+        if (
+          !targets.length ||
+          (copy && d.scene.cues.length + targets.length > MAX_CUES)
+        )
+          return d;
+        if (copy) {
+          const cues = targets.map((c) => ({
+            ...c,
+            id: copies.get(c.id)!,
+            time: c.time + shift,
+          }));
+          return {
+            ...d,
+            selected: copies.get(d.selected) || cues[0]!.id,
+            selection: cues.map((c) => c.id),
+            scene: { ...d.scene, cues: [...d.scene.cues, ...cues] },
+          };
+        }
+        return updateScene(d, (current) => ({
+          ...current,
+          cues: current.cues.map((c) =>
+            ids.includes(c.id) ? { ...c, time: c.time + shift } : c,
+          ),
+        }));
+      },
+    });
+  }
+  function splitClips(ids = selectionIds(latest.current.state)) {
+    const at = transport.current.current(),
+      current = latest.current.state;
+    const parts = new Map(
+      current.scene.cues
+        .filter((c) => ids.includes(c.id))
+        .flatMap((c) => {
+          const pair = splitClip(c, at, sourceDuration(c), crypto.randomUUID());
+          return pair ? [[c.id, pair] as const] : [];
+        }),
+    );
+    if (!parts.size) {
+      setNotice(
+        "Place the playhead inside a selected clip, at least 10 ms from either edge.",
+      );
+      return;
+    }
+    if (current.scene.cues.length + parts.size > MAX_CUES) {
+      setNotice("Splitting these clips would exceed the 24-layer limit.");
+      return;
+    }
+    stopScene();
+    dispatch({
+      type: "edit",
+      edit: (d) => {
+        const rights = [...parts.values()].map((pair) => pair[1].id);
         return {
           ...d,
-          selected: id,
+          selected: rights[0]!,
+          selection: rights,
           scene: {
             ...d.scene,
-            cues: [
-              ...d.scene.cues,
-              {
-                ...structuredClone(c),
-                id,
-                time: Math.max(0, Math.min(3600, at ?? c.time + 0.25)),
-              },
-            ],
+            cues: d.scene.cues.flatMap((c) => parts.get(c.id) || [c]),
           },
         };
       },
     });
+    setNotice(
+      "Split at playhead. Both pieces retain their source audio and fades.",
+    );
+  }
+  function resetTrim(ids = selectionIds(latest.current.state)) {
+    scene((current) => ({
+      ...current,
+      cues: current.cues.map((c) =>
+        ids.includes(c.id)
+          ? { ...c, sourceIn: 0, sourceOut: null, fadeAnchor: undefined }
+          : c,
+      ),
+    }));
+  }
+  function resetFades(ids = selectionIds(latest.current.state)) {
+    scene((current) => ({
+      ...current,
+      cues: current.cues.map((c) =>
+        ids.includes(c.id)
+          ? { ...c, fadeIn: 0, fadeOut: 0, fadeAnchor: undefined }
+          : c,
+      ),
+    }));
+  }
+  function muteClips(ids = selectionIds(latest.current.state)) {
+    const muted = !latest.current.state.scene.cues
+      .filter((c) => ids.includes(c.id))
+      .every((c) => c.muted);
+    scene((current) => ({
+      ...current,
+      cues: current.cues.map((c) => (ids.includes(c.id) ? { ...c, muted } : c)),
+    }));
+  }
+  function duplicateCue(target: string, at?: number) {
+    const c = latest.current.state.scene.cues.find((c) => c.id === target);
+    if (c) moveClips([target], at === undefined ? 0.25 : at - c.time, true);
   }
   const [renameRequest, setRenameRequest] = useState<{
     id: string;
@@ -470,7 +588,7 @@ export function useEditor() {
         {
           ...current.state.scene,
           start: 0,
-          end: pcm.length / SAMPLE_RATE,
+          end: cueRange(cue, pcm.length / SAMPLE_RATE).duration,
           cues: [{ ...cue, time: 0, muted: false }],
         },
         current.samples,
@@ -794,9 +912,19 @@ export function useEditor() {
     scene,
     cue,
     addCue,
-    deleteCue: () => deleteCueById(state.selected),
-    deleteCueById,
-    duplicate: () => duplicateCue(state.selected),
+    deleteCue: () => deleteClips(),
+    deleteCueById: (id: string) => deleteClips([id]),
+    duplicate: () => moveClips(selectionIds(latest.current.state), 0.25, true),
+    deleteClips,
+    moveClips,
+    splitClips,
+    resetTrim,
+    resetFades,
+    muteClips,
+    selectCue,
+    sourceDuration,
+    clipDuration,
+    selectedIds: selectionIds(state),
     duplicateCue,
     renameCue,
     renameRequest,

@@ -7,6 +7,7 @@ export interface Document {
   patch: Patch;
   patchName: string;
   selected: string;
+  selection?: string[];
   source: { patch: Patch; name: string };
 }
 export interface EditorState extends Document {
@@ -38,6 +39,7 @@ export function initialDocument(): Document {
   } catch {}
   // Prefer one atomic document; retain legacy scene/source migration.
   let selected = scene.cues[0]?.id || "";
+  let selection: string[] | undefined;
   try {
     const raw = localStorage.getItem(DOCUMENT_KEY);
     if (raw) {
@@ -48,6 +50,9 @@ export function initialDocument(): Document {
         patch: validatePatch(saved.source.patch),
         name: String(saved.source.name).slice(0, 40),
       };
+      selection = Array.isArray(saved.selection)
+        ? saved.selection.filter((id: unknown) => typeof id === "string")
+        : undefined;
       scene = nextScene;
       source = nextSource;
       selected = scene.cues.some((c) => c.id === saved.selected)
@@ -59,6 +64,7 @@ export function initialDocument(): Document {
     scene,
     source,
     selected,
+    selection,
     patch: source.patch,
     patchName: source.name,
   });
@@ -70,7 +76,8 @@ export type Action =
   | { type: "edit"; edit: (doc: Document) => Document; record?: boolean }
   | { type: "undo" }
   | { type: "redo" }
-  | { type: "select"; id: string }
+  | { type: "select"; id: string; mode?: SelectionMode }
+  | { type: "selectMany"; ids: string[] }
   | { type: "workspace"; workspace: Workspace }
   | { type: "tool"; tool: Tool }
   | { type: "open"; scene: Scene }
@@ -81,6 +88,7 @@ function snapshotDocument(s: Document): Document {
     patch: s.patch,
     patchName: s.patchName,
     selected: s.selected,
+    selection: selectionIds(s),
     source: s.source,
   };
 }
@@ -108,8 +116,16 @@ export function reducer(s: EditorState, a: Action): EditorState {
   }
   if (a.type === "workspace") return { ...s, workspace: a.workspace };
   if (a.type === "tool") return { ...s, tool: a.tool };
-  if (a.type === "select")
-    return { ...s, ...projectDocument({ ...s, selected: a.id }) };
+  if (a.type === "select") return { ...s, ...selectDocument(s, a.id, a.mode) };
+  if (a.type === "selectMany")
+    return {
+      ...s,
+      ...projectDocument({
+        ...s,
+        selected: a.ids.at(-1) || "",
+        selection: a.ids,
+      }),
+    };
   if (a.type === "media")
     return {
       ...s,
@@ -121,7 +137,12 @@ export function reducer(s: EditorState, a: Action): EditorState {
     const scene = validateScene(a.scene);
     return {
       ...s,
-      ...projectDocument({ ...s, scene, selected: scene.cues[0]?.id || "" }),
+      ...projectDocument({
+        ...s,
+        scene,
+        selection: undefined,
+        selected: scene.cues[0]?.id || "",
+      }),
       past: [],
       future: [],
     };
@@ -172,12 +193,50 @@ function cancel(s: EditorState): EditorState {
   const { checkpoint, ...rest } = s;
   return { ...rest, ...projectDocument(checkpoint) };
 }
+export type SelectionMode = "toggle" | "range" | "preserve";
+export function selectionIds(doc: Document): string[] {
+  if (!doc.selected) return [];
+  const valid = new Set(doc.scene.cues.map((c) => c.id));
+  if (!doc.selection?.includes(doc.selected) && valid.has(doc.selected))
+    return [doc.selected];
+  return [...new Set(doc.selection || [doc.selected])].filter((id) =>
+    valid.has(id),
+  );
+}
+export function selectDocument(
+  doc: Document,
+  id: string,
+  mode?: SelectionMode,
+): Document {
+  let ids = selectionIds(doc);
+  if (mode === "toggle")
+    ids = ids.includes(id) ? ids.filter((v) => v !== id) : [...ids, id];
+  else if (mode === "range" && doc.selected) {
+    const a = doc.scene.cues.findIndex((c) => c.id === doc.selected),
+      b = doc.scene.cues.findIndex((c) => c.id === id);
+    ids =
+      a >= 0 && b >= 0
+        ? doc.scene.cues
+            .slice(Math.min(a, b), Math.max(a, b) + 1)
+            .map((c) => c.id)
+        : [id];
+  } else if (mode !== "preserve" || !ids.includes(id)) ids = id ? [id] : [];
+  return projectDocument({
+    ...doc,
+    selected: ids.includes(id) ? id : ids.at(-1) || "",
+    selection: ids,
+  });
+}
 /** patch/patchName are the selected sound projection, never a second source of truth. */
 export function projectDocument(doc: Document): Document {
-  const cue = doc.scene.cues.find((c) => c.id === doc.selected);
+  const ids = selectionIds(doc);
+  const cue = doc.scene.cues.find(
+    (c) => c.id === (ids.includes(doc.selected) ? doc.selected : ids.at(-1)),
+  );
   return {
     ...doc,
     selected: cue?.id || "",
+    selection: ids,
     patch: cue?.patch || doc.source.patch,
     patchName: cue?.name || doc.source.name,
   };

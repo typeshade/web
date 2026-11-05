@@ -46,6 +46,21 @@ export function WorkspaceShell({
         picture ? save() : e.savePatch();
         return;
       }
+      if (picture && (event.ctrlKey || event.metaKey)) {
+        if (event.key.toLowerCase() === "a") {
+          event.preventDefault();
+          e.dispatch({
+            type: "selectMany",
+            ids: e.state.scene.cues.map((c) => c.id),
+          });
+          return;
+        }
+        if (event.key.toLowerCase() === "d") {
+          event.preventDefault();
+          event.shiftKey ? e.splitClips() : e.duplicate();
+          return;
+        }
+      }
       if (event.code === "Space") {
         if (
           event.target instanceof HTMLElement &&
@@ -158,12 +173,37 @@ export function WorkspaceShell({
               },
               { separator: true },
               {
-                label: "Duplicate layer",
-                disabled: !e.selected || e.state.scene.cues.length >= 24,
+                label: "Split at playhead",
+                shortcut: `${key} Shift D`,
+                disabled: !e.selected,
+                action: () => e.splitClips(),
+              },
+              {
+                label: "Select all layers",
+                shortcut: `${key} A`,
+                disabled: !e.state.scene.cues.length,
+                action: () =>
+                  e.dispatch({
+                    type: "selectMany",
+                    ids: e.state.scene.cues.map((c) => c.id),
+                  }),
+              },
+              {
+                label:
+                  e.selectedIds.length > 1
+                    ? "Duplicate selected layers"
+                    : "Duplicate layer",
+                shortcut: `${key} D`,
+                disabled:
+                  !e.selected ||
+                  e.state.scene.cues.length + e.selectedIds.length > 24,
                 action: e.duplicate,
               },
               {
-                label: "Delete layer",
+                label:
+                  e.selectedIds.length > 1
+                    ? "Delete selected layers"
+                    : "Delete layer",
                 shortcut: "Delete",
                 disabled: !e.selected,
                 danger: true,

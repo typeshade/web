@@ -1,70 +1,15 @@
-import { soundLength } from "../../sound-design.ts";
 import { useRef, useState } from "react";
 import type { Editor } from "../useEditor.ts";
-import type { Cue } from "../../video-model.ts";
-import { validatePatch, SAMPLE_RATE } from "../../designer.ts";
+import { validatePatch } from "../../designer.ts";
 import { Panel, Icon } from "./Panel.tsx";
-import { ClipWaveform } from "./Waveform.tsx";
-import {
-  openContext,
-  useInteractions,
-  type MenuItem,
-} from "../interactions.tsx";
-import { moveClip } from "../timeline-gesture.ts";
-function clipItems(e: Editor, cue: Cue): MenuItem[] {
-  return [
-    {
-      label: "Audition clip",
-      disabled: !e.ready || !e.samples.has(cue.id),
-      action: () => void e.auditionCue(cue.id),
-    },
-    {
-      label: "Edit sound",
-      action: () => {
-        e.dispatch({ type: "select", id: cue.id });
-        e.workspace("sound");
-      },
-    },
-    { label: "Rename…", action: () => e.renameCue(cue.id) },
-    { separator: true },
-    {
-      label: "Move to playhead",
-      action: () =>
-        e.cue(
-          (c) => ({
-            ...c,
-            time: Math.max(
-              0,
-              Math.min(3600, Math.round(e.transport.current() * 1000) / 1000),
-            ),
-          }),
-          cue.id,
-        ),
-    },
-    {
-      label: "Mute layer",
-      checked: cue.muted,
-      action: () => e.cue((c) => ({ ...c, muted: !c.muted }), cue.id),
-    },
-    {
-      label: "Duplicate layer",
-      shortcut: "Alt-drag",
-      disabled: e.state.scene.cues.length >= 24,
-      action: () => e.duplicateCue(cue.id),
-    },
-    { separator: true },
-    {
-      label: "Delete layer",
-      shortcut: "Delete",
-      danger: true,
-      action: () => e.deleteCueById(cue.id),
-    },
-  ];
-}
+import { openContext, useInteractions } from "../interactions.tsx";
+import { clipItems } from "../clip-menu.ts";
+import { TimelineClip, type GroupDrag } from "./TimelineClip.tsx";
 export function Timeline({ editor: e }: { editor: Editor }) {
   const { openMenu } = useInteractions();
   const [zoom, setZoom] = useState(1),
     [snap, setSnap] = useState(true);
+  const [group, setGroup] = useState<GroupDrag>();
   const scroll = useRef<HTMLDivElement>(null);
   const pan = useRef<
     { x: number; y: number; left: number; top: number } | undefined
@@ -123,7 +68,20 @@ export function Timeline({ editor: e }: { editor: Editor }) {
           <Icon name="plus" />
           Add sound at playhead
         </button>
-        <span className="mono">{scene.cues.length} / 24 layers</span>
+        <button
+          id="split-cue"
+          disabled={!e.selectedIds.length}
+          data-tooltip="Split selected clips at the playhead. Ctrl/⌘ Shift D."
+          onClick={() => e.splitClips()}
+        >
+          Split
+        </button>
+        <span className="mono">
+          {scene.cues.length} / 24 layers
+          {e.selectedIds.length > 1
+            ? ` · ${e.selectedIds.length} selected`
+            : ""}
+        </span>
         <div className="range-inputs">
           <label>
             In
@@ -229,23 +187,32 @@ export function Timeline({ editor: e }: { editor: Editor }) {
           <div className="layers">
             {scene.cues.map((cue, i) => (
               <div
-                className={`layer-row ${e.state.selected === cue.id ? "selected" : ""}`}
+                className={`layer-row ${e.selectedIds.includes(cue.id) ? "selected" : ""}`}
                 key={cue.id}
               >
                 <button
                   className="layer-name"
-                  aria-pressed={e.state.selected === cue.id}
-                  onClick={() => e.dispatch({ type: "select", id: cue.id })}
-                  data-tooltip="Select this layer. Double-click to rename; right-click for clip actions."
+                  aria-pressed={e.selectedIds.includes(cue.id)}
+                  onClick={(event) =>
+                    e.selectCue(
+                      cue.id,
+                      event.ctrlKey || event.metaKey
+                        ? "toggle"
+                        : event.shiftKey
+                          ? "range"
+                          : undefined,
+                    )
+                  }
+                  data-tooltip="Select this layer. Ctrl/Cmd-click toggles selection; Shift-click selects a range. Double-click to rename."
                   onDoubleClick={() => e.renameCue(cue.id)}
                   onContextMenu={(event) => {
-                    e.dispatch({ type: "select", id: cue.id });
+                    const ids = e.selectCue(cue.id, "preserve");
                     openContext(
                       event,
                       openMenu,
                       `clip-${cue.id}`,
                       "Clip actions",
-                      clipItems(e, cue),
+                      clipItems(e, cue, ids),
                     );
                   }}
                 >
@@ -323,11 +290,13 @@ export function Timeline({ editor: e }: { editor: Editor }) {
                     }
                   }}
                 >
-                  <Clip
+                  <TimelineClip
                     cue={cue}
                     editor={e}
                     snap={snap}
-                    samples={e.samples.get(cue.id)}
+                    samples={e.ready ? e.samples.get(cue.id) : undefined}
+                    group={group}
+                    setGroup={setGroup}
                   />
                 </div>
               </div>
@@ -378,210 +347,11 @@ export function Timeline({ editor: e }: { editor: Editor }) {
       </div>
       <div className="timeline-bottom">
         <span>
-          Drag to move · Alt-drag to copy · Middle-drag to pan · Right-click for
-          actions
+          Drag to move · Edges trim · Top handles fade · Ctrl/⌘-click selects
+          layers
         </span>
-        <span>48 kHz · CPU clips · Live LFO excluded</span>
+        <span>48 kHz · Effects, modulation and automation included</span>
       </div>
     </Panel>
-  );
-}
-function Clip({
-  cue,
-  editor: e,
-  snap,
-  samples,
-}: {
-  cue: Cue;
-  editor: Editor;
-  snap: boolean;
-  samples?: Float32Array;
-}) {
-  const { openMenu } = useInteractions();
-  const [guide, setGuide] = useState<number>();
-  const suppressClick = useRef(false);
-  const [draft, setDraft] = useState<number>(),
-    drag = useRef<
-      | {
-          x: number;
-          time: number;
-          next: number;
-          width: number;
-          moved: boolean;
-          copy: boolean;
-        }
-      | undefined
-    >(undefined);
-  const scene = e.state.scene,
-    span = scene.end - scene.start,
-    time = draft ?? cue.time,
-    duration = samples ? samples.length / SAMPLE_RATE : soundLength(cue.patch),
-    left = Math.max(0, ((time - scene.start) / span) * 100),
-    width = Math.min(
-      100 - left,
-      ((time + duration - Math.max(time, scene.start)) / span) * 100,
-    );
-  function context(
-    event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
-  ) {
-    e.dispatch({ type: "select", id: cue.id });
-    openContext(
-      event,
-      openMenu,
-      `clip-${cue.id}`,
-      "Clip actions",
-      clipItems(e, cue),
-    );
-  }
-  if (time >= scene.end || time + duration <= scene.start)
-    return (
-      <button
-        className="outside-clip"
-        data-cue={cue.id}
-        onContextMenu={context}
-        onClick={() => e.dispatch({ type: "select", id: cue.id })}
-      >
-        Outside range · {cue.time.toFixed(2)} s
-      </button>
-    );
-  return (
-    <>
-      <button
-        className={`audio-clip ${cue.muted ? "muted" : ""} ${draft !== undefined ? "dragging" : ""} ${drag.current?.copy ? "copying" : ""}`}
-        data-cue={cue.id}
-        aria-label={`${cue.name}, ${cue.time.toFixed(2)} seconds. Drag to move or use arrow keys.`}
-        aria-pressed={e.state.selected === cue.id}
-        style={{ left: `${left}%`, width: `${Math.max(0.3, width)}%` }}
-        onClick={(event) => {
-          if (suppressClick.current && event.detail > 0) {
-            suppressClick.current = false;
-            return;
-          }
-          e.dispatch({ type: "select", id: cue.id });
-        }}
-        onContextMenu={context}
-        data-tooltip={`${cue.name}. Drag to move, Alt-drag to copy. Right-click for clip actions.`}
-        onKeyDown={(event) => {
-          if (
-            event.key === "ContextMenu" ||
-            (event.shiftKey && event.key === "F10")
-          ) {
-            context(event);
-            return;
-          }
-          if (event.key === "Escape" && drag.current) {
-            event.preventDefault();
-            event.stopPropagation();
-            drag.current = undefined;
-            setDraft(undefined);
-            setGuide(undefined);
-            return;
-          }
-          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-            event.preventDefault();
-            const delta =
-              (event.key === "ArrowRight" ? 1 : -1) *
-              (event.shiftKey ? 0.1 : 0.01);
-            e.cue(
-              (c) => ({
-                ...c,
-                time: Math.max(0, Math.min(3600, c.time + delta)),
-              }),
-              cue.id,
-            );
-          }
-        }}
-        onPointerDown={(event) => {
-          if (event.button !== 0 || e.state.tool !== "select") return;
-          suppressClick.current = false;
-          event.stopPropagation();
-          e.stopScene();
-          e.dispatch({ type: "select", id: cue.id });
-          event.currentTarget.setPointerCapture(event.pointerId);
-          drag.current = {
-            x: event.clientX,
-            time: cue.time,
-            next: cue.time,
-            width:
-              event.currentTarget.parentElement!.getBoundingClientRect().width,
-            moved: false,
-            copy: event.altKey,
-          };
-        }}
-        onPointerMove={(event) => {
-          const d = drag.current;
-          if (!d) return;
-          const anchors = [scene.start, scene.end, e.position];
-          for (const other of scene.cues)
-            if (other.id !== cue.id)
-              anchors.push(
-                other.time,
-                other.time +
-                  (e.samples.get(other.id)?.length
-                    ? e.samples.get(other.id)!.length / SAMPLE_RATE
-                    : soundLength(other.patch)),
-              );
-          const moved = moveClip(
-            d.time,
-            event.clientX - d.x,
-            d.width,
-            span,
-            duration,
-            snap,
-            event.shiftKey,
-            anchors,
-          );
-          d.next = moved.time;
-          d.moved ||= Math.abs(event.clientX - d.x) > 2;
-          if (d.moved) {
-            setDraft(d.next);
-            setGuide(moved.guide);
-          }
-        }}
-        onPointerUp={() => {
-          const d = drag.current;
-          drag.current = undefined;
-          setDraft(undefined);
-          setGuide(undefined);
-          suppressClick.current = !!d?.moved;
-          if (d?.moved) {
-            if (d.copy) {
-              if (scene.cues.length >= 24)
-                e.setNotice("A composition can contain up to 24 sound layers.");
-              else e.duplicateCue(cue.id, d.next);
-            } else e.cue((c) => ({ ...c, time: d.next }), cue.id);
-          }
-        }}
-        onPointerCancel={() => {
-          drag.current = undefined;
-          setDraft(undefined);
-          setGuide(undefined);
-        }}
-        onLostPointerCapture={() => {
-          drag.current = undefined;
-          setDraft(undefined);
-          setGuide(undefined);
-        }}
-      >
-        <span>{cue.name}</span>
-        {draft !== undefined && (
-          <span className="clip-drag-readout">
-            {drag.current?.copy ? "Copy · " : ""}
-            {draft.toFixed(3)} s
-          </span>
-        )}
-        <ClipWaveform
-          samples={samples}
-          offset={Math.max(0, (scene.start - time) * SAMPLE_RATE)}
-        />
-      </button>
-      {guide !== undefined && (
-        <div
-          className="clip-snap-guide"
-          style={{ left: `${((guide - scene.start) / span) * 100}%` }}
-          aria-hidden="true"
-        />
-      )}
-    </>
   );
 }
