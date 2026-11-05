@@ -1,36 +1,97 @@
-import type { Device, FuseReport } from 'typeshade/runtime';
-import { bank, mixdown, gain, drive } from '../src/index.ts';
-import { DesignerVoice, designerSynth } from './designer.shade.ts';
-import { SAMPLE_RATE, type Patch } from './designer.ts';
-export async function renderPatch(dev: Device, p: Patch): Promise<{ samples: Float32Array; reports: FuseReport[] }> {
+import type { Device, FuseReport } from "typeshade/runtime";
+import { bank } from "../src/bank.ts";
+import { DesignerVoice, designerSynth, designerMix } from "./designer.shade.ts";
+import { SAMPLE_RATE, type Patch } from "./designer.ts";
+
+// Finite render batches are independent of Live's 128-frame callback quantum.
+export const RENDER_BATCH = 16384;
+export interface RenderStats {
+  frames: number;
+  batchFrames: number;
+  batches: number;
+  pcmReadbacks: number;
+  dispatches: number;
+  /** Plan submissions; the explicit final PCM download is counted separately. */
+  submissions: number;
+  planMs: number;
+  /** Includes waiting for any queued GPU work, not just transfer time. */
+  readbackMs: number;
+}
+export async function renderPatch(
+  dev: Device,
+  p: Patch,
+): Promise<{
+  samples: Float32Array;
+  reports: FuseReport[];
+  stats: RenderStats;
+}> {
   const instances = Array.from({ length: p.voices }, (_, i) => {
     const cents = p.voices === 1 ? 0 : (i / (p.voices - 1) - 0.5) * p.spread;
     const a = p.frequency * 2 ** (cents / 1200);
     const b = a * 2 ** (p.transpose / 12 + p.detune / 1200);
-    return new DesignerVoice(a,b,p.shapeA,p.shapeB,i * 0.11,p.blend,p.cutoff,p.resonance,
-      p.filter ? 1 : 0,p.attack,p.decay,p.sustain,p.release,p.duration);
+    return new DesignerVoice(
+      a,
+      b,
+      p.shapeA,
+      p.shapeB,
+      i * 0.11,
+      p.blend,
+      p.cutoff,
+      p.resonance,
+      p.filter ? 1 : 0,
+      p.attack,
+      p.decay,
+      p.sustain,
+      p.release,
+      p.duration,
+    );
   });
   const voices = bank(dev, instances);
   const frames = Math.ceil((p.duration + p.release) * SAMPLE_RATE);
-  const samples = new Float32Array(frames);
-  const master = dev.array(1024, 'f32');
+  const master = dev.array(frames, "f32");
   const reports: FuseReport[] = [];
+  let planMs = 0;
   try {
-    for (let at = 0; at < frames; at += 1024) {
-      const n = Math.min(1024, frames - at);
-      const report = await dev.fuse(scope => {
-        const lanes = scope.scratch(p.voices * 1024), mixed = scope.scratch(1024);
-        const averaged = scope.scratch(1024), driven = scope.scratch(1024);
-        designerSynth(lanes, voices.instances, 1024);
-        mixdown(mixed, lanes, p.voices, 1024);
-        gain(averaged, mixed, 1 / p.voices);
-        if (p.distortion) drive(driven, averaged, p.drive);
-        else gain(driven, averaged, 1);
-        gain(master, driven, 0.7);
+    for (let at = 0; at < frames; at += RENDER_BATCH) {
+      const n = Math.min(RENDER_BATCH, frames - at);
+      const started = performance.now();
+      const report = await dev.fuse((scope) => {
+        const lanes = scope.scratch(p.voices * n);
+        designerSynth(lanes, voices.instances, n);
+        designerMix(
+          master,
+          lanes,
+          p.voices,
+          n,
+          at,
+          1 / p.voices,
+          p.distortion ? 1 : 0,
+          p.drive,
+        );
       });
-      samples.set((await master.read()).subarray(0,n), at);
+      planMs += performance.now() - started;
       reports.push(report);
     }
-    return { samples, reports };
-  } finally { dev.release(master); dev.release(voices.instances); }
+    const started = performance.now();
+    // read() may expose the owner's host storage. Return an owned result before
+    // release() makes that storage eligible for reuse by the next render.
+    const samples = (await master.read()).slice();
+    return {
+      samples,
+      reports,
+      stats: {
+        frames,
+        batchFrames: RENDER_BATCH,
+        batches: reports.length,
+        pcmReadbacks: 1,
+        dispatches: reports.reduce((n, r) => n + r.dispatches, 0),
+        submissions: reports.reduce((n, r) => n + r.submissions, 0),
+        planMs,
+        readbackMs: performance.now() - started,
+      },
+    };
+  } finally {
+    dev.release(master);
+    dev.release(voices.instances);
+  }
 }

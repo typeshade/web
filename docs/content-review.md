@@ -118,3 +118,6 @@ its component boundaries, reviewed English surfaces and validation scope.
 
 The same record now includes the Live CPU kernel and measured computation changes,
 with the distinction between worker benchmarks and device/game real-time behavior.
+
+Its finite-render follow-up records resident output batching, worker/device reuse,
+timing definitions and explicitly identified software-GPU comparisons.

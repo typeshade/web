@@ -71,8 +71,25 @@ export class DesignerVoice {
 }
 export function designerSynth(out: array<f32>, voices: array<DesignerVoice>, block: u32) {
   for (let v: u32 = 0; v < voices.length; v++) {
+    // Keep the recurrent state local to this invocation. Storage-bank state is
+    // loaded and committed once per batch, rather than through every tick.
+    let voice = voices[v];
     for (let n: u32 = 0; n < block; n++) {
-      out[v * block + n] = voices[v].tick();
+      out[v * block + n] = voice.tick();
     }
+    voices[v] = voice;
+  }
+}
+
+/** Gather and finish directly into the resident output tape. The arithmetic order
+ * matches mixdown → gain → optional drive → gain; no intermediate bus readback. */
+export function designerMix(out: array<f32>, lanes: array<f32>, voices: u32,
+  block: u32, offset: u32, average: f32, distortion: u32, amount: f32) {
+  for (let n: u32 = 0; n < block; n++) {
+    let sum: f32 = 0.;
+    for (let v: u32 = 0; v < voices; v++) { sum += lanes[v * block + n]; }
+    let value: f32 = sum * average;
+    if (distortion == 1) { value = tanh(value * amount); }
+    out[offset + n] = value * 0.7;
   }
 }

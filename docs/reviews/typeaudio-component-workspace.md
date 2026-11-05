@@ -129,3 +129,70 @@ bursts, control delivery while requestAnimationFrame is suppressed, effects and
 modulation, finite CPU/WebGPU PCM parity, and the Tone state regressions. The new
 English implementation and measurement descriptions were reviewed within this
 scope; no broader imported-document or translation review is claimed.
+
+## Finite WebGPU render optimization
+
+The follow-up starts from `75e3d89` and optimizes the separate finite renderer. The
+previous implementation created a worker/device for every Sound render and read
+PCM after every 1,024 frames. The renderer now uses up to 16,384 frames per batch,
+holds each voice's recurrent state in invocation-local storage until the batch
+finishes, and gathers/averages/drives/scales directly into a resident output tape.
+It reads PCM once and returns an owned copy before releasing the tape to the pool.
+The 4-second hold plus 0.35-second release case now uses 13 plans and one PCM
+readback, versus 204 plans/readbacks. Its reports count 26 kernel dispatches and
+13 plan submissions; the explicit final download is outside those plan counts.
+
+The Sound editor retains completed workers and one device per backend. Each
+device's released-array pool is limited to 16 MiB; this is not a total GPU memory
+limit. Backend selection remains strict. Request IDs reject obsolete responses.
+Cancellation and timeout terminate the pending worker; close also frees idle
+workers. Rendering errors evict the affected device, and device loss invalidates
+its cache entry. Active renders release their residents before owner disposal.
+The Picture clip renderer still creates CPU workers per uncached clip. Live's
+128-frame CPU callback and its generated worklet are unchanged.
+
+The render metric now measures request-to-result wall time, including worker
+startup/message delivery. Reports distinguish device setup, plan/scheduling time,
+output wait plus PCM readback, and CPU post-processing. Output wait includes any
+queued GPU execution and must not be read as transfer-only time. Actual GPU times
+remain optional runtime timestamp measurements; missing values are not zero.
+
+`bench:render` records actual production-worker requests, three fresh workers per
+backend/workload and two identical requests per worker. The baseline worker
+recreated its device for the second request; the optimized worker reuses it. In
+cloud Chromium with `google / swiftshader`, `isFallbackAdapter: true`, the median
+request-to-result wall times were:
+
+| Voices / hold / release | GPU first, before | GPU first, after | GPU repeated, before | GPU repeated, after |
+| --- | --- | --- | --- | --- |
+| 1 / 0.5 s / 0.35 s | 1,124.3 ms | 295.7 ms | 962.1 ms | 62.1 ms |
+| 8 / 4 s / 0.35 s | 3,432.3 ms | 519.8 ms | 3,148.4 ms | 280.1 ms |
+
+Repeated WebGPU render time fell about 94% and 91% respectively. These are
+SwiftShader software-adapter observations, not hardware GPU results or Live
+latency measurements. The default patch has filter/drive on and delay/reverb/LFO
+off. The outputs contain 40,800 and 208,800 mono frames. The manual runner records
+adapter/browser metadata and phase timings; hardware GPU mode is the default,
+and forcing software requires `TYPEAUDIO_BENCH_SOFTWARE_GPU=1`.
+
+CPU repeated medians were 28.9 → 21.7 ms for one voice and 433.4 → 462.2 ms for
+eight voices. The latter was about 7% slower in this run; its trial range overlaps
+the baseline range (422.9–529.7 ms before, 455.0–476.8 ms after). This comparison
+does not establish an eight-voice CPU improvement. One-voice CPU remains faster
+than WebGPU in this environment; eight-voice repeated WebGPU was faster here.
+Target hardware, cold compilation, other patches and concurrent workloads can
+change that relationship.
+
+The bounded English review covers the new report text, timing descriptions and
+benchmark instructions. It does not claim another imported-document or translation
+review. Source library and compiler pins remain unchanged.
+
+Shader/TypeScript checks, 34 unit tests, the production build and both existing
+browser suites pass. Added coverage checks multi-batch CPU output against an
+independent per-sample TypeAudio reference, retained PCM ownership, identical
+repeated GPU output, long eight-voice CPU/WebGPU WAV parity (maximum 1/32768 here),
+worker/device reuse across backends, obsolete request IDs and cancellation/timeout
+recovery. A third browser check forces device loss during a real GPU submission
+through a wrapper around the production worker. It verifies error delivery, a new
+GPU device on retry, and retention of the independent CPU device. The delayed
+render fixture now echoes request IDs so it still exercises patch revision checks.
