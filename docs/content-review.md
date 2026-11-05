@@ -115,3 +115,6 @@ new translated or full imported-document review is claimed by this addition.
 The subsequent [component workspace review](reviews/typeaudio-component-workspace.md)
 records the owner-directed Photoshop/After Effects layout and interaction redesign,
 its component boundaries, reviewed English surfaces and validation scope.
+
+The same record now includes the Live CPU kernel and measured computation changes,
+with the distinction between worker benchmarks and device/game real-time behavior.

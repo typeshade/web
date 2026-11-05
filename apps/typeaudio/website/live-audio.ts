@@ -6,6 +6,8 @@ export class LiveAudio {
   private gain:GainNode|undefined;
   private analyser:AnalyserNode|undefined;
   private closed=false;
+  private pending:{patch:Patch;repeat:boolean;dry:boolean}|undefined;
+  private updateQueued=false;
   private context:AudioContext|undefined;
   private wave=new Float32Array(2048);
   private bins=new Float32Array(1024);
@@ -31,15 +33,28 @@ export class LiveAudio {
     this.gain=context.createGain();this.gain.gain.setValueAtTime(0,context.currentTime);this.gain.gain.linearRampToValueAtTime(1,context.currentTime+0.02);
     this.analyser=context.createAnalyser();this.analyser.fftSize=2048;this.analyser.smoothingTimeConstant=0.65;
     node.connect(this.gain).connect(this.analyser).connect(context.destination);
+    this.flushUpdate();
   }
-  update(patch:Patch,repeat:boolean,dry:boolean):void{this.node?.port.postMessage({type:'patch',patch,repeat,dry});}
-  retrigger():void{this.node?.port.postMessage({type:'retrigger'});}
+  update(patch:Patch,repeat:boolean,dry:boolean):void{
+    if(this.closed)return;
+    this.pending={patch,repeat,dry};
+    // Coalesce one input burst without waiting for a display frame. Game/control
+    // commands must also work when requestAnimationFrame is delayed or paused.
+    if(this.node&&!this.updateQueued){this.updateQueued=true;queueMicrotask(()=>{this.updateQueued=false;this.flushUpdate();});}
+  }
+  private flushUpdate():void{
+    if(this.closed||!this.node||!this.pending)return;
+    const next=this.pending;this.pending=undefined;
+    this.node.port.postMessage({type:'patch',...next});
+  }
+  retrigger():void{this.flushUpdate();this.node?.port.postMessage({type:'retrigger'});}
   trace():{wave:Float32Array;bins:Float32Array}|undefined{
     if(!this.analyser||this.closed)return;
     this.analyser.getFloatTimeDomainData(this.wave);this.analyser.getFloatFrequencyData(this.bins);return{wave:this.wave,bins:this.bins};
   }
   stop():void{
     if(this.closed)return;this.closed=true;
+    this.updateQueued=false;this.pending=undefined;
     const node=this.node,gain=this.gain,analyser=this.analyser,ctx=this.context;
     if(gain&&ctx){gain.gain.cancelScheduledValues(ctx.currentTime);gain.gain.setTargetAtTime(0,ctx.currentTime,0.004);}
     setTimeout(()=>{node?.port.postMessage({type:'stop'});node?.disconnect();node?.port.close();gain?.disconnect();analyser?.disconnect();},25);

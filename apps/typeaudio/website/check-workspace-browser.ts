@@ -73,11 +73,14 @@ try {
     const w = window as any;
     w.liveNodes = 0;
     w.renderWorkers = 0;
+    w.patchMessages=0;w.lastPatch=undefined;
     const Native = window.AudioWorkletNode;
     window.AudioWorkletNode = class extends Native {
       constructor(...args: ConstructorParameters<typeof AudioWorkletNode>) {
         super(...args);
         w.liveNodes++;
+        const send=this.port.postMessage.bind(this.port);
+        (this.port as any).postMessage=(data:any)=>{if(data.type==='patch'){w.patchMessages++;w.lastPatch=data.patch;}send(data);};
       }
     };
     const Worker = window.Worker;
@@ -102,6 +105,15 @@ try {
     undefined,
     { timeout: 15000 },
   );
+  const messageCount=await page.evaluate(()=>(window as any).patchMessages);
+  await page.evaluate(()=>{const input=document.querySelector('#frequency') as HTMLInputElement;const set=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!;for(let i=0;i<40;i++){set.call(input,String(400+i));input.dispatchEvent(new Event('input',{bubbles:true}));}});
+  await page.waitForFunction(()=>(window as any).lastPatch?.frequency===439);
+  assert.ok((await page.evaluate(()=>(window as any).patchMessages))-messageCount<=3,'Control bursts must be coalesced before posting to the worklet');
+  // Control delivery must not depend on display frames (background tabs, a
+  // stalled visualizer, or a game rendering more slowly than its audio).
+  await page.evaluate(()=>{const w=window as any;w.savedRAF=requestAnimationFrame;window.requestAnimationFrame=()=>-1;const input=document.querySelector('#frequency') as HTMLInputElement;Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!.call(input,'440');input.dispatchEvent(new Event('input',{bubbles:true}));});
+  try{await page.waitForFunction(()=>(window as any).lastPatch?.frequency===440,undefined,{timeout:2000});}
+  finally{await page.evaluate(()=>{window.requestAnimationFrame=(window as any).savedRAF;});}
   await range(page, "frequency", 880);
   await range(page, "voices", 8);
   await module(page, "filter");

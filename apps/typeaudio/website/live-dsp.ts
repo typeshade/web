@@ -1,28 +1,40 @@
-import { LiveVoice } from './live-voice.shade.ts';
+import { LiveVoice } from './live-voice.ts';
 import { DEFAULT, SAMPLE_RATE, validatePatch, type Patch } from './designer.ts';
 const SMOOTH_KEYS = ['frequency','blend','detune','spread','cutoff','resonance','attack','decay','sustain','release','duration','drive','delayTime','feedback','delayMix','room','reverbMix','volume','lfoRate','lfoDepth','tempo'] as const;
 /** Stateful effects. Delay reads interpolate as their times move; buffers never reset on edits. */
 class LiveEffects {
   private frame=0;
   private delay=new Float32Array(Math.ceil(SAMPLE_RATE*0.8));
-  private combs=[0.0297,0.0371,0.0411,0.0437].map(t=>({seconds:t,line:new Float32Array(Math.ceil(t*SAMPLE_RATE*1.5)+2),damp:0}));
+  private combs=[0.0297,0.0371,0.0411,0.0437].map(t=>({seconds:t,line:new Float32Array(Math.ceil(t*SAMPLE_RATE*1.5)+2),damp:0,offset:0}));
   private allpasses=[0.005,0.0017].map(t=>new Float32Array(Math.round(t*SAMPLE_RATE)));
+  private delayOffset=0;
+  private feedback=0;
+  private roomFeedback=0;
+  private delayMix=0;
+  private reverbMix=0;
+  configure(p:Patch,delayMix:number,reverbMix:number):void{
+    this.delayOffset=p.delayTime*SAMPLE_RATE;this.feedback=p.feedback;
+    this.roomFeedback=0.55+p.room*0.35;this.delayMix=delayMix;this.reverbMix=reverbMix;
+    for(let i=0;i<this.combs.length;i++){const comb=this.combs[i]!;comb.offset=Math.round(comb.seconds*SAMPLE_RATE*(0.6+p.room));}
+  }
   private read(line:Float32Array,offset:number):number{
     const pos=((this.frame-offset)%line.length+line.length)%line.length,a=Math.floor(pos),mix=pos-a;
     return line[a]!*(1-mix)+line[(a+1)%line.length]!*mix;
   }
-  tick(input:number,p:Patch,delayMix:number,reverbMix:number):number{
-    const echo=this.read(this.delay,p.delayTime*SAMPLE_RATE);
-    this.delay[this.frame%this.delay.length]=input+echo*p.feedback;
+  tick(input:number):number{
+    const delayMix=this.delayMix,reverbMix=this.reverbMix;
+    const echo=this.read(this.delay,this.delayOffset);
+    this.delay[this.frame%this.delay.length]=input+echo*this.feedback;
     const delayed=input*(1-delayMix)+echo*delayMix;
     let wet=0;
-    for(const comb of this.combs){
-      const tap=this.read(comb.line,Math.round(comb.seconds*SAMPLE_RATE*(0.6+p.room)));
+    for(let i=0;i<this.combs.length;i++){
+      const comb=this.combs[i]!;
+      const tap=this.read(comb.line,comb.offset);
       comb.damp=tap*0.65+comb.damp*0.35;
-      comb.line[this.frame%comb.line.length]=delayed+comb.damp*(0.55+p.room*0.35);
+      comb.line[this.frame%comb.line.length]=delayed+comb.damp*this.roomFeedback;
       wet+=tap*0.25;
     }
-    for(const line of this.allpasses){const at=this.frame%line.length,tap=line[at]!;const next=tap-wet*0.5;line[at]=wet+tap*0.5;wet=next;}
+    for(let i=0;i<this.allpasses.length;i++){const line=this.allpasses[i]!;const at=this.frame%line.length,tap=line[at]!;const next=tap-wet*0.5;line[at]=wet+tap*0.5;wet=next;}
     this.frame++;
     return delayed*(1-reverbMix)+wet*reverbMix;
   }
@@ -58,7 +70,7 @@ export class LiveDsp {
     for(let offset=0;offset<out.length;offset+=128){
       const count=Math.min(128,out.length-offset),smooth=1-Math.exp(-count/(SAMPLE_RATE*0.012));
       const p=this.current,t=this.target;
-      for(const key of SMOOTH_KEYS)p[key]+=(t[key]-p[key])*smooth;
+      for(let i=0;i<SMOOTH_KEYS.length;i++){const key=SMOOTH_KEYS[i]!;p[key]+=(t[key]-p[key])*smooth;}
       p.shapeA=t.shapeA;p.shapeB=t.shapeB;p.transpose=t.transpose;p.voices=t.voices;
       this.filterBlend+=((t.filter?1:0)-this.filterBlend)*smooth;
       this.distortionBlend+=((t.distortion?1:0)-this.distortionBlend)*smooth;
@@ -84,10 +96,11 @@ export class LiveDsp {
         const samples=voice.block(count);
         for(let n=0;n<count;n++)this.scratch[n]!+=samples[n]!*weight;
       }
+      this.effects.configure(p,this.delayBlend,this.reverbBlend);
       for(let n=0;n<count;n++){
         const mixed=this.scratch[n]!/Math.max(1e-6,weightSum);
         const driven=(mixed*(1-this.distortionBlend)+Math.tanh(mixed*p.drive)*this.distortionBlend)*0.7;
-        const wet=this.effects.tick(driven,p,this.delayBlend,this.reverbBlend);
+        const wet=this.effects.tick(driven);
         const value=(driven*(1-this.monitorBlend)+wet*this.monitorBlend)*p.volume;
         if(!Number.isFinite(value))throw new Error('Live DSP produced a non-finite sample. Reset the patch and restart.');
         out[offset+n]=value;

@@ -108,8 +108,8 @@ export function useEditor() {
   const cueKey = JSON.stringify(state.scene.cues.map((c) => [c.id, c.patch]));
   const preparedKey = useRef("");
   const sceneReady = ready && preparedKey.current === cueKey;
-  const latest = useRef({ state, samples, ready: sceneReady });
-  latest.current = { state, samples, ready: sceneReady };
+  const latest = useRef({ state, samples, ready: sceneReady, repeat, dry });
+  latest.current = { state, samples, ready: sceneReady, repeat, dry };
   const soundGeneration = useRef(0),
     looping = useRef(false),
     snapshots = useRef({ a: { ...DEFAULT }, b: { ...DEFAULT } });
@@ -355,6 +355,7 @@ export function useEditor() {
         },
       );
       if (generation !== soundGeneration.current) return;
+      sound.current.update(latest.current.state.patch,latest.current.repeat,latest.current.dry);
       setLive(true);
       setBusy(false);
       setNotice("Live on CPU. Controls update the running sound.");

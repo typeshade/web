@@ -48,6 +48,22 @@ preserves this compiler pipeline; it consumes the web workspace's shared UI toke
 - Older version-1 JSON patches remain valid and default to modulation depth zero.
   New exports include the live modulation settings. Snapshots are not exported.
 
+The website's live oscillator/filter/envelope kernel is compiled from TypeShade
+to f32 CPU code during the build. Playback reuses voice state, parameter and output
+buffers instead of calling the generic class host boundary for each block. The
+build adapter uses the pinned compiler's internal generator and matching runtime;
+compiler upgrades must review that adapter. The library pin and finite GPU render
+path are unchanged. Control bursts are coalesced within a microtask, without a
+display-frame wait. Retrigger flushes pending controls before sending its event.
+
+For a repeatable CPU compute comparison, build first, then run
+`pnpm --filter typeaudio-site bench:live`. Set `TYPESHADE_CHROMIUM` to use an existing
+Chromium executable. Results go to `artifacts/live-performance.json`: three trials
+per voice count, 500 warm-up blocks, then 6,000 128-frame blocks at 48 kHz. It runs
+the production worklet code in a dedicated worker and measures computation only.
+It does not measure audio-device latency, actual AudioWorklet deadline misses,
+or input-to-speaker latency. Browsers do not offer a hard real-time guarantee.
+
 The sound controls draw on [Ableton rack variations and macro controls](https://www.ableton.com/en/live-manual/12/instrument-drum-and-effect-racks/)
 and [Bitwig's modulation system](https://www.bitwig.com/userguide/latest/the_unified_modulation_system/).
 These references inform direct sound manipulation and quick comparison; this site
