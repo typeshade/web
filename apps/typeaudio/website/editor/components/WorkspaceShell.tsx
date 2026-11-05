@@ -119,12 +119,7 @@ export function WorkspaceShell({
         ? [
             {
               label: "New sound",
-              action: () => {
-                e.stopSound();
-                e.dispatch({ type: "select", id: "" });
-                e.patch({ ...e.presets.warm.patch }, "Untitled sound");
-                e.workspace("sound");
-              },
+              action: e.newSound,
             },
             {
               label: "Open project…",
@@ -416,6 +411,30 @@ export function WorkspaceShell({
                   Render
                 </button>
               </div>
+              {e.mode === "live" && (
+                <>
+                  <button
+                    id="record-live"
+                    className={e.recording ? "recording" : ""}
+                    disabled={!e.live || e.busy}
+                    onClick={() =>
+                      e.recording ? e.stopRecording() : void e.recordLive()
+                    }
+                    data-tooltip="Record the live output, including your edits, for up to 30 seconds. Stops when playback stops."
+                  >
+                    {e.recording ? "Stop recording" : "Record live"}
+                  </button>
+                  {e.recorded && (
+                    <button
+                      id="export-take"
+                      onClick={e.exportTake}
+                      data-tooltip="Download the last recorded take as a mono WAV. This take stays available until the next recording or page reload."
+                    >
+                      Export take ({(e.recorded.length / 48000).toFixed(1)} s)
+                    </button>
+                  )}
+                </>
+              )}
               {e.mode === "render" && (
                 <>
                   <select
@@ -427,8 +446,18 @@ export function WorkspaceShell({
                     }
                   >
                     <option value="cpu">CPU</option>
-                    <option value="webgpu">WebGPU</option>
+                    <option value="webgpu" disabled={e.cpuRenderRequired}>
+                      WebGPU
+                    </option>
                   </select>
+                  {e.cpuRenderRequired && (
+                    <span
+                      className="render-path-hint"
+                      data-tooltip="This sound uses the same CPU DSP for Live and Render, including all layers and modulation."
+                    >
+                      Live DSP
+                    </span>
+                  )}
                   <button
                     id="render"
                     disabled={e.busy}

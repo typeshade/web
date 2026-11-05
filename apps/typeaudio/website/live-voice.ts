@@ -1,10 +1,14 @@
+import { DEFAULT } from "./designer.ts";
+const defaultWave = new Float32Array(DEFAULT.wave);
 import { liveBlock } from "./live-kernel.shade.ts?audio-cpu";
 
 /** No host-value conversions or new output arrays in the audio callback. */
 export class LiveVoice {
-  private state = new Float32Array(4);
-  private clock = new Uint32Array(1);
-  private params = new Float32Array(14);
+  private state = new Float32Array(5);
+  private clock = new Uint32Array(2);
+  private params = new Float32Array(16);
+  private wave = defaultWave;
+  private seed = 1;
   readonly samples = new Float32Array(128);
   constructor(
     hzA: number,
@@ -22,6 +26,7 @@ export class LiveVoice {
     release: number,
     gate: number,
   ) {
+    this.clock[1] = this.seed;
     this.state[0] = phase;
     this.state[1] = phase;
     this.configure(
@@ -56,6 +61,10 @@ export class LiveVoice {
     release: number,
     gate: number,
     repeat: number,
+    fmRatio = 2,
+    fmIndex = 0,
+    wave = defaultWave,
+    seed = 1,
   ): void {
     const p = this.params;
     // Round arguments before division, matching TypeShade's f32 host contract.
@@ -73,12 +82,27 @@ export class LiveVoice {
     p[11] = repeat;
     p[12] = cutoff;
     p[13] = resonance;
+    p[14] = fmIndex;
+    p[15] = p[0]! * fmRatio;
+    this.wave = wave;
+    if (seed !== this.seed) {
+      this.seed = seed;
+      this.clock[1] = seed;
+    }
   }
   retrigger(): void {
     this.clock[0] = 0;
+    this.clock[1] = this.seed;
   }
   block(frames: number): Float32Array {
-    liveBlock(this.samples, this.state, this.clock, this.params, frames);
+    liveBlock(
+      this.samples,
+      this.state,
+      this.clock,
+      this.params,
+      frames,
+      this.wave,
+    );
     return this.samples;
   }
 }

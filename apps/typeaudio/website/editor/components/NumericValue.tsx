@@ -13,7 +13,7 @@ export function NumericValue({
   disabled = false,
 }: {
   editor: Editor;
-  name: keyof Patch;
+  name: Exclude<keyof Patch, "wave" | "curves" | "layers">;
   label: string;
   unit: string;
   step: number;

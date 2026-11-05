@@ -1817,3 +1817,31 @@
 }
 .parameter > label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .studio-app input.parameter-number { width:66px; max-width:66px; }
+/* Procedural sources use the same compact panels and property controls. */
+.studio-app .source-rack .panel-body { padding: 9px; }
+.source-list { display: grid; gap: 2px; margin-bottom: 8px; }
+.studio-app .source-list > button { display: grid; grid-template-columns: 12px minmax(0,1fr) auto; gap: 6px; text-align: left; border-color: transparent; }
+.source-list > button > span:nth-child(2) { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.source-list small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.layer-settings, .wave-sample { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; margin: 8px 0; }
+.studio-app :is(.layer-settings,.wave-sample) label { min-width: 0; display: grid; gap: 4px; color: var(--muted); }
+.studio-app :is(.layer-settings,.wave-sample) input { width: 100%; min-width: 0; }
+.studio-app .layer-settings .check { display: flex; }
+.studio-app .layer-settings .check input { width: auto; }
+.studio-app .source-rack .button-row { gap: 4px; }
+.studio-app .source-rack .button-row button { min-width: 0; flex: 1; }
+.wave-editor, .curve-editor { display: grid; gap: 10px; }
+.studio-app :is(.wave-editor,.curve-editor) label { display: grid; gap: 4px; }
+.studio-app :is(.wave-editor,.curve-editor) .button-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.studio-app .expression-field textarea { width: 100%; min-height: 76px; resize: vertical; border: 1px solid #4c4c4c; background: #202124; color: var(--text); padding: 8px; font: 11px/1.6 monospace; }
+.wave-drawing, .curve-drawing { display: block; width: 100%; height: 140px; border: 1px solid #50555c; background: #22262b; touch-action: none; overflow: visible; cursor: crosshair; }
+:is(.wave-drawing,.curve-drawing) polyline { stroke: var(--accent); stroke-width: 1.5; fill: none; pointer-events: none; }
+:is(.wave-drawing,.curve-drawing) circle { fill: var(--accent); stroke: #242424; stroke-width: 1.5; }
+.curve-drawing circle { cursor: grab; }
+.curve-drawing circle:focus { outline: none; stroke: white; stroke-width: 2; }
+.curve-grid { stroke: #363b42; stroke-width: 1; fill: none; pointer-events: none; }
+.curve-scale { display: flex; justify-content: space-between; margin-top: -8px; color: var(--muted); font: 10px monospace; }
+.studio-app .field-error { color: #efb0a4; font-size: 11px; overflow-wrap: anywhere; }
+.studio-app .render-path-hint { color: var(--muted); font-size: 10px; }
+.studio-app button.recording { color: #ffd6cf; border-color: #9f5954; background: #633531; }
+@media (max-width: 1200px) { .studio-app .options-bar { gap: 5px; } .studio-app .options-bar .transport-buttons { gap: 5px; } }

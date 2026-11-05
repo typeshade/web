@@ -268,3 +268,69 @@ Desktop live audio, numeric entry, context menus, tooltips and the 390 px stacke
 layout were also inspected in screenshots. Existing suites retain audio/worker,
 media, persistence and 320/390 px layout coverage. GPU checks use SwiftShader here;
 this UI pass establishes no new hardware latency or performance claim.
+
+## Procedural sound design
+
+This pass starts from web `598fdc5`. Sound sources now include deterministic white
+noise, FM on oscillator A and a 64-sample periodic wave. The Wave component supports
+drawing, numeric samples and a bounded expression language. It parses arithmetic
+and named functions once on the main thread; it does not execute arbitrary user
+JavaScript or TypeShade in the audio callback. The CPU TypeShade leaf kernel reads
+the resulting table and keeps per-voice FM/noise state in preallocated buffers.
+The library and compiler pins remain unchanged.
+
+A patch contains a base source plus up to three independent layers, each with its
+own synthesis, filter, envelope, effects, modulation and a start offset up to five
+seconds. Layer selection routes property edits to that layer without replacing
+the source/selected Picture clip document. Base mute, layer mute, duplication,
+deleting, naming and offsets participate in document history and serialization.
+The new fields have defaults for older version-1 files. Layer nesting, duplicate
+IDs, oversized tables and invalid curve points are rejected; project imports
+allow up to 1 MB for the extended documents.
+
+Pitch, cutoff and post-effects level curves use 2–16 ordered points across note
+hold/release. Final values hold during bounded effects tails. Pitch/cutoff and
+LFO controls run at intervals of at most 128 frames; gain curves and layer starts
+follow sample time. Structural layer/offset edits retrigger; other controls update
+the running state. Repeat off now plays one note and tail, while Repeat on loops
+the complete layered sound. A/B interpolates wave samples and scalar controls;
+layer arrangements and curve shapes switch at the midpoint.
+
+The new sources, layers, base mute, LFO and automation render through the same CPU
+DSP as the worklet, including in Picture. WebGPU is visibly unavailable for those
+patches and the worker rejects an explicit unsupported backend request. Basic
+unmodulated patches retain the prior batched CPU/WebGPU path. Render is one note
+per layer; Record live captures the worklet's actual output and parameter gestures
+for up to 30 seconds. Playback stop completes the take. Export take writes mono
+48 kHz 16-bit WAV; clipping is reported. Takes are session-only, and physical
+speaker/device output latency is outside this capture.
+
+The three example recipes expose their construction: Laser shot uses a descending
+pitch curve and FM, Metal impact adds a noise transient, and SF door layers motor,
+air release and latch. The UI retains the neutral panel layout and shared menu,
+tooltip, numeric-entry and undo interactions. Desktop waveform/automation screens
+and the 390 px arrangement were visually inspected. The English review covers
+new controls, hints, errors, recipes and README instructions. It does not claim an
+imported-library documentation or translation review. Remaining synthesis limits
+include aliasing at high frequencies/complex waveforms, fixed effect routing and
+no sample-file source or arbitrary DSP-program editor.
+
+Unit checks cover validation/backward compatibility, expression bounds, seeded
+noise reproducibility, audible FM/wave/LFO/curve changes, delayed/muted layers,
+recording capacity and exact shared-DSP output across callback boundaries. The
+new browser suite covers real edits/undo, wave/curve dragging, project recovery,
+CPU export reproducibility, Picture export and sample-by-sample comparison of a
+recorded worklet take with its downloaded WAV.
+
+A compute-only browser worker benchmark ran the built worklet in Chrome 156 for
+two trials per scenario, 500 warm-up blocks and 6,000 measured 128-frame blocks.
+Recipe p99 costs were 0.2–0.4 ms; a four-layer/32-voice stress patch reached about
+0.6 ms p99. That stress scenario recorded 0 and 4 calls above the 2.67 ms quantum
+budget, with maxima of 2.3 and 6.6 ms. Other workloads also had isolated outliers.
+These are elapsed worker-call observations, not actual AudioWorklet deadline-miss
+or hardware input/output latency measurements; they establish no hard real-time
+guarantee. The runner now includes recipes and the layered stress case.
+
+Local validation passes shader/TypeScript checks, 47 unit tests, production build,
+style/scope checks and all five browser suites. The last cleanup also checks the
+new source-layer keyboard menu and the completed recording/export flow.

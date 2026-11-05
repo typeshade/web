@@ -1,3 +1,5 @@
+import { renderSound } from "./sound-dsp.ts";
+import { needsLiveRenderer } from "./sound-design.ts";
 import { createDevice, type Device } from "typeshade/runtime";
 import { explain } from "../src/explain.ts";
 import { renderPatch } from "./designer-render.ts";
@@ -37,6 +39,44 @@ async function render(data: RenderRequest): Promise<void> {
     const patch = validatePatch(data.patch);
     if (!["cpu", "webgpu"].includes(data.backend))
       throw new Error("Select CPU or WebGPU.");
+    if (needsLiveRenderer(patch)) {
+      if (data.backend !== "cpu")
+        throw new Error(
+          "Noise, custom waves, FM, layers and modulation render on CPU. Select CPU.",
+        );
+      const { dry, wet } = renderSound(patch);
+      if (!wet.every(Number.isFinite) || !dry.every(Number.isFinite))
+        throw new Error("Non-finite sound output.");
+      const peak = wet.reduce((m, v) => Math.max(m, Math.abs(v)), 0),
+        elapsed = performance.now() - started;
+      self.postMessage(
+        {
+          id: data.id,
+          dry,
+          wet,
+          tier: "cpu",
+          peak,
+          milliseconds: elapsed,
+          report:
+            "Rendered with the live DSP: source layers, FM, seeded noise, custom waves, LFO, automation and effects. One note per layer with bounded effect tails. Parameter gestures are captured by Record live.",
+          timing: {
+            frames: wet.length,
+            batchFrames: 128,
+            batches: Math.ceil(wet.length / 128),
+            pcmReadbacks: 0,
+            dispatches: 0,
+            submissions: 0,
+            planMs: elapsed,
+            readbackMs: 0,
+            deviceSetupMs: 0,
+            deviceReused: false,
+            postprocessMs: 0,
+          },
+        },
+        { transfer: [dry.buffer, wet.buffer] },
+      );
+      return;
+    }
     const setupStarted = performance.now();
     const { device: dev, reused } = await deviceFor(data.backend);
     const deviceSetupMs = performance.now() - setupStarted;
@@ -90,7 +130,8 @@ async function render(data: RenderRequest): Promise<void> {
       throw error;
     } finally {
       activeDevice = undefined;
-      if (devices.get(data.backend) !== dev) await dev.dispose().catch(() => {});
+      if (devices.get(data.backend) !== dev)
+        await dev.dispose().catch(() => {});
     }
   } catch (error) {
     self.postMessage({

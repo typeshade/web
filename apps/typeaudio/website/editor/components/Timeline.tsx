@@ -1,3 +1,4 @@
+import { soundLength } from "../../sound-design.ts";
 import { useRef, useState } from "react";
 import type { Editor } from "../useEditor.ts";
 import type { Cue } from "../../video-model.ts";
@@ -32,7 +33,10 @@ function clipItems(e: Editor, cue: Cue): MenuItem[] {
         e.cue(
           (c) => ({
             ...c,
-          time: Math.max(0,Math.min(3600,Math.round(e.transport.current() * 1000) / 1000)),
+            time: Math.max(
+              0,
+              Math.min(3600, Math.round(e.transport.current() * 1000) / 1000),
+            ),
           }),
           cue.id,
         ),
@@ -411,9 +415,7 @@ function Clip({
   const scene = e.state.scene,
     span = scene.end - scene.start,
     time = draft ?? cue.time,
-    duration = samples
-      ? samples.length / SAMPLE_RATE
-      : cue.patch.duration + cue.patch.release,
+    duration = samples ? samples.length / SAMPLE_RATE : soundLength(cue.patch),
     left = Math.max(0, ((time - scene.start) / span) * 100),
     width = Math.min(
       100 - left,
@@ -517,7 +519,7 @@ function Clip({
                 other.time +
                   (e.samples.get(other.id)?.length
                     ? e.samples.get(other.id)!.length / SAMPLE_RATE
-                    : other.patch.duration + other.patch.release),
+                    : soundLength(other.patch)),
               );
           const moved = moveClip(
             d.time,

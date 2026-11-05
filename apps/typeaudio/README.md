@@ -43,10 +43,19 @@ preserves this compiler pipeline; it consumes the web workspace's shared UI toke
   Its clock advances in the audio processor at 128-frame control intervals, without
   UI timers. Beat sync means one cycle per beat at the selected tempo. Depth zero
   disables the modulation. Filter cutoff modulation requires the filter to be on.
-- CPU/WebGPU Render and WAV export remain finite, **unmodulated** renders. They do
-  not record a live performance. LFO controls and render completion explain this.
+- Render includes LFO and automation. Noise, FM, custom waves, layers, base mute or
+  automation use the same CPU DSP as Live; the backend selector identifies this
+  path and disables WebGPU. Basic unmodulated patches retain batched CPU/WebGPU
+  rendering. Render plays one note per layer with bounded effect tails.
+- Repeat off now plays one note and its tail. Repeat on loops the complete sound.
+  Retrigger restarts envelopes, automation and LFO clocks while preserving phase
+  and existing effect buffers. Structural layer/start-offset edits retrigger.
+- Record live captures the worklet output, including parameter edits and monitor
+  selection, for up to 30 seconds. Export take writes mono 48 kHz, 16-bit WAV.
+  Stopping playback also finishes the recording. Takes are session-only and must
+  be exported before leaving the page; they do not include speaker/device latency.
 - Older version-1 JSON patches remain valid and default to modulation depth zero.
-  New exports include the live modulation settings. Snapshots are not exported.
+  New exports include modulation, wave tables, curves and source layers. Snapshots are not exported.
 
 The website's live oscillator/filter/envelope kernel is compiled from TypeShade
 to f32 CPU code during the build. Playback reuses voice state, parameter and output
@@ -59,12 +68,13 @@ display-frame wait. Retrigger flushes pending controls before sending its event.
 For a repeatable CPU compute comparison, build first, then run
 `pnpm --filter typeaudio-site bench:live`. Set `TYPESHADE_CHROMIUM` to use an existing
 Chromium executable. Results go to `artifacts/live-performance.json`: three trials
-per voice count, 500 warm-up blocks, then 6,000 128-frame blocks at 48 kHz. It runs
+per workload (unison, the three recipes and a four-layer stress patch), 500 warm-up
+blocks, then 6,000 128-frame blocks at 48 kHz. It runs
 the production worklet code in a dedicated worker and measures computation only.
 It does not measure audio-device latency, actual AudioWorklet deadline misses,
 or input-to-speaker latency. Browsers do not offer a hard real-time guarantee.
 
-Finite Render keeps oscillator/filter state local to each voice for a batch, then
+The basic CPU/WebGPU Render path keeps oscillator/filter state local to each voice for a batch, then
 commits it to the bank. It uses up to 16,384 frames per batch and gathers, averages,
 drives and scales directly into a resident output tape. PCM is read once at the
 end. The Sound editor retains its worker and one device per requested backend
@@ -89,6 +99,40 @@ and [Bitwig's modulation system](https://www.bitwig.com/userguide/latest/the_uni
 These references inform direct sound manipulation and quick comparison; this site
 is a small sound designer, not a full DAW. Browser performance and end-to-end audio
 latency still require measurement on the user's hardware.
+
+## Build a sound
+
+File → New sound starts with one sine source. The Oscillators module offers sine,
+saw, square, triangle, deterministic white noise and a custom periodic wave.
+FM ratio/index modulate oscillator A; Noise seed makes repeated renders repeatable.
+The Wave module edits 64 samples by pointer or number, or generates a wave from
+`phase`, `pi`, arithmetic and `sin`, `cos`, `tanh`, `abs`, `sqrt`, `exp`. Expressions
+are parsed into a bounded waveform calculation, with DC removed and peak normalized.
+This is a periodic-wave editor, not an arbitrary TypeShade/JavaScript DSP runtime.
+The current oscillator implementation does not provide band-limited synthesis;
+high pitches, FM depth and sharp custom waves can alias.
+
+Sound layers supports a base source and three additional sources. Each has its own
+oscillators, unison, filter, envelope, effects, LFO and automation. Select a layer
+before changing modules. Additional layers start up to five seconds later; mute,
+duplicate and delete commands operate on the selected layer. Base mute is saved
+with the sound. Layers sum directly: lower their output levels if export reports
+clipping. There is no arbitrary routing graph or sample-file source in this pass.
+
+Automation edits pitch (semitones), cutoff (octaves) and post-effects layer level.
+Curves have 2–16 points spanning the layer's hold and release; the final value holds
+through its effects tail. Click to add a point, drag or use arrows to adjust, or
+edit its time/value numerically. Escape cancels a drag; points retain ordered times.
+Pitch/cutoff and LFO update at audio control intervals of at most 128 frames; layer
+starts and gain curves follow sample time. A/B stores the entire layered sound;
+wave samples interpolate, while curve shapes and layer arrangements switch at the
+midpoint. Save/export the resulting patch to keep it.
+
+Project → Sounds includes Laser shot, Metal impact and SF door recipes. SF door
+separates the motor, air release and latch; selecting each layer exposes the source
+and automation that make that part. Render and Picture use the complete sound,
+including layer offsets, LFO and curves. Existing version-1 patches/projects remain
+readable; the new fields receive defaults and nested layer graphs are rejected.
 
 ## Editor interactions
 
@@ -166,8 +210,8 @@ Space plays/pauses; V/H select the selection/hand tools; Delete removes a select
 layer; Ctrl/Cmd Z and Shift Z undo/redo. Shortcuts yield to text/number inputs.
 
 - Up to 24 cues; ranges span at most 60 seconds within the first hour.
-- Clips use finite CPU renders without live LFO. Changing clip sound prepares new
-  PCM. Original video and effects have independent listening levels.
+- Clips use finite CPU renders including LFO, automation and source layers. Changing
+  clip sound prepares new PCM. Original video and effects have independent listening levels.
 - Local video uses an object URL and is never uploaded. JSON stores references and
   patches, not media. Re-select footage after reopening or reloading the project.
 - YouTube uses the [official IFrame API](https://developers.google.com/youtube/iframe_api_reference)
@@ -175,12 +219,13 @@ layer; Ctrl/Cmd Z and Shift Z undo/redo. Shortcuts yield to text/number inputs.
   cue synchronization is approximate.
 - Effects WAV is mono 48 kHz, 16-bit PCM for the selected range, including silence
   and cropped tails. Original audio and video are excluded. Clipping is reported.
-  Sound WAV is a separate finite CPU/WebGPU render, excluding live modulation.
+  Sound WAV is a finite render with modulation. Export take saves a recorded performance.
 - Scene JSON and saved patch keys remain compatible with the previous studio.
   A standalone source draft is retained locally; save/export named sounds to keep
   or share them. Session A/B snapshots are not included in patch exports.
 
-`test:browser` runs `check-workspace-browser.ts`. It covers actual live processing,
+`test:browser` runs the workspace, state, device-loss, interaction and sound-design
+browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
 transport and video loops, mobile layout and mocked YouTube recovery. The local

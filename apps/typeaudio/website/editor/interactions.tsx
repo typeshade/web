@@ -26,7 +26,7 @@ type MenuState = {
   x: number;
   y: number;
   items: MenuItem[];
-  origin: HTMLElement | null;
+  origin: HTMLElement | SVGElement | null;
 };
 const Context = createContext<{
   menuKey?: string;
@@ -35,7 +35,7 @@ const Context = createContext<{
     label: string,
     items: MenuItem[],
     point: { x: number; y: number },
-    origin?: HTMLElement | null,
+    origin?: HTMLElement | SVGElement | null,
   ) => void;
   closeMenu: () => void;
 } | null>(null);
@@ -317,7 +317,9 @@ export function InteractionProvider({ children }: { children: ReactNode }) {
 }
 
 export function openContext(
-  event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
+  event:
+    | React.MouseEvent<HTMLElement | SVGElement>
+    | React.KeyboardEvent<HTMLElement | SVGElement>,
   open: ReturnType<typeof useInteractions>["openMenu"],
   key: string,
   label: string,

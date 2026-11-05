@@ -3,6 +3,7 @@
 import { chromium } from "playwright-core";
 import { preview } from "vite";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { RECIPES } from "./sound-recipes.ts";
 import { DEFAULT } from "./designer.ts";
 const server = await preview({
   configFile: "website/vite.config.ts",
@@ -19,7 +20,41 @@ try {
     f.startsWith("live.worklet-"),
   )!;
   const rows = [];
-  for (const voices of [1, 2, 8])
+  const scenarios = [
+    ...[1, 2, 8].map((voices) => ({
+      name: `unison-${voices}`,
+      patch: { ...DEFAULT, voices, delay: true, reverb: true, lfoDepth: 0.8 },
+    })),
+    ...Object.entries(RECIPES).map(([name, r]) => ({ name, patch: r.patch })),
+    {
+      name: "four-layer-stress",
+      patch: {
+        ...RECIPES.door.patch,
+        voices: 8,
+        layers: [
+          ...RECIPES.door.patch.layers.map((l) => ({
+            ...l,
+            patch: { ...l.patch, voices: 8 },
+          })),
+          {
+            id: "extra",
+            name: "Extra",
+            offset: 0,
+            muted: false,
+            patch: {
+              ...DEFAULT,
+              voices: 8,
+              fmIndex: 4,
+              lfoDepth: 1,
+              delay: true,
+              reverb: true,
+            },
+          },
+        ],
+      },
+    },
+  ];
+  for (const scenario of scenarios)
     for (let trial = 0; trial < Number(process.env.TRIALS || 3); trial++) {
       const row = await page.evaluate(
         async ({ asset, patch }) => {
@@ -49,9 +84,18 @@ postMessage({ elapsed, p50: costs[3000], p95: costs[5700], p99: costs[5940],
           const worker = new Worker(url, { type: "module" });
           try {
             return await new Promise((resolve, reject) => {
-              const timer=setTimeout(()=>reject(new Error('Live compute benchmark timed out.')),30000);
-              worker.onmessage = (e) => {clearTimeout(timer);resolve(e.data);};
-              worker.onerror = (e) => {clearTimeout(timer);reject(new Error(e.message));};
+              const timer = setTimeout(
+                () => reject(new Error("Live compute benchmark timed out.")),
+                30000,
+              );
+              worker.onmessage = (e) => {
+                clearTimeout(timer);
+                resolve(e.data);
+              };
+              worker.onerror = (e) => {
+                clearTimeout(timer);
+                reject(new Error(e.message));
+              };
             });
           } finally {
             worker.terminate();
@@ -60,16 +104,16 @@ postMessage({ elapsed, p50: costs[3000], p95: costs[5700], p99: costs[5940],
         },
         {
           asset,
-          patch: {
-            ...DEFAULT,
-            voices,
-            delay: true,
-            reverb: true,
-            lfoDepth: 0.8,
-          },
+          patch: scenario.patch,
         },
       );
-      rows.push({ voices, trial, ...(row as any) });
+      rows.push({
+        scenario: scenario.name,
+        voices: scenario.patch.voices,
+        layers: scenario.patch.layers.length + 1,
+        trial,
+        ...(row as any),
+      });
       console.log(JSON.stringify(rows.at(-1)));
     }
   await mkdir("artifacts", { recursive: true });

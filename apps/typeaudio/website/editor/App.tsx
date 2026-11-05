@@ -19,12 +19,29 @@ import {
   useInteractions,
   type MenuItem,
 } from "./interactions.tsx";
+import { SourceRack } from "./components/SourceRack.tsx";
 export function App() {
   const layout = useWorkspaceLayout();
   const { openMenu } = useInteractions();
   const e = useEditor(),
     [module, setModule] = useState("source"),
     picture = e.state.workspace === "picture";
+  const [selection, setSelection] = useState({ owner: "", id: "base" }),
+    owner = e.state.selected || "source";
+  const sourceId = selection.owner === owner ? selection.id : "base",
+    layer = e.state.patch.layers.find((l) => l.id === sourceId);
+  const selectSource = (id: string) => {
+    e.endEdit();
+    setSelection({ owner, id });
+  };
+  const sourceEditor = layer
+    ? {
+        ...e,
+        state: { ...e.state, patch: layer.patch },
+        patch: (changes: Partial<typeof layer.patch>) =>
+          e.editLayer(layer.id, changes),
+      }
+    : e;
   return (
     <WorkspaceShell editor={e}>
       <main
@@ -118,28 +135,16 @@ export function App() {
           ) : (
             <>
               <SoundEditor
-                key={e.state.selected || "source"}
-                editor={e}
+                key={`${owner}-${layer?.id || "base"}`}
+                editor={sourceEditor}
+                sourceName={layer?.name || "Base source"}
                 module={module}
               />
-              <Panel title="Sound controls" className="utility-panel">
-                <button
-                  onClick={() =>
-                    e.patch({ ...e.presets.warm.patch }, "Warm lead")
-                  }
-                >
-                  Reset sound
-                </button>
-                <p className="panel-hint">
-                  {e.selected
-                    ? "Editing the selected timeline layer."
-                    : "Choose a module below to edit its parameters."}
-                </p>
-                <p className="panel-hint">
-                  Live processing uses the CPU audio thread. Render exports a
-                  finite CPU or WebGPU clip.
-                </p>
-              </Panel>
+              <SourceRack
+                editor={e}
+                selected={layer?.id || "base"}
+                select={selectSource}
+              />
             </>
           )}
         </aside>
@@ -169,8 +174,11 @@ export function App() {
               </div>
               <div className="sound-dock-controls">
                 <div>
-                  <h3>Tone</h3>
-                  <TonePad editor={e} />
+                  <h3>Tone · {layer?.name || "Base source"}</h3>
+                  <TonePad
+                    key={`${owner}-${layer?.id || "base"}`}
+                    editor={sourceEditor}
+                  />
                 </div>
                 <div>
                   <h3>Variations</h3>
@@ -180,8 +188,11 @@ export function App() {
                   <h3>{e.selected ? "Selected layer" : "Source"}</h3>
                   <span>{e.state.patchName}</span>
                   <p>
-                    {e.state.patch.voices} voices ·{" "}
-                    {Math.round(e.state.patch.frequency)} Hz
+                    {e.state.patch.layers.length + 1}{" "}
+                    {e.state.patch.layers.length ? "layers" : "layer"} ·{" "}
+                    {e.state.patch.voices}{" "}
+                    {e.state.patch.voices === 1 ? "base voice" : "base voices"}{" "}
+                    · {Math.round(e.state.patch.frequency)} Hz
                   </p>
                   <p>
                     Hold {e.state.patch.duration.toFixed(2)} s / Release{" "}
