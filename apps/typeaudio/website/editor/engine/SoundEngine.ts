@@ -1,5 +1,6 @@
 import { LiveAudio } from "../../live-audio.ts";
 import { SAMPLE_RATE, type Patch } from "../../designer.ts";
+import type { RenderStats } from "../../designer-render.ts";
 export interface Rendered {
   dry: Float32Array;
   wet: Float32Array;
@@ -7,6 +8,13 @@ export interface Rendered {
   peak: number;
   milliseconds: number;
   report: string;
+  timing: RenderStats & {
+    deviceSetupMs: number;
+    deviceReused: boolean;
+    postprocessMs: number;
+    workerMs: number;
+    wallMs: number;
+  };
 }
 /** Owns audio resources; UI components never construct worklets or workers. */
 export class SoundEngine {
@@ -15,9 +23,13 @@ export class SoundEngine {
   private source?: AudioBufferSourceNode;
   private worker?: Worker;
   private reject?: (error: Error) => void;
+  private renderId = 0;
   private generation = 0;
   async unlock() {
-    this.context ??= new AudioContext({ sampleRate: SAMPLE_RATE, latencyHint: 'interactive' });
+    this.context ??= new AudioContext({
+      sampleRate: SAMPLE_RATE,
+      latencyHint: "interactive",
+    });
     await this.context.resume();
     return this.context;
   }
@@ -49,40 +61,77 @@ export class SoundEngine {
         new Error("WebGPU is unavailable. Select CPU to render this sound."),
       );
     }
+    const requested = performance.now();
     return new Promise((resolve, reject) => {
-      const worker = new Worker(
-        new URL("../../render.worker.ts", import.meta.url),
-        { type: "module" },
-      );
+      const worker =
+        this.worker ??
+        new Worker(new URL("../../render.worker.ts", import.meta.url), {
+          type: "module",
+        });
       this.worker = worker;
-      this.reject = reject;
+      const id = ++this.renderId;
+      let settled = false;
       const timer = setTimeout(
         () =>
-          finish(new Error("Render timed out. Reduce voices or note hold.")),
+          finish(
+            new Error("Render timed out. Reduce voices or note hold."),
+            undefined,
+            true,
+          ),
         90000,
       );
-      const finish = (error?: Error, result?: Rendered) => {
+      const finish = (error?: Error, result?: Rendered, discard = false) => {
+        if (settled) return;
+        settled = true;
         clearTimeout(timer);
-        worker.terminate();
         if (this.worker === worker) {
-          this.worker = undefined;
           this.reject = undefined;
+          if (discard) {
+            worker.terminate();
+            this.worker = undefined;
+          }
         }
         if (error) reject(error);
         else resolve(result!);
       };
-      this.reject = (error) => finish(error);
-      worker.onerror = (e) => finish(new Error(e.message || "Render failed."));
-      worker.onmessage = ({ data }) =>
-        data.error ? finish(new Error(data.error)) : finish(undefined, data);
-      worker.postMessage({ patch, backend });
+      this.reject = (error) => finish(error, undefined, true);
+      worker.onerror = (e) => {
+        if (settled && this.worker === worker) {
+          worker.terminate();
+          this.worker = undefined;
+        }
+        finish(new Error(e.message || "Render failed."), undefined, true);
+      };
+      worker.onmessage = ({ data }) => {
+        if (data.id !== id) return;
+        if (data.error) {
+          finish(new Error(data.error));
+          return;
+        }
+        const wallMs = performance.now() - requested;
+        finish(undefined, {
+          ...data,
+          milliseconds: wallMs,
+          timing: { ...data.timing, workerMs: data.milliseconds, wallMs },
+          report:
+            data.report +
+            `\nRequest to result: ${wallMs.toFixed(2)} ms, including worker startup and message transfer.`,
+        });
+      };
+      try {
+        worker.postMessage({ id, patch, backend });
+      } catch (error) {
+        finish(
+          error instanceof Error ? error : new Error(String(error)),
+          undefined,
+          true,
+        );
+      }
     });
   }
   cancelRender() {
     this.reject?.(new Error("Render cancelled."));
     this.reject = undefined;
-    this.worker?.terminate();
-    this.worker = undefined;
   }
   async play(pcm: Float32Array, loop: boolean, onEnded: () => void) {
     this.stop();
@@ -122,6 +171,8 @@ export class SoundEngine {
   close() {
     this.stop();
     this.cancelRender();
+    this.worker?.terminate();
+    this.worker = undefined;
     void this.context?.close();
   }
 }

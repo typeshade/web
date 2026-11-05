@@ -9,7 +9,7 @@ export interface Patch {
   volume: number;
   lfoRate: number; lfoDepth: number; lfoTarget: number; lfoShape: number; lfoSync: boolean; tempo: number;
 }
-export interface RenderRequest { patch: Patch; backend: 'cpu' | 'webgpu'; }
+export interface RenderRequest { id?: number; patch: Patch; backend: 'cpu' | 'webgpu'; }
 export const DEFAULT: Patch = {
   lfoRate: 1, lfoDepth: 0, lfoTarget: 0, lfoShape: 0, lfoSync: false, tempo: 120,
   shapeA: 1, shapeB: 0, blend: 0.35, frequency: 220, transpose: 0,

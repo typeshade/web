@@ -52,8 +52,8 @@ The website's live oscillator/filter/envelope kernel is compiled from TypeShade
 to f32 CPU code during the build. Playback reuses voice state, parameter and output
 buffers instead of calling the generic class host boundary for each block. The
 build adapter uses the pinned compiler's internal generator and matching runtime;
-compiler upgrades must review that adapter. The library pin and finite GPU render
-path are unchanged. Control bursts are coalesced within a microtask, without a
+compiler upgrades must review that adapter. The library pin is unchanged. Finite
+rendering uses a separate batched CPU/WebGPU path. Control bursts are coalesced within a microtask, without a
 display-frame wait. Retrigger flushes pending controls before sending its event.
 
 For a repeatable CPU compute comparison, build first, then run
@@ -63,6 +63,26 @@ per voice count, 500 warm-up blocks, then 6,000 128-frame blocks at 48 kHz. It r
 the production worklet code in a dedicated worker and measures computation only.
 It does not measure audio-device latency, actual AudioWorklet deadline misses,
 or input-to-speaker latency. Browsers do not offer a hard real-time guarantee.
+
+Finite Render keeps oscillator/filter state local to each voice for a batch, then
+commits it to the bank. It uses up to 16,384 frames per batch and gathers, averages,
+drives and scales directly into a resident output tape. PCM is read once at the
+end. The Sound editor retains its worker and one device per requested backend
+after successful renders; each device's released-array pool is limited to 16 MiB.
+Cancellation and timeout terminate pending workers. Errors and device loss evict
+the affected device. Completed results own their PCM and do not alias pooled storage.
+
+The displayed render duration measures the main-thread request through result
+delivery, including worker startup and message transfer. The report also separates
+device setup, plan/scheduling time, output wait/readback and CPU post-processing.
+Output wait includes outstanding GPU execution; it is not a pure transfer-time
+measurement. GPU timestamps appear only when the runtime provides them.
+
+After building, `pnpm --filter typeaudio-site bench:render` compares CPU and WebGPU
+with fresh and repeated requests, three trials per workload. It records browser
+and adapter metadata in `artifacts/render-performance.json`. For a software-only
+check, explicitly set `TYPEAUDIO_BENCH_SOFTWARE_GPU=1`. Those results do not establish
+hardware GPU throughput or Live audio latency.
 
 The sound controls draw on [Ableton rack variations and macro controls](https://www.ableton.com/en/live-manual/12/instrument-drum-and-effect-racks/)
 and [Bitwig's modulation system](https://www.bitwig.com/userguide/latest/the_unified_modulation_system/).

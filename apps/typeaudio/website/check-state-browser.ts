@@ -190,10 +190,11 @@ try {
   await delayedRender.addInitScript(() => {
     (window as any).Worker = class {
       onmessage?: (event: any) => void;
-      postMessage() {
+      postMessage(request: { id: number }) {
         (window as any).finishRender = () =>
           this.onmessage?.({
             data: {
+              id: request.id,
               dry: new Float32Array(480),
               wet: new Float32Array(480),
               tier: "cpu",
