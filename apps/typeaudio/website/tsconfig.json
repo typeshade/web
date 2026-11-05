@@ -12,6 +12,8 @@
     "jsx": "react-jsx"
   },
   "include": [
+    "./audio-cpu.d.ts",
+    "./audio-cpu-plugin.ts",
     "./audio.ts",
     "./render.worker.ts",
     "./live.worklet.ts",

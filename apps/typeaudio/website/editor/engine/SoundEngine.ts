@@ -17,7 +17,7 @@ export class SoundEngine {
   private reject?: (error: Error) => void;
   private generation = 0;
   async unlock() {
-    this.context ??= new AudioContext({ sampleRate: SAMPLE_RATE });
+    this.context ??= new AudioContext({ sampleRate: SAMPLE_RATE, latencyHint: 'interactive' });
     await this.context.resume();
     return this.context;
   }

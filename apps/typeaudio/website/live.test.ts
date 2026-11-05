@@ -36,3 +36,27 @@ describe('continuous synchronous audio',()=>{
     const frames=dsp.frames;dsp.retrigger();dsp.process(new Float32Array(128));expect(dsp.frames).toBe(frames+128);
   });
 });
+
+describe('optimized block DSP equivalence',()=>{
+  it('matches the independent TypeAudio voice for every waveform, filter bypass and a repeated envelope',async()=>{
+    const {DesignerVoice}=await import('./designer.shade.ts');
+    const {LiveVoice}=await import('./live-voice.ts');
+    for(const shape of [0,1,2,3])for(const filtered of [0,1]){
+      const args=[220,329.63,shape,3,.11,.35,1800,.8,filtered,.005,.1,.4,.02,.5] as const;
+      const reference=new DesignerVoice(...args),voice=new LiveVoice(...args);
+      voice.configure(220,329.63,shape,3,.35,1800,.8,filtered,.005,.1,.4,.02,.5,1);
+      let largest=0;
+      for(let at=0;at<32000;at+=128){const out=voice.block(128);for(let n=0;n<128;n++){
+        if(reference.age>=Math.fround(Math.fround(.5+.02)*48000))reference.age=0;
+        largest=Math.max(largest,Math.abs(out[n]!-reference.tick()));
+      }}
+      expect(largest,`shape ${shape}, filter ${filtered}`).toBeLessThan(.00001);
+    }
+  },20000);
+  it('keeps eight-voice modulation and effect state identical across callback boundaries',()=>{
+    const patch={...DEFAULT,voices:8,delay:true,reverb:true,lfoDepth:.8,lfoRate:12};
+    const a=new LiveDsp(patch),b=new LiveDsp(patch),whole=new Float32Array(16384),split=new Float32Array(16384),block=new Float32Array(128);
+    a.process(whole);for(let at=0;at<split.length;at+=128){b.process(block);split.set(block,at);}
+    expect(split).toEqual(whole);expect(b.frames).toBe(a.frames);expect(split.every(Number.isFinite)).toBe(true);
+  });
+});
