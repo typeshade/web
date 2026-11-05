@@ -80,6 +80,19 @@ function snapshotDocument(s: Document): Document {
     source: s.source,
   };
 }
+function sameData(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (!a || !b || typeof a !== "object" || typeof b !== "object") return false;
+  const left = a as Record<string, unknown>,
+    right = b as Record<string, unknown>,
+    keys = Object.keys(left);
+  return (
+    keys.length === Object.keys(right).length &&
+    keys.every(
+      (key) => Object.hasOwn(right, key) && sameData(left[key], right[key]),
+    )
+  );
+}
 export function reducer(s: EditorState, a: Action): EditorState {
   if (a.type === "workspace") return { ...s, workspace: a.workspace };
   if (a.type === "tool") return { ...s, tool: a.tool };
@@ -124,7 +137,7 @@ export function reducer(s: EditorState, a: Action): EditorState {
       : s;
   }
   const next = projectDocument(a.edit(snapshotDocument(s)));
-  if (JSON.stringify(snapshotDocument(s)) === JSON.stringify(next)) return s;
+  if (sameData(snapshotDocument(s), next)) return s;
   return {
     ...s,
     ...next,

@@ -172,6 +172,25 @@ describe("state rollback regressions", () => {
   });
 });
 
+it("treats a legacy source with a different property order as the same document", () => {
+  const base = initial();
+  base.source = { name: "Source", patch: { ...DEFAULT } };
+  const before = {
+    ...base,
+    future: [
+      {
+        scene: base.scene,
+        patch: base.patch,
+        patchName: base.patchName,
+        selected: "",
+        source: base.source,
+      },
+    ],
+  };
+  expect(
+    reducer(before, { type: "edit", edit: (d) => updatePatch(d, {}) }),
+  ).toBe(before);
+});
 describe("document restoration", () => {
   it("restores an explicitly deselected source instead of selecting the first clip", async () => {
     const { vi } = await import("vitest");
