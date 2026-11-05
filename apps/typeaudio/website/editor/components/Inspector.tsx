@@ -1,7 +1,15 @@
 import type { Editor } from "../useEditor.ts";
+import { useEffect, useRef } from "react";
 import { Panel, Icon } from "./Panel.tsx";
 export function Inspector({ editor: e }: { editor: Editor }) {
   const c = e.selected;
+  const name = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (e.renameRequest?.id === c?.id) {
+      name.current?.focus();
+      name.current?.select();
+    }
+  }, [e.renameRequest, c?.id]);
   return (
     <>
       <Panel title="Properties" className="clip-properties">
@@ -18,6 +26,7 @@ export function Inspector({ editor: e }: { editor: Editor }) {
               Name
               <input
                 id="cue-name"
+                ref={name}
                 value={c.name}
                 maxLength={100}
                 onChange={(event) => {
@@ -103,27 +112,7 @@ export function Inspector({ editor: e }: { editor: Editor }) {
               <button
                 id="audition"
                 disabled={!e.ready}
-                onClick={async () => {
-                  e.stopScene();
-                  try {
-                    await e.transport.audio.unlock();
-                    const pcm = e.samples.get(c.id);
-                    if (pcm)
-                      e.transport.audio.schedule(
-                        {
-                          ...e.state.scene,
-                          start: 0,
-                          end: pcm.length / 48000,
-                          cues: [{ ...c, time: 0, muted: false }],
-                        },
-                        e.samples,
-                        0,
-                      );
-                    e.setNotice("Auditioning selected clip.");
-                  } catch (error) {
-                    e.setNotice(String(error));
-                  }
-                }}
+                onClick={() => void e.auditionCue(c.id)}
               >
                 Audition
               </button>

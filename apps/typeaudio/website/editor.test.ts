@@ -247,3 +247,89 @@ describe("document restoration", () => {
     }
   });
 });
+
+describe("continuous control history", () => {
+  it("keeps an entire parameter gesture as one undoable edit", () => {
+    let state = reducer(initial(), { type: "begin" });
+    for (let frequency = 300; frequency < 400; frequency++)
+      state = reducer(state, {
+        type: "edit",
+        edit: (d) => updatePatch(d, { frequency }),
+      });
+    expect(state.past).toHaveLength(0);
+    state = reducer(state, { type: "commit" });
+    expect(state.past).toHaveLength(1);
+    expect(state.checkpoint).toBeUndefined();
+    state = reducer(state, { type: "undo" });
+    expect(state.patch.frequency).toBe(DEFAULT.frequency);
+    state = reducer(state, { type: "redo" });
+    expect(state.patch.frequency).toBe(399);
+  });
+  it("restores values and redo after cancellation or a gesture with no net change", () => {
+    let state = reducer(initial(), {
+      type: "edit",
+      edit: (d) => updatePatch(d, { frequency: 440 }),
+    });
+    state = reducer(state, { type: "undo" });
+    state = reducer(state, { type: "begin" });
+    state = reducer(state, {
+      type: "edit",
+      edit: (d) => updatePatch(d, { frequency: 880, cutoff: 9000 }),
+    });
+    state = reducer(state, { type: "cancel" });
+    expect(state.patch).toEqual(DEFAULT);
+    expect(state.future).toHaveLength(1);
+    state = reducer(state, { type: "begin" });
+    state = reducer(state, {
+      type: "edit",
+      edit: (d) => updatePatch(d, { frequency: 330 }),
+    });
+    state = reducer(state, {
+      type: "edit",
+      edit: (d) => updatePatch(d, { frequency: DEFAULT.frequency }),
+    });
+    state = reducer(state, { type: "commit" });
+    expect(state.past).toHaveLength(0);
+    expect(state.future).toHaveLength(1);
+  });
+  it("commits source edits before selection changes without mixing source and clip Tone", () => {
+    let state = reducer(initial(), { type: "begin" });
+    state = reducer(state, {
+      type: "edit",
+      edit: (d) => updatePatch(d, { cutoff: 9000 }),
+    });
+    state = reducer(state, { type: "select", id: "a" });
+    expect(state.source.patch.cutoff).toBe(9000);
+    expect(state.patch.cutoff).toBe(DEFAULT.cutoff);
+    expect(state.checkpoint).toBeUndefined();
+    expect(state.past).toHaveLength(1);
+    state = reducer(state, { type: "begin" });
+    state = reducer(state, {
+      type: "edit",
+      edit: (d) => updatePatch(d, { frequency: 660 }),
+    });
+    state = reducer(state, { type: "workspace", workspace: "sound" });
+    expect(state.past).toHaveLength(2);
+    expect(state.scene.cues[0]!.patch.frequency).toBe(660);
+    expect(state.source.patch.frequency).toBe(DEFAULT.frequency);
+    state = reducer(state, { type: "undo" });
+    expect(state.patch.frequency).toBe(DEFAULT.frequency);
+    expect(state.source.patch.cutoff).toBe(9000);
+  });
+  it("undo cancels the active gesture before undoing earlier edits", () => {
+    let state = reducer(initial(), {
+      type: "edit",
+      edit: (d) => updatePatch(d, { frequency: 440 }),
+    });
+    state = reducer(state, { type: "begin" });
+    state = reducer(state, {
+      type: "edit",
+      edit: (d) => updatePatch(d, { frequency: 880 }),
+    });
+    state = reducer(state, { type: "undo" });
+    expect(state.patch.frequency).toBe(440);
+    expect(state.past).toHaveLength(1);
+    state = reducer(state, { type: "undo" });
+    expect(state.patch.frequency).toBe(DEFAULT.frequency);
+  });
+});

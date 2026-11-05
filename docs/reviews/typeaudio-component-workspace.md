@@ -206,3 +206,65 @@ An explicit 80 ms pause reproduced the later timeline scheduling timeout on Chro
 native scheduler restored. Its assertion polls independently of RAF. The same
 80 ms pause and full browser suite pass with this correction. No application or
 audio-processing code changed for this fixture repair.
+
+## Editor interaction pass
+
+This follow-up starts from `5ceba3a` and keeps the owner's Photoshop/After Effects
+workspace direction. Shared interaction and layout providers now own transient
+menus/tooltips and panel preferences. They are separate from the audio document,
+its undo history and the engine adapters.
+
+File/Edit/Window and contextual menus share keyboard navigation, disabled/checked
+items, type-to-select, Escape, focus restoration and viewport bounds. Contexts
+cover project sounds, timeline clips and empty lanes, parameters, the Tone pad and
+the viewer. Clip actions target explicit cue IDs, including when the clicked cue
+was not previously selected. They expose audition, editing, rename, mute, move to
+playhead, duplication and deletion. Native text/video context menus remain native.
+Menu commands perform existing editor operations; the UI does not pretend to
+support arbitrary signal routing or free-form window docking.
+
+Tooltips support hover and keyboard focus, delay/dismissal, viewport placement and
+`aria-describedby`. Parameter help explains units and behavior, including synced
+rate and Live modulation limits. The decorative panel-header menu glyph has been
+removed. Numeric property values can be clicked for entry, dragged for scrubbing
+or reset through their menu. Pitch/cutoff scrubbing is logarithmic; Shift gives
+finer steps. Input stays within the patch's validated bounds. Enter commits;
+Escape restores the original value. Focus returns after keyboard entry.
+
+A document checkpoint groups Sound property/range and Tone-pad edits into one
+undo step. Cancellation and gestures with no net change preserve redo. Changing
+selection/workspace commits the previous target before projecting the next sound.
+The checkpoint is not part of saved project data. The independent source and
+selected clip remain separate. A/B labels are derived from the applied patch key,
+so restoring a matching patch after a manual edit can recover its variation
+position; storing an endpoint marks the current sound as that endpoint.
+
+Project width, properties width and dock height resize by pointer or keyboard.
+Completed sizes are validated and saved under `typeaudio.editor.layout.v1`;
+Escape cancels a resize, double-click resets one dimension, and Reset layout
+clears preferences. Desktop focus-viewer mode uses F/Escape. Small screens keep
+the stacked arrangement and disable this desktop focus mode. These are fixed
+panel positions with saved sizes, not draggable floating windows.
+
+Clip moves remain drafts until release; Escape/pointer cancellation discard the
+draft. Alt-drag copies without moving the original, then selects the copy. Snap
+uses a six-pixel tolerance around clip boundaries, range boundaries and playhead,
+in addition to the grid. A guide and time readout show the current draft. Middle
+button or Hand-tool panning handles horizontal/vertical scroll and pointer loss.
+Right-click does not start clip, Tone-pad or panel drags. Global Space preserves
+native button/checkbox behavior and ignores key repeat during audio playback.
+
+Reviewed the new English commands, tooltips, input help, shortcuts and layout
+labels, and inspected desktop Sound/Picture screenshots. Audio kernels, worker
+rendering, source pins, WAV semantics and the saved scene format are unchanged.
+This pass does not claim a new imported-document or translation review.
+
+Validation: shader/TypeScript checks, all 38 unit tests, the production build and
+all four browser suites pass on Chrome 156. The interaction suite covers numeric
+entry/scrub/range history, cancel/redo, tooltip descriptions, native Space behavior,
+Tone/A-B rollback, menu keyboard focus, saved/cancelled/reset panel sizes, targeted
+clip actions, rename, Alt-copy, magnetic snap, cancellation, panning and menu bounds.
+Desktop live audio, numeric entry, context menus, tooltips and the 390 px stacked
+layout were also inspected in screenshots. Existing suites retain audio/worker,
+media, persistence and 320/390 px layout coverage. GPU checks use SwiftShader here;
+this UI pass establishes no new hardware latency or performance claim.

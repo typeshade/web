@@ -121,3 +121,7 @@ with the distinction between worker benchmarks and device/game real-time behavio
 
 Its finite-render follow-up records resident output batching, worker/device reuse,
 timing definitions and explicitly identified software-GPU comparisons.
+
+The component record also covers the editor interaction pass: shared context menus
+and tooltips, direct numeric editing, gesture history, persistent panel sizes and
+timeline manipulation. Its English review is limited to those changed surfaces.

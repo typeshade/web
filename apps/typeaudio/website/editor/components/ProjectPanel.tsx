@@ -2,7 +2,48 @@ import { useRef, useState } from "react";
 import type { Editor, SavedSound } from "../useEditor.ts";
 import { Panel, Icon } from "./Panel.tsx";
 import { download } from "../model.ts";
+import {
+  openContext,
+  useInteractions,
+  type MenuItem,
+} from "../interactions.tsx";
 export function ProjectPanel({ editor: e }: { editor: Editor }) {
+  const { openMenu } = useInteractions();
+  function actions(value: SavedSound): MenuItem[] {
+    return [
+      {
+        label: e.selected ? "Load into selected layer" : "Load sound",
+        action: () => e.patch(value.patch, value.name),
+      },
+      {
+        label: "Load and audition",
+        action: () => {
+          e.patch(value.patch, value.name);
+          e.workspace("sound");
+          void e.startLive(value.patch);
+        },
+      },
+      {
+        label: "Add at playhead",
+        disabled: e.state.scene.cues.length >= 24,
+        action: () => {
+          e.workspace("picture");
+          e.addCue(value);
+        },
+      },
+      { separator: true },
+      {
+        label: "Export sound…",
+        action: () =>
+          download(
+            new Blob([JSON.stringify({ version: 1, ...value }, null, 2)], {
+              type: "application/json",
+            }),
+            "typeaudio-patch.json",
+          ),
+      },
+    ];
+  }
   const [tab, setTab] = useState<"project" | "sounds">("sounds"),
     [search, setSearch] = useState("");
   const file = e.videoInput,
@@ -21,7 +62,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
       className="project-panel"
       actions={
         <button
-          title="Import video"
+          data-tooltip="Import a local video reference. The file stays in this browser."
           aria-label="Import video"
           onClick={() => file.current?.click()}
         >
@@ -83,8 +124,37 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
                   key={id}
                   className="asset-row"
                   data-preset={kind === "Preset" ? id : undefined}
-                  aria-pressed={e.state.patchName === value.name}
+                  aria-pressed={
+                    e.state.patchName === value.name &&
+                    Object.entries(value.patch).every(
+                      ([key, v]) =>
+                        e.state.patch[key as keyof SavedSound["patch"]] === v,
+                    )
+                  }
                   draggable
+                  data-tooltip={`${value.name}. Load with a click; drag to the timeline or right-click for actions.`}
+                  onContextMenu={(event) =>
+                    openContext(
+                      event,
+                      openMenu,
+                      `asset-${id}`,
+                      "Sound actions",
+                      actions(value),
+                    )
+                  }
+                  onKeyDown={(event) => {
+                    if (
+                      event.key === "ContextMenu" ||
+                      (event.shiftKey && event.key === "F10")
+                    )
+                      openContext(
+                        event,
+                        openMenu,
+                        `asset-${id}`,
+                        "Sound actions",
+                        actions(value),
+                      );
+                  }}
                   onDragStart={(event) =>
                     event.dataTransfer.setData(
                       "application/typeaudio-sound",

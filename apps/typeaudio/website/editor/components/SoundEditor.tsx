@@ -1,3 +1,7 @@
+import { useRef } from "react";
+import { NumericValue } from "./NumericValue.tsx";
+import { DEFAULT } from "../../designer.ts";
+import { openContext, useInteractions } from "../interactions.tsx";
 import type { Editor } from "../useEditor.ts";
 import { LIMITS, SHAPES, envelopeAt, type Patch } from "../../designer.ts";
 
@@ -92,6 +96,40 @@ const units: Record<string, string> = {
   lfoRate: "Hz",
   tempo: "BPM",
 };
+const HELP: Partial<Record<keyof Patch, string>> = {
+  shapeA: "Waveform for oscillator A. Blend balances it with oscillator B.",
+  shapeB: "Waveform for oscillator B. Transpose and detune adjust its pitch.",
+  frequency: "Base pitch of the oscillators. Tune it while Live runs.",
+  transpose: "Oscillator B pitch, in semitones relative to oscillator A.",
+  detune: "Fine pitch offset for oscillator B, in cents.",
+  voices:
+    "Unison voices for this sound. More voices add density and processing cost.",
+  spread: "Pitch spread across the unison voices, in cents.",
+  blend: "Balance between oscillators A and B.",
+  cutoff: "Transition frequency of the lowpass filter.",
+  resonance: "Emphasis around the lowpass cutoff frequency.",
+  attack: "Time to reach full amplitude after a trigger.",
+  decay: "Time to fall from the attack peak to the sustain level.",
+  sustain: "Amplitude held after the decay stage.",
+  release: "Time to fade after the note hold.",
+  duration: "Note hold before release. Live with Repeat off keeps sustaining.",
+  drive: "Input gain for soft clipping. Enable Drive to hear it.",
+  delayTime: "Time between echoes. Edits preserve the running delay tail.",
+  feedback: "Amount of each echo returned to the delay.",
+  delayMix: "Balance of the dry signal and delay echoes.",
+  room: "Reverb room size. Enable Reverb to hear it.",
+  reverbMix: "Balance of the dry signal and reverb tail.",
+  lfoTarget:
+    "Parameter controlled by the live LFO: cutoff, pitch or oscillator blend.",
+  lfoShape: "Sine or triangle modulation for the live LFO.",
+  lfoSync: "Follow the composition BPM instead of the free modulation rate.",
+  tempo:
+    "Composition BPM. With Beat sync enabled, the LFO cycles once per beat.",
+  lfoDepth:
+    "Strength of live modulation. Finite renders exclude this modulation.",
+  lfoRate: "Live modulation cycles per second. Beat sync follows BPM instead.",
+  volume: "Output level for Live and exported sound.",
+};
 export function Parameter({
   editor: e,
   name,
@@ -99,6 +137,8 @@ export function Parameter({
   editor: Editor;
   name: keyof Patch;
 }) {
+  const gesture = useRef(false),
+    { openMenu } = useInteractions();
   const value = e.state.patch[name],
     limit = LIMITS[name],
     options =
@@ -111,7 +151,7 @@ export function Parameter({
             : undefined;
   if (typeof value === "boolean")
     return (
-      <label className="check">
+      <label className="check" data-tooltip={HELP[name]}>
         <input
           id={name}
           type="checkbox"
@@ -137,11 +177,34 @@ export function Parameter({
         ? 0.001
         : 0.01;
   return (
-    <label
+    <div
       className={`parameter ${options ? "parameter-select" : ""}`}
-      htmlFor={name}
+      data-tooltip={
+        name === "lfoRate" && e.state.patch.lfoSync
+          ? "Beat sync is on. Rate follows BPM."
+          : HELP[name]
+      }
+      onContextMenu={(event) => {
+        if (
+          event.target instanceof HTMLInputElement &&
+          event.target.type !== "range"
+        )
+          return;
+        openContext(
+          event,
+          openMenu,
+          `parameter-${name}`,
+          `${labels[name] || name} options`,
+          [
+            {
+              label: `Reset ${labels[name] || name}`,
+              action: () => e.patch({ [name]: DEFAULT[name] }),
+            },
+          ],
+        );
+      }}
     >
-      <span>{labels[name] || name}</span>
+      <label htmlFor={name}>{labels[name] || name}</label>
       {options ? (
         <select
           id={name}
@@ -156,9 +219,15 @@ export function Parameter({
         </select>
       ) : (
         <>
-          <output>
-            {Number(value.toFixed(3))} {units[name] || ""}
-          </output>
+          <NumericValue
+            editor={e}
+            name={name}
+            label={labels[name] || name}
+            unit={units[name] || ""}
+            step={step}
+            integer={integer}
+            disabled={name === "lfoRate" && e.state.patch.lfoSync}
+          />
           <input
             id={name}
             type="range"
@@ -167,13 +236,62 @@ export function Parameter({
             step={step}
             value={value}
             disabled={name === "lfoRate" && e.state.patch.lfoSync}
+            onPointerDown={(event) => {
+              if (event.button === 0) {
+                gesture.current = true;
+                e.beginEdit();
+              }
+            }}
+            onPointerUp={() => {
+              if (gesture.current) e.endEdit();
+              gesture.current = false;
+            }}
+            onPointerCancel={() => {
+              if (gesture.current) e.cancelEdit();
+              gesture.current = false;
+            }}
+            onLostPointerCapture={() => {
+              if (gesture.current) e.endEdit();
+              gesture.current = false;
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && gesture.current) {
+                event.preventDefault();
+                event.stopPropagation();
+                e.cancelEdit();
+                gesture.current = false;
+              } else if (
+                [
+                  "ArrowLeft",
+                  "ArrowRight",
+                  "ArrowUp",
+                  "ArrowDown",
+                  "Home",
+                  "End",
+                  "PageUp",
+                  "PageDown",
+                ].includes(event.key) &&
+                !gesture.current
+              ) {
+                gesture.current = true;
+                e.beginEdit();
+              }
+            }}
+            onKeyUp={() => {
+              if (gesture.current) e.endEdit();
+              gesture.current = false;
+            }}
+            onBlur={() => {
+              if (gesture.current) e.endEdit();
+              gesture.current = false;
+            }}
             onChange={(event) =>
               e.patch({ [name]: Number(event.target.value) })
             }
           />
         </>
       )}
-    </label>
+    </div>
   );
 }
 export function SoundEditor({
@@ -255,12 +373,23 @@ function Envelope({ patch: p }: { patch: Patch }) {
   );
 }
 export function TonePad({ editor: e }: { editor: Editor }) {
+  const active = useRef(false),
+    { openMenu } = useInteractions();
+  const end = (cancel = false) => {
+    if (!active.current) return;
+    active.current = false;
+    cancel ? e.cancelEdit() : e.endEdit();
+  };
   const position = {
     x: Math.log(e.state.patch.cutoff / 80) / Math.log(200),
     y: 1 - e.state.patch.blend,
   };
   const move = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+    if (
+      !active.current ||
+      !event.currentTarget.hasPointerCapture(event.pointerId)
+    )
+      return;
     const rect = event.currentTarget.getBoundingClientRect(),
       x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)),
       y = Math.max(
@@ -277,12 +406,80 @@ export function TonePad({ editor: e }: { editor: Editor }) {
       id="xy-pad"
       className="tone-pad"
       role="group"
+      tabIndex={0}
+      data-tooltip="Drag horizontally for filter cutoff and vertically for oscillator blend. Arrow keys adjust the same controls. Escape cancels a drag."
       aria-label="Tone pad: horizontal cutoff, vertical oscillator blend"
       onPointerDown={(event) => {
+        if (event.button !== 0) return;
+        event.currentTarget.focus();
+        active.current = true;
+        e.beginEdit();
         event.currentTarget.setPointerCapture(event.pointerId);
         move(event);
       }}
       onPointerMove={move}
+      onPointerUp={() => end()}
+      onPointerCancel={() => end(true)}
+      onLostPointerCapture={() => end(true)}
+      onBlur={() => end()}
+      onContextMenu={(event) =>
+        openContext(event, openMenu, "tone", "Tone options", [
+          {
+            label: "Reset Tone",
+            action: () =>
+              e.patch({ cutoff: DEFAULT.cutoff, blend: DEFAULT.blend }),
+          },
+        ])
+      }
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && active.current) {
+          event.preventDefault();
+          event.stopPropagation();
+          end(true);
+        } else if (
+          ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(
+            event.key,
+          )
+        ) {
+          event.preventDefault();
+          if (!active.current) {
+            active.current = true;
+            e.beginEdit();
+          }
+          const step = event.shiftKey ? 0.002 : 0.02;
+          const x = Math.max(
+            0,
+            Math.min(
+              1,
+              position.x +
+                (event.key === "ArrowRight"
+                  ? step
+                  : event.key === "ArrowLeft"
+                    ? -step
+                    : 0),
+            ),
+          );
+          const blend = Math.max(
+            0,
+            Math.min(
+              1,
+              e.state.patch.blend +
+                (event.key === "ArrowUp"
+                  ? step
+                  : event.key === "ArrowDown"
+                    ? -step
+                    : 0),
+            ),
+          );
+          e.patch({
+            cutoff: Math.round(80 * 200 ** x),
+            blend: Math.round(blend * 1000) / 1000,
+          });
+        }
+      }}
+      onKeyUp={(event) => {
+        if (event.key.startsWith("Arrow")) end();
+      }}
     >
       <span>OSCILLATOR B ↑</span>
       <span className="pad-axis">FILTER CUTOFF →</span>

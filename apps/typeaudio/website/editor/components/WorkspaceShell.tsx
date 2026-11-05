@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { Editor } from "../useEditor.ts";
 import { download } from "../model.ts";
 import { Icon } from "./Panel.tsx";
+import { useInteractions, type MenuItem } from "../interactions.tsx";
+import { useWorkspaceLayout } from "../layout.tsx";
 export function WorkspaceShell({
   editor: e,
   children,
@@ -10,13 +12,29 @@ export function WorkspaceShell({
   children: ReactNode;
 }) {
   const file = useRef<HTMLInputElement>(null),
-    [menu, setMenu] = useState(false);
+    menus = useInteractions(),
+    layout = useWorkspaceLayout();
   const picture = e.state.workspace === "picture";
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        (event.target instanceof HTMLElement &&
+          event.target.closest('[role="menu"]') &&
+          !event.ctrlKey &&
+          !event.metaKey)
+      )
+        return;
+      const target =
+        event.target instanceof HTMLElement
+          ? event.target.closest("input,textarea,select,[contenteditable=true]")
+          : null;
       const editable =
-        event.target instanceof HTMLElement &&
-        !!event.target.closest("input,textarea,select,[contenteditable=true]");
+        !!target &&
+        !(
+          target instanceof HTMLInputElement &&
+          ["range", "checkbox"].includes(target.type)
+        );
       if (editable) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
         event.preventDefault();
@@ -29,6 +47,17 @@ export function WorkspaceShell({
         return;
       }
       if (event.code === "Space") {
+        if (
+          event.target instanceof HTMLElement &&
+          event.target.closest(
+            'button:not([data-cue]),input[type="checkbox"],summary',
+          )
+        )
+          return;
+        if (event.repeat || (!picture && e.busy)) {
+          event.preventDefault();
+          return;
+        }
         event.preventDefault();
         if (picture) {
           if (e.playing) e.stopScene();
@@ -52,6 +81,16 @@ export function WorkspaceShell({
         event.preventDefault();
         e.deleteCue();
       }
+      if (event.key === "Escape" && layout.focused) {
+        layout.focus(false);
+        return;
+      }
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.key.toLowerCase() === "f" && innerWidth > 950) {
+        event.preventDefault();
+        layout.focus(!layout.focused);
+        return;
+      }
       if (event.key.toLowerCase() === "v")
         e.dispatch({ type: "tool", tool: "select" });
       if (event.key.toLowerCase() === "h")
@@ -67,7 +106,94 @@ export function WorkspaceShell({
       }),
       "typeaudio-scene.json",
     );
-    setMenu(false);
+    menus.closeMenu();
+  }
+  function showMenu(name: "File" | "Edit" | "Window", origin: HTMLElement) {
+    if (menus.menuKey === name) {
+      menus.closeMenu();
+      return;
+    }
+    const key = navigator.platform.toLowerCase().includes("mac") ? "⌘" : "Ctrl";
+    const items: MenuItem[] =
+      name === "File"
+        ? [
+            {
+              label: "New sound",
+              action: () => {
+                e.stopSound();
+                e.dispatch({ type: "select", id: "" });
+                e.patch({ ...e.presets.warm.patch }, "Untitled sound");
+                e.workspace("sound");
+              },
+            },
+            {
+              label: "Open project…",
+              id: "open-project",
+              action: () => file.current?.click(),
+            },
+            {
+              label: "Export project…",
+              id: "save-project",
+              shortcut: `${key} S`,
+              action: save,
+            },
+            { separator: true },
+            {
+              label: "Import video…",
+              action: () => e.videoInput.current?.click(),
+            },
+            {
+              label: "Import sound…",
+              action: () => e.patchInput.current?.click(),
+            },
+          ]
+        : name === "Edit"
+          ? [
+              {
+                label: "Undo",
+                shortcut: `${key} Z`,
+                disabled: !e.state.past.length && !e.state.checkpoint,
+                action: e.undo,
+              },
+              {
+                label: "Redo",
+                shortcut: `${key} Shift Z`,
+                disabled: !e.state.future.length,
+                action: e.redo,
+              },
+              { separator: true },
+              {
+                label: "Duplicate layer",
+                disabled: !e.selected || e.state.scene.cues.length >= 24,
+                action: e.duplicate,
+              },
+              {
+                label: "Delete layer",
+                shortcut: "Delete",
+                disabled: !e.selected,
+                danger: true,
+                action: e.deleteCue,
+              },
+            ]
+          : [
+              {
+                label: "Focus viewer",
+                shortcut: "F",
+                disabled: innerWidth <= 950,
+                checked: layout.focused,
+                action: () => layout.focus(!layout.focused),
+              },
+              { separator: true },
+              { label: "Reset layout", action: layout.reset },
+            ];
+    const rect = origin.getBoundingClientRect();
+    menus.openMenu(
+      name,
+      `${name} menu`,
+      items,
+      { x: rect.left, y: rect.bottom + 4 },
+      origin,
+    );
   }
   return (
     <div className="studio-app">
@@ -86,72 +212,33 @@ export function WorkspaceShell({
           <img src="/icon.png" width="22" height="22" alt="" />
           <span>TypeAudio</span>
         </a>
-        <div className="file-menu">
-          <button aria-expanded={menu} onClick={() => setMenu(!menu)}>
-            File
+        {(["File", "Edit", "Window"] as const).map((name) => (
+          <button
+            key={name}
+            aria-haspopup="menu"
+            aria-expanded={menus.menuKey === name}
+            onClick={(event) => showMenu(name, event.currentTarget)}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowDown") {
+                event.preventDefault();
+                showMenu(name, event.currentTarget);
+              }
+            }}
+          >
+            {name}
           </button>
-          {menu && (
-            <>
-              <button
-                className="menu-dismiss"
-                aria-label="Close file menu"
-                onClick={() => setMenu(false)}
-              />
-              <div className="menu-popover">
-                <button
-                  onClick={() => {
-                    e.dispatch({ type: "select", id: "" });
-                    e.patch({ ...e.presets.warm.patch }, "Untitled sound");
-                    e.workspace("sound");
-                    setMenu(false);
-                  }}
-                >
-                  New sound
-                </button>
-                <button
-                  id="open-project"
-                  onClick={() => {
-                    file.current?.click();
-                    setMenu(false);
-                  }}
-                >
-                  Open project…<kbd>JSON</kbd>
-                </button>
-                <button id="save-project" onClick={save}>
-                  Export project…<kbd>⌘ S</kbd>
-                </button>
-                <hr />
-                <button
-                  onClick={() => {
-                    e.videoInput.current?.click();
-                    setMenu(false);
-                  }}
-                >
-                  Import video…
-                </button>
-                <button
-                  onClick={() => {
-                    e.patchInput.current?.click();
-                    setMenu(false);
-                  }}
-                >
-                  Import sound…
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+        ))}
         <button
           id="undo"
-          title="Undo (Ctrl/Cmd Z)"
-          disabled={!e.state.past.length}
+          data-tooltip="Undo the last document edit (Ctrl/Cmd Z)."
+          disabled={!e.state.past.length && !e.state.checkpoint}
           onClick={e.undo}
         >
           Undo
         </button>
         <button
           id="redo"
-          title="Redo (Ctrl/Cmd Shift Z)"
+          data-tooltip="Redo the last undone edit (Ctrl/Cmd Shift Z)."
           disabled={!e.state.future.length}
           onClick={e.redo}
         >
@@ -167,12 +254,18 @@ export function WorkspaceShell({
         </div>
         <button
           className="quiet reset-layout"
-          onClick={() => {
-            document.documentElement.style.removeProperty("--project-width");
-            document.documentElement.style.removeProperty("--timeline-height");
-          }}
+          data-tooltip="Restore default panel sizes and show all panels."
+          onClick={layout.reset}
         >
           Reset layout
+        </button>
+        <button
+          className="quiet viewer-focus-toggle"
+          aria-pressed={layout.focused}
+          data-tooltip="Maximize the viewer and restore panels with F."
+          onClick={() => layout.focus(!layout.focused)}
+        >
+          {layout.focused ? "Restore panels" : "Focus viewer"}
         </button>
         <a
           className="help-link"

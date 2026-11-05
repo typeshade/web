@@ -10,6 +10,7 @@ export interface Document {
   source: { patch: Patch; name: string };
 }
 export interface EditorState extends Document {
+  checkpoint?: Document;
   past: Document[];
   future: Document[];
   workspace: Workspace;
@@ -63,6 +64,9 @@ export function initialDocument(): Document {
   });
 }
 export type Action =
+  | { type: "begin" }
+  | { type: "commit" }
+  | { type: "cancel" }
   | { type: "edit"; edit: (doc: Document) => Document; record?: boolean }
   | { type: "undo" }
   | { type: "redo" }
@@ -94,6 +98,14 @@ function sameData(a: unknown, b: unknown): boolean {
   );
 }
 export function reducer(s: EditorState, a: Action): EditorState {
+  if (a.type === "begin")
+    return s.checkpoint ? s : { ...s, checkpoint: snapshotDocument(s) };
+  if (a.type === "commit") return settle(s);
+  if (a.type === "cancel") return cancel(s);
+  if (s.checkpoint) {
+    if (a.type === "undo" || a.type === "redo") return cancel(s);
+    if (a.type !== "edit" && a.type !== "tool") s = settle(s);
+  }
   if (a.type === "workspace") return { ...s, workspace: a.workspace };
   if (a.type === "tool") return { ...s, tool: a.tool };
   if (a.type === "select")
@@ -142,9 +154,23 @@ export function reducer(s: EditorState, a: Action): EditorState {
     ...s,
     ...next,
     past:
-      a.record === false ? s.past : [...s.past, snapshotDocument(s)].slice(-30),
-    future: [],
+      a.record === false || s.checkpoint
+        ? s.past
+        : [...s.past, snapshotDocument(s)].slice(-30),
+    future: s.checkpoint ? s.future : [],
   };
+}
+function settle(s: EditorState): EditorState {
+  if (!s.checkpoint) return s;
+  const { checkpoint, ...rest } = s;
+  return sameData(snapshotDocument(s), checkpoint)
+    ? rest
+    : { ...rest, past: [...s.past, checkpoint].slice(-30), future: [] };
+}
+function cancel(s: EditorState): EditorState {
+  if (!s.checkpoint) return s;
+  const { checkpoint, ...rest } = s;
+  return { ...rest, ...projectDocument(checkpoint) };
 }
 /** patch/patchName are the selected sound projection, never a second source of truth. */
 export function projectDocument(doc: Document): Document {
