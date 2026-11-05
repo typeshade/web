@@ -44,6 +44,7 @@ async function legacyStatus(api, requireDisabled) {
     if (!Array.isArray(runs.workflow_runs) || runs.total_count !== 0 || runs.workflow_runs.length)
       throw new Error(`Legacy publisher has ${status} runs, or its run list cannot be verified.`);
   }
+  return workflow.state;
 }
 export async function cutover(mode, api = github, env = process.env) {
   if (!['setup', 'verify'].includes(mode)) throw new Error('Choose setup or verify.');
@@ -51,7 +52,7 @@ export async function cutover(mode, api = github, env = process.env) {
     throw new Error('TypeAudio production cutover requires typeshade/web main.');
   let current = (await environments(api)).find(item => item.name === environment);
   if (mode === 'setup') {
-    await legacyStatus(api, false);
+    const legacyState = await legacyStatus(api, false);
     if (!current) {
       await api(`repos/${repository}/environments/${environment}`, 'PUT', {
         deployment_branch_policy: { protected_branches: false, custom_branch_policies: true },
@@ -64,7 +65,7 @@ export async function cutover(mode, api = github, env = process.env) {
     if (!rules.length) await api(`repos/${repository}/environments/${environment}/deployment-branch-policies`, 'POST', { name: 'main', type: 'branch' });
     const problems = environmentProblems(current, await policies(api));
     if (problems.length) throw new Error(problems.join('; '));
-    await api(`${legacy}/disable`, 'PUT');
+    if (legacyState !== 'disabled_manually') await api(`${legacy}/disable`, 'PUT');
   }
   const problems = environmentProblems(current, current ? await policies(api) : []);
   if (problems.length) throw new Error(problems.join('; '));
