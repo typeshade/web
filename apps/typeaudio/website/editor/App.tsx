@@ -13,7 +13,15 @@ import {
 import { Composition } from "./components/Composition.tsx";
 import { Timeline } from "./components/Timeline.tsx";
 import { Inspector } from "./components/Inspector.tsx";
+import { useWorkspaceLayout } from "./layout.tsx";
+import {
+  openContext,
+  useInteractions,
+  type MenuItem,
+} from "./interactions.tsx";
 export function App() {
+  const layout = useWorkspaceLayout();
+  const { openMenu } = useInteractions();
   const e = useEditor(),
     [module, setModule] = useState("source"),
     picture = e.state.workspace === "picture";
@@ -21,12 +29,79 @@ export function App() {
     <WorkspaceShell editor={e}>
       <main
         id="editor-main"
-        className={`workspace ${picture ? "picture-workspace" : "sound-workspace"}`}
+        tabIndex={-1}
+        className={`workspace ${picture ? "picture-workspace" : "sound-workspace"} ${layout.focused ? "viewer-focused" : ""}`}
         data-workspace={e.state.workspace}
       >
         <ProjectPanel editor={e} />
-        <Splitter axis="x" variable="--project-width" min={170} max={380} />
-        <div className="viewer-region">
+        <Splitter dimension="project" />
+        <div
+          className="viewer-region"
+          onContextMenu={(event) => {
+            if (
+              event.target instanceof Element &&
+              event.target.closest(
+                "button,input,select,textarea,video,iframe,a",
+              )
+            )
+              return;
+            const items: MenuItem[] = picture
+              ? [
+                  {
+                    label: "Import video…",
+                    action: () => e.videoInput.current?.click(),
+                  },
+                ]
+              : [
+                  {
+                    label: "Waveform",
+                    checked: !e.spectrum,
+                    action: () => e.setSpectrum(false),
+                  },
+                  {
+                    label: "Spectrum",
+                    checked: e.spectrum,
+                    action: () => e.setSpectrum(true),
+                  },
+                  {
+                    label: "Monitor before FX",
+                    checked: e.dry,
+                    action: () => e.setDry(!e.dry),
+                  },
+                  { separator: true },
+                  {
+                    label: "Render current sound",
+                    disabled: e.busy,
+                    action: () => {
+                      e.setMode("render");
+                      void e.render();
+                    },
+                  },
+                  {
+                    label: "Export WAV…",
+                    disabled: !e.rendered,
+                    action: e.exportSound,
+                  },
+                ];
+            openContext(
+              event,
+              openMenu,
+              "viewer",
+              picture ? "Composition actions" : "Monitor actions",
+              [
+                ...items,
+                { separator: true },
+                {
+                  label: "Focus viewer",
+                  shortcut: "F",
+                  checked: layout.focused,
+                  disabled: innerWidth <= 950,
+                  action: () => layout.focus(!layout.focused),
+                },
+              ],
+            );
+          }}
+        >
           <div className="document-view" hidden={picture}>
             <Panel title="Sound / Monitor">
               <SoundMonitor editor={e} />
@@ -36,12 +111,17 @@ export function App() {
             <Composition editor={e} />
           </div>
         </div>
+        <Splitter dimension="inspector" />
         <aside className="inspector-region">
           {picture ? (
             <Inspector editor={e} />
           ) : (
             <>
-              <SoundEditor editor={e} module={module} />
+              <SoundEditor
+                key={e.state.selected || "source"}
+                editor={e}
+                module={module}
+              />
               <Panel title="Sound controls" className="utility-panel">
                 <button
                   onClick={() =>
@@ -63,7 +143,7 @@ export function App() {
             </>
           )}
         </aside>
-        <Splitter axis="y" variable="--timeline-height" min={190} max={480} />
+        <Splitter dimension="dock" />
         <div className="dock-region">
           {picture ? (
             <Timeline editor={e} />
@@ -97,7 +177,7 @@ export function App() {
                   <Variations editor={e} />
                 </div>
                 <div className="sound-summary">
-                  <h3>Source</h3>
+                  <h3>{e.selected ? "Selected layer" : "Source"}</h3>
                   <span>{e.state.patchName}</span>
                   <p>
                     {e.state.patch.voices} voices ·{" "}

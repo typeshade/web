@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { DIMENSIONS, useWorkspaceLayout, type Dimension } from "../layout.tsx";
 import type { ReactNode } from "react";
 export function Panel({
   title,
@@ -69,65 +71,98 @@ export function Icon({
     </svg>
   );
 }
-export function Splitter({
-  axis,
-  variable,
-  min,
-  max,
-}: {
-  axis: "x" | "y";
-  variable: string;
-  min: number;
-  max: number;
-}) {
-  function change(delta: number) {
-    const root = document.documentElement;
-    const initial = parseFloat(
-      getComputedStyle(root).getPropertyValue(variable),
-    );
-    root.style.setProperty(
-      variable,
-      `${Math.max(min, Math.min(max, initial + delta))}px`,
-    );
+export function Splitter({ dimension }: { dimension: Dimension }) {
+  const layout = useWorkspaceLayout(),
+    config = DIMENSIONS[dimension],
+    axis = dimension === "dock" ? "y" : "x",
+    direction = dimension === "project" ? 1 : -1;
+  const drag = useRef<
+    | {
+        pointer: number;
+        start: number;
+        initial: number;
+        override: number | undefined;
+      }
+    | undefined
+  >(undefined);
+  function end(cancel = false) {
+    const d = drag.current;
+    if (!d) return;
+    drag.current = undefined;
+    if (cancel) layout.set(dimension, d.override);
+    else layout.save();
   }
   return (
     <div
-      className={`splitter splitter-${axis}`}
+      className={`splitter splitter-${axis} splitter-${dimension}`}
       role="separator"
-      aria-label={axis === "x" ? "Resize project panel" : "Resize timeline"}
+      aria-label={config.label}
       aria-orientation={axis === "x" ? "vertical" : "horizontal"}
+      aria-valuemin={config.min}
+      aria-valuemax={config.max}
+      aria-valuenow={layout.size(dimension)}
+      data-tooltip={`${config.label}. Drag or use arrow keys. Double-click to reset.`}
       tabIndex={0}
+      onDoubleClick={() => {
+        layout.set(dimension, undefined);
+        layout.save();
+      }}
       onKeyDown={(event) => {
+        if (event.key === "Escape" && drag.current) {
+          event.preventDefault();
+          end(true);
+          return;
+        }
         if (
-          ["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"].includes(
-            event.key,
-          )
+          [
+            "ArrowLeft",
+            "ArrowRight",
+            "ArrowUp",
+            "ArrowDown",
+            "Home",
+            "End",
+          ].includes(event.key)
         ) {
           event.preventDefault();
-          change(["ArrowLeft", "ArrowUp"].includes(event.key) ? -10 : 10);
+          const delta =
+            (["ArrowLeft", "ArrowUp"].includes(event.key) ? -10 : 10) *
+            direction;
+          layout.set(
+            dimension,
+            event.key === "Home"
+              ? config.min
+              : event.key === "End"
+                ? config.max
+                : layout.size(dimension) + delta,
+          );
+          layout.save();
         }
       }}
       onPointerDown={(event) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        event.currentTarget.focus();
         event.currentTarget.setPointerCapture(event.pointerId);
-        const start = axis === "x" ? event.clientX : event.clientY,
-          initial = parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue(
-              variable,
-            ),
-          );
-        const node = event.currentTarget;
-        node.onpointermove = (e) => {
-          const delta = (axis === "x" ? e.clientX : e.clientY) - start;
-          document.documentElement.style.setProperty(
-            variable,
-            `${Math.max(min, Math.min(max, initial + (axis === "y" ? -delta : delta)))}px`,
-          );
-        };
-        node.onpointerup = () => {
-          node.onpointermove = null;
-          node.onpointerup = null;
+        drag.current = {
+          pointer: event.pointerId,
+          start: axis === "x" ? event.clientX : event.clientY,
+          initial: layout.size(dimension),
+          override: layout.sizes[dimension],
         };
       }}
+      onPointerMove={(event) => {
+        const d = drag.current;
+        if (d)
+          layout.set(
+            dimension,
+            d.initial +
+              ((axis === "x" ? event.clientX : event.clientY) - d.start) *
+                direction,
+          );
+      }}
+      onPointerUp={() => end()}
+      onPointerCancel={() => end(true)}
+      onLostPointerCapture={() => end(true)}
     />
   );
 }

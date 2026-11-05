@@ -1,6 +1,7 @@
 @import "@typeshade/site-ui/tokens.css";
 :root {
   --project-width: 228px;
+  --inspector-width: 300px;
   --timeline-height: 270px;
 }
 #root {
@@ -22,7 +23,7 @@
   background: var(--bg);
   color: var(--text);
   font:
-    12px/1.45 Arial,
+    12px/1.45 Plex,
     Helvetica,
     sans-serif;
   overflow: hidden;
@@ -443,7 +444,7 @@
 }
 .workspace {
   display: grid;
-  grid-template-columns: var(--project-width) 4px minmax(200px, 1fr) 280px;
+  grid-template-columns: min(var(--project-width),28vw) 4px minmax(180px, 1fr) 4px min(var(--inspector-width),32vw);
   grid-template-rows: minmax(160px, 1fr) 4px var(--timeline-height);
   flex: 1;
   gap: 2px;
@@ -476,7 +477,7 @@
   font-size: 11px;
 }
 .panel-header::after {
-  content: "≡";
+  content: none;
   color: #929292;
   margin-left: 5px;
   font-size: 12px;
@@ -653,7 +654,7 @@
   overflow: hidden;
 }
 .inspector-region {
-  grid-column: 4;
+  grid-column: 5;
   grid-row: 1/-1;
   display: flex;
   flex-direction: column;
@@ -1429,10 +1430,11 @@
 @media (max-width: 1200px) {
   :root {
     --project-width: 195px;
+    --inspector-width: 250px;
     --timeline-height: 260px;
   }
   .workspace {
-    grid-template-columns: var(--project-width) 4px minmax(180px, 1fr) 250px;
+    grid-template-columns: min(var(--project-width),28vw) 4px minmax(180px, 1fr) 4px min(var(--inspector-width),32vw);
   }
   .sound-dock-controls {
     grid-template-columns: 1fr 1fr;
@@ -1767,3 +1769,51 @@
     display: none;
   }
 }
+
+/* Shared editor interactions: overlays keep their own theme outside the app portal. */
+.studio-context-menu, .studio-tooltip {
+  position: fixed;
+  z-index: 1000;
+  color-scheme: dark;
+  color: #e2e5e9;
+  font: 12px/1.45 Plex, var(--ui-font-sans);
+  background: #303237;
+  border: 1px solid #50535b;
+  border-radius: var(--ui-radius-sm);
+  box-shadow: 0 10px 30px #0008, 0 1px 3px #0008;
+}
+.studio-context-menu { min-width: 220px; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow: auto; padding: 5px; }
+.studio-context-menu button { width:100%; display:flex; align-items:center; gap:8px; min-height:30px; padding:6px 9px; background:transparent; border:0; border-radius:2px; color:inherit; font:inherit; text-align:left; cursor:pointer; white-space:nowrap; }
+.studio-context-menu button:hover:not(:disabled), .studio-context-menu button:focus-visible { background:#465f82; color:#fff; outline:0; }
+.studio-context-menu button:disabled { opacity:.4; cursor:default; }
+.studio-context-menu button.danger { color:#ffb0ab; }
+.studio-context-menu .menu-check { width:13px; flex-shrink:0; color:#acd0ff; }
+.studio-context-menu kbd { margin-left:auto; padding-left:20px; font:10px PlexMono, var(--ui-font-mono); color:#b7bfca; }
+.studio-context-menu [role=separator] { height:1px; background:#484b52; margin:5px 7px; }
+.studio-tooltip { z-index:1100; max-width:min(300px,calc(100vw - 16px)); padding:8px 10px; pointer-events:none; background:#17191deF; line-height:1.55; }
+.splitter-inspector { grid-column:4; grid-row:1/-1; cursor:col-resize; }
+.studio-app .numeric-value { display:inline-flex; align-items:center; justify-content:flex-end; gap:4px; min-width:0; font:10px PlexMono,var(--ui-font-mono); color:#bed6ff; }
+.studio-app .parameter-value { padding:2px 3px; min-height:22px; border:1px solid transparent; color:#bed6ff; font:inherit; background:transparent; cursor:ew-resize; border-radius:2px; }
+.studio-app .parameter-value:hover:not(:disabled) { background:#3a4352; border-color:#576a86; }
+.studio-app input.parameter-number { max-width:88px; min-height:22px; padding:2px 3px; margin:0!important; font:10px PlexMono,var(--ui-font-mono); border-color:#8daedb; color:#e6f0ff; }
+.parameter-unit { font-size:9px; color:#99a8bd; white-space:nowrap; }
+.parameter > label { min-width:0; }
+.audio-clip.dragging { z-index:4; box-shadow:0 0 0 1px #b9d4ff,0 5px 16px #0007; }
+.audio-clip.copying { border-style:dashed; }
+.studio-app .clip-drag-readout { position:absolute; right:5px; top:3px; padding:1px 4px; background:#182b45e8; font:9px PlexMono,var(--ui-font-mono); color:white; }
+.clip-snap-guide { position:absolute; top:0; bottom:0; width:1px; background:#f4c36a; z-index:6; pointer-events:none; box-shadow:0 0 4px #f4c36a77; }
+.timeline-scroll { overscroll-behavior:contain; }
+@media (min-width:951px) {
+  .workspace.viewer-focused { grid-template-columns:0 0 minmax(0,1fr) 0 0; grid-template-rows:minmax(0,1fr) 0 0; gap:0; }
+  .workspace.viewer-focused > :is(.project-panel,.inspector-region,.dock-region,.splitter) { display:none; }
+}
+@media (max-width:950px) {
+  .splitter-inspector,.studio-app .viewer-focus-toggle { display:none; }
+}
+@media (max-width:620px) {
+  .studio-app .app-menubar > :is(#undo,#redo) { display:none; }
+  .studio-app .app-menubar > button { padding-inline:5px; }
+  .studio-context-menu { min-width:200px; }
+}
+.parameter > label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.studio-app input.parameter-number { width:66px; max-width:66px; }

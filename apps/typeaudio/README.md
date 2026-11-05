@@ -90,6 +90,21 @@ These references inform direct sound manipulation and quick comparison; this sit
 is a small sound designer, not a full DAW. Browser performance and end-to-end audio
 latency still require measurement on the user's hardware.
 
+## Editor interactions
+
+Right-click a sound, clip, parameter or viewer for contextual commands. Menus also
+support Shift+F10 on focused sounds/clips, arrows, Home/End, Enter and Escape.
+Hover or focus controls for tooltips. Text fields retain the browser's own menu.
+
+Click a blue property value to type, or drag it horizontally to scrub. Shift gives
+finer scrubbing. Enter commits and Escape cancels numeric entry. Sound property
+and Tone-pad gestures undo as one edit; clip moves commit on release. Alt-drag
+copies a clip, Middle-drag pans, and Snap aligns nearby clip edges and the playhead.
+
+Resize the Project, Properties and lower dock dividers. Arrow keys resize focused
+dividers; double-click resets one size. Sizes persist in this browser. Window →
+Reset layout restores defaults, and F focuses/restores the desktop viewer.
+
 ## Publishing
 
 The TypeAudio CI workflow checks and builds this application. Its artifact is

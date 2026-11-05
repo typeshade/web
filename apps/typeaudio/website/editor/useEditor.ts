@@ -48,7 +48,9 @@ export function useEditor() {
     patchRequest = useRef(0);
   const dispatch = useCallback((action: Action) => {
     if (
-      ["edit", "open", "media", "undo", "redo", "select"].includes(action.type)
+      ["edit", "open", "media", "undo", "redo", "select", "cancel"].includes(
+        action.type,
+      )
     )
       editVersion.current++;
     rawDispatch(action);
@@ -111,6 +113,7 @@ export function useEditor() {
   const latest = useRef({ state, samples, ready: sceneReady, repeat, dry });
   latest.current = { state, samples, ready: sceneReady, repeat, dry };
   const soundGeneration = useRef(0),
+    sceneAction = useRef(0),
     looping = useRef(false),
     snapshots = useRef({ a: { ...DEFAULT }, b: { ...DEFAULT } });
   const stopSound = useCallback(() => {
@@ -121,6 +124,7 @@ export function useEditor() {
     setBusy(false);
   }, []);
   const stopScene = useCallback(() => {
+    sceneAction.current++;
     transport.current.stop();
     setPosition(transport.current.current());
     setPlaying(false);
@@ -200,6 +204,7 @@ export function useEditor() {
   }, [state.scene.original, state.scene.effects]);
   const playScene = useCallback(
     async (restart = false) => {
+      sceneAction.current++;
       try {
         if (!latest.current.ready)
           throw new Error("Wait for sound clips to prepare.");
@@ -248,6 +253,7 @@ export function useEditor() {
   }, [finishScene]);
   useEffect(() => {
     const stop = () => {
+      sceneAction.current++;
       sound.current.stop();
       transport.current.stop();
       setLive(false);
@@ -261,7 +267,6 @@ export function useEditor() {
     };
   }, []);
   function patch(changes: Partial<Patch>, name?: string) {
-    setMorphState(undefined);
     dispatch({ type: "edit", edit: (d) => updatePatch(d, changes, name) });
   }
   function scene(edit: (current: Scene) => Scene, record = true, pause = true) {
@@ -306,20 +311,19 @@ export function useEditor() {
     });
     setNotice("Sound clip added at playhead.");
   }
-  function deleteCue() {
-    const id = state.selected;
+  function deleteCueById(id: string) {
     scene((current) => ({
       ...current,
       cues: current.cues.filter((c) => c.id !== id),
     }));
   }
-  function duplicate() {
+  function duplicateCue(target: string, at?: number) {
     const id = crypto.randomUUID();
     stopScene();
     dispatch({
       type: "edit",
       edit: (d) => {
-        const c = d.scene.cues.find((c) => c.id === d.selected);
+        const c = d.scene.cues.find((c) => c.id === target);
         if (!c || d.scene.cues.length >= MAX_CUES) return d;
         return {
           ...d,
@@ -331,7 +335,7 @@ export function useEditor() {
               {
                 ...structuredClone(c),
                 id,
-                time: Math.min(3600, c.time + 0.25),
+                time: Math.max(0, Math.min(3600, at ?? c.time + 0.25)),
               },
             ],
           },
@@ -339,13 +343,47 @@ export function useEditor() {
       },
     });
   }
-  async function startLive() {
+  const [renameRequest, setRenameRequest] = useState<{
+    id: string;
+    nonce: number;
+  }>();
+  function renameCue(id: string) {
+    dispatch({ type: "select", id });
+    workspace("picture");
+    setRenameRequest({ id, nonce: performance.now() });
+  }
+  async function auditionCue(id: string) {
+    stopScene();
+    const generation = sceneAction.current;
+    try {
+      await transport.current.audio.unlock();
+      const current = latest.current,
+        cue = current.state.scene.cues.find((c) => c.id === id),
+        pcm = current.samples.get(id);
+      if (generation !== sceneAction.current || !current.ready || !cue || !pcm)
+        return;
+      transport.current.audio.schedule(
+        {
+          ...current.state.scene,
+          start: 0,
+          end: pcm.length / SAMPLE_RATE,
+          cues: [{ ...cue, time: 0, muted: false }],
+        },
+        current.samples,
+        0,
+      );
+      setNotice("Auditioning selected clip.");
+    } catch (error) {
+      if (generation === sceneAction.current) setNotice(String(error));
+    }
+  }
+  async function startLive(override?: Patch) {
     stopSound();
     const generation = soundGeneration.current;
     try {
       setBusy(true);
       await sound.current.start(
-        state.patch,
+        override ?? state.patch,
         repeat,
         dry,
         (frames, revision) => setMeter({ frames, revision }),
@@ -355,7 +393,11 @@ export function useEditor() {
         },
       );
       if (generation !== soundGeneration.current) return;
-      sound.current.update(latest.current.state.patch,latest.current.repeat,latest.current.dry);
+      sound.current.update(
+        latest.current.state.patch,
+        latest.current.repeat,
+        latest.current.dry,
+      );
       setLive(true);
       setBusy(false);
       setNotice("Live on CPU. Controls update the running sound.");
@@ -576,6 +618,7 @@ export function useEditor() {
   function snapshot(action: "store" | "recall", slot: "a" | "b") {
     if (action === "store") {
       snapshots.current[slot] = { ...state.patch };
+      setMorphState({ value: slot === "a" ? 0 : 1, key: patchKey });
       setNotice(`Stored variation ${slot.toUpperCase()}.`);
     } else {
       patch({ ...snapshots.current[slot] });
@@ -635,8 +678,16 @@ export function useEditor() {
     scene,
     cue,
     addCue,
-    deleteCue,
-    duplicate,
+    deleteCue: () => deleteCueById(state.selected),
+    deleteCueById,
+    duplicate: () => duplicateCue(state.selected),
+    duplicateCue,
+    renameCue,
+    renameRequest,
+    auditionCue,
+    beginEdit: () => dispatch({ type: "begin" }),
+    endEdit: () => dispatch({ type: "commit" }),
+    cancelEdit: () => dispatch({ type: "cancel" }),
     startLive,
     render,
     seek,
