@@ -27,7 +27,7 @@ export function App() {
     [module, setModule] = useState("source"),
     picture = e.state.workspace === "picture";
   const [selection, setSelection] = useState({ owner: "", id: "base" }),
-    owner = e.state.selected || "source";
+    owner = (e.selected?.audio ? "" : e.state.selected) || "source";
   const sourceId = selection.owner === owner ? selection.id : "base",
     layer = e.state.patch.layers.find((l) => l.id === sourceId);
   const selectSource = (id: string) => {

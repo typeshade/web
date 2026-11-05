@@ -389,3 +389,53 @@ pauses the transport and snapshots one scheduling batch before replaying it, so
 later drift reschedules cannot be counted twice while the asynchronous render runs.
 The deployed preview commands remain within 1 LSB of the exported WAV at all three
 clock positions tested.
+
+## Imported audio clips — 2026-11-05
+
+Project → Audio accepts local recordings for Picture compositions. Import adds a
+clip at the playhead; dropping a file on a timeline row uses that position. Library
+items support audition, drag/drop, a dedicated add button and pointer/keyboard
+context menus for WAV export and removal. Imported clips share trim, fade, split,
+gain, mute and multiple-selection operations with procedural clips. Their source
+duration and waveform come from decoded PCM, and missing audio never falls back to
+the cue's compatibility patch. Sound keeps the independent procedural source draft
+when an imported clip is selected; Use in Picture adds it as another layer.
+
+Mono/stereo files are limited to 10 ms–30 seconds and 25 MiB. Browser decoding
+resamples to 48 kHz and averages stereo to mono; format support depends on the
+browser. The library allows 24 distinct sources and 120 seconds total. SHA-256 of
+canonical float PCM identifies shared sources. IndexedDB stores samples separately
+from the small references in document history. AudioBuffer caching is bounded.
+Files are never uploaded. Sound-rack filters/effects, stereo output and sample
+oscillator voices are outside this change.
+
+Export project includes each referenced source once as float PCM in version-1 JSON;
+video still needs re-selection. Import validates the full bundle and its checksums
+before a single storage transaction, then opens the scene only if no newer edit
+superseded the request. Files are limited to 40 MiB. Slow audio imports can populate
+the library without overwriting newer composition edits. Missing sources can be
+restored by importing the original file or opening a bundled project. Decode and
+storage failures leave the document unchanged. Removal is disabled for sources in
+the current composition, undo/redo history or active gesture checkpoint.
+
+The English review covers the Audio library, file menus, timeline import controls,
+clip properties, tooltips, validation/recovery messages and README instructions.
+Desktop and 390 px screenshots were inspected for panel layout and overflow. This
+is a bounded editor review; imported engine documentation and translations were
+not changed. Engine/compiler pins and upstream runtime sources are unchanged.
+
+Unit coverage verifies exact float PCM round trips across base64 chunk boundaries,
+content identity, corrupt/oversized data rejection, scene references and independent
+source Tone/Undo behavior. A new browser suite imports an actual 44.1 kHz stereo WAV,
+checks the 48 kHz mono result, and compares trimmed/faded export against independently
+calculated samples (maximum 1 LSB difference in 16-bit WAV). Splitting preserves the
+WAV exactly, and these edits start no synthesis workers. Mixed procedural/imported
+projects produce identical exports after reload and in an empty browser context.
+The suite also checks actual library dragging, damaged and missing source recovery,
+duration rejection, delayed decode with intervening edits, simulated storage quota
+failure and removal protection across undo history.
+
+Local shader/TypeScript checks, 55 unit tests, production build, CSS/scope checks
+and all seven browser suites pass. Existing Tone persistence, CPU/WebGPU rendering,
+device-loss recovery, Live processing and timeline preview/WAV checks also pass.
+This evidence does not establish hardware audio latency or support for every codec.

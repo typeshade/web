@@ -10,10 +10,11 @@ export function clipItems(e: Editor, cue: Cue, ids = [cue.id]): MenuItem[] {
       action: () => void e.auditionCue(cue.id),
     },
     {
-      label: "Edit sound",
+      label: cue.audio ? "Clip properties" : "Edit sound",
       action: () => {
         e.selectCue(cue.id);
-        e.workspace("sound");
+        if (cue.audio) e.renameCue(cue.id);
+        else e.workspace("sound");
       },
     },
     { label: "Rename…", action: () => e.renameCue(cue.id) },

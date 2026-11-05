@@ -5,7 +5,9 @@ import {
   fadePoints,
   type Scene,
 } from "./video-model.ts";
+import { AudioLibrary } from "./editor/audio-library.ts";
 export class CueAudio {
+  readonly assets = new AudioLibrary();
   context: AudioContext | undefined;
   private cache = new Map<string, Float32Array>();
   private buffers = new Map<string, AudioBuffer>();
@@ -80,7 +82,12 @@ export class CueAudio {
   async prepare(scene: Scene): Promise<Map<string, Float32Array>> {
     const result = new Map<string, Float32Array>();
     for (const cue of scene.cues)
-      result.set(cue.id, await this.render(cue.patch));
+      result.set(
+        cue.id,
+        cue.audio
+          ? await this.assets.read(cue.audio)
+          : await this.render(cue.patch),
+      );
     return result;
   }
   setLevel(level: number): void {
@@ -118,11 +125,16 @@ export class CueAudio {
       if (!pcm) continue;
       const window = cueWindow(cue, pcm.length / SAMPLE_RATE, at, scene.end);
       if (!window) continue;
-      const key = JSON.stringify(cue.patch);
+      const key = cue.audio
+        ? `audio:${cue.audio.id}`
+        : JSON.stringify(cue.patch);
       let buffer = this.buffers.get(key);
       if (!buffer) {
         buffer = ctx.createBuffer(1, pcm.length, SAMPLE_RATE);
         buffer.copyToChannel(new Float32Array(pcm), 0);
+        // Imported sources can leave the library while this transport stays alive.
+        if (this.buffers.size >= 32)
+          this.buffers.delete(this.buffers.keys().next().value!);
         this.buffers.set(key, buffer);
       }
       const source = ctx.createBufferSource(),
@@ -156,6 +168,7 @@ export class CueAudio {
   }
   close(): void {
     this.closed = true;
+    this.assets.close();
     this.stop();
     this.abort?.();
     this.worker?.terminate();

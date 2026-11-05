@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import type { Editor } from "../useEditor.ts";
+import { validateAudioRef } from "../../audio-asset.ts";
 import { validatePatch } from "../../designer.ts";
 import { Panel, Icon } from "./Panel.tsx";
 import { openContext, useInteractions } from "../interactions.tsx";
@@ -22,6 +23,38 @@ export function Timeline({ editor: e }: { editor: Editor }) {
       scene.start +
       Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)) * span
     );
+  }
+  function drop(event: React.DragEvent<HTMLElement>, at: number) {
+    event.preventDefault();
+    try {
+      if (event.dataTransfer.files.length) {
+        if (event.dataTransfer.files.length !== 1)
+          throw new Error("Import one audio file at a time.");
+        void e.importAudio(event.dataTransfer.files[0]!, at);
+        return;
+      }
+      const audio = event.dataTransfer.getData("application/typeaudio-audio");
+      if (audio) {
+        const ref = validateAudioRef(JSON.parse(audio));
+        const asset = e.audioAssets.find(
+          (a) => a.id === ref.id && a.frames === ref.frames,
+        );
+        if (!asset)
+          throw new Error("Import this audio into the Audio library first.");
+        e.addAudioCue(asset, at);
+        return;
+      }
+      const value = JSON.parse(
+        event.dataTransfer.getData("application/typeaudio-sound"),
+      );
+      e.seek(at);
+      e.addCue({
+        name: String(value.name).slice(0, 100),
+        patch: validatePatch(value.patch),
+      });
+    } catch (error) {
+      e.setNotice(String(error));
+    }
   }
   return (
     <Panel
@@ -67,6 +100,14 @@ export function Timeline({ editor: e }: { editor: Editor }) {
         >
           <Icon name="plus" />
           Add sound at playhead
+        </button>
+        <button
+          id="timeline-import-audio"
+          disabled={e.audioImporting}
+          onClick={() => e.audioInput.current?.click()}
+          data-tooltip="Import an audio file at the playhead. WAV, MP3, Ogg and FLAC depend on browser support."
+        >
+          Import audio…
         </button>
         <button
           id="split-cue"
@@ -272,23 +313,7 @@ export function Timeline({ editor: e }: { editor: Editor }) {
                       ],
                     );
                   }}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    try {
-                      const value = JSON.parse(
-                        event.dataTransfer.getData(
-                          "application/typeaudio-sound",
-                        ),
-                      );
-                      e.seek(timeAt(event));
-                      e.addCue({
-                        name: String(value.name).slice(0, 100),
-                        patch: validatePatch(value.patch),
-                      });
-                    } catch (error) {
-                      e.setNotice(String(error));
-                    }
-                  }}
+                  onDrop={(event) => drop(event, timeAt(event))}
                 >
                   <TimelineClip
                     cue={cue}
@@ -314,23 +339,18 @@ export function Timeline({ editor: e }: { editor: Editor }) {
                 ])
               }
               onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => {
-                event.preventDefault();
-                try {
-                  const value = JSON.parse(
-                    event.dataTransfer.getData("application/typeaudio-sound"),
-                  );
-                  e.addCue({
-                    name: String(value.name).slice(0, 100),
-                    patch: validatePatch(value.patch),
-                  });
-                } catch (error) {
-                  e.setNotice(String(error));
-                }
-              }}
+              onDrop={(event) => drop(event, e.transport.current())}
             >
               <Icon name="sound" />
-              <span>Add a sound or drag one from the Project panel.</span>
+              <span>
+                Add a sound, import audio, or drag a file onto the timeline.
+              </span>
+              <button
+                disabled={e.audioImporting}
+                onClick={() => e.audioInput.current?.click()}
+              >
+                Import audio…
+              </button>
             </div>
           )}
           <div className="timeline-cursor-space">
