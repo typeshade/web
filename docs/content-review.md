@@ -111,3 +111,7 @@ The original three-site review and production ownership above are unchanged.
 The video scene studio follow-up has a separate bounded English UI review and
 actual local-video/PCM browser checks in the same TypeAudio review record. No
 new translated or full imported-document review is claimed by this addition.
+
+The subsequent [component workspace review](reviews/typeaudio-component-workspace.md)
+records the owner-directed Photoshop/After Effects layout and interaction redesign,
+its component boundaries, reviewed English surfaces and validation scope.
