@@ -146,3 +146,8 @@ limits, actual browser audio checks and measured graph computation.
 The Atomic Design refactor has a bounded review in that same record. It covers
 the editor architecture guide and revised README, retained UI wording, component
 and controller boundaries, unchanged compiled CSS and browser regression evidence.
+
+The node workspace follow-up adds a bounded English review for searchable node
+creation, multi-selection, connection editing, framing and keyboard help. Its
+component review records pure edit-operation tests and real browser gesture,
+audio and persistence coverage.

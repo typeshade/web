@@ -553,3 +553,54 @@ actual CPU/WebGPU rendering, Live audio, graph compilation, Tone persistence,
 context menus/tooltips, resize/drag/Undo, video transport, imported audio and
 portable project/WAV round trips. This is behavior-preservation evidence; it adds
 no new hardware-latency or real-time guarantee.
+
+## Node workspace editing — 2026-11-06
+
+The graph viewer now supports searching the node catalog, marquee and additive
+selection, group movement/duplication/deletion, grid snapping and automatic DAG
+layout. Search opens from Add node, empty-space double-click, Tab on the canvas or
+Shift+A. Each result explains its purpose and category. Connected searches filter
+incompatible nodes and expose capacity limits. New cards are placed near the
+requested position without covering existing nodes. Recipes live in the toolbar
+and restore a useful initial selection after replacement.
+
+Ports accept pointer and keyboard connections in either direction. An occupied
+input retains its applied wire until reconnection succeeds. Compatible targets
+are highlighted; signal mismatches and cycles are rejected before compilation.
+Dropping a cable on empty space opens a compatible search. Wires have a wider
+pointer target, keyboard focus and context actions for disconnecting or inserting
+a node. Selection, connection previews and search cancellation do not modify the
+applied network. Group copies remap internal connections and retain external
+inputs; group deletion protects Output. Each drag, insertion and group edit uses
+the existing document history. Escape cancels a gesture. The code panel now
+handles an empty selection after deletion or Undo.
+
+Fit all / Home frames the network, Frame / F frames selected nodes, and wheel
+zoom keeps the pointer's graph position fixed. Zoom buttons use the viewer center.
+Middle-drag, Alt-drag and the Hand tool pan. Resizing and monitor switches retain
+the session view, with memory bounded to 32 source owners. Grid density adapts at
+low zoom; the responsive viewer has room for its toolbar and help text. Node
+headers, connected/empty ports and wire selection have distinct visual states.
+
+The Atomic Design boundaries remain in place. Selection, compilation, viewport,
+gestures, connections, keyboard commands and search have separate controllers.
+Ports, wires and view controls have individual component files. Pure graph
+operations and UI placement are separately tested. The compiler, audio processing
+loops, file format, engine/compiler pins, 16-node limit and two-Code limit are
+unchanged. Subgraphs, stereo routing and arbitrary feedback remain unimplemented.
+
+The bounded English review covers node search/results, toolbar and wire menus,
+selection properties, connection hints, keyboard help, limits and the updated
+README/architecture guide. Desktop and 390 px screenshots were inspected. This
+does not extend the imported-document or translation review.
+
+Validation includes shader/TypeScript and architecture checks, 72 unit tests and
+nine browser suites. New coverage exercises actual pointer/keyboard search,
+marquee and group gestures, internal-wire copying, Output protection, wire
+selection/context insertion, reconnection cancellation, invalid-target feedback,
+connected creation, compilation reuse, history, view retention and mobile bounds.
+The 320 px and 390 px checks also verify that canvas help and zoom controls fit
+inside the responsive panel.
+The existing graph suite verifies real Live/finite/Picture audio and stale compile
+protection; the wider suites retain Tone, imported audio, timeline and CPU/WebGPU
+regressions. This change makes no new real-time or device-latency claim.

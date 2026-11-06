@@ -29,6 +29,7 @@
 @import "./features/audio-library.css";
 @import "./graph/canvas.css";
 @import "./graph/node.css";
+@import "./graph/picker.css";
 @import "./graph/viewer.css";
 @import "./graph/inspector.css";
 @import "./graph/code.css";

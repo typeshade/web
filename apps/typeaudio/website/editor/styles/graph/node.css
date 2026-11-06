@@ -102,3 +102,53 @@
   padding: 7px 9px;
   border-top: 1px solid #ffffff08;
 }
+.graph-node.primary-selection {
+  box-shadow:
+    0 0 0 2px #a1c3f4,
+    0 4px 14px #0005;
+}
+.graph-node-title {
+  border-left: 3px solid #73859b;
+}
+.graph-node[data-node-kind="noise"] .graph-node-title,
+.graph-node[data-node-kind="oscillator"] .graph-node-title {
+  border-left-color: #8dbbc6;
+}
+.graph-node[data-node-kind="code"] .graph-node-title {
+  border-left-color: #ba9fce;
+}
+.graph-node[data-node-kind="parameter"] .graph-node-title {
+  border-left-color: #d5bb80;
+}
+.graph-node[data-node-kind="output"] .graph-node-title {
+  border-left-color: #8db39c;
+}
+.graph-node-caption {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.graph-port:not(.connected) i {
+  background: #303235;
+  border-color: #9cb7d8;
+}
+.graph-port.control:not(.connected) i {
+  border-color: #d5bb80;
+}
+.studio-app .graph-port[aria-pressed="true"],
+.studio-app .graph-port.compatible {
+  color: #deedff;
+}
+.graph-port.compatible i {
+  outline: 2px solid #b6d3fc;
+  outline-offset: 2px;
+}
+.studio-app .graph-port.incompatible {
+  opacity: 0.35;
+}
+.graph-selection-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 4px;
+}

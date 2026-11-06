@@ -1,51 +1,74 @@
-import { useState } from "react";
-import type { GraphEditor } from "../../../hooks/graph/useGraphEditor.ts";
-import { DEFINITIONS } from "../../../../graph/catalog.ts";
-import { type NodeKind } from "../../../../graph/types.ts";
-import type { GraphViewport } from "../../../hooks/graph/useGraphViewport.ts";
 export function GraphToolbar({
-  controller: c,
-  viewport,
+  count,
+  selected,
+  busy,
+  snap,
+  onSnap,
+  onAdd,
+  onArrange,
+  onRecipe,
 }: {
-  controller: GraphEditor;
-  viewport: GraphViewport;
+  count: number;
+  selected: number;
+  busy: boolean;
+  snap: boolean;
+  onSnap: (snap: boolean) => void;
+  onAdd: () => void;
+  onArrange: () => void;
+  onRecipe: (recipe: "impact" | "tone") => void;
 }) {
-  const g = c.graph!,
-    { surface, point } = viewport;
-  const [kind, setKind] = useState<NodeKind>("code");
   return (
     <div className="graph-toolbar">
-      <select
-        aria-label="Node type"
-        value={kind}
-        onChange={(event) => setKind(event.target.value as NodeKind)}
-      >
-        {(Object.keys(DEFINITIONS) as NodeKind[])
-          .filter((k) => k !== "output")
-          .map((k) => (
-            <option key={k} value={k}>
-              {DEFINITIONS[k].label}
-            </option>
-          ))}
-      </select>
       <button
         id="add-graph-node"
-        disabled={c.busy || g.nodes.length >= 16}
-        onClick={() => {
-          const r = surface.current!.getBoundingClientRect(),
-            p = point(r.left + r.width / 2, r.top + r.height / 2);
-          c.add(kind, p.x, p.y);
-        }}
+        disabled={busy || count >= 16}
+        onClick={onAdd}
+        data-tooltip="Search source, processor and control nodes. Tab on the canvas or Shift+A opens search."
       >
-        + Add node
+        + Add node <kbd>Tab</kbd>
       </button>
-      <span className="graph-count">{g.nodes.length} / 16 nodes</span>
-      <button disabled={c.busy} onClick={() => c.recipe("impact")}>
-        Impact recipe
+      <button
+        onClick={onArrange}
+        disabled={busy}
+        data-tooltip="Arrange the graph from inputs to output. Undo restores the previous positions."
+      >
+        Arrange
       </button>
-      <button disabled={c.busy} onClick={() => c.recipe("tone")}>
-        Tone recipe
+      <button
+        aria-pressed={snap}
+        onClick={() => onSnap(!snap)}
+        data-tooltip="Snap node movement to the 20-unit grid; group spacing is preserved."
+      >
+        Snap
       </button>
+      <span className="graph-count">
+        {count} / 16 nodes{selected ? ` · ${selected} selected` : ""}
+      </span>
+      <details className="graph-recipes">
+        <summary data-tooltip="Replace the network with a starting recipe. Undo restores your graph.">
+          Recipes
+        </summary>
+        <div>
+          <button
+            disabled={busy}
+            onClick={(event) => {
+              event.currentTarget.closest("details")!.open = false;
+              onRecipe("impact");
+            }}
+          >
+            Impact recipe
+          </button>
+          <button
+            disabled={busy}
+            onClick={(event) => {
+              event.currentTarget.closest("details")!.open = false;
+              onRecipe("tone");
+            }}
+          >
+            Tone recipe
+          </button>
+        </div>
+      </details>
     </div>
   );
 }
