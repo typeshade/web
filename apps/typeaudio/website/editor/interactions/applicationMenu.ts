@@ -1,6 +1,7 @@
 import type { Editor } from "../useEditor.ts";
 import { type MenuItem } from "./types.ts";
 import type { useWorkspaceLayout } from "../hooks/layout/useWorkspaceLayout.ts";
+import { exportGraphSnapshot } from "../../feedback/exportGraphSnapshot.ts";
 
 export function applicationMenu(
   name: "File" | "Edit" | "Window",
@@ -32,6 +33,23 @@ export function applicationMenu(
             id: "save-project",
             shortcut: `${key} S`,
             action: save,
+          },
+          {
+            label: "Export graph reproduction…",
+            id: "export-graph-reproduction",
+            disabled: !e.state.patch.graph,
+            action: () => {
+              try {
+                exportGraphSnapshot(e.state.patch);
+                e.setNotice(
+                  "Exported the applied graph voice. Layer mixing, previous edits and playback timing are not included.",
+                );
+              } catch (error) {
+                e.setNotice(
+                  error instanceof Error ? error.message : String(error),
+                );
+              }
+            },
           },
           { separator: true },
           {

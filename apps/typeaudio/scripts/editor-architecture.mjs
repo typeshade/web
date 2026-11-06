@@ -50,6 +50,8 @@ export function inspectModule(file, code) {
       );
     if (!ts.isImportDeclaration(node) || !runtimeImport(node)) continue;
     const specifier = node.moduleSpecifier.text;
+    if (/\/editor\//.test(file) && specifier === "typeaudio/graph/compiler")
+      errors.push(`The TypeShade compiler belongs in its worker: ${specifier}`);
     if (!specifier.startsWith(".")) continue;
     const target = resolve(dirname(file), specifier).replaceAll("\\", "/");
     dependencies.push(target);
