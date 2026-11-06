@@ -59,6 +59,7 @@ export function CommandPalette({
         }
       }}
       onKeyDown={(event) => {
+        if ((event.target as Element).closest("button")) return;
         if (event.key === "ArrowDown" || event.key === "ArrowUp") {
           event.preventDefault();
           setIndex(

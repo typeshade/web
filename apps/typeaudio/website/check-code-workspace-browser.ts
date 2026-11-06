@@ -81,6 +81,12 @@ try {
       exact: true,
     })
     .waitFor();
+  await p
+    .getByRole("button", { name: "Close command palette", exact: true })
+    .focus();
+  await p.keyboard.press("Enter");
+  await p.getByRole("dialog").waitFor({ state: "hidden" });
+  await p.keyboard.press("Control+p");
   await p.keyboard.press("Escape");
   await command(p, "New procedural sound");
   await p.locator('[data-graph-node="impact"]').waitFor();
