@@ -599,6 +599,8 @@ nine browser suites. New coverage exercises actual pointer/keyboard search,
 marquee and group gestures, internal-wire copying, Output protection, wire
 selection/context insertion, reconnection cancellation, invalid-target feedback,
 connected creation, compilation reuse, history, view retention and mobile bounds.
+The 320 px and 390 px checks also verify that canvas help and zoom controls fit
+inside the responsive panel.
 The existing graph suite verifies real Live/finite/Picture audio and stale compile
 protection; the wider suites retain Tone, imported audio, timeline and CPU/WebGPU
 regressions. This change makes no new real-time or device-latency claim.

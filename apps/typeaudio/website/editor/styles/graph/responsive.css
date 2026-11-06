@@ -33,6 +33,9 @@
   .graph-workspace {
     grid-template-rows: 500px 4px auto auto;
   }
+  .graph-workspace .viewer-region {
+    height: 500px;
+  }
   .graph-workspace .dock-region,
   .graph-dock-panel,
   .graph-dock {

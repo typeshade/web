@@ -67,6 +67,12 @@
 }
 .graph-network > .panel-header .panel-actions {
   gap: 4px;
+  flex-shrink: 0;
+}
+.graph-network > .panel-header h2 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .graph-zoom {
   min-width: 34px;

@@ -338,6 +338,22 @@ try {
     "pitch",
   );
   assert.equal(await p.locator(".graph-recipes").getAttribute("open"), null);
+  for (const width of [390, 320]) {
+    await p.setViewportSize({ width, height: 844 });
+    const panel = await box(p.locator(".graph-network")),
+      footer = await box(p.locator(".graph-footer"));
+    const zoomButton = await box(
+      p.getByRole("button", { name: "Zoom graph in", exact: true }),
+    );
+    assert.ok(
+      footer.y + footer.height <= panel.y + panel.height,
+      "Canvas help must not be clipped by the responsive panel",
+    );
+    assert.ok(
+      zoomButton.x + zoomButton.width <= width,
+      "View controls remain available on narrow screens",
+    );
+  }
   assert.deepEqual(errors, []);
   console.log(
     "PASS node workspace: search/cancel, marquee and group gestures, internal-wire duplication, Undo, wire deletion/insertion, bidirectional reconnection/cancellation, invalid-target feedback, connected creation, layout/compile reuse, view retention, keyboard framing and mobile bounds",
