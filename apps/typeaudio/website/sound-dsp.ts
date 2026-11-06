@@ -1,9 +1,10 @@
-import { SAMPLE_RATE, validatePatch, type Patch } from "./designer.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { validatePatch } from "./sound/validatePatch.ts";
+import { type Patch } from "./sound/types.ts";
 import { LiveDsp } from "./live-dsp.ts";
 import { soundLength, sourceLength } from "./sound-design.ts";
 import { GraphDsp } from "./graph/dsp.ts";
-import { graphKey } from "./graph/model.ts";
-
+import { graphKey } from "./graph/graphIdentity.ts";
 interface Layer {
   id: string;
   dsp: LiveDsp | GraphDsp;
@@ -18,6 +19,7 @@ interface Layer {
   wet: Float32Array;
   dry: Float32Array;
 }
+
 /** Layer allocation and patch validation happen on control messages, never in process(). */
 export class SoundDsp {
   private layers: Layer[] = [];

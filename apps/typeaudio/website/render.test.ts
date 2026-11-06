@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { createDevice } from "typeshade/runtime";
-import { DEFAULT, SAMPLE_RATE, type Patch } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { type Patch } from "./sound/types.ts";
 import { DesignerVoice } from "./designer.shade.ts";
 import { renderPatch, RENDER_BATCH } from "./designer-render.ts";
 

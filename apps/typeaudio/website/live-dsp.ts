@@ -1,6 +1,9 @@
 import { curveAt } from "./sound-design.ts";
 import { LiveVoice } from "./live-voice.ts";
-import { DEFAULT, SAMPLE_RATE, validatePatch, type Patch } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { validatePatch } from "./sound/validatePatch.ts";
+import { type Patch } from "./sound/types.ts";
 const SMOOTH_KEYS = [
   "frequency",
   "blend",

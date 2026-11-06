@@ -1,8 +1,10 @@
 import workletUrl from "./live.worklet.ts?worker&url";
-import type { Patch } from "./designer.ts";
-import { patchPrograms, loadGraphModule } from "./graph/client.ts";
-import { graphKey } from "./graph/model.ts";
+import type { Patch } from "./sound/types.ts";
+import { patchPrograms } from "./graph/preparePatch.ts";
+import { loadGraphModule } from "./graph/loadGraphModule.ts";
+import { graphKey } from "./graph/graphIdentity.ts";
 const modules = new WeakMap<AudioContext, Promise<void>>();
+
 export class LiveAudio {
   private node: AudioWorkletNode | undefined;
   private gain: GainNode | undefined;

@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { DEFAULT, validatePatch, PRESETS } from './designer.ts';
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { validatePatch } from "./sound/validatePatch.ts";
+import { PRESETS } from "./sound/presets.ts";
 import { morphPatch, tonePosition } from './exploration.ts';
 import { LiveDsp } from './live-dsp.ts';
 

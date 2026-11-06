@@ -1,0 +1,46 @@
+.audio-library {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  padding: 10px;
+  gap: 6px;
+}
+.audio-library .asset-list {
+  min-height: 80px;
+  margin: 0 -10px;
+}
+.audio-asset {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.audio-asset .asset-row {
+  flex: 1;
+  min-width: 0;
+}
+.audio-asset .asset-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.audio-asset .asset-row small {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  margin-top: 3px;
+}
+.audio-asset > button:last-child {
+  flex: none;
+  margin-right: 4px;
+}
+.audio-source-name {
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  color: var(--text);
+}
+.timeline-tools {
+  flex-wrap: wrap;
+}
+.empty-layers > button {
+  flex: none;
+}

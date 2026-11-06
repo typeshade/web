@@ -1,0 +1,28 @@
+@media (min-width: 951px) {
+  .workspace.viewer-focused {
+    grid-template-columns: 0 0 minmax(0, 1fr) 0 0;
+    grid-template-rows: minmax(0, 1fr) 0 0;
+    gap: 0;
+  }
+  .workspace.viewer-focused
+    > :is(.project-panel, .inspector-region, .dock-region, .splitter) {
+    display: none;
+  }
+}
+@media (max-width: 950px) {
+  .splitter-inspector,
+  .studio-app .viewer-focus-toggle {
+    display: none;
+  }
+}
+@media (max-width: 620px) {
+  .studio-app .app-menubar > :is(#undo, #redo) {
+    display: none;
+  }
+  .studio-app .app-menubar > button {
+    padding-inline: 5px;
+  }
+  .studio-context-menu {
+    min-width: 200px;
+  }
+}

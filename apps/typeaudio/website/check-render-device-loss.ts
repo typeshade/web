@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright-core";
 import { preview } from "vite";
 import { readdir } from "node:fs/promises";
-import { DEFAULT } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
 import { SOFTWARE_GPU_FLAGS } from "../scripts/browser.ts";
 const server = await preview({
   configFile: "website/vite.config.ts",

@@ -1,6 +1,6 @@
 import { describe,it,expect } from 'vitest';
 import { createDevice } from 'typeshade/runtime';
-import { DEFAULT } from './designer.ts';
+import { DEFAULT } from "./sound/defaultPatch.ts";
 import { LiveDsp } from './live-dsp.ts';
 import { renderPatch } from './designer-render.ts';
 

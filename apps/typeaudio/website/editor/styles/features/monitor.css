@@ -1,0 +1,83 @@
+.sound-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 10px 16px;
+}
+.viewer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 6px;
+}
+.signal-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 90px;
+  background: #1c1d20;
+  border: 1px solid #151515;
+  overflow: hidden;
+}
+.signal-canvas > canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.viewer-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: #84878f;
+  font-size: 11px;
+  background: #1c1d20eb;
+  text-align: center;
+  padding: 20px;
+}
+.viewer-empty > svg {
+  width: 40px;
+  height: 40px;
+  color: #757980;
+  margin-bottom: 8px;
+}
+.viewer-empty strong {
+  font-size: 14px;
+  font-weight: 400;
+  color: #bfc5d0;
+}
+.viewer-empty small {
+  font-size: 9px;
+  margin-top: 2px;
+  color: #858994;
+}
+.studio-app .viewer-empty button {
+  font-size: 10px;
+  margin-top: 5px;
+}
+.axis {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0 10px;
+  font-size: 8px !important;
+  color: #80858d !important;
+}
+.monitor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 9px;
+  color: #aaa;
+}
+.monitor-footer output {
+  font-size: 9px;
+  margin-left: 5px;
+}
+.sound-view .execution {
+  padding-top: 9px;
+}

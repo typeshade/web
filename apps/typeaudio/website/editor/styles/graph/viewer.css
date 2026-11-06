@@ -1,0 +1,27 @@
+.graph-footer {
+  font-size: 9px;
+  color: var(--muted);
+  padding: 5px 9px;
+  border-top: 1px solid var(--border);
+}
+.document-view.has-graph:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+.document-view.has-graph > .panel {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+.graph-view-switch {
+  display: flex;
+  flex-shrink: 0;
+  padding: 4px;
+  gap: 4px;
+  background: #28292c;
+  border-top: 1px solid var(--border);
+}
+.graph-view-switch button[aria-pressed="true"] {
+  color: #b6d3fc;
+  background: #38495f;
+}

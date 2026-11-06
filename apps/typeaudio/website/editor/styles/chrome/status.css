@@ -1,0 +1,33 @@
+.studio-app .status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: #2b2b2b;
+  border-top: 1px solid #111;
+  min-width: 0;
+}
+.status-led {
+  width: 5px;
+  height: 5px;
+  background: #808080;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-led.running {
+  background: #8fafda;
+}
+.studio-app #status {
+  margin: 0;
+  font-size: 10px;
+  min-height: 0;
+  color: #aaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+.status-bar > .mono {
+  font-size: 8px;
+  white-space: nowrap;
+}

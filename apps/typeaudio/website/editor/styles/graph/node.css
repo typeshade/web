@@ -1,0 +1,104 @@
+.graph-node {
+  position: absolute;
+  min-height: 102px;
+  border: 1px solid #55585d;
+  background: #303235;
+  border-radius: 4px;
+  box-shadow: 0 3px 12px #0005;
+  cursor: grab;
+  outline: none;
+  user-select: none;
+}
+.graph-node.selected,
+.graph-node:focus-visible {
+  border-color: #a1c3f4;
+  box-shadow: 0 0 0 1px #a1c3f4;
+}
+.graph-node.bypassed {
+  opacity: 0.55;
+}
+.graph-node-title {
+  height: 33px;
+  border-bottom: 1px solid #484a50;
+  padding: 6px 9px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  background: #383b40;
+  border-radius: 3px 3px 0 0;
+}
+.graph-node-title span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+.graph-node-title small {
+  color: #afb3bb;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+.graph-node[data-node-kind="code"] .graph-node-title {
+  background: #3a3644;
+}
+.graph-node[data-node-kind="output"] .graph-node-title {
+  background: #33443b;
+}
+.graph-node[data-node-kind="parameter"] .graph-node-title {
+  background: #484135;
+}
+.graph-node-ports {
+  padding-top: 5px;
+  min-height: 35px;
+}
+.studio-app .graph-port {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 25px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 10px;
+  color: #b6bcc7;
+  cursor: crosshair;
+}
+.studio-app .graph-port.input {
+  margin-left: -5px;
+}
+.studio-app .graph-port.output {
+  position: absolute;
+  right: -5px;
+  top: 38px;
+}
+.graph-port i {
+  display: block;
+  width: 9px;
+  height: 9px;
+  background: #a7c7f2;
+  border: 1px solid #20314a;
+  border-radius: 50%;
+}
+.graph-port.control i {
+  background: #d5bb80;
+  border-color: #57421d;
+  border-radius: 2px;
+}
+.studio-app .graph-port:hover,
+.studio-app .graph-port:focus-visible {
+  color: #fff;
+  background: #ffffff12;
+  outline: 1px solid #a7c7f2;
+}
+.graph-node-caption {
+  font:
+    9px "IBM Plex Mono",
+    monospace;
+  color: #a4a8b1;
+  padding: 7px 9px;
+  border-top: 1px solid #ffffff08;
+}

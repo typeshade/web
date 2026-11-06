@@ -1,4 +1,4 @@
-import { SAMPLE_RATE } from "./designer.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
 export const MAX_RECORD_SECONDS = 30;
 /** Allocate on the record command; copying a render quantum never allocates. */
 export class PcmRecorder {

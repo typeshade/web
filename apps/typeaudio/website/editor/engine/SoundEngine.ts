@@ -1,7 +1,8 @@
 import { LiveAudio } from "../../live-audio.ts";
-import { SAMPLE_RATE, type Patch } from "../../designer.ts";
+import { SAMPLE_RATE } from "../../sound/constants.ts";
+import { type Patch } from "../../sound/types.ts";
 import type { RenderStats } from "../../designer-render.ts";
-import { patchPrograms } from "../../graph/client.ts";
+import { patchPrograms } from "../../graph/preparePatch.ts";
 export interface Rendered {
   dry: Float32Array;
   wet: Float32Array;
@@ -17,6 +18,7 @@ export interface Rendered {
     wallMs: number;
   };
 }
+
 /** Owns audio resources; UI components never construct worklets or workers. */
 export class SoundEngine {
   context?: AudioContext;

@@ -507,3 +507,49 @@ worker, two trials per scenario, 500 warm-up and 6000 measured 128-frame blocks 
 duration; the maximum was 7.3 ms. These include scheduling pauses and are not
 measurements of actual AudioWorklet underruns or hardware latency. They establish
 bounded tested compute costs, not a hard real-time or arbitrary-program guarantee.
+
+## Atomic Design and responsibility boundaries — 2026-11-06
+
+The editor now separates atoms, molecules, feature organisms, workspace templates
+and the Studio page. Each TSX module owns one named component. The former shell
+is composed from individual menu, document, transport, tool and status components;
+the workspace grid accepts panel slots. Timeline controls/handles, graph nodes,
+connections, code editing, tooltips and context menus have individual owners.
+Feature stylesheets replace the single workspace stylesheet, preserving cascade
+order. The built CSS is byte-identical to the pre-refactor graph implementation.
+
+The former useEditor controller now composes document, audio-session, sound,
+Picture, asset, media and project controllers. One document hook owns the reducer,
+revision and local persistence. One resource hook owns SoundEngine/SceneTransport
+creation and cleanup. Selection, history, document projection and restoration are
+separate modules. Playback generations and import/compile revision guards retain
+their previous behavior, including independent source/clip Tone and stale-result
+protection. No additional copy of the patch or scene was introduced.
+
+Graph types, catalog, creation, recipes, validation, ordering, identity and
+parameters are separated from compilation requests, module installation and DSP.
+Compiler stages separately validate Code, emit source and call the pinned kernel
+generator. The sound domain similarly separates patch definitions, presets,
+validation, envelope sampling, delay, reverb, finite output and spectrum analysis.
+Consumers import the owning module directly. The audio processing algorithms,
+engine/compiler pins, file formats and graph limits are unchanged.
+
+The architecture check runs in the app's check script. It verifies one named
+component per TSX file, downward UI dependencies, props-based feature access for
+primitives, document/domain isolation from UI, audio resource ownership, compiler
+isolation and runtime import cycles. Unit checks exercise accepted type contracts
+and rejected boundary violations. The editor architecture guide documents the
+folder roles, state/resource owners, style order and extension workflow.
+
+This bounded English review covers that guide, the updated application README and
+the retained component labels/tooltips at the extraction boundaries. Existing
+workflow instructions and diagnostic wording were retained because behavior is
+unchanged. Desktop and 390 px graph/workspace screenshots were inspected. This
+does not claim a new review or translation of imported engine documentation.
+
+Shader/TypeScript and architecture checks, 65 unit tests, the production build,
+CSS/scope checks and all eight browser suites pass. Browser coverage includes
+actual CPU/WebGPU rendering, Live audio, graph compilation, Tone persistence,
+context menus/tooltips, resize/drag/Undo, video transport, imported audio and
+portable project/WAV round trips. This is behavior-preservation evidence; it adds
+no new hardware-latency or real-time guarantee.

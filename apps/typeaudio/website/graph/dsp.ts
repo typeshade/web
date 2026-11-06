@@ -1,10 +1,8 @@
-import type { Patch } from "../designer.ts";
-import {
-  graphKey,
-  graphValues,
-  orderedNodes,
-  type SoundGraph,
-} from "./model.ts";
+import type { Patch } from "../sound/types.ts";
+import { graphKey } from "./graphIdentity.ts";
+import { graphValues } from "./graphParameters.ts";
+import { orderedNodes } from "./orderGraph.ts";
+import { type SoundGraph } from "./types.ts";
 import { graphKernel, type GraphKernel } from "./registry.ts";
 /** Compiled graph execution only. Compiler, imports and allocations stay out of process(). */
 export class GraphDsp {

@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { createDevice } from 'typeshade/runtime';
-import { DEFAULT, PRESETS, validatePatch, envelopeAt, delayPcm, reverbPcm, finishPcm, spectrum } from './designer.ts';
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { PRESETS } from "./sound/presets.ts";
+import { validatePatch } from "./sound/validatePatch.ts";
+import { envelopeAt } from "./sound/envelopeAt.ts";
+import { delayPcm } from "./sound/effects/delayPcm.ts";
+import { reverbPcm } from "./sound/effects/reverbPcm.ts";
+import { finishPcm } from "./sound/effects/finishPcm.ts";
+import { spectrum } from "./sound/analysis/spectrum.ts";
 import { renderPatch } from './designer-render.ts';
 
 describe('sound designer DSP', () => {

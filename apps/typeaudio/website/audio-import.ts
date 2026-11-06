@@ -1,4 +1,4 @@
-import { SAMPLE_RATE } from "./designer.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
 import {
   MAX_AUDIO_FILE_BYTES,
   MAX_AUDIO_SECONDS,

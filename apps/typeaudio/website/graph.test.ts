@@ -1,13 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT, validatePatch } from "./designer.ts";
-import {
-  initialGraph,
-  createNode,
-  graphKey,
-  graphValues,
-  validateGraph,
-} from "./graph/model.ts";
-import { compileGraph } from "./graph/compiler.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { validatePatch } from "./sound/validatePatch.ts";
+import { initialGraph } from "./graph/recipes.ts";
+import { createNode } from "./graph/createNode.ts";
+import { graphKey } from "./graph/graphIdentity.ts";
+import { graphValues } from "./graph/graphParameters.ts";
+import { validateGraph } from "./graph/validateGraph.ts";
+import { compileGraph } from "./graph/compiler/compileGraph.ts";
 import { graphKernel } from "./graph/registry.ts";
 import { renderSound, SoundDsp } from "./sound-dsp.ts";
 import { GraphDsp } from "./graph/dsp.ts";
@@ -18,6 +17,7 @@ function install(g = initialGraph()) {
   new Function(program.code)();
   return program;
 }
+
 describe("procedural graph contracts", () => {
   it("validates typed connections, topology, bounds and portable patches", () => {
     const g = initialGraph("tone");

@@ -1,4 +1,6 @@
-import { DEFAULT, validatePatch, type Patch } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { validatePatch } from "./sound/validatePatch.ts";
+import { type Patch } from "./sound/types.ts";
 const discrete = new Set([
   "shapeA",
   "shapeB",

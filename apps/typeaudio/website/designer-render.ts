@@ -1,7 +1,8 @@
 import type { Device, FuseReport } from "typeshade/runtime";
 import { bank } from "../src/bank.ts";
 import { DesignerVoice, designerSynth, designerMix } from "./designer.shade.ts";
-import { SAMPLE_RATE, type Patch } from "./designer.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { type Patch } from "./sound/types.ts";
 
 // Finite render batches are independent of Live's 128-frame callback quantum.
 export const RENDER_BATCH = 16384;

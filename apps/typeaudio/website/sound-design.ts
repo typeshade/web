@@ -1,4 +1,4 @@
-import { type Patch, type CurvePoint } from "./designer.ts";
+import { type Patch, type CurvePoint } from "./sound/types.ts";
 
 export function curveAt(
   points: CurvePoint[],

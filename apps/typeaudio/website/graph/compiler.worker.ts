@@ -1,4 +1,4 @@
-import { compileGraph } from "./compiler.ts";
+import { compileGraph } from "./compiler/compileGraph.ts";
 self.onmessage = ({ data }) => {
   try {
     self.postMessage({ id: data.id, program: compileGraph(data.graph) });

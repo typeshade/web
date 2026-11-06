@@ -1,0 +1,137 @@
+.project-panel {
+  grid-column: 1;
+  grid-row: 1/-1;
+}
+.project-panel .panel-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+.panel-tabs {
+  display: flex;
+  border-bottom: 1px solid #171717;
+  background: #292929;
+  padding: 0 10px;
+}
+.studio-app .panel-tabs button {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  color: #aaa;
+  padding: 9px 10px;
+  font-size: 10px;
+}
+.studio-app .panel-tabs button[aria-pressed="true"] {
+  color: #bdd4f8;
+  border-color: #8aaee0;
+}
+.studio-app .asset-search {
+  margin: 11px !important;
+  width: calc(100% - 22px) !important;
+  flex-shrink: 0;
+  background: #202020 !important;
+  font-size: 10px !important;
+}
+.asset-columns {
+  display: flex;
+  justify-content: space-between;
+  border-block: 1px solid #222;
+  padding: 5px 12px;
+  font-size: 9px;
+  color: #999;
+  background: #303030;
+}
+.asset-list {
+  padding: 2px 0;
+  min-height: 80px;
+  overflow: auto;
+}
+.studio-app .asset-row {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  border: 1px solid transparent;
+  border-radius: 0;
+  padding: 7px 9px;
+  width: 100%;
+  font-size: 10px;
+  min-height: 30px;
+  background: transparent;
+  text-align: left;
+  color: #c8c8c8;
+}
+.asset-row svg {
+  color: #b0a0cb;
+  flex-shrink: 0;
+}
+.asset-row > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.asset-row > small {
+  font-size: 9px;
+  color: #999;
+  margin-left: auto;
+}
+.studio-app .asset-row[aria-pressed="true"] {
+  border-color: transparent;
+  background: #414c60;
+  color: #dce9fc;
+}
+.project-panel .panel-hint {
+  padding: 0 11px;
+  margin: 10px 0;
+  font-size: 9px;
+}
+.project-bottom {
+  padding: 14px 11px 9px;
+  border-top: 1px solid #171717;
+  margin-top: auto;
+  background: #292929;
+  flex-shrink: 0;
+}
+.project-bottom .panel-hint {
+  padding: 0;
+  margin-bottom: 0;
+}
+.project-bottom label {
+  font-size: 10px;
+}
+.button-row {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.project-bottom .button-row {
+  margin-top: 8px;
+}
+.studio-app .project-bottom .button-row button {
+  font-size: 9px;
+  padding: 4px 7px;
+  flex: 1;
+}
+.media-assets {
+  padding-top: 8px;
+}
+.media-assets > button:not(.asset-row) {
+  margin: 9px 11px;
+  width: calc(100% - 22px);
+  font-size: 10px;
+}
+.youtube-import {
+  padding: 14px 11px;
+  border-top: 1px solid #171717;
+  margin-top: 18px;
+}
+.youtube-import button {
+  margin-top: 8px;
+  width: 100%;
+}
+.youtube-import .panel-hint {
+  padding: 0;
+}

@@ -1,0 +1,5 @@
+.splitter-inspector {
+  grid-column: 4;
+  grid-row: 1/-1;
+  cursor: col-resize;
+}

@@ -4,11 +4,14 @@ import { chromium } from "playwright-core";
 import { preview } from "vite";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { RECIPES } from "./sound-recipes.ts";
-import { DEFAULT } from "./designer.ts";
-import { createNode, initialGraph } from "./graph/model.ts";
-import { compileGraph } from "./graph/compiler.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { createNode } from "./graph/createNode.ts";
+import { initialGraph } from "./graph/recipes.ts";
+import { compileGraph } from "./graph/compiler/compileGraph.ts";
 const fullGraph = initialGraph();
+
 let from = "filter";
+
 while (fullGraph.nodes.length < 15) {
   const n = createNode("gain", `gain-${fullGraph.nodes.length}`);
   n.values[0] = 1;
@@ -16,20 +19,29 @@ while (fullGraph.nodes.length < 15) {
   from = n.id;
   fullGraph.nodes.push(n);
 }
+
 const shaper = createNode("code", "shaper");
+
 shaper.code = "out = tanh(input * (1 + p3));";
+
 shaper.inputs.input = from;
+
 fullGraph.nodes.push(shaper);
+
 fullGraph.nodes.find((n) => n.kind === "output")!.inputs.input = shaper.id;
+
 const graphPatch = { ...DEFAULT, graph: fullGraph, duration: 4 };
+
 const server = await preview({
   configFile: "website/vite.config.ts",
   preview: { host: "127.0.0.1", port: 4183, strictPort: true },
 });
+
 const browser = await chromium.launch({
   executablePath: process.env.TYPESHADE_CHROMIUM || chromium.executablePath(),
   args: ["--no-sandbox"],
 });
+
 try {
   const page = await browser.newPage();
   await page.goto("http://127.0.0.1:4183/");

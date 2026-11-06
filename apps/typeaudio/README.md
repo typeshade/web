@@ -252,29 +252,41 @@ sound is edited directly in Sound and immediately updates that layer's patch.
 When an imported audio clip is selected, Sound edits the independent source draft;
 Use in Picture adds that draft as a new procedural layer.
 
-- `model.ts` holds the shared document, selection and undo/redo reducer. History
-  keeps 30 document snapshots; opening a project or replacing media resets it.
-- `useEditor.ts` owns project actions, local persistence, patch library and the
-  engine lifecycle. UI components receive typed state and actions.
+- `state/` separates document types, projection, selection, restoration and the
+  undo/redo reducer. History keeps 30 snapshots; opening a project or replacing
+  media resets it. `hooks/document/useEditorDocument.ts` owns the reducer,
+  persistence and the revision used to reject stale asynchronous results.
+- `useEditor.ts` composes feature controllers from `hooks/`; playback, recording,
+  imports, project files, clip actions and graph editing have separate owners.
+  `hooks/session/useAudioResources.ts` creates and releases the audio resources.
+  UI components receive typed state and actions.
 - `engine/SoundEngine.ts` wraps the existing worklet and finite CPU/WebGPU worker.
   `engine/SceneTransport.ts` follows native/YouTube media time and schedules PCM
   with the existing `CueAudio` cache. UI components do not construct audio nodes.
-- `components/WorkspaceShell` owns workspace tabs, document tools, File commands,
-  transport, tool selection, export and status. `Panel` and `Splitter` provide
-  shared panel structure and keyboard/pointer resizing.
-- `ProjectPanel` browses/imports sounds, audio files and video. `AudioLibraryPanel`
+- `components/atoms/` contains individual visual controls; `molecules/` combines
+  controls into panels, toolbars and inputs; `organisms/` owns feature panels.
+  Each TSX file defines one component. `templates/WorkspaceShell.tsx` composes
+  the application chrome, and `templates/WorkspaceGrid.tsx` arranges panel slots.
+  `pages/StudioPage.tsx` connects the controllers to the workspace.
+- The project organisms browse/import sounds, audio files and video. `AudioLibraryPanel`
   exposes audition, drag/drop, export and removal; `audio-library.ts` stores decoded
   PCM in IndexedDB separately from document/history references. `SoundEditor`,
   `SoundMonitor`, `TonePad` and `Variations` compose the sound workspace.
   `GraphCanvas`, `GraphInspector` and `GraphDock` use `useGraphEditor` for node
-  selection, draft/apply and graph operations. `graph/model.ts` validates the
-  portable network; `graph/compiler.ts` and `graph/dsp.ts` separate compilation
-  from stateful execution.
-  `Composition`, `Timeline` and `Inspector` compose Picture; `Mixer` handles the
+  selection, draft/apply and graph operations. `graph/validateGraph.ts` validates
+  the portable network; `graph/compiler/` separates code validation, source
+  generation and the pinned compiler adapter. `graph/dsp.ts` owns stateful execution.
+  `Composition`, `Timeline` and `ClipInspector` compose Picture; `Mixer` handles the
   listening levels.
-- `workspace.css` defines the compact neutral-gray panel system, restrained blue
-  selection color, document tabs, tool rail and desktop/mobile arrangements.
+- `sound/` separates patch types/defaults/presets, limits and validation from
+  envelope sampling, individual PCM effects and spectrum analysis.
+- `styles/index.css` imports feature stylesheets in cascade order for the compact
+  neutral-gray panels, selection color and desktop/mobile arrangements.
   Generated engine documents use their own `docs.css`.
+
+The [editor architecture guide](website/editor/README.md) describes these
+boundaries and how to extend them. `pnpm check:typeaudio` checks the component
+convention, dependency direction, resource ownership and runtime import cycles.
 
 The owner's visual/workflow references are Photoshop and After Effects: a
 project browser, central viewer, lower timeline, selected-object properties and

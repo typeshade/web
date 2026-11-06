@@ -1,0 +1,44 @@
+.studio-app .numeric-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+  font:
+    10px PlexMono,
+    var(--ui-font-mono);
+  color: #bed6ff;
+}
+.studio-app .parameter-value {
+  padding: 2px 3px;
+  min-height: 22px;
+  border: 1px solid transparent;
+  color: #bed6ff;
+  font: inherit;
+  background: transparent;
+  cursor: ew-resize;
+  border-radius: 2px;
+}
+.studio-app .parameter-value:hover:not(:disabled) {
+  background: #3a4352;
+  border-color: #576a86;
+}
+.studio-app input.parameter-number {
+  max-width: 88px;
+  min-height: 22px;
+  padding: 2px 3px;
+  margin: 0 !important;
+  font:
+    10px PlexMono,
+    var(--ui-font-mono);
+  border-color: #8daedb;
+  color: #e6f0ff;
+}
+.parameter-unit {
+  font-size: 9px;
+  color: #99a8bd;
+  white-space: nowrap;
+}
+.parameter > label {
+  min-width: 0;
+}

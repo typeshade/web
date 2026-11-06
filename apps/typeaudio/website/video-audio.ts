@@ -1,4 +1,5 @@
-import { SAMPLE_RATE, type Patch } from "./designer.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { type Patch } from "./sound/types.ts";
 import {
   cueWindow,
   cueEnvelope,
@@ -6,7 +7,7 @@ import {
   type Scene,
 } from "./video-model.ts";
 import { AudioLibrary } from "./editor/audio-library.ts";
-import { patchPrograms } from "./graph/client.ts";
+import { patchPrograms } from "./graph/preparePatch.ts";
 export class CueAudio {
   readonly assets = new AudioLibrary();
   context: AudioContext | undefined;
