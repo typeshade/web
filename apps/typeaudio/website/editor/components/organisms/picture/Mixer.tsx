@@ -27,7 +27,7 @@ export function Mixer({ editor: e }: { editor: Editor }) {
           WAV contains added effects in the selected range. Original video audio
           is excluded. This does not export a video file.
         </p>
-        <p className="panel-hint">Mono · 48 kHz · 16-bit PCM</p>
+        <p className="panel-hint">{e.state.scene.space ? "Stereo" : "Mono"} · 48 kHz · 16-bit PCM</p>
       </details>
     </Panel>
   );

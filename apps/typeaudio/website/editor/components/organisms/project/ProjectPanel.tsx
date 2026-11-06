@@ -9,6 +9,7 @@ import { openContext } from "../../../interactions/openContext.ts";
 import { useInteractions } from "../../../hooks/interactions/useInteractions.ts";
 import { type MenuItem } from "../../../interactions/types.ts";
 import { YouTubeInput } from "../../molecules/media/YouTubeInput.tsx";
+import { ProjectExamples } from "./ProjectExamples.tsx";
 export function ProjectPanel({ editor: e }: { editor: Editor }) {
   const { openMenu } = useInteractions();
   function actions(value: SavedSound): MenuItem[] {
@@ -49,7 +50,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
       },
     ];
   }
-  const [tab, setTab] = useState<"project" | "sounds" | "audio">("sounds"),
+  const [tab, setTab] = useState<"project" | "sounds" | "audio" | "examples">("sounds"),
     [search, setSearch] = useState("");
   const file = e.videoInput,
     patchFile = e.patchInput;
@@ -81,6 +82,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
       }
     >
       <div className="panel-tabs" role="group" aria-label="Project browser">
+        <button aria-pressed={tab === "examples"} onClick={() => setTab("examples")}>Projects</button>
         <button
           aria-pressed={tab === "sounds"}
           onClick={() => setTab("sounds")}
@@ -146,7 +148,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
           event.target.value = "";
         }}
       />
-      {tab === "sounds" ? (
+      {tab === "examples" ? <ProjectExamples editor={e} /> : tab === "sounds" ? (
         <>
           <div className="asset-columns">
             <span>Name</span>

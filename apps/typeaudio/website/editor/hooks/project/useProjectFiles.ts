@@ -1,5 +1,7 @@
-import { useRef } from "react";
-import { validateScene } from "../../../video-model.ts";
+import { useRef, useState } from "react";
+import { decodeProject } from "../../../project/decodeProject.ts";
+import { encodeProject } from "../../../project/encodeProject.ts";
+import { projectUrl } from "../../../project/catalog.ts";
 import {
   MAX_PROJECT_BYTES,
   packAudio,
@@ -15,24 +17,25 @@ export function useProjectFiles(
   { assetLibrary, transport }: EditorResources,
   { detach }: MediaSource,
   setAudioRevision: React.Dispatch<React.SetStateAction<number>>,
+  workspace: (next: "picture") => void,
 ) {
   const projectRequest = useRef(0);
-  async function openProject(file: File) {
+  const [projectLoading, setProjectLoading] = useState(false);
+  async function loadProject(read: () => Promise<unknown>) {
     const request = ++projectRequest.current,
       version = editVersion.current;
     const current = () =>
       request === projectRequest.current && version === editVersion.current;
+    setProjectLoading(true);
     try {
-      if (file.size > MAX_PROJECT_BYTES)
-        throw new Error(
-          "Project files must be smaller than 40 MB, including embedded audio.",
-        );
-      const raw = JSON.parse(await file.text()),
-        next = validateScene(raw);
+      const { scene: next, audioAssets } = decodeProject(await read());
       for (const cue of next.cues)
-        if (!cue.audio) await patchPrograms(cue.patch);
+        if (!cue.audio) {
+          if (!current()) return;
+          await patchPrograms(cue.patch);
+        }
       const assets = await unpackAudioAssets(
-        raw.audioAssets,
+        audioAssets,
         next.cues.flatMap((c) => (c.audio ? [c.audio] : [])),
       );
       if (!current()) return;
@@ -40,16 +43,36 @@ export function useProjectFiles(
       if (!current()) return;
       detach();
       dispatch({ type: "open", scene: next });
+      workspace("picture");
       setAudioRevision((n) => n + 1);
       transport.current.seek(next.start);
       setNotice(
-        next.media.kind === "none"
+        next.media.kind === "youtube"
+          ? "Editable project opened. Select a layer to edit its sound; connect the YouTube reference when needed."
+          : next.media.kind === "none"
           ? "Project opened."
           : `Project opened. Re-select video: ${next.media.name}`,
       );
     } catch (error) {
       if (current()) setNotice(`Import failed: ${String(error)}`);
+    } finally {
+      if (request === projectRequest.current) setProjectLoading(false);
     }
+  }
+  async function openProject(file: File) {
+    return loadProject(async () => {
+      if (file.size > MAX_PROJECT_BYTES) throw new Error("Project files must be smaller than 40 MB, including embedded audio.");
+      return JSON.parse(await file.text());
+    });
+  }
+  async function openExample(id: string) {
+    return loadProject(async () => {
+      const response = await fetch(projectUrl(id));
+      if (!response.ok) throw new Error("This example project could not be loaded.");
+      const text = await response.text();
+      if (text.length > MAX_PROJECT_BYTES) throw new Error("Project file is too large.");
+      return JSON.parse(text);
+    });
   }
   async function exportProject() {
     const snapshot = latest.current.state.scene;
@@ -67,13 +90,13 @@ export function useProjectFiles(
           packAudio({ ...ref, pcm: await assetLibrary.read(ref) }),
         );
       const data = JSON.stringify(
-        { ...snapshot, ...(audioAssets.length ? { audioAssets } : {}) },
+        encodeProject(snapshot, audioAssets),
         null,
         2,
       );
       download(
         new Blob([data], { type: "application/json" }),
-        "typeaudio-scene.json",
+        snapshot.origin ? `${snapshot.name.replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}.typeaudio.json` : "typeaudio-scene.json",
       );
       setNotice(
         audioAssets.length
@@ -84,5 +107,5 @@ export function useProjectFiles(
       setNotice(`Export failed: ${String(error)}`);
     }
   }
-  return { openProject, exportProject };
+  return { openProject, openExample, projectLoading, exportProject };
 }

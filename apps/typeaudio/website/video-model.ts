@@ -1,6 +1,9 @@
 import { SAMPLE_RATE } from "./sound/constants.ts";
 import { validatePatch } from "./sound/validatePatch.ts";
 import { type Patch } from "./sound/types.ts";
+import type { SceneSpace, CueSpace, ProjectOrigin } from "./scene/types.ts";
+import { validateSceneSpace, validateCueSpace } from "./scene/validateSceneSpace.ts";
+import { validateOrigin } from "./project/validateOrigin.ts";
 import {
   MAX_LIBRARY_FRAMES,
   validateAudioRef,
@@ -21,6 +24,7 @@ export interface Cue {
   fadeOut?: number;
   /** Original source range whose fades survive a non-destructive split. */
   fadeAnchor?: [number, number];
+  space?: CueSpace;
 }
 export interface Scene {
   version: 1;
@@ -32,6 +36,8 @@ export interface Scene {
   original: number;
   effects: number;
   cues: Cue[];
+  space?: SceneSpace;
+  origin?: ProjectOrigin;
 }
 export const emptyScene = (): Scene => ({
   version: 1,
@@ -108,6 +114,7 @@ export function validateScene(raw: unknown): Scene {
   if (typeof s.loop !== "boolean") throw new Error("Invalid loop setting.");
   const ids = new Set<string>();
   const audioFrames = new Map<string, number>();
+  const space = s.space === undefined ? undefined : validateSceneSpace(s.space);
   const cues = s.cues.map((c) => {
     if (
       !c ||
@@ -126,6 +133,7 @@ export function validateScene(raw: unknown): Scene {
       muted: c.muted,
       patch: validatePatch(c.patch),
     };
+    if (c.space !== undefined) cue.space = validateCueSpace(c.space, space);
     if (c.audio !== undefined) {
       cue.audio = validateAudioRef(c.audio);
       const frames = audioFrames.get(cue.audio.id);
@@ -162,6 +170,8 @@ export function validateScene(raw: unknown): Scene {
     original: number(s.original, 0, 1),
     effects: number(s.effects, 0, 1),
     cues,
+    ...(space ? { space } : {}),
+    ...(s.origin !== undefined ? { origin: validateOrigin(s.origin) } : {}),
   };
 }
 /** Source and timeline edits are rounded to the PCM sample clock. */

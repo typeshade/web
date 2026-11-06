@@ -4,7 +4,7 @@ import { DEFAULT } from "../../../../sound/defaultPatch.ts";
 import { openContext } from "../../../interactions/openContext.ts";
 import { useInteractions } from "../../../hooks/interactions/useInteractions.ts";
 import type { Editor } from "../../../useEditor.ts";
-import { LIMITS } from "../../../../sound/limits.ts";
+import { parameterLimits } from "../../../../sound/parameterLimits.ts";
 import { SHAPES } from "../../../../sound/constants.ts";
 import { type Patch } from "../../../../sound/types.ts";
 import { labels } from "../../../config/parameterMetadata.ts";
@@ -20,7 +20,7 @@ export function Parameter({
   const gesture = useRef(false),
     { openMenu } = useInteractions();
   const value = e.state.patch[name],
-    limit = LIMITS[name],
+    limit = parameterLimits(e.state.patch, name),
     options =
       name === "shapeA" || name === "shapeB"
         ? SHAPES

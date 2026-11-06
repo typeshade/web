@@ -8,6 +8,7 @@ import {
 } from "./video-model.ts";
 import { AudioLibrary } from "./editor/audio-library.ts";
 import { patchPrograms } from "./graph/preparePatch.ts";
+import { SpatialSceneClient } from "./scene/SpatialSceneClient.ts";
 export class CueAudio {
   readonly assets = new AudioLibrary();
   context: AudioContext | undefined;
@@ -20,6 +21,8 @@ export class CueAudio {
   private worker: Worker | undefined;
   private abort: (() => void) | undefined;
   private closed = false;
+  private prepareGeneration = 0;
+  readonly spatial = new SpatialSceneClient();
   scheduled = 0;
   async unlock(): Promise<void> {
     if (!this.context) {
@@ -90,14 +93,21 @@ export class CueAudio {
     return next;
   }
   async prepare(scene: Scene): Promise<Map<string, Float32Array>> {
+    const generation = ++this.prepareGeneration;
     const result = new Map<string, Float32Array>();
-    for (const cue of scene.cues)
+    for (const cue of scene.cues) {
+      if (generation !== this.prepareGeneration || this.closed) throw new Error("Preparation superseded.");
       result.set(
         cue.id,
         cue.audio
           ? await this.assets.read(cue.audio)
           : await this.render(cue.patch),
       );
+    }
+    if (generation !== this.prepareGeneration || this.closed) throw new Error("Preparation superseded.");
+    if (scene.space) await this.spatial.prepare(scene, result);
+    else this.spatial.close();
+    if (generation !== this.prepareGeneration || this.closed) throw new Error("Preparation superseded.");
     return result;
   }
   setLevel(level: number): void {
@@ -130,6 +140,22 @@ export class CueAudio {
     this.bus.connect(this.limiter!);
     const now = ctx.currentTime,
       origin = Math.round(at * SAMPLE_RATE) / SAMPLE_RATE;
+    if (scene.space) {
+      const pcm = this.spatial.read(scene);
+      if (!pcm) throw new Error("Wait for the edited room preview to prepare.");
+      const offset = Math.max(0, origin - scene.start);
+      if (offset >= pcm.left.length / SAMPLE_RATE) return;
+      const buffer = ctx.createBuffer(2, pcm.left.length, SAMPLE_RATE);
+      buffer.copyToChannel(new Float32Array(pcm.left), 0);
+      buffer.copyToChannel(new Float32Array(pcm.right), 1);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer; source.playbackRate.value = rate;
+      source.connect(this.bus);
+      source.onended = () => source.disconnect();
+      source.start(now + Math.max(0, scene.start - origin) / rate, offset);
+      this.nodes.push(source); this.scheduled = 1;
+      return;
+    }
     for (const cue of scene.cues) {
       const pcm = samples.get(cue.id);
       if (!pcm) continue;
@@ -178,6 +204,8 @@ export class CueAudio {
   }
   close(): void {
     this.closed = true;
+    this.prepareGeneration++;
+    this.spatial.close();
     this.assets.close();
     this.stop();
     this.abort?.();

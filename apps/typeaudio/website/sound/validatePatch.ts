@@ -1,16 +1,17 @@
 import type { Patch } from "./types.ts";
 import { DEFAULT } from "./defaultPatch.ts";
-import { LIMITS } from "./limits.ts";
 import { validateGraph } from "typeaudio/graph";
 import { WAVE_SIZE } from "./constants.ts";
 import { CURVE_LIMITS } from "./limits.ts";
 import { MAX_SOUND_LAYERS } from "./constants.ts";
+import { parameterLimits } from "./parameterLimits.ts";
 /** Strict validation for stored/imported patches and worker requests. */
 export function validatePatch(value: unknown, nested = false): Patch {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("A patch must be an object.");
   const data = value as Record<string, unknown>;
   const result = { ...DEFAULT };
+  result.graph = data.graph == null ? null : validateGraph(data.graph);
   for (const key of Object.keys(DEFAULT) as (keyof Patch)[]) {
     if (["graph", "wave", "curves", "layers"].includes(key)) continue;
     const v =
@@ -32,7 +33,7 @@ export function validatePatch(value: unknown, nested = false): Patch {
     if (typeof DEFAULT[key] === "boolean") {
       if (typeof v !== "boolean") throw new Error(`${key} must be on or off.`);
     } else {
-      const [low, high] = LIMITS[key]!;
+      const [low, high] = parameterLimits(result, key);
       if (typeof v !== "number" || !Number.isFinite(v) || v < low || v > high)
         throw new Error(`${key} must be between ${low} and ${high}.`);
       if (
@@ -53,7 +54,6 @@ export function validatePatch(value: unknown, nested = false): Patch {
   }
   if (nested && result.baseMuted)
     throw new Error("Nested layer patches cannot mute the base source.");
-  result.graph = data.graph == null ? null : validateGraph(data.graph);
   const wave = data.wave ?? DEFAULT.wave;
   if (
     !Array.isArray(wave) ||

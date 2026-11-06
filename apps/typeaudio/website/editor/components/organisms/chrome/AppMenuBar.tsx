@@ -141,7 +141,6 @@ export function AppMenuBar({
         onChange={(event) => {
           const f = event.target.files?.[0];
           if (f) {
-            e.workspace("picture");
             void e.openProject(f);
           }
           event.target.value = "";

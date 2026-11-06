@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SAMPLE_RATE } from "../../../sound/constants.ts";
 import { cueRange, mixScene } from "../../../video-model.ts";
 import { wav } from "../../../audio.ts";
+import { stereoWav } from "../../../scene/stereoWav.ts";
+import { sceneRenderKey } from "../../../scene/sceneRenderKey.ts";
 import { download } from "../../shared/download.ts";
 import type { DocumentController } from "../document/useEditorDocument.ts";
 import type { EditorResources } from "../session/useAudioResources.ts";
@@ -14,9 +16,7 @@ export function useSceneSession(
     [position, setPosition] = useState(0),
     [ready, setReady] = useState(false),
     [samples, setSamples] = useState(new Map<string, Float32Array>());
-  const cueKey = JSON.stringify(
-      state.scene.cues.map((c) => [c.id, c.audio ?? c.patch]),
-    ),
+  const cueKey = sceneRenderKey(state.scene),
     preparedKey = useRef("");
   const sceneReady = ready && preparedKey.current === cueKey,
     latest = useRef({ state, samples, ready: sceneReady });
@@ -123,6 +123,7 @@ export function useSceneSession(
       transport.current.audio.schedule(
         {
           ...current.state.scene,
+          space: undefined,
           start: 0,
           end: cueRange(cue, pcm.length / SAMPLE_RATE).duration,
           cues: [{ ...cue, time: 0, muted: false }],
@@ -130,13 +131,20 @@ export function useSceneSession(
         current.samples,
         0,
       );
-      setNotice("Auditioning selected clip.");
+      setNotice(current.state.scene.space ? "Auditioning the selected source without the scene room." : "Auditioning selected clip.");
     } catch (error) {
       if (generation === sceneAction.current) setNotice(String(error));
     }
   }
   function exportScene() {
     if (!sceneReady) return;
+    if (state.scene.space) {
+      const pcm = transport.current.audio.spatial.read(state.scene);
+      if (!pcm) return;
+      download(new Blob([stereoWav(pcm, state.scene.effects)], { type: "audio/wav" }), "typeaudio-effects-stereo.wav");
+      setNotice(`Exported the stereo effects composition.${pcm.peak * state.scene.effects > 1 ? " Clipping detected; lower Effects level." : ""}`);
+      return;
+    }
     const result = mixScene(state.scene, samples, SAMPLE_RATE);
     download(
       new Blob([wav(result.pcm, SAMPLE_RATE)], { type: "audio/wav" }),

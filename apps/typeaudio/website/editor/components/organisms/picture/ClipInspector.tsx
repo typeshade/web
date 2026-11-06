@@ -5,6 +5,8 @@ import { useEffect, useRef } from "react";
 import { Panel } from "../../molecules/Panel.tsx";
 import { Icon } from "../../atoms/Icon.tsx";
 import { Mixer } from "./Mixer.tsx";
+import { SpatialSourceProperties } from "./SpatialSourceProperties.tsx";
+import { RoomProperties } from "./RoomProperties.tsx";
 export function ClipInspector({ editor: e }: { editor: Editor }) {
   const c = e.selected;
   const range = c ? cueRange(c, e.sourceDuration(c)) : undefined;
@@ -227,6 +229,7 @@ export function ClipInspector({ editor: e }: { editor: Editor }) {
                 apply to all {e.selectedIds.length} selected layers.
               </p>
             )}
+            <SpatialSourceProperties editor={e} />
             <div className="button-row">
               <button
                 id="audition"
@@ -255,6 +258,7 @@ export function ClipInspector({ editor: e }: { editor: Editor }) {
         )}
       </Panel>
       <Mixer editor={e} />
+      <RoomProperties editor={e} />
     </>
   );
 }

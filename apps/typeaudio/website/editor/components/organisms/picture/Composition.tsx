@@ -72,6 +72,8 @@ export function Composition({ editor: e }: { editor: Editor }) {
         if (player.getDuration() > 0)
           e.fitDuration(player.getDuration(), media);
         else e.scene((current) => ({ ...current, media }));
+        e.transport.level(latest.current.state.scene);
+        e.transport.seek(latest.current.state.scene.start);
         e.setNotice("YouTube ready. Use Play to enable sound clips.");
       } catch (error) {
         if (current()) {
@@ -130,14 +132,16 @@ export function Composition({ editor: e }: { editor: Editor }) {
         {e.mediaKind === "none" && (
           <div className="viewer-empty">
             <Icon name="film" />
-            <strong>No footage</strong>
-            <span>Import a video from the Project panel.</span>
+            <strong>{e.state.scene.media.kind === "youtube" ? "YouTube reference" : "No footage"}</strong>
+            <span>{e.state.scene.media.kind === "youtube" ? "Edit and play the composition now, or connect its video reference." : "Import a video from the Project panel."}</span>
+            {e.state.scene.media.kind === "youtube" ? <button className="primary"
+              onClick={() => e.loadYouTube(`https://www.youtube.com/watch?v=${e.state.scene.media.id}`)}>Connect reference</button> :
             <button
               className="primary"
               onClick={() => e.videoInput.current?.click()}
             >
               Import video…
-            </button>
+            </button>}
             <small>Or build an effects track without video.</small>
           </div>
         )}

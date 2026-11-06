@@ -40,6 +40,7 @@ export function useEditor() {
     resources,
     media,
     library.setAudioRevision,
+    workspace,
   );
   const imports = useAudioImport(
     document,
