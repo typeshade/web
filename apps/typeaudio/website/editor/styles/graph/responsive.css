@@ -31,7 +31,7 @@
 }
 @media (max-width: 950px) {
   .graph-workspace {
-    grid-template-rows: 420px 4px auto auto;
+    grid-template-rows: 500px 4px auto auto;
   }
   .graph-workspace .dock-region,
   .graph-dock-panel,

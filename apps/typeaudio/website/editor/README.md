@@ -33,8 +33,11 @@ can describe feature contracts without introducing a runtime dependency.
 Every TSX module except the root entry defines one named component matching its
 filename. For example, `Timeline` arranges layers, `TimelineClip` owns a clip's
 gestures and `ClipHandle` renders its accessible handle. `GraphCanvas` composes
-`GraphNodeCard`, `GraphConnections` and `GraphToolbar`; `useGraphViewport` owns
-viewport gestures. Avoid forwarding barrels so an import identifies its owner.
+`GraphNodeCard`, `GraphConnections`, `GraphToolbar` and the searchable node picker.
+`useGraphViewport` owns framing and zoom, `useGraphGestures` owns marquee/group
+drags, `useGraphConnections` owns temporary cables and wire selection, and
+`useGraphSelection` owns node selection. Compilation and node search have their
+own controllers. Avoid forwarding barrels so an import identifies its owner.
 
 `WorkspaceGrid` accepts panel slots. `WorkspaceShell` composes the menu, document
 bar, transport, tool rail and status. `StudioPage` selects the Sound/Picture panel
@@ -72,6 +75,13 @@ layout have separate modules. `compilationClient` owns worker requests/cache;
 `preparePatch` resolves layer programs, `loadGraphModule` installs a module and
 `dsp` executes it. The compiler remains in a lazy worker; the audio callback
 does not import it. Live and finite rendering share the same graph DSP.
+
+Connection edits, group duplication/deletion and connected-node insertion are
+pure operations in the graph domain. Group copying remaps internal IDs and
+retains external inputs. Validation runs before applying a structural edit.
+Transient connection previews never disconnect an applied wire. `graphLayout`
+and `graphGeometry` own UI placement; layout edits do not alter the compile key.
+Viewport memory is bounded to 32 source owners for the current editor session.
 
 ## Styles and extensions
 

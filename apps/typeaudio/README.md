@@ -38,14 +38,39 @@ recipe connects Parameter → Oscillator → Envelope → Output. Start Live, ad
 the four exposed parameters, and retrigger to hear the beginning again. Switch
 the central viewer between Node network and Waveform / Spectrum.
 
-Drag nodes to arrange the graph and drag an output onto a matching input to
-connect it. Audio ports are blue circles; control ports are gold squares. The
-inspector also provides connection dropdowns. Wheel zooms, middle-drag or the
-Hand tool pans, and Fit frames the network. On the canvas, Enter focuses the
-selected node and Tab opens Add node; Shift+Tab leaves the canvas. Activate an
-output and then an input to connect them with the keyboard. Node context menus
-also open with Shift+F10. Move, duplicate, bypass, disconnect and delete operations
-participate in document Undo/Redo; Escape cancels a node drag.
+Use **Add node**, double-click empty canvas space, or press Tab while the canvas
+is focused to search the node catalog. Shift+A also opens search within the
+network. Results show the node's purpose and category; arrows choose a result,
+Enter adds it and Escape cancels. Recipes in the toolbar replace the network with
+Impact or Tone and participate in Undo. New nodes use nearby free space when the
+requested position overlaps an existing card.
+
+Drag empty space to select a group, Shift-click to add/remove a node, or use
+Ctrl/Cmd+A to select all. Move, duplicate (Ctrl/Cmd+D) and delete operate on the
+selection. Copies retain incoming signals and reconnect internal wires to their
+copied nodes. Output stays in the graph. Each drag is one history edit; Escape
+cancels it. Snap aligns the group to a 20-unit grid while preserving its spacing.
+Arrange lays out the network from inputs to output without changing its signal
+order. Undo restores its previous positions.
+
+Drag between an output and a matching input in either direction. Audio ports are
+blue circles; controls are gold squares. Compatible targets are highlighted;
+wrong signal types and cycles are rejected before compilation. Starting from an
+occupied input retains its current wire until a valid reconnection completes.
+Drop a cable on empty space to search compatible nodes and connect the new node
+automatically. Cancelling leaves the network unchanged. Keyboard users can
+activate one port and then its counterpart; inspector dropdowns remain available.
+
+Click a wire to select it, then Delete to disconnect. Double-click it or use its
+context menu to insert a compatible node between its ends. A focused wire supports
+Enter to insert and Shift+F10 for its menu. Node context menus support the same
+keyboard access. Compilation errors and stale results leave the applied graph
+and running sound intact.
+
+Wheel zooms around the pointer; middle-drag, Alt-drag or the Hand tool pans.
+Fit all / Home frames the network, and Frame / F frames the selection. Zoom buttons
+use the viewer center. Panel resizing and monitor switches retain the view during
+the session. Enter on the canvas focuses the selected node; Shift+Tab leaves it.
 
 Select Code and write scalar TypeShade in the lower dock. **Apply code** or
 Ctrl/Cmd+Enter compiles it in a dedicated worker. Failed compilation keeps the

@@ -1,20 +1,29 @@
+import { useRef } from "react";
 import type { GraphEditor } from "../../../hooks/graph/useGraphEditor.ts";
+import type { GraphGestures } from "../../../hooks/graph/useGraphGestures.ts";
+import type { GraphConnectionsController } from "../../../hooks/graph/useGraphConnections.ts";
 import { DEFINITIONS } from "../../../../graph/catalog.ts";
-import { type GraphNode } from "../../../../graph/types.ts";
+import type { GraphNode } from "../../../../graph/types.ts";
+import { NODE_METADATA } from "../../../config/graphNodeMetadata.ts";
 import { openContext } from "../../../interactions/openContext.ts";
-import type { GraphViewport } from "../../../hooks/graph/useGraphViewport.ts";
-import { WIDTH } from "../../../shared/graphGeometry.ts";
+import { useInteractions } from "../../../hooks/interactions/useInteractions.ts";
+import { WIDTH, moveNodes } from "../../../shared/graphGeometry.ts";
+import { GraphPort } from "./GraphPort.tsx";
 export function GraphNodeCard({
   node: n,
   controller: c,
-  viewport,
+  gestures,
+  connections,
 }: {
   node: GraphNode;
   controller: GraphEditor;
-  viewport: GraphViewport;
+  gestures: GraphGestures;
+  connections: GraphConnectionsController;
 }) {
-  const g = c.graph!,
-    { down, link, setLink, setCursor, point, openMenu } = viewport;
+  const { openMenu } = useInteractions(),
+    pointerFocus = useRef(false);
+  const def = DEFINITIONS[n.kind],
+    selected = c.selectedIds.includes(n.id);
   return (
     <div
       data-graph-node={n.id}
@@ -22,14 +31,24 @@ export function GraphNodeCard({
       role="group"
       aria-label={`${n.name} node`}
       tabIndex={0}
-      className={`graph-node ${c.selected?.id === n.id ? "selected" : ""} ${n.bypass ? "bypassed" : ""}`}
+      className={`graph-node ${selected ? "selected" : ""} ${c.selected?.id === n.id ? "primary-selection" : ""} ${n.bypass ? "bypassed" : ""}`}
       style={{ left: n.x, top: n.y, width: WIDTH }}
-      onPointerDown={(event) => down(event, n)}
-      onFocus={() => {
-        if (c.selected?.id !== n.id) c.select(n.id);
+      onPointerDown={(event) => {
+        pointerFocus.current = true;
+        connections.select();
+        gestures.down(event, n);
+        pointerFocus.current = false;
+      }}
+      onFocus={(event) => {
+        if (
+          event.target === event.currentTarget &&
+          !pointerFocus.current &&
+          !c.isSelected(n.id)
+        )
+          c.select(n.id);
       }}
       onContextMenu={(event) => {
-        c.select(n.id);
+        c.select(n.id, "preserve");
         openContext(
           event,
           openMenu,
@@ -52,7 +71,7 @@ export function GraphNodeCard({
           );
           return;
         }
-        if ((event.target as Element).closest("button")) return;
+        if (event.target !== event.currentTarget) return;
         if (
           ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(
             event.key,
@@ -60,107 +79,71 @@ export function GraphNodeCard({
         ) {
           event.preventDefault();
           event.stopPropagation();
-          c.edit(n.id, {
-            x:
-              n.x +
+          c.change({
+            ...c.graph!,
+            nodes: moveNodes(
+              c.graph!.nodes,
+              c.getSelection(),
               (event.key === "ArrowRight"
                 ? 1
                 : event.key === "ArrowLeft"
                   ? -1
-                  : 0) *
-                (event.shiftKey ? 20 : 5),
-            y:
-              n.y +
+                  : 0) * (event.shiftKey ? 20 : 5),
               (event.key === "ArrowDown"
                 ? 1
                 : event.key === "ArrowUp"
                   ? -1
-                  : 0) *
-                (event.shiftKey ? 20 : 5),
+                  : 0) * (event.shiftKey ? 20 : 5),
+            ),
           });
         }
       }}
     >
       <div className="graph-node-title">
         <span>{n.name}</span>
-        <small>{n.bypass ? "BYPASS" : DEFINITIONS[n.kind].label}</small>
+        <small>{n.bypass ? "BYPASS" : def.label}</small>
       </div>
       <div className="graph-node-ports">
-        {Object.entries(DEFINITIONS[n.kind].inputs).map(([port, type]) => (
-          <button
+        {Object.entries(def.inputs).map(([port, signal]) => (
+          <GraphPort
             key={port}
-            className={`graph-port input ${type}`}
-            data-graph-input={port}
-            data-graph-target={n.id}
-            aria-label={`${n.name} ${port} input`}
-            data-tooltip={`${type} input. Connect a matching output, or use Node properties to choose a source.`}
-            disabled={c.busy}
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={() => {
-              if (link) {
-                c.connect(link, n.id, port);
-                setLink(undefined);
-              } else c.select(n.id);
-            }}
-          >
-            <i />
-            {port}
-          </button>
+            endpoint={{ node: n.id, port }}
+            name={n.name}
+            signal={signal}
+            connected={!!n.inputs[port]}
+            busy={c.busy}
+            connections={connections}
+          />
         ))}
       </div>
       {n.kind !== "output" && (
-        <button
-          className={`graph-port output ${DEFINITIONS[n.kind].output}`}
-          data-graph-output={n.id}
-          aria-label={`${n.name} output`}
-          disabled={c.busy}
-          data-tooltip="Drag to a matching input. Keyboard: activate this output, then activate an input."
-          onPointerDown={(event) => {
-            event.stopPropagation();
-            event.preventDefault();
-            setLink(n.id);
-            setCursor(point(event.clientX, event.clientY));
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            if (link) setCursor(point(event.clientX, event.clientY));
-          }}
-          onPointerUp={(event) => {
-            event.stopPropagation();
-            const input = document
-              .elementFromPoint(event.clientX, event.clientY)
-              ?.closest<HTMLElement>("[data-graph-input]");
-            if (input) {
-              c.connect(
-                n.id,
-                input.dataset.graphTarget!,
-                input.dataset.graphInput!,
-              );
-              setLink(undefined);
-            }
-            event.currentTarget.releasePointerCapture(event.pointerId);
-          }}
-          onClick={(event) => {
-            if (event.detail === 0) {
-              setLink(n.id);
-              setCursor({ x: n.x + WIDTH + 70, y: n.y + 50 });
-            }
-          }}
-        >
-          {DEFINITIONS[n.kind].output}
-          <i />
-        </button>
+        <GraphPort
+          endpoint={{ node: n.id }}
+          name={n.name}
+          signal={def.output}
+          connected={c.graph!.nodes.some((other) =>
+            Object.values(other.inputs).includes(n.id),
+          )}
+          busy={c.busy}
+          connections={connections}
+        />
       )}
-      <div className="graph-node-caption">
+      <div
+        className="graph-node-caption"
+        data-tooltip={NODE_METADATA[n.kind].summary}
+      >
         {n.kind === "code"
           ? "TypeShade · 4 state values"
           : n.kind === "parameter"
-            ? `p${n.values[0]} · ${g.parameters[n.values[0]!]!.name}`
-            : n.values.length
-              ? n.values.map((v) => Number(v.toFixed(3))).join(" · ")
-              : n.kind === "output"
-                ? "Mono · 48 kHz"
-                : ""}
+            ? `p${n.values[0]} · ${c.graph!.parameters[n.values[0]!]!.name}`
+            : n.kind === "output"
+              ? "Mono · 48 kHz"
+              : n.values
+                  .map(
+                    (v, i) =>
+                      `${def.controls[i]!.name.split(" (")[0].split(":")[0]} ${Number(v.toFixed(3))}`,
+                  )
+                  .join(" · ")}
       </div>
     </div>
   );

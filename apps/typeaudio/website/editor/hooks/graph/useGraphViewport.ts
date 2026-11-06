@@ -1,147 +1,118 @@
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GraphEditor } from "./useGraphEditor.ts";
-import { DEFINITIONS } from "../../../graph/catalog.ts";
-import { type GraphNode, type NodeKind } from "../../../graph/types.ts";
-import { useInteractions } from "../interactions/useInteractions.ts";
-import { type MenuItem } from "../../interactions/types.ts";
-import { WIDTH } from "../../shared/graphGeometry.ts";
+import {
+  graphBounds,
+  type GraphView,
+  type Point,
+} from "../../shared/graphGeometry.ts";
+
 export function useGraphViewport(c: GraphEditor) {
-  const { openMenu } = useInteractions(),
-    surface = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState({ x: 24, y: 32, scale: 0.85 }),
-    [link, setLink] = useState<string>(),
-    [cursor, setCursor] = useState({ x: 0, y: 0 });
-  const drag = useRef<
-    | {
-        pointer: number;
-        x: number;
-        y: number;
-        node?: GraphNode;
-        view: typeof view;
-        element: HTMLElement;
-      }
-    | undefined
-  >(undefined);
-  const g = c.graph;
-  const currentGraph = useRef(g);
-  currentGraph.current = g;
-  useEffect(() => {
-    if (!surface.current || !currentGraph.current) return;
-    const observer = new ResizeObserver(() => fit());
-    observer.observe(surface.current);
-    return () => observer.disconnect();
-  }, [c.owner]);
-  function point(x: number, y: number) {
-    const r = surface.current!.getBoundingClientRect();
-    return {
-      x: (x - r.left - view.x) / view.scale,
-      y: (y - r.top - view.y) / view.scale,
-    };
+  const surface = useRef<HTMLDivElement>(null);
+  const lockZoom = useRef(false);
+  const [view, setState] = useState<GraphView>(
+    () => c.viewMemory.current.get(c.owner) ?? { x: 24, y: 32, scale: 0.85 },
+  );
+  const current = useRef({ c, view });
+  current.current = { c, view };
+  function setView(next: GraphView | ((previous: GraphView) => GraphView)) {
+    const value =
+      typeof next === "function" ? next(current.current.view) : next;
+    current.current.view = value;
+    const { viewMemory, owner } = current.current.c;
+    viewMemory.current.set(owner, value);
+    if (viewMemory.current.size > 32)
+      viewMemory.current.delete(viewMemory.current.keys().next().value!);
+    setState(value);
   }
-  function finish(cancel = false) {
-    const d = drag.current;
-    if (!d) return;
-    drag.current = undefined;
-    if (d.node) {
-      if (cancel) c.e.cancelEdit();
-      else c.e.endEdit();
-    } else if (cancel) setView(d.view);
-    try {
-      d.element.releasePointerCapture(d.pointer);
-    } catch {}
-  }
-  function down(event: PointerEvent<HTMLElement>, n?: GraphNode) {
-    if (event.button !== 0 && event.button !== 1) return;
-    if ((event.target as Element).closest("button,input,select,textarea"))
-      return;
-    event.preventDefault();
-    event.stopPropagation();
-    const pan = event.button === 1 || c.e.state.tool === "hand" || !n;
-    if (n && !pan) {
-      event.currentTarget.focus({ preventScroll: true });
-      c.select(n.id);
-      c.e.beginEdit();
-    }
-    event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = {
-      pointer: event.pointerId,
-      x: event.clientX,
-      y: event.clientY,
-      node: pan ? undefined : n,
-      view,
-      element: event.currentTarget,
-    };
-  }
-  function move(event: PointerEvent<HTMLElement>) {
-    const d = drag.current;
-    if (link) setCursor(point(event.clientX, event.clientY));
-    if (!d) return;
-    if (d.node)
-      c.edit(d.node.id, {
-        x: Math.max(
-          -10000,
-          Math.min(10000, d.node.x + (event.clientX - d.x) / view.scale),
-        ),
-        y: Math.max(
-          -10000,
-          Math.min(10000, d.node.y + (event.clientY - d.y) / view.scale),
-        ),
-      });
-    else
-      setView({
-        ...d.view,
-        x: d.view.x + event.clientX - d.x,
-        y: d.view.y + event.clientY - d.y,
-      });
-  }
-  function fit() {
+  function point(x: number, y: number): Point {
     const r = surface.current!.getBoundingClientRect(),
-      xs = currentGraph.current!.nodes.map((n) => n.x),
-      ys = currentGraph.current!.nodes.map((n) => n.y),
-      minX = Math.min(...xs),
-      minY = Math.min(...ys),
-      w = Math.max(...xs) + WIDTH - minX,
-      h = Math.max(...ys) + 140 - minY,
-      s = Math.max(
-        0.25,
-        Math.min(1.2, (r.width - 60) / w, (r.height - 55) / h),
+      v = current.current.view;
+    return { x: (x - r.left - v.x) / v.scale, y: (y - r.top - v.y) / v.scale };
+  }
+  function center() {
+    const r = surface.current!.getBoundingClientRect();
+    return point(r.left + r.width / 2, r.top + r.height / 2);
+  }
+  function fit(nodes = current.current.c.graph?.nodes ?? []) {
+    const r = surface.current?.getBoundingClientRect();
+    if (!r?.width || !r.height || !nodes.length) return;
+    const b = graphBounds(nodes),
+      scale = Math.max(
+        0.15,
+        Math.min(1.2, (r.width - 60) / b.width, (r.height - 60) / b.height),
       );
     setView({
-      x: (r.width - w * s) / 2 - minX * s,
-      y: (r.height - h * s) / 2 - minY * s,
-      scale: s,
+      x: (r.width - b.width * scale) / 2 - b.x * scale,
+      y: (r.height - b.height * scale) / 2 - b.y * scale,
+      scale,
     });
   }
-  function additions(x: number, y: number): MenuItem[] {
-    return (Object.keys(DEFINITIONS) as NodeKind[])
-      .filter((k) => k !== "output")
-      .map((k) => ({
-        label: `Add ${DEFINITIONS[k].label}`,
-        disabled:
-          c.busy ||
-          g!.nodes.length >= 16 ||
-          (k === "code" &&
-            g!.nodes.filter((n) => n.kind === "code").length >= 2),
-        action: () => c.add(k, x, y),
-      }));
+  function frameSelection() {
+    const g = current.current.c;
+    fit(g.graph?.nodes.filter((n) => g.getSelection().includes(n.id)));
   }
-
+  function zoom(factor: number, anchor?: Point) {
+    const r = surface.current!.getBoundingClientRect(),
+      v = current.current.view;
+    const screen = anchor ?? {
+        x: r.left + r.width / 2,
+        y: r.top + r.height / 2,
+      },
+      p = point(screen.x, screen.y);
+    const scale = Math.max(0.15, Math.min(2.5, v.scale * factor));
+    setView({
+      x: screen.x - r.left - p.x * scale,
+      y: screen.y - r.top - p.y * scale,
+      scale,
+    });
+  }
+  useEffect(() => {
+    const el = surface.current;
+    if (!el) return;
+    let initialized = c.viewMemory.current.has(c.owner),
+      width = 0,
+      height = 0;
+    if (initialized) setView(c.viewMemory.current.get(c.owner)!);
+    const observer = new ResizeObserver(() => {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      if (!initialized) {
+        fit();
+        initialized = true;
+      } else if (width && height)
+        setView((v) => ({
+          ...v,
+          x: v.x + (r.width - width) / 2,
+          y: v.y + (r.height - height) / 2,
+        }));
+      width = r.width;
+      height = r.height;
+    });
+    observer.observe(el);
+    const wheel = (event: WheelEvent) => {
+      event.preventDefault();
+      if (lockZoom.current) return;
+      zoom(Math.exp(-event.deltaY * 0.001), {
+        x: event.clientX,
+        y: event.clientY,
+      });
+    };
+    el.addEventListener("wheel", wheel, { passive: false });
+    return () => {
+      observer.disconnect();
+      el.removeEventListener("wheel", wheel);
+    };
+  }, [c.owner]);
   return {
-    dragging: () => !!drag.current,
     surface,
     view,
     setView,
-    link,
-    setLink,
-    cursor,
-    setCursor,
     point,
-    finish,
-    down,
-    move,
+    center,
     fit,
-    additions,
-    openMenu,
+    frameSelection,
+    zoom,
+    lockZoom,
   };
 }
 export type GraphViewport = ReturnType<typeof useGraphViewport>;

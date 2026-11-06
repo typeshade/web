@@ -13,8 +13,8 @@ export function GraphCodeEditor({
     [generated, setGenerated] = useState(false);
   const id = c.owner + ":" + n?.id,
     draft = drafts[id],
-    text = draft?.base === n?.code ? draft!.text : (n?.code ?? ""),
-    dirty = text !== n?.code;
+    text = draft && draft.base === n?.code ? draft.text : (n?.code ?? ""),
+    dirty = n?.kind === "code" && text !== n.code;
   const setDraft = (next: { id: string; base: string; text: string }) =>
     setDrafts((old) => ({
       ...old,

@@ -1,150 +1,136 @@
 import type { GraphEditor } from "../../../hooks/graph/useGraphEditor.ts";
 import { Panel } from "../../molecules/Panel.tsx";
 import { openContext } from "../../../interactions/openContext.ts";
+import { useInteractions } from "../../../hooks/interactions/useInteractions.ts";
 import { useGraphViewport } from "../../../hooks/graph/useGraphViewport.ts";
+import { useGraphGestures } from "../../../hooks/graph/useGraphGestures.ts";
+import { useGraphConnections } from "../../../hooks/graph/useGraphConnections.ts";
+import { useGraphNodePicker } from "../../../hooks/graph/useGraphNodePicker.ts";
+import { graphKeyboardHandler } from "../../../hooks/graph/graphKeyboardHandler.ts";
+import { arrangeGraph } from "../../../shared/graphLayout.ts";
+import { GRID } from "../../../shared/graphGeometry.ts";
 import { GraphToolbar } from "../../molecules/graph/GraphToolbar.tsx";
+import { GraphViewControls } from "../../molecules/graph/GraphViewControls.tsx";
 import { GraphConnections } from "../../molecules/graph/GraphConnections.tsx";
 import { GraphNodeCard } from "../../molecules/graph/GraphNodeCard.tsx";
+import { GraphNodePicker } from "./GraphNodePicker.tsx";
 export function GraphCanvas({ controller: c }: { controller: GraphEditor }) {
-  const viewport = useGraphViewport(c);
-  const {
-    surface,
-    view,
-    setView,
-    link,
-    setLink,
-    cursor,
-    point,
-    finish,
-    down,
-    move,
-    fit,
-    additions,
-    openMenu,
-  } = viewport;
-  const g = c.graph;
-  if (!g) return null;
+  const viewport = useGraphViewport(c),
+    gestures = useGraphGestures(c, viewport),
+    picker = useGraphNodePicker(c, viewport);
+  const connections = useGraphConnections(c, viewport, picker),
+    { openMenu } = useInteractions();
+  const { surface, view } = viewport,
+    graph = c.graph;
+  if (!graph) return null;
+  function arrange() {
+    const next = arrangeGraph(graph!);
+    c.e.endEdit();
+    c.change(next);
+    viewport.fit(next.nodes);
+  }
   return (
     <Panel
       title="Sound / Node network"
       className="graph-network"
       actions={
-        <>
-          <button
-            onClick={fit}
-            data-tooltip="Fit the complete node graph in the viewer."
-          >
-            Fit
-          </button>
-          <button
-            aria-label="Zoom graph out"
-            onClick={() =>
-              setView((v) => ({ ...v, scale: Math.max(0.25, v.scale - 0.1) }))
-            }
-          >
-            −
-          </button>
-          <span>{Math.round(view.scale * 100)}%</span>
-          <button
-            aria-label="Zoom graph in"
-            onClick={() =>
-              setView((v) => ({ ...v, scale: Math.min(2, v.scale + 0.1) }))
-            }
-          >
-            +
-          </button>
-        </>
+        <GraphViewControls
+          scale={view.scale}
+          hasSelection={!!c.selectedIds.length}
+          onFit={() => viewport.fit()}
+          onFrame={viewport.frameSelection}
+          onZoom={viewport.zoom}
+        />
       }
     >
-      <GraphToolbar controller={c} viewport={viewport} />
+      <GraphToolbar
+        count={graph.nodes.length}
+        selected={c.selectedIds.length}
+        busy={c.busy}
+        snap={gestures.snap}
+        onSnap={gestures.setSnap}
+        onAdd={() => {
+          connections.cancel();
+          picker.open();
+        }}
+        onArrange={arrange}
+        onRecipe={(recipe) => {
+          connections.cancel();
+          void c.recipe(recipe);
+        }}
+      />
       <div
         ref={surface}
-        className={`graph-surface ${link ? "is-connecting" : ""}`}
+        className={`graph-surface ${connections.pending ? "is-connecting" : ""}`}
         tabIndex={0}
         aria-label="Node graph canvas"
         aria-describedby="graph-canvas-help"
-        onPointerDown={(event) => down(event)}
-        onPointerMove={move}
-        onPointerUp={() => finish()}
-        onPointerCancel={() => finish(true)}
-        onLostPointerCapture={() => finish(true)}
-        onWheel={(event) => {
-          if (viewport.dragging()) return;
-          const p = point(event.clientX, event.clientY),
-            r = surface.current!.getBoundingClientRect(),
-            scale = Math.max(
-              0.25,
-              Math.min(2, view.scale * Math.exp(-event.deltaY * 0.001)),
-            );
-          setView({
-            scale,
-            x: event.clientX - r.left - p.x * scale,
-            y: event.clientY - r.top - p.y * scale,
-          });
+        style={{
+          backgroundPosition: `${view.x}px ${view.y}px`,
+          backgroundSize: `${GRID * view.scale * (view.scale < 0.5 ? 2 : 1)}px ${GRID * view.scale * (view.scale < 0.5 ? 2 : 1)}px`,
         }}
-        onKeyDown={(event) => {
-          if ((event.target as Element).closest("input,textarea,select"))
-            return;
-          if (event.key === "Escape") {
-            event.preventDefault();
-            setLink(undefined);
-            finish(true);
-          }
-          if (
-            (event.ctrlKey || event.metaKey) &&
-            event.key.toLowerCase() === "d" &&
-            c.selected
-          ) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (!c.busy) c.duplicate(c.selected.id);
-          }
-          if (
-            (event.key === "Delete" || event.key === "Backspace") &&
-            c.selected
-          ) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (!c.busy) c.remove(c.selected.id);
-          }
-          if (
-            event.key.toLowerCase() === "f" &&
-            !event.ctrlKey &&
-            !event.metaKey
-          ) {
-            event.preventDefault();
-            event.stopPropagation();
-            fit();
-          }
-          if (event.key === "Enter" && event.target === surface.current) {
-            event.preventDefault();
-            surface.current
-              ?.querySelector<HTMLElement>(".graph-node.selected")
-              ?.focus();
-          }
-          if (
-            event.key === "Tab" &&
-            !event.shiftKey &&
-            event.target === surface.current
-          ) {
-            event.preventDefault();
-            const r = surface.current!.getBoundingClientRect();
-            openMenu(
-              "add-node",
-              "Add node",
-              additions(100, 100),
-              { x: r.left + 20, y: r.top + 20 },
-              surface.current,
-            );
-          }
+        onPointerDown={(event) => {
+          connections.select();
+          gestures.down(event);
         }}
+        onPointerMove={(event) => {
+          gestures.move(event);
+          connections.move(event);
+        }}
+        onPointerUp={() => gestures.finish()}
+        onPointerCancel={() => {
+          gestures.finish(true);
+          connections.cancel();
+        }}
+        onLostPointerCapture={() => gestures.finish(true)}
+        onDoubleClick={(event) => {
+          if (
+            !(event.target as Element).closest(
+              "[data-graph-node],[data-graph-wire]",
+            )
+          )
+            picker.open(viewport.point(event.clientX, event.clientY));
+        }}
+        onKeyDown={graphKeyboardHandler(
+          c,
+          viewport,
+          gestures,
+          connections,
+          picker,
+        )}
         onContextMenu={(event) => {
-          if ((event.target as Element).closest("[data-graph-node]")) return;
-          const p = point(event.clientX, event.clientY);
+          if (
+            (event.target as Element).closest(
+              "[data-graph-node],[data-graph-wire]",
+            )
+          )
+            return;
+          const point = viewport.point(event.clientX, event.clientY);
           openContext(event, openMenu, "graph-canvas", "Graph actions", [
-            ...additions(p.x, p.y),
+            {
+              label: "Add node…",
+              shortcut: "Tab",
+              disabled: c.busy,
+              action: () => picker.open(point),
+            },
+            {
+              label: "Select all nodes",
+              shortcut: "Ctrl/⌘ A",
+              action: () => c.selectMany(graph.nodes.map((n) => n.id)),
+            },
+            { label: "Arrange nodes", disabled: c.busy, action: arrange },
             { separator: true },
-            { label: "Fit graph", shortcut: "F", action: fit },
+            {
+              label: "Frame selection",
+              shortcut: "F",
+              disabled: !c.selectedIds.length,
+              action: viewport.frameSelection,
+            },
+            {
+              label: "Fit graph",
+              shortcut: "Home",
+              action: () => viewport.fit(),
+            },
           ]);
         }}
       >
@@ -154,23 +140,42 @@ export function GraphCanvas({ controller: c }: { controller: GraphEditor }) {
             transform: `translate(${view.x}px,${view.y}px) scale(${view.scale})`,
           }}
         >
-          <GraphConnections graph={g} link={link} cursor={cursor} />
-          {g.nodes.map((n) => (
+          <GraphConnections
+            graph={graph}
+            connections={connections}
+            picker={picker}
+            busy={c.busy}
+          />
+          {graph.nodes.map((node) => (
             <GraphNodeCard
-              key={n.id}
-              node={n}
+              key={node.id}
+              node={node}
               controller={c}
-              viewport={viewport}
+              gestures={gestures}
+              connections={connections}
             />
           ))}
+          {gestures.box && (
+            <div
+              className="graph-selection-box"
+              style={{
+                left: gestures.box.x,
+                top: gestures.box.y,
+                width: gestures.box.width,
+                height: gestures.box.height,
+              }}
+            />
+          )}
         </div>
+        {picker.request && <GraphNodePicker graph={graph} picker={picker} />}
       </div>
       <div className="graph-footer" id="graph-canvas-help">
         {c.busy
           ? "Compiling…"
-          : link
-            ? "Choose an input · Escape cancels"
-            : "Drag nodes / ports · Wheel zooms · Middle-drag pans · Enter selects · Tab adds a node"}
+          : (connections.feedback ??
+            (connections.selected
+              ? "Connection selected · Delete disconnects · Enter inserts a node"
+              : "Drag empty space to select · Shift-click adds · Middle-drag pans · Tab adds · F frames selection"))}
       </div>
     </Panel>
   );

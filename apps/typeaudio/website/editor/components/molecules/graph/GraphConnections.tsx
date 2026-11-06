@@ -1,43 +1,64 @@
 import { DEFINITIONS } from "../../../../graph/catalog.ts";
 import type { SoundGraph } from "../../../../graph/types.ts";
-import { WIDTH, curve } from "../../../shared/graphGeometry.ts";
+import type { GraphConnectionsController } from "../../../hooks/graph/useGraphConnections.ts";
+import type { GraphNodePickerController } from "../../../hooks/graph/useGraphNodePicker.ts";
+import {
+  inputPoint,
+  outputPoint,
+  curve,
+} from "../../../shared/graphGeometry.ts";
+import { GraphConnection } from "./GraphConnection.tsx";
 export function GraphConnections({
   graph: g,
-  link,
-  cursor,
+  connections: c,
+  picker,
+  busy,
 }: {
   graph: SoundGraph;
-  link?: string;
-  cursor: { x: number; y: number };
+  connections: GraphConnectionsController;
+  picker: GraphNodePickerController;
+  busy: boolean;
 }) {
   return (
-    <svg className="graph-wires" aria-hidden="true">
+    <svg className="graph-wires" role="group" aria-label="Graph connections">
       {g.nodes.flatMap((n) =>
         Object.entries(n.inputs).map(([port, from]) => {
-          const a = g.nodes.find((n) => n.id === from)!;
-          const y =
-            n.y +
-            50 +
-            Object.keys(DEFINITIONS[n.kind].inputs).indexOf(port) * 25;
+          const source = g.nodes.find((node) => node.id === from)!,
+            start = outputPoint(source),
+            end = inputPoint(n, port),
+            wire = { from, to: n.id, port };
           return (
-            <path
-              key={n.id + port}
-              className={DEFINITIONS[a.kind].output}
-              d={curve(a.x + WIDTH, a.y + 50, n.x, y)}
+            <GraphConnection
+              key={n.id + ":" + port}
+              wire={wire}
+              start={start}
+              end={end}
+              label={`${source.name} to ${n.name} ${port}`}
+              signal={DEFINITIONS[source.kind].output}
+              selected={c.selected?.to === n.id && c.selected.port === port}
+              busy={busy}
+              onSelect={() => c.select(wire)}
+              onDisconnect={() => c.disconnect(wire)}
+              onInsert={() =>
+                picker.open(
+                  { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 + 40 },
+                  { from, to: { node: n.id, port } },
+                )
+              }
             />
           );
         }),
       )}
-      {link &&
-        (() => {
-          const n = g.nodes.find((n) => n.id === link);
-          return n ? (
-            <path
-              className="pending"
-              d={curve(n.x + WIDTH, n.y + 50, cursor.x, cursor.y)}
-            />
-          ) : null;
-        })()}
+      {c.origin && c.pending && (
+        <path
+          className="pending"
+          d={
+            c.pending.port === undefined
+              ? curve(c.origin.x, c.origin.y, c.cursor.x, c.cursor.y)
+              : curve(c.cursor.x, c.cursor.y, c.origin.x, c.origin.y)
+          }
+        />
+      )}
     </svg>
   );
 }
