@@ -1,0 +1,212 @@
+.code-document-tabs {
+  display: flex;
+  flex-shrink: 0;
+  overflow-x: auto;
+  background: #252629;
+  border-bottom: 1px solid #17181b;
+}
+.studio-app .code-document-tabs button {
+  border: 0;
+  border-right: 1px solid #191a1d;
+  border-top: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  min-height: 32px;
+  padding: 6px 12px;
+  color: #9fa5af;
+}
+.studio-app .code-document-tabs button[aria-selected="true"] {
+  background: #202124;
+  border-top-color: #96b8f1;
+  color: #e1e6ef;
+}
+.code-file-icon {
+  color: #96b8f1;
+  font:
+    11px PlexMono,
+    monospace;
+}
+.code-draft-dot {
+  width: 6px;
+  height: 6px;
+  background: #ddc59b;
+  border-radius: 50%;
+}
+#code-document-panel {
+  flex: 1;
+  min-height: 110px;
+  display: flex;
+}
+.code-editor-frame {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.studio-app #graph-code.monaco-host {
+  flex: 1;
+  min-height: 90px;
+  width: 100%;
+  padding: 0;
+}
+.code-position {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 3px 10px;
+  background: #24262b;
+  color: #9da5b4;
+  font-size: 9px;
+  flex-wrap: wrap;
+}
+.code-loading {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: #adb5c4;
+}
+.code-conflict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  background: #463b2c;
+  font-size: 11px;
+}
+.code-conflict span {
+  flex: 1 1 100%;
+}
+.code-layout-controls {
+  display: flex;
+  gap: 2px;
+}
+.studio-app .code-layout-controls button[aria-pressed="true"] {
+  background: #3d4a5d;
+}
+.graph-dock-panel > .panel-body {
+  padding: 0;
+  overflow: hidden;
+}
+.graph-code-panel {
+  min-height: 0;
+}
+.graph-code-toolbar > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.graph-code-toolbar button {
+  flex-shrink: 0;
+}
+.graph-code-status {
+  flex-shrink: 0;
+}
+.graph-parameters {
+  overflow: auto;
+}
+.graph-dock-panel > .panel-header {
+  gap: 4px;
+}
+.graph-dock-panel > .panel-header h2 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Monaco owns its input/widget styling. Keep application controls out of editor internals. */
+.studio-app .monaco-editor :is(input, textarea) {
+  font-family: inherit;
+}
+.studio-app .monaco-editor .inputarea {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+.studio-app .monaco-editor .monaco-inputbox input {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+}
+@media (min-width: 951px) {
+  .workspace.code-layout-code:not(.viewer-focused) {
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .code-layout-code:not(.viewer-focused) > :is(.viewer-region, .splitter-dock) {
+    display: none;
+  }
+  .code-layout-code:not(.viewer-focused) > .dock-region {
+    grid-row: 1;
+  }
+}
+@media (min-width: 1400px) {
+  .workspace.code-layout-right:not(.viewer-focused) {
+    grid-template-columns: min(var(--project-width), 22vw) 4px minmax(
+        220px,
+        1fr
+      ) 4px min(var(--code-width), 32vw) 4px min(var(--inspector-width), 24vw);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .code-layout-right:not(.viewer-focused) > .dock-region {
+    grid-column: 5;
+    grid-row: 1;
+  }
+  .code-layout-right:not(.viewer-focused) > .inspector-region {
+    grid-column: 7;
+  }
+  .code-layout-right:not(.viewer-focused) > .splitter-inspector {
+    grid-column: 6;
+  }
+  .code-layout-right:not(.viewer-focused) > .splitter-code {
+    grid-column: 4;
+  }
+  .code-layout-right .graph-dock {
+    flex-direction: column;
+  }
+  .code-layout-right .graph-parameters {
+    width: auto;
+    flex-shrink: 0;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 950px) {
+  .graph-code-panel {
+    height: 400px;
+    flex: none;
+  }
+  .graph-dock-panel > .panel-body {
+    overflow: visible;
+  }
+  .code-layout-code > :is(.viewer-region, .splitter-dock) {
+    display: none;
+  }
+  .workspace.code-layout-code {
+    grid-template-rows: auto auto;
+  }
+  .code-layout-code > .dock-region {
+    grid-row: 1;
+  }
+  .code-layout-code .graph-code-panel {
+    height: 520px;
+  }
+}
+@media (max-width: 600px) {
+  .graph-code-toolbar {
+    flex-wrap: wrap;
+  }
+  .graph-code-toolbar > span {
+    width: 100%;
+  }
+  .code-position {
+    gap: 8px;
+    justify-content: space-between;
+  }
+  .code-position span:last-child {
+    display: none;
+  }
+}

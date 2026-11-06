@@ -19,6 +19,8 @@ editor/
   state/            Document data, projection, history and restoration
   engine/           Sound and scene playback adapters
   interactions/     Menu contracts and command descriptions
+  commands/         Shared application command catalog and search
+  code/             Draft reconciliation, diagnostics and editor language setup
   layout/           Layout contracts, storage and application
   shared/           Small utilities with one purpose
   styles/           Ordered base, layout, control and feature styles
@@ -82,6 +84,28 @@ retains external inputs. Validation runs before applying a structural edit.
 Transient connection previews never disconnect an applied wire. `graphLayout`
 and `graphGeometry` own UI placement; layout edits do not alter the compile key.
 Viewport memory is bounded to 32 source owners for the current editor session.
+
+`useCodeDocuments` owns unapplied code buffers at the page level, keyed by source
+owner and node ID. It survives panel unmounts and keeps newer typing when a worker
+applies an older submitted snapshot. Clean buffers follow document edits; dirty
+buffers require explicit conflict resolution when applied code changes. Drafts
+stay in memory and are excluded from document saves/exports. A beforeunload guard
+covers unapplied edits. `codeDraft` contains the reconciliation rule.
+
+`useMonacoEditor` owns editor instances, per-document models, cursor/view state,
+local Undo and disposal. Monaco, its CSS and its editor worker load only for the
+code panel, separately from the TypeShade compiler and audio worklet. Language
+setup provides tokens, bounded vocabulary completion and hover help, not a full
+TypeScript language server. Worker errors with explicit node/line locations get
+markers only while that attempted text is still active. `codeDiagnostic` never
+invents a source position for an unlocated error.
+
+`createStudioCommands` reuses File/Edit/Window menu descriptions and adds graph,
+code and workspace actions. `useCommandPalette` owns global shortcuts; the modal
+`CommandPalette` owns search, result selection and focus restoration. Disabled
+actions remain visible and cannot execute. `useCodeLayout` owns persisted code
+placement; `WorkspaceGrid` uses the existing panel slots for horizontal/vertical
+splits and code focus. Narrow layouts fall back to a horizontal split.
 
 ## Styles and extensions
 

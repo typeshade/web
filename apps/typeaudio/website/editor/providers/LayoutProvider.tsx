@@ -10,7 +10,9 @@ import { DIMENSIONS } from "../layout/constants.ts";
 import { load } from "../layout/storage.ts";
 import { apply } from "../layout/applyLayout.ts";
 import { Context } from "../layout/context.ts";
+import { useCodeLayout } from "../hooks/layout/useCodeLayout.ts";
 export function LayoutProvider({ children }: { children: ReactNode }) {
+  const code = useCodeLayout();
   const [sizes, setSizes] = useState(load),
     [focused, focus] = useState(false),
     current = useRef(sizes);
@@ -35,6 +37,7 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
   return (
     <Context.Provider
       value={{
+        ...code,
         sizes,
         focused,
         focus,
@@ -59,6 +62,7 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
         },
         save,
         reset: () => {
+          code.setCodeMode("bottom");
           current.current = {};
           apply({});
           setSizes({});

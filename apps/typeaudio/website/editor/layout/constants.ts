@@ -19,4 +19,10 @@ export const DIMENSIONS = {
     max: 520,
     label: "Resize timeline",
   },
+  code: {
+    variable: "--code-width",
+    min: 280,
+    max: 700,
+    label: "Resize code editor",
+  },
 } as const;

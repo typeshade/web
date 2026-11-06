@@ -1,10 +1,12 @@
 import { PanelSplitter } from "../components/molecules/PanelSplitter.tsx";
 import type { ReactNode } from "react";
 import type { Workspace } from "../state/documentTypes.ts";
+import type { CodeMode } from "../layout/types.ts";
 export function WorkspaceGrid({
   workspace,
   hasGraph,
   focused,
+  codeMode,
   project,
   viewer,
   inspector,
@@ -14,6 +16,7 @@ export function WorkspaceGrid({
   workspace: Workspace;
   hasGraph: boolean;
   focused: boolean;
+  codeMode: CodeMode;
   project: ReactNode;
   viewer: ReactNode;
   inspector: ReactNode;
@@ -25,7 +28,7 @@ export function WorkspaceGrid({
     <main
       id="editor-main"
       tabIndex={-1}
-      className={`workspace ${picture ? "picture-workspace" : "sound-workspace"} ${hasGraph ? "graph-workspace" : ""} ${focused ? "viewer-focused" : ""}`}
+      className={`workspace ${picture ? "picture-workspace" : "sound-workspace"} ${hasGraph ? `graph-workspace code-layout-${codeMode}` : ""} ${focused ? "viewer-focused" : ""}`}
       data-workspace={workspace}
     >
       {project}
@@ -35,7 +38,9 @@ export function WorkspaceGrid({
       </div>
       <PanelSplitter dimension="inspector" />
       <aside className="inspector-region">{inspector}</aside>
-      <PanelSplitter dimension="dock" />
+      <PanelSplitter
+        dimension={hasGraph && codeMode === "right" ? "code" : "dock"}
+      />
       <div className="dock-region">{dock}</div>
     </main>
   );

@@ -14,6 +14,10 @@ import { WorkspaceGrid } from "../templates/WorkspaceGrid.tsx";
 import { SoundViewer } from "../components/organisms/sound/SoundViewer.tsx";
 import { SoundProperties } from "../components/organisms/sound/SoundProperties.tsx";
 import { SignalChainPanel } from "../components/organisms/sound/SignalChainPanel.tsx";
+import { useCodeDocuments } from "../hooks/code/useCodeDocuments.ts";
+import { useCommandPalette } from "../hooks/interactions/useCommandPalette.ts";
+import { createStudioCommands } from "../commands/createStudioCommands.ts";
+import { CommandPalette } from "../components/organisms/chrome/CommandPalette.tsx";
 export function StudioPage() {
   const e = useEditor(),
     layout = useWorkspaceLayout(),
@@ -24,13 +28,28 @@ export function StudioPage() {
     JSON.stringify([selection.owner, selection.sourceId]),
   );
   const onViewerContextMenu = useViewerContextMenu(e);
+  const documents = useCodeDocuments(graph),
+    palette = useCommandPalette(),
+    projectFile = useRef<HTMLInputElement>(null);
+  const commands = createStudioCommands(
+    e,
+    graph,
+    documents,
+    layout,
+    projectFile,
+  );
   useEditorShortcuts(e);
   return (
-    <WorkspaceShell editor={e}>
+    <WorkspaceShell
+      editor={e}
+      projectFile={projectFile}
+      onCommands={() => palette.open()}
+    >
       <WorkspaceGrid
         workspace={e.state.workspace}
         hasGraph={!!graph.graph && !picture}
         focused={layout.focused}
+        codeMode={layout.codeMode}
         project={<ProjectPanel editor={e} />}
         viewer={
           <>
@@ -51,13 +70,24 @@ export function StudioPage() {
           picture ? (
             <Timeline editor={e} />
           ) : graph.graph ? (
-            <GraphDock controller={graph} />
+            <GraphDock controller={graph} documents={documents} />
           ) : (
             <SignalChainPanel editor={e} selection={selection} />
           )
         }
         onViewerContextMenu={onViewerContextMenu}
       />
+      {palette.mode && (
+        <CommandPalette
+          key={palette.mode}
+          mode={palette.mode}
+          commands={
+            palette.mode === "files" ? commands.files : commands.commands
+          }
+          onClose={palette.close}
+        />
+      )}
     </WorkspaceShell>
   );
 }
+import { useRef } from "react";

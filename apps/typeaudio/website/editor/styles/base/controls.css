@@ -3,6 +3,7 @@
   --project-width: 228px;
   --inspector-width: 300px;
   --timeline-height: 270px;
+  --code-width: 420px;
 }
 #root {
   height: 100dvh;
