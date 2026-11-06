@@ -1,8 +1,8 @@
-import { DEFINITIONS } from "./catalog.ts";
+import { DEFINITIONS } from "typeaudio/graph";
 import { createNode } from "./createNode.ts";
 import { connectNodes } from "./connectNodes.ts";
-import { validateGraph } from "./validateGraph.ts";
-import type { NodeKind, SoundGraph } from "./types.ts";
+import { validateGraph } from "typeaudio/graph";
+import type { NodeKind, SoundGraph } from "typeaudio/graph";
 
 export interface NodeAttachment {
   from?: string;

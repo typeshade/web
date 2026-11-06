@@ -1,7 +1,7 @@
 import { GraphSelectionInspector } from "./GraphSelectionInspector.tsx";
 import { duplicationError } from "../../../../graph/duplicateNodes.ts";
 import type { GraphEditor } from "../../../hooks/graph/useGraphEditor.ts";
-import { DEFINITIONS } from "../../../../graph/catalog.ts";
+import { DEFINITIONS } from "typeaudio/graph";
 import { Panel } from "../../molecules/Panel.tsx";
 import { Parameter } from "../../molecules/sound/Parameter.tsx";
 export function GraphInspector({ controller: c }: { controller: GraphEditor }) {

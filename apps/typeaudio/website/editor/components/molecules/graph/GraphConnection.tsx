@@ -1,5 +1,5 @@
 import type { GraphConnection as Connection } from "../../../../graph/connectNodes.ts";
-import type { Signal } from "../../../../graph/types.ts";
+import type { Signal } from "typeaudio/graph";
 import { curve, type Point } from "../../../shared/graphGeometry.ts";
 import { openContext } from "../../../interactions/openContext.ts";
 import { useInteractions } from "../../../hooks/interactions/useInteractions.ts";

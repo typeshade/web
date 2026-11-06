@@ -1,5 +1,5 @@
-import type { GraphNode } from "./types.ts";
-import type { SoundGraph } from "./types.ts";
+import type { GraphNode } from "typeaudio/graph";
+import type { SoundGraph } from "typeaudio/graph";
 import { createNode } from "./createNode.ts";
 export const IMPACT_CODE = `// p0: pitch, p1: decay, p2: strength, p3: texture
 state0 = fract(state0 + p0 * (1 + 0.6 * exp(-time * 45)) / sampleRate);

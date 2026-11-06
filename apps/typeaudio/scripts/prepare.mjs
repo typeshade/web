@@ -1,14 +1,26 @@
-import { mkdir, symlink, realpath, readFile } from 'node:fs/promises';
+import { mkdir, symlink, realpath, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 const source = new URL('../../../sources/typeaudio/', import.meta.url);
+const engine = JSON.parse(await readFile(new URL('package.json', source), 'utf8'));
+const site = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+if (engine.devDependencies.typeshade !== site.devDependencies.typeshade)
+  throw new Error('TypeAudio and its website must pin the same TypeShade compiler. Promote the version pair together.');
 // Source modules and website modules must resolve the very same resident registry.
 // A second installed TypeShade runtime would break GPU array identity.
 const compiler = await realpath(new URL('../node_modules/typeshade', import.meta.url));
 await readFile(new URL('src/index.ts', source));
 await mkdir(new URL('node_modules/', source), { recursive: true });
-const link = new URL('node_modules/typeshade', source);
-try {
-  await symlink(compiler, fileURLToPath(link), 'dir');
-} catch (error) {
-  if (error.code !== 'EEXIST' || await realpath(link) !== compiler) throw error;
+for (const dependency of ['typeshade', 'typescript']) {
+  const target = dependency === 'typeshade' ? compiler :
+    await realpath(new URL(`../node_modules/${dependency}`, import.meta.url));
+  const link = new URL(`node_modules/${dependency}`, source);
+  try {
+    await symlink(target, fileURLToPath(link), 'dir');
+  } catch (error) {
+    if (error.code !== 'EEXIST' || await realpath(link) !== target) throw error;
+  }
 }
+const paths = Object.fromEntries(Object.entries(engine.exports).map(([key, target]) => [
+  key === '.' ? 'typeaudio' : `typeaudio/${key.slice(2)}`, [target],
+]));
+await writeFile(new URL('../typeaudio-paths.json', import.meta.url), JSON.stringify({ compilerOptions: { paths } }, null, 2) + '\n');

@@ -1,5 +1,5 @@
-import { DEFINITIONS } from "../../../../graph/catalog.ts";
-import type { SoundGraph } from "../../../../graph/types.ts";
+import { DEFINITIONS } from "typeaudio/graph";
+import type { SoundGraph } from "typeaudio/graph";
 import type { GraphConnectionsController } from "../../../hooks/graph/useGraphConnections.ts";
 import type { GraphNodePickerController } from "../../../hooks/graph/useGraphNodePicker.ts";
 import {

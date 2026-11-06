@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { SoundGraph } from "../../../graph/types.ts";
+import type { SoundGraph } from "typeaudio/graph";
 
 export function useGraphSelection(graph: SoundGraph | null, owner: string) {
   const [value, setValue] = useState<{ owner: string; ids: string[] }>({

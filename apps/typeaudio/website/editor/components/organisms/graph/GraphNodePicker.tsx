@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { DEFINITIONS } from "../../../../graph/catalog.ts";
+import { DEFINITIONS } from "typeaudio/graph";
 import { insertionError } from "../../../../graph/insertNode.ts";
-import type { NodeKind, SoundGraph } from "../../../../graph/types.ts";
+import type { NodeKind, SoundGraph } from "typeaudio/graph";
 import { NODE_METADATA } from "../../../config/graphNodeMetadata.ts";
 import type { GraphNodePickerController } from "../../../hooks/graph/useGraphNodePicker.ts";
 

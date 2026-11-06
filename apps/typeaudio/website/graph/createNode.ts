@@ -1,6 +1,6 @@
-import type { NodeKind } from "./types.ts";
-import type { GraphNode } from "./types.ts";
-import { DEFINITIONS } from "./catalog.ts";
+import type { NodeKind } from "typeaudio/graph";
+import type { GraphNode } from "typeaudio/graph";
+import { DEFINITIONS } from "typeaudio/graph";
 export function createNode(
   kind: NodeKind,
   id: string = crypto.randomUUID(),

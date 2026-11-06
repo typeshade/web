@@ -1,5 +1,5 @@
-import type { SoundGraph } from "./types.ts";
-import { validateGraph } from "./validateGraph.ts";
+import type { SoundGraph } from "typeaudio/graph";
+import { validateGraph } from "typeaudio/graph";
 
 export interface GraphConnection {
   from: string;

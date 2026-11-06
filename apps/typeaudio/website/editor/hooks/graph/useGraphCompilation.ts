@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { Editor } from "../../useEditor.ts";
-import type { SoundGraph } from "../../../graph/types.ts";
-import { graphKey } from "../../../graph/graphIdentity.ts";
-import { validateGraph } from "../../../graph/validateGraph.ts";
+import type { SoundGraph } from "typeaudio/graph";
+import { graphKey } from "typeaudio/graph";
+import { validateGraph } from "typeaudio/graph";
 import { prepareGraph } from "../../../graph/compilationClient.ts";
 
 export function useGraphCompilation(e: Editor, owner: string) {

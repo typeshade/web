@@ -6,7 +6,7 @@ import { renderPatch } from "./designer-render.ts";
 import { finishPcm } from "./sound/effects/finishPcm.ts";
 import { validatePatch } from "./sound/validatePatch.ts";
 import { type RenderRequest } from "./sound/types.ts";
-import "./graph/registry.ts";
+import "typeaudio/graph/runtime";
 import { loadGraphModule } from "./graph/loadGraphModule.ts";
 type Backend = RenderRequest["backend"];
 

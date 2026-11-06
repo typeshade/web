@@ -21,3 +21,4 @@ apps/typenn/src/vendor/typenn/*.js
 
 *.shade.typeshade.ts
 apps/typeaudio/artifacts/
+apps/typeaudio/typeaudio-paths.json

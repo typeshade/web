@@ -1,5 +1,5 @@
-import { DEFINITIONS } from "../../graph/catalog.ts";
-import type { GraphNode } from "../../graph/types.ts";
+import { DEFINITIONS } from "typeaudio/graph";
+import type { GraphNode } from "typeaudio/graph";
 export const WIDTH = 190;
 export const GRID = 20;
 export interface Point {
