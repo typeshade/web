@@ -131,6 +131,11 @@ export function WorkspaceShell({
               action: e.newSound,
             },
             {
+              label: "New procedural sound",
+              id: "new-graph",
+              action: () => void e.newGraph(),
+            },
+            {
               label: "Open project…",
               id: "open-project",
               action: () => file.current?.click(),

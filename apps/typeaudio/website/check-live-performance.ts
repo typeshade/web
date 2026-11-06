@@ -5,6 +5,23 @@ import { preview } from "vite";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { RECIPES } from "./sound-recipes.ts";
 import { DEFAULT } from "./designer.ts";
+import { createNode, initialGraph } from "./graph/model.ts";
+import { compileGraph } from "./graph/compiler.ts";
+const fullGraph = initialGraph();
+let from = "filter";
+while (fullGraph.nodes.length < 15) {
+  const n = createNode("gain", `gain-${fullGraph.nodes.length}`);
+  n.values[0] = 1;
+  n.inputs.input = from;
+  from = n.id;
+  fullGraph.nodes.push(n);
+}
+const shaper = createNode("code", "shaper");
+shaper.code = "out = tanh(input * (1 + p3));";
+shaper.inputs.input = from;
+fullGraph.nodes.push(shaper);
+fullGraph.nodes.find((n) => n.kind === "output")!.inputs.input = shaper.id;
+const graphPatch = { ...DEFAULT, graph: fullGraph, duration: 4 };
 const server = await preview({
   configFile: "website/vite.config.ts",
   preview: { host: "127.0.0.1", port: 4183, strictPort: true },
@@ -20,50 +37,89 @@ try {
     f.startsWith("live.worklet-"),
   )!;
   const rows = [];
-  const scenarios = [
-    ...[1, 2, 8].map((voices) => ({
-      name: `unison-${voices}`,
-      patch: { ...DEFAULT, voices, delay: true, reverb: true, lfoDepth: 0.8 },
-    })),
-    ...Object.entries(RECIPES).map(([name, r]) => ({ name, patch: r.patch })),
-    {
-      name: "four-layer-stress",
-      patch: {
-        ...RECIPES.door.patch,
-        voices: 8,
-        layers: [
-          ...RECIPES.door.patch.layers.map((l) => ({
-            ...l,
-            patch: { ...l.patch, voices: 8 },
-          })),
+  const scenarios =
+    process.env.GRAPH_BENCH === "1"
+      ? [
           {
-            id: "extra",
-            name: "Extra",
-            offset: 0,
-            muted: false,
+            name: "graph-impact",
+            patch: { ...DEFAULT, graph: initialGraph(), duration: 4 },
+          },
+          {
+            name: "graph-tone",
+            patch: { ...DEFAULT, graph: initialGraph("tone"), duration: 4 },
+          },
+          { name: "graph-16-nodes-2-code", patch: graphPatch },
+          {
+            name: "graph-four-layer-stress",
             patch: {
-              ...DEFAULT,
-              voices: 8,
-              fmIndex: 4,
-              lfoDepth: 1,
-              delay: true,
-              reverb: true,
+              ...graphPatch,
+              layers: [0, 1, 2].map((i) => ({
+                id: `graph-${i}`,
+                name: `Graph ${i}`,
+                offset: 0,
+                muted: false,
+                patch: { ...graphPatch, layers: [] },
+              })),
             },
           },
-        ],
-      },
-    },
-  ];
+        ]
+      : [
+          ...[1, 2, 8].map((voices) => ({
+            name: `unison-${voices}`,
+            patch: {
+              ...DEFAULT,
+              voices,
+              delay: true,
+              reverb: true,
+              lfoDepth: 0.8,
+            },
+          })),
+          ...Object.entries(RECIPES).map(([name, r]) => ({
+            name,
+            patch: r.patch,
+          })),
+          {
+            name: "four-layer-stress",
+            patch: {
+              ...RECIPES.door.patch,
+              voices: 8,
+              layers: [
+                ...RECIPES.door.patch.layers.map((l) => ({
+                  ...l,
+                  patch: { ...l.patch, voices: 8 },
+                })),
+                {
+                  id: "extra",
+                  name: "Extra",
+                  offset: 0,
+                  muted: false,
+                  patch: {
+                    ...DEFAULT,
+                    voices: 8,
+                    fmIndex: 4,
+                    lfoDepth: 1,
+                    delay: true,
+                    reverb: true,
+                  },
+                },
+              ],
+            },
+          },
+        ];
   for (const scenario of scenarios)
     for (let trial = 0; trial < Number(process.env.TRIALS || 3); trial++) {
       const row = await page.evaluate(
-        async ({ asset, patch }) => {
+        async ({ asset, patch, programs }) => {
           const code = `
 globalThis.sampleRate = 48000;
 globalThis.AudioWorkletProcessor = class { port = { postMessage() {} }; };
 let Processor;
 globalThis.registerProcessor = (name, ctor) => Processor = ctor;
 await import(${JSON.stringify(location.origin + "/assets/" + asset)});
+for (const program of ${JSON.stringify(programs)}) {
+  const moduleUrl = URL.createObjectURL(new Blob([program.code], { type: 'text/javascript' }));
+  try { await import(moduleUrl); } finally { URL.revokeObjectURL(moduleUrl); }
+}
 const dsp = new Processor({ processorOptions: { patch: ${JSON.stringify(patch)}, repeat: true } });
 const inputs = [], output = [[new Float32Array(128)]], costs = new Float64Array(6000);
 for (let i = 0; i < 500; i++) dsp.process(inputs, output);
@@ -105,6 +161,9 @@ postMessage({ elapsed, p50: costs[3000], p95: costs[5700], p99: costs[5940],
         {
           asset,
           patch: scenario.patch,
+          programs: scenario.patch.graph
+            ? [compileGraph(scenario.patch.graph)]
+            : [],
         },
       );
       rows.push({
@@ -118,7 +177,10 @@ postMessage({ elapsed, p50: costs[3000], p95: costs[5700], p99: costs[5940],
     }
   await mkdir("artifacts", { recursive: true });
   await writeFile(
-    process.env.BENCH_OUT || "artifacts/live-performance.json",
+    process.env.BENCH_OUT ||
+      (process.env.GRAPH_BENCH === "1"
+        ? "artifacts/graph-performance.json"
+        : "artifacts/live-performance.json"),
     JSON.stringify(
       {
         environment:

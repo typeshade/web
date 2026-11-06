@@ -439,3 +439,71 @@ Local shader/TypeScript checks, 55 unit tests, production build, CSS/scope check
 and all seven browser suites pass. Existing Tone persistence, CPU/WebGPU rendering,
 device-loss recovery, Live processing and timeline preview/WAV checks also pass.
 This evidence does not establish hardware audio latency or support for every codec.
+
+## Procedural graph and TypeShade Code nodes — 2026-11-06
+
+New procedural sound opens an editable network in the Sound viewer. Impact and
+Tone recipes provide starting points; Parameter, Oscillator, Noise, Code, Gain,
+Lowpass, Envelope, Mix and Output nodes can be connected through typed audio and
+control ports. The graph supports dragging, zoom/pan/Fit, pointer and keyboard
+connections, inspector dropdowns, context menus, bypass, duplication and deletion.
+Node dragging is one history edit and Escape cancels it. The lower dock contains
+Code, its generated TypeShade source, a code reference and four named parameters.
+The central viewer can switch to the existing waveform/spectrum monitor.
+
+Code nodes compile actual scalar TypeShade through the pinned CPU generator in a
+lazy dedicated worker. The generated kernel installs as a blob module in the
+existing AudioWorklet and finite-render worker. No browser eval or compiler runs
+in the callback. Validation bounds code size and topology; generated-code checks
+reject fallback, nested kernel calls and allocation expressions. Graphs allow
+16 nodes, two Code nodes, four parameters and one Output, without cycles. Each
+Code body permits 1800 characters and 350 syntax elements, scalar statements and
+the documented math functions. It receives input/time/sampleRate/p0–p3 and four
+persistent scalar state values; it writes out. Loops, helper functions, imports,
+arrays and host access are unavailable.
+
+Parameter/layout/name changes reuse compilation. Controls smooth over about
+12 ms; structural changes retain unchanged node state and crossfade for 10 ms.
+Retrigger resets graph state and seeded noise. Compile failure leaves the applied
+document and audio intact. A compile result cannot replace newer graph edits.
+Unapplied drafts survive node selection within the session; successful code,
+layout and parameters persist in the source, saved sounds and portable projects.
+Project/patch import compiles graphs before committing the document. Live silences
+non-finite samples and reports them; finite rendering rejects such output.
+
+Live, WAV and Picture share CPU graph DSP. A graph owns synthesis/processing for
+its source layer; source level, duration, offsets and mute still apply. Ordinary
+sound-rack effects/unison do not process graph sources. Output is mono, Lowpass is
+one-pole and sharp oscillator shapes are not band-limited. Feedback/delay networks,
+subgraphs, sample-player nodes, stereo buses, parameter automation tracks and a
+game-runtime graph export remain outside this implementation. Engine/compiler
+pins and upstream runtime sources are unchanged.
+
+The bounded English review covers graph menus, ports, node hints/properties,
+parameter controls, code reference, compile/recovery messages and README workflow.
+Desktop and 390 px screenshots were visually reviewed. It does not extend the
+earlier imported-document or translation review.
+
+Unit tests cover typed topology/cycles/limits, actual compiled-kernel block
+independence, forbidden code, exact live-sized/finite PCM parity, parameter state
+continuity, non-finite containment, state carry across recompilation and a noise
+node introduced after playback starts. Browser checks exercise the real compiler,
+AudioWorklet and render worker, PCM recording, successful/failed code swaps,
+delayed compilation with an intervening edit, node drag/Undo/Escape, pointer and
+keyboard connections, context actions, compile reuse, reload and invalid import.
+Portable Picture projects render identical WAVs in a fresh browser context.
+Canonical connection ordering keeps parameter slots stable when JSON properties
+are reordered. Selected-clip graph edits and Undo preserve the independent source.
+
+Local shader/TypeScript checks, 63 unit tests, the production build, CSS/scope
+checks and all eight browser suites pass. The existing CPU/WebGPU, device-loss,
+Tone persistence, imported-audio and timeline checks remain covered.
+
+The compute benchmark runs the production worklet in Chromium 156 in a dedicated
+worker, two trials per scenario, 500 warm-up and 6000 measured 128-frame blocks at
+48 kHz. Impact and Tone have p99 costs of 0.1–0.2 ms; the 16-node/two-Code graph is
+0.2 ms and four such layers are 0.3 ms. Timer resolution is about 0.1 ms. Across
+48000 measured blocks, eight elapsed measurements exceeded the 2.67 ms block
+duration; the maximum was 7.3 ms. These include scheduling pauses and are not
+measurements of actual AudioWorklet underruns or hardware latency. They establish
+bounded tested compute costs, not a hard real-time or arbitrary-program guarantee.

@@ -96,6 +96,15 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
           Media
         </button>
       </div>
+      {tab === "sounds" && (
+        <button
+          className="new-graph-button"
+          onClick={() => void e.newGraph()}
+          data-tooltip="Start a procedural sound with a node network, TypeShade code and exposed parameters."
+        >
+          + New procedural sound
+        </button>
+      )}
       <input
         id="audio-file"
         type="file"

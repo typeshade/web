@@ -71,6 +71,7 @@ class LiveProcessor extends scope.AudioWorkletProcessor {
           type: "meter",
           frames: this.dsp.frames,
           revision: this.dsp.revision,
+          invalidSamples: this.dsp.invalidSamples,
         });
       }
     } catch (error) {

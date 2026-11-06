@@ -25,6 +25,12 @@ import { BLANK, RECIPES } from "../sound-recipes.ts";
 import { needsLiveRenderer, soundLength } from "../sound-design.ts";
 import { wav } from "../audio.ts";
 import { morphPatch } from "../exploration.ts";
+import { initialGraph } from "../graph/model.ts";
+import {
+  prepareGraph,
+  patchPrograms,
+  disposeGraphCompiler,
+} from "../graph/client.ts";
 import {
   selectionIds,
   selectDocument,
@@ -303,6 +309,7 @@ export function useEditor() {
     return () => {
       window.removeEventListener("pagehide", stop);
       sound.current.close();
+      disposeGraphCompiler();
       transport.current.close();
     };
   }, []);
@@ -381,6 +388,29 @@ export function useEditor() {
     setNotice(
       "New sound. Choose a source, add layers and shape its automation.",
     );
+  }
+  async function newGraph() {
+    const version = editVersion.current;
+    setNotice("Preparing a procedural sound…");
+    try {
+      const graph = initialGraph();
+      await prepareGraph(graph);
+      if (version !== editVersion.current) {
+        setNotice(
+          "The sound changed. Choose New procedural sound again when ready.",
+        );
+        return;
+      }
+      stopSound();
+      dispatch({ type: "select", id: "" });
+      patch({ ...BLANK, graph, duration: 2, volume: 0.65 }, "Impact graph");
+      workspace("sound");
+      setNotice(
+        "Procedural sound ready. Start Live, edit exposed parameters, or select the Code node.",
+      );
+    } catch (error) {
+      setNotice(String(error));
+    }
   }
   async function recordLive() {
     const live = sound.current.live;
@@ -624,13 +654,21 @@ export function useEditor() {
   async function startLive(override?: Patch) {
     stopSound();
     const generation = soundGeneration.current;
+    let warnedInvalid = false;
     try {
       setBusy(true);
       await sound.current.start(
         override ?? state.patch,
         repeat,
         dry,
-        (frames, revision) => setMeter({ frames, revision }),
+        (frames, revision, invalidSamples) => {
+          setMeter({ frames, revision });
+          if (invalidSamples && !warnedInvalid)
+            setNotice(
+              "Graph produced non-finite samples; those samples were silenced. Check division, sqrt and pow in Code nodes.",
+            );
+          warnedInvalid = invalidSamples > 0;
+        },
         (message) => {
           stopSound();
           setNotice(message);
@@ -775,6 +813,8 @@ export function useEditor() {
         );
       const raw = JSON.parse(await file.text()),
         next = validateScene(raw);
+      for (const cue of next.cues)
+        if (!cue.audio) await patchPrograms(cue.patch);
       const assets = await unpackAudioAssets(
         raw.audioAssets,
         next.cues.flatMap((c) => (c.audio ? [c.audio] : [])),
@@ -991,15 +1031,15 @@ export function useEditor() {
     const current = () =>
       request === patchRequest.current && version === editVersion.current;
     try {
-      if (file.size > 20000)
-        throw new Error("Patch files must be smaller than 20 KB.");
+      if (file.size > 100000)
+        throw new Error("Patch files must be smaller than 100 KB.");
       const p = JSON.parse(await file.text());
       if (!current()) return;
       if (p.version !== 1) throw new Error("Unsupported patch version.");
-      patch(
-        validatePatch(p.patch),
-        String(p.name || "Imported patch").slice(0, 40),
-      );
+      const imported = validatePatch(p.patch);
+      await patchPrograms(imported);
+      if (!current()) return;
+      patch(imported, String(p.name || "Imported patch").slice(0, 40));
       setNotice("Patch imported.");
     } catch (error) {
       if (current()) setNotice(`Import failed: ${String(error)}`);
@@ -1087,6 +1127,7 @@ export function useEditor() {
     stopRecording: () => sound.current.live?.stopRecording(),
     exportTake,
     newSound,
+    newGraph,
     editLayer,
     changeLayer,
     addLayer,

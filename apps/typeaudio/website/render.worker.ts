@@ -4,6 +4,8 @@ import { createDevice, type Device } from "typeshade/runtime";
 import { explain } from "../src/explain.ts";
 import { renderPatch } from "./designer-render.ts";
 import { finishPcm, validatePatch, type RenderRequest } from "./designer.ts";
+import "./graph/registry.ts";
+import { loadGraphModule } from "./graph/client.ts";
 
 type Backend = RenderRequest["backend"];
 const devices = new Map<Backend, Device>();
@@ -37,14 +39,23 @@ async function render(data: RenderRequest): Promise<void> {
   const started = performance.now();
   try {
     const patch = validatePatch(data.patch);
+    for (const program of data.programs ?? [])
+      await loadGraphModule(
+        program.code,
+        (url) => import(/* @vite-ignore */ url),
+      );
     if (!["cpu", "webgpu"].includes(data.backend))
       throw new Error("Select CPU or WebGPU.");
     if (needsLiveRenderer(patch)) {
       if (data.backend !== "cpu")
         throw new Error(
-          "Noise, custom waves, FM, layers and modulation render on CPU. Select CPU.",
+          "Graphs, noise, custom waves, FM, layers and modulation render on CPU. Select CPU.",
         );
-      const { dry, wet } = renderSound(patch);
+      const { dry, wet, invalidSamples } = renderSound(patch);
+      if (invalidSamples)
+        throw new Error(
+          "Graph produced non-finite samples. Check division, sqrt and pow in Code nodes before rendering.",
+        );
       if (!wet.every(Number.isFinite) || !dry.every(Number.isFinite))
         throw new Error("Non-finite sound output.");
       const peak = wet.reduce((m, v) => Math.max(m, Math.abs(v)), 0),
@@ -58,7 +69,7 @@ async function render(data: RenderRequest): Promise<void> {
           peak,
           milliseconds: elapsed,
           report:
-            "Rendered with the live DSP: source layers, FM, seeded noise, custom waves, LFO, automation and effects. One note per layer with bounded effect tails. Parameter gestures are captured by Record live.",
+            "Rendered with the live CPU DSP, including procedural graphs and sound layers. One note per layer; graphs own their processing and use the source note hold. Record live captures parameter gestures.",
           timing: {
             frames: wet.length,
             batchFrames: 128,

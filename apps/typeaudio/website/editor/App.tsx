@@ -20,6 +20,9 @@ import {
   type MenuItem,
 } from "./interactions.tsx";
 import { SourceRack } from "./components/SourceRack.tsx";
+import { useGraphEditor } from "./useGraphEditor.ts";
+import { GraphCanvas } from "./components/GraphCanvas.tsx";
+import { GraphInspector, GraphDock } from "./components/GraphInspector.tsx";
 export function App() {
   const layout = useWorkspaceLayout();
   const { openMenu } = useInteractions();
@@ -27,7 +30,10 @@ export function App() {
     [module, setModule] = useState("source"),
     picture = e.state.workspace === "picture";
   const [selection, setSelection] = useState({ owner: "", id: "base" }),
-    owner = (e.selected?.audio ? "" : e.state.selected) || "source";
+    owner =
+      e.state.selected && !e.selected?.audio
+        ? `cue:${e.state.selected}`
+        : "source";
   const sourceId = selection.owner === owner ? selection.id : "base",
     layer = e.state.patch.layers.find((l) => l.id === sourceId);
   const selectSource = (id: string) => {
@@ -42,12 +48,14 @@ export function App() {
           e.editLayer(layer.id, changes),
       }
     : e;
+  const graph = useGraphEditor(sourceEditor, JSON.stringify([owner, sourceId]));
+  const [graphMonitor, setGraphMonitor] = useState(false);
   return (
     <WorkspaceShell editor={e}>
       <main
         id="editor-main"
         tabIndex={-1}
-        className={`workspace ${picture ? "picture-workspace" : "sound-workspace"} ${layout.focused ? "viewer-focused" : ""}`}
+        className={`workspace ${picture ? "picture-workspace" : "sound-workspace"} ${graph.graph && !picture ? "graph-workspace" : ""} ${layout.focused ? "viewer-focused" : ""}`}
         data-workspace={e.state.workspace}
       >
         <ProjectPanel editor={e} />
@@ -119,10 +127,33 @@ export function App() {
             );
           }}
         >
-          <div className="document-view" hidden={picture}>
-            <Panel title="Sound / Monitor">
-              <SoundMonitor editor={e} />
-            </Panel>
+          <div
+            className={`document-view ${graph.graph ? "has-graph" : ""}`}
+            hidden={picture}
+          >
+            {!!graph.graph && !graphMonitor ? (
+              <GraphCanvas controller={graph} />
+            ) : (
+              <Panel title="Sound / Monitor">
+                <SoundMonitor editor={e} />
+              </Panel>
+            )}
+            {!!graph.graph && (
+              <div className="graph-view-switch">
+                <button
+                  aria-pressed={!graphMonitor}
+                  onClick={() => setGraphMonitor(false)}
+                >
+                  Node network
+                </button>
+                <button
+                  aria-pressed={graphMonitor}
+                  onClick={() => setGraphMonitor(true)}
+                >
+                  Waveform / Spectrum
+                </button>
+              </div>
+            )}
           </div>
           <div className="document-view" hidden={!picture}>
             <Composition editor={e} />
@@ -134,12 +165,16 @@ export function App() {
             <Inspector editor={e} />
           ) : (
             <>
-              <SoundEditor
-                key={`${owner}-${layer?.id || "base"}`}
-                editor={sourceEditor}
-                sourceName={layer?.name || "Base source"}
-                module={module}
-              />
+              {graph.graph ? (
+                <GraphInspector controller={graph} />
+              ) : (
+                <SoundEditor
+                  key={`${owner}-${layer?.id || "base"}`}
+                  editor={sourceEditor}
+                  sourceName={layer?.name || "Base source"}
+                  module={module}
+                />
+              )}
               <SourceRack
                 editor={e}
                 selected={layer?.id || "base"}
@@ -152,6 +187,8 @@ export function App() {
         <div className="dock-region">
           {picture ? (
             <Timeline editor={e} />
+          ) : graph.graph ? (
+            <GraphDock controller={graph} />
           ) : (
             <Panel title="Signal chain" className="sound-dock">
               <div

@@ -149,7 +149,7 @@ export function Parameter({
   name,
 }: {
   editor: Editor;
-  name: Exclude<keyof Patch, "wave" | "curves" | "layers">;
+  name: Exclude<keyof Patch, "graph" | "wave" | "curves" | "layers">;
 }) {
   const gesture = useRef(false),
     { openMenu } = useInteractions();

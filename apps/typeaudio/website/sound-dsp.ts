@@ -1,10 +1,16 @@
 import { SAMPLE_RATE, validatePatch, type Patch } from "./designer.ts";
 import { LiveDsp } from "./live-dsp.ts";
 import { soundLength, sourceLength } from "./sound-design.ts";
+import { GraphDsp } from "./graph/dsp.ts";
+import { graphKey } from "./graph/model.ts";
 
 interface Layer {
   id: string;
-  dsp: LiveDsp;
+  dsp: LiveDsp | GraphDsp;
+  signature: string;
+  previous?: LiveDsp | GraphDsp;
+  transition: number;
+  old: Float32Array;
   offset: number;
   length: number;
   muted: boolean;
@@ -22,6 +28,12 @@ export class SoundDsp {
   oneShot = false;
   frames = 0;
   revision = 0;
+  get invalidSamples() {
+    let count = 0;
+    for (const layer of this.layers)
+      if (layer.dsp instanceof GraphDsp) count += layer.dsp.invalidSamples;
+    return count;
+  }
   constructor(p: Patch) {
     this.configure(validatePatch(p));
   }
@@ -37,8 +49,20 @@ export class SoundDsp {
     const previous = this.layers.map((l) => `${l.id}:${l.offset}`).join("|");
     this.layers = sources.map((s) => {
       const existing = this.layers.find((l) => l.id === s.id);
+      const signature = s.patch.graph ? graphKey(s.patch.graph) : "legacy";
       if (existing) {
-        existing.dsp.update(s.patch, false, this.dry);
+        if (existing.signature !== signature) {
+          const previous = existing.dsp;
+          existing.dsp = s.patch.graph
+            ? new GraphDsp(
+                s.patch,
+                previous instanceof GraphDsp ? previous : undefined,
+              )
+            : new LiveDsp(s.patch);
+          existing.signature = signature;
+          existing.previous = previous;
+          existing.transition = 480;
+        } else existing.dsp.update(s.patch, false, this.dry);
         existing.offset = Math.round(s.offset * SAMPLE_RATE);
         existing.muted = s.muted;
         existing.length = Math.ceil(sourceLength(s.patch) * SAMPLE_RATE);
@@ -46,7 +70,10 @@ export class SoundDsp {
       }
       return {
         id: s.id,
-        dsp: new LiveDsp(s.patch),
+        dsp: s.patch.graph ? new GraphDsp(s.patch) : new LiveDsp(s.patch),
+        signature,
+        transition: 0,
+        old: new Float32Array(128),
         offset: Math.round(s.offset * SAMPLE_RATE),
         length: Math.ceil(sourceLength(s.patch) * SAMPLE_RATE),
         muted: s.muted,
@@ -92,6 +119,15 @@ export class SoundDsp {
         layer.dsp.repeat = false;
         layer.dsp.dry = this.dry;
         layer.dsp.process(layer.wet, available, dryOut ? layer.dry : undefined);
+        if (layer.previous && layer.transition > 0) {
+          layer.previous.process(layer.old, available);
+          for (let n = 0; n < available; n++) {
+            const mix = Math.max(0, layer.transition-- / 480);
+            layer.wet[n] = layer.old[n]! * mix + layer.wet[n]! * (1 - mix);
+            if (dryOut) layer.dry[n] = layer.wet[n]!;
+          }
+          if (layer.transition <= 0) layer.previous = undefined;
+        }
         for (let n = skip; n < skip + available; n++) {
           layer.gain += ((layer.muted ? 0 : 1) - layer.gain) * 0.001735;
           const fade = Math.max(
@@ -118,6 +154,7 @@ export class SoundDsp {
 export function renderSound(p: Patch): {
   dry: Float32Array;
   wet: Float32Array;
+  invalidSamples: number;
 } {
   const frames = Math.ceil(soundLength(p) * SAMPLE_RATE),
     dsp = new SoundDsp(p);
@@ -126,5 +163,5 @@ export function renderSound(p: Patch): {
   const dry = new Float32Array(frames),
     wet = new Float32Array(frames);
   dsp.process(wet, frames, dry);
-  return { dry, wet };
+  return { dry, wet, invalidSamples: dsp.invalidSamples };
 }

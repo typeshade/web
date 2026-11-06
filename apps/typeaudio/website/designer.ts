@@ -1,3 +1,5 @@
+import { validateGraph, type SoundGraph } from "./graph/model.ts";
+import type { GraphProgram } from "./graph/compiler.ts";
 export const SAMPLE_RATE = 48000;
 export const SHAPES = [
   "Sine",
@@ -27,6 +29,7 @@ export const CURVE_LIMITS: Record<CurveTarget, [number, number]> = {
   gain: [0, 1],
 };
 export interface Patch {
+  graph: SoundGraph | null;
   baseMuted: boolean;
   fmRatio: number;
   fmIndex: number;
@@ -71,8 +74,10 @@ export interface RenderRequest {
   id?: number;
   patch: Patch;
   backend: "cpu" | "webgpu";
+  programs?: GraphProgram[];
 }
 export const DEFAULT: Patch = {
+  graph: null,
   baseMuted: false,
   fmRatio: 2,
   fmIndex: 0,
@@ -262,7 +267,7 @@ export function validatePatch(value: unknown, nested = false): Patch {
   const data = value as Record<string, unknown>;
   const result = { ...DEFAULT };
   for (const key of Object.keys(DEFAULT) as (keyof Patch)[]) {
-    if (["wave", "curves", "layers"].includes(key)) continue;
+    if (["graph", "wave", "curves", "layers"].includes(key)) continue;
     const v =
       data[key] === undefined &&
       [
@@ -303,6 +308,7 @@ export function validatePatch(value: unknown, nested = false): Patch {
   }
   if (nested && result.baseMuted)
     throw new Error("Nested layer patches cannot mute the base source.");
+  result.graph = data.graph == null ? null : validateGraph(data.graph);
   const wave = data.wave ?? DEFAULT.wave;
   if (
     !Array.isArray(wave) ||
