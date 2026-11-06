@@ -101,12 +101,12 @@ export function useCodeDocuments(c: GraphEditor) {
     documents: [
       ...nodes.map((n) => ({
         id: n.id,
-        label: `${n.name}${nodes.filter((other) => other.name === n.name).length > 1 ? `-${n.id.slice(0, 8)}` : ""}.shade`,
+        label: `${n.name}${nodes.filter((other) => other.name === n.name).length > 1 ? `-${n.id.slice(0, 8)}` : ""}.sample.ts`,
         dirty:
           resolveCodeDraft(drafts[codeDocumentKey(c.owner, n.id)], n.code)
             .text !== n.code,
       })),
-      { id: GENERATED_DOCUMENT, label: "Generated.shade", dirty: false },
+      { id: GENERATED_DOCUMENT, label: "Generated.shade.ts", dirty: false },
     ],
     select,
     apply,

@@ -72,13 +72,22 @@ Fit all / Home frames the network, and Frame / F frames the selection. Zoom butt
 use the viewer center. Panel resizing and monitor switches retain the view during
 the session. Enter on the canvas focuses the selected node; Shift+Tab leaves it.
 
-Each Code node opens as a TypeShade document tab in a lazily loaded Monaco editor.
+Each Code node opens as a `.sample.ts` tab in a lazily loaded Monaco editor.
 Tabs retain their drafts, cursor position and editor Undo while switching nodes.
-Syntax coloring, scalar-function/variable completion (Ctrl/Cmd+Space), hover help,
-find/replace, comment toggling and multiple cursors support code editing.
-**Generated.shade** shows the combined applied kernel as a read-only document.
-**Code reference** describes the supported scalar subset; this is not a full
-TypeScript language server or arbitrary JavaScript execution.
+The pinned public `typeshade/language-service` supplies completion for local
+variables and builtins (Ctrl/Cmd+Space), hover types, call signatures, definitions
+(F12), references and local-variable rename (F2). A separate language worker
+checks drafts while you type. **Problems** lists diagnostics on the visible lines;
+click an error to focus it. The editor also supports find/replace, comments and
+multiple cursors. **Generated.shade.ts** shows the combined applied kernel as a
+read-only document.
+
+**Sample code** explains that a node runs once per sample. Expand **Inputs & state**
+to see its implicit bindings and actual parameter names. The language service reads
+a virtual TypeShade function containing those bindings and maps its answers back
+to the visible body. **Audio-node limits & math reference** describes the separate
+TypeAudio execution restrictions. A clean language check does not replace Apply's
+audio-node validation or permit arbitrary TypeScript module execution.
 
 **Apply code**, Ctrl/Cmd+Enter, or Ctrl/Cmd+S inside the editor compiles the draft
 in a dedicated worker. Failed compilation keeps the applied graph and audio;
@@ -95,9 +104,10 @@ triggers the browser's unsaved-change prompt. Only successfully applied code is
 included in local saves, patch exports and Picture projects. These tabs represent
 the current graph's Code nodes and generated source, not independent projects.
 
-**Below**, **Beside** and **Code** place code below the graph, beside it on screens
+**Below**, **Beside** and **Focus code** place code below the graph, beside it on screens
 at least 1400 px wide, or across the central workspace. Split sizes and code
-layout persist locally. Narrow screens use the stacked layout; **Reset layout**
+layout persist locally. Code height is stored separately from the Picture timeline.
+Narrow screens use the stacked layout; **Reset layout**
 restores defaults. Ctrl/Cmd+Shift+P opens searchable application commands, including
 context-dependent graph and layout actions. Ctrl/Cmd+P opens Code documents.
 Arrow keys navigate results, Enter runs the selection, and Escape restores focus.
@@ -115,8 +125,9 @@ out = sin(state0 * 6.28318530718) * p2;
 and `sampleRate` is 48000. `p0`–`p3` are editable named parameters. `state0`–`state3`
 are persistent scalar floats; assign the sample to `out`. Scalar variables,
 assignments and `if` are supported, with `sin`, `cos`, `abs`, `min`, `max`, `clamp`,
-`fract`, `floor`, `ceil`, `sqrt`, `exp`, `exp2`, `pow`, `tanh`, `mix`, `select` and
-the `f32`/`u32`/`i32` casts. Code bodies cannot contain loops, functions, imports,
+`fract`, `floor`, `ceil`, `sqrt`, `exp`, `exp2`, `tanh`, `mix`, `select` and
+the `f32`/`u32`/`i32` casts. Use `a ** b` for powers; TypeShade removed `pow(a, b)`.
+Code bodies cannot contain loops, functions, imports,
 arrays or browser access. Limits are 1800 characters and 350 syntax elements per
 Code node, two Code nodes and 16 total nodes per graph, and four exposed parameters.
 Graphs must be acyclic and have one Output. Non-finite samples are silenced with
@@ -324,6 +335,9 @@ Use in Picture adds that draft as a new procedural layer.
   `GraphCanvas`, `GraphInspector` and `GraphDock` use `useGraphEditor` for node
   selection, compilation and graph operations. `useCodeDocuments` owns per-owner,
   per-node drafts; `useMonacoEditor` owns models, editor history and resource disposal.
+  `code/language/` separates worker transport, virtual document projection, the public
+  TypeShade language-service session and Monaco providers. `CodeContext` and
+  `CodeProblems` receive display data and actions without owning audio resources.
   Command search and code layout have separate modules. Public `typeaudio/graph`
   entries own portable validation, compiler integration and stateful execution.
   The website retains graph editing operations, its compiler worker and module loading.

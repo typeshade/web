@@ -25,4 +25,10 @@ export const DIMENSIONS = {
     max: 700,
     label: "Resize code editor",
   },
+  codeDock: {
+    variable: "--code-height",
+    min: 300,
+    max: 650,
+    label: "Resize code panel height",
+  },
 } as const;

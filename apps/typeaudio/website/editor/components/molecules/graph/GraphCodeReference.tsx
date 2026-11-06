@@ -1,7 +1,9 @@
+import { SCALAR_FUNCTIONS } from "typeaudio/graph";
+
 export function GraphCodeReference() {
   return (
     <details className="graph-code-reference">
-      <summary>Code reference</summary>
+      <summary>Audio-node limits &amp; math reference</summary>
       <p>
         Read input (audio), time (seconds since Retrigger), sampleRate (48000),
         and exposed parameters p0–p3. Assign out. The four scalar values
@@ -9,15 +11,13 @@ export function GraphCodeReference() {
       </p>
       <p>
         Use scalar variables, assignments and if statements. Functions:{" "}
-        <code>
-          sin, cos, abs, min, max, clamp, fract, floor, ceil, sqrt, exp, exp2,
-          pow, tanh, mix, select, f32, u32, i32
-        </code>
+        <code>{SCALAR_FUNCTIONS.join(", ")}</code>
         .
       </p>
       <p>
-        A Code node allows 1800 characters and 350 syntax elements. Loops,
-        imports, arrays and helper functions are unavailable. Each graph
+        TypeAudio Code nodes allow 1800 characters and 350 syntax elements.
+        Loops, imports, arrays and helper functions cannot run in these nodes.
+        These are audio-node limits, not TypeShade language limits. Each graph
         supports 16 nodes and two Code nodes. Unapplied drafts stay in this
         session.
       </p>

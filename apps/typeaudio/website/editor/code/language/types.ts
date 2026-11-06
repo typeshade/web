@@ -1,6 +1,12 @@
 import type {
-  TypeshadeCompletionItem, TypeshadeDiagnostic, TypeshadeHover, TypeshadeLocation,
-  TypeshadePosition, TypeshadeRange, TypeshadeSignatureHelp, TypeshadeTextEdit,
+  TypeshadeCompletionItem,
+  TypeshadeDiagnostic,
+  TypeshadeHover,
+  TypeshadeLocation,
+  TypeshadePosition,
+  TypeshadeRange,
+  TypeshadeSignatureHelp,
+  TypeshadeTextEdit,
 } from "typeshade/language-service";
 
 export interface LanguageDocument {

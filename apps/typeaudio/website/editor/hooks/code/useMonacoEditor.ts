@@ -1,6 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type * as Monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 import type { CodeDiagnostic } from "../../code/codeDiagnostic.ts";
+import {
+  observeLanguageModel,
+  type LanguageAnalysis,
+} from "../../code/language/observeLanguageModel.ts";
+import type { TypeshadeRange } from "typeshade/language-service";
 
 export interface MonacoEditorProps {
   documentKey: string;
@@ -19,6 +24,8 @@ type Session = {
     {
       model: Monaco.editor.ITextModel;
       view: Monaco.editor.ICodeEditorViewState | null;
+      analysis: LanguageAnalysis;
+      language?: ReturnType<typeof observeLanguageModel>;
     }
   >;
 };
@@ -33,6 +40,10 @@ export function useMonacoEditor(props: MonacoEditorProps) {
   const [session, setSession] = useState<Session>();
   const [failure, setFailure] = useState("");
   const [cursor, setCursor] = useState({ lineNumber: 1, column: 1 });
+  const [analysis, setAnalysis] = useState<LanguageAnalysis>({
+    status: "checking",
+    problems: [],
+  });
   const [instance] = useState(() => ++nextInstance);
   const handledFocus = useRef(0);
   useLayoutEffect(() => {
@@ -65,6 +76,11 @@ export function useMonacoEditor(props: MonacoEditorProps) {
           wordWrap: "on",
           wrappingIndent: "same",
           contextmenu: true,
+          quickSuggestions: { other: true, comments: false, strings: false },
+          suggestOnTriggerCharacters: true,
+          wordBasedSuggestions: "off",
+          parameterHints: { enabled: true },
+          renameOnType: false,
           stickyScroll: { enabled: false },
           ariaLabel: "TypeShade node code",
           editContext: false,
@@ -107,7 +123,10 @@ export function useMonacoEditor(props: MonacoEditorProps) {
           changed.dispose();
           moved.dispose();
           editor.dispose();
-          for (const { model } of models.values()) model.dispose();
+          for (const { model, language } of models.values()) {
+            language?.dispose();
+            model.dispose();
+          }
         };
       })
       .catch((error) => {
@@ -131,13 +150,25 @@ export function useMonacoEditor(props: MonacoEditorProps) {
           props.value,
           "typeshade",
           m.Uri.parse(
-            `inmemory://typeaudio/${instance}/${encodeURIComponent(props.documentKey)}.shade`,
+            `inmemory://typeaudio/${instance}/${encodeURIComponent(props.documentKey)}.shade.ts`,
           ),
         ),
         view: null,
+        analysis: { status: "checking", problems: [] },
       };
       entry.model.updateOptions({ tabSize: 2, insertSpaces: true });
       models.set(props.documentKey, entry);
+      const current = entry,
+        key = props.documentKey;
+      current.language = observeLanguageModel(
+        m,
+        current.model,
+        props.readOnly ? "module" : "sample",
+        (next) => {
+          current.analysis = next;
+          if (active.current === key) setAnalysis(next);
+        },
+      );
     }
     syncing.current = true;
     if (entry.model.getValue() !== props.value)
@@ -147,6 +178,7 @@ export function useMonacoEditor(props: MonacoEditorProps) {
       editor.setModel(entry.model);
       if (entry.view) editor.restoreViewState(entry.view);
       setCursor(editor.getPosition() ?? { lineNumber: 1, column: 1 });
+      setAnalysis(entry.analysis);
     }
     editor.updateOptions({
       readOnly: props.readOnly,
@@ -186,5 +218,24 @@ export function useMonacoEditor(props: MonacoEditorProps) {
       session.editor.focus();
     }
   }, [session, props.focusRequest]);
-  return { host, ready: !!session, failure, cursor };
+  function revealProblem(range: TypeshadeRange) {
+    if (!session) return;
+    const position = {
+      lineNumber: range.start.line + 1,
+      column: range.start.character + 1,
+    };
+    session.editor.setPosition(position);
+    session.editor.revealPositionInCenter(position);
+    session.editor.focus();
+  }
+  return {
+    host,
+    ready: !!session,
+    failure,
+    cursor,
+    analysis,
+    revealProblem,
+    retryAnalysis: () =>
+      session?.models.get(active.current)?.language?.refresh(),
+  };
 }

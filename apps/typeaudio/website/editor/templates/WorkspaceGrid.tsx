@@ -39,7 +39,13 @@ export function WorkspaceGrid({
       <PanelSplitter dimension="inspector" />
       <aside className="inspector-region">{inspector}</aside>
       <PanelSplitter
-        dimension={hasGraph && codeMode === "right" ? "code" : "dock"}
+        dimension={
+          hasGraph && !picture
+            ? codeMode === "right"
+              ? "code"
+              : "codeDock"
+            : "dock"
+        }
       />
       <div className="dock-region">{dock}</div>
     </main>

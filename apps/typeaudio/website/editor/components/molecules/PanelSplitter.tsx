@@ -5,7 +5,7 @@ import { type Dimension } from "../../layout/types.ts";
 export function PanelSplitter({ dimension }: { dimension: Dimension }) {
   const layout = useWorkspaceLayout(),
     config = DIMENSIONS[dimension],
-    axis = dimension === "dock" ? "y" : "x",
+    axis = dimension === "dock" || dimension === "codeDock" ? "y" : "x",
     direction = dimension === "project" ? 1 : -1;
   const drag = useRef<
     | {
@@ -25,7 +25,7 @@ export function PanelSplitter({ dimension }: { dimension: Dimension }) {
   }
   return (
     <div
-      className={`splitter splitter-${axis} splitter-${dimension}`}
+      className={`splitter splitter-${axis} splitter-${dimension === "codeDock" ? "dock" : dimension}`}
       role="separator"
       aria-label={config.label}
       aria-orientation={axis === "x" ? "vertical" : "horizontal"}

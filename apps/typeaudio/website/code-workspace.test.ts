@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { codeDocumentKey, resolveCodeDraft } from "./editor/code/codeDraft.ts";
 import { codeDiagnostic } from "./editor/code/codeDiagnostic.ts";
-import { FUNCTIONS } from "./editor/code/languageVocabulary.ts";
-import { SCALAR_FUNCTIONS } from "typeaudio/graph";
 import { searchCommands } from "./editor/commands/searchCommands.ts";
 
 describe("code document ownership", () => {
@@ -24,9 +22,6 @@ describe("code document ownership", () => {
   });
 });
 describe("editor language help", () => {
-  it("offers exactly the scalar functions accepted by the pinned worker validator", () => {
-    expect(Object.keys(FUNCTIONS).sort()).toEqual([...SCALAR_FUNCTIONS].sort());
-  });
   it("marks only explicit locations for the matching node", () => {
     expect(
       codeDiagnostic(
