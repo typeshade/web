@@ -115,7 +115,7 @@ out = sin(state0 * 6.28318530718) * p2;
 and `sampleRate` is 48000. `p0`–`p3` are editable named parameters. `state0`–`state3`
 are persistent scalar floats; assign the sample to `out`. Scalar variables,
 assignments and `if` are supported, with `sin`, `cos`, `abs`, `min`, `max`, `clamp`,
-`fract`, `floor`, `ceil`, `sqrt`, `exp`, `exp2`, `pow`, `tanh`, `mix`, `select` and
+`fract`, `floor`, `ceil`, `sqrt`, `exp`, `exp2`, `tanh`, `mix`, `select` and
 the `f32`/`u32`/`i32` casts. Code bodies cannot contain loops, functions, imports,
 arrays or browser access. Limits are 1800 characters and 350 syntax elements per
 Code node, two Code nodes and 16 total nodes per graph, and four exposed parameters.
