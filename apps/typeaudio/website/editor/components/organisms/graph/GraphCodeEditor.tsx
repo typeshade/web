@@ -1,97 +1,83 @@
-import { useState } from "react";
 import type { GraphEditor } from "../../../hooks/graph/useGraphEditor.ts";
+import type { CodeDocuments } from "../../../hooks/code/useCodeDocuments.ts";
+import { codeDiagnostic } from "../../../code/codeDiagnostic.ts";
 import { GraphCodeReference } from "../../molecules/graph/GraphCodeReference.tsx";
+import { CodeDocumentTabs } from "../../molecules/code/CodeDocumentTabs.tsx";
+import { MonacoCodeEditor } from "../code/MonacoCodeEditor.tsx";
+
 export function GraphCodeEditor({
   controller: c,
+  documents: d,
 }: {
   controller: GraphEditor;
+  documents: CodeDocuments;
 }) {
-  const n = c.selected;
-  const [drafts, setDrafts] = useState<
-      Record<string, { base: string; text: string }>
-    >({}),
-    [generated, setGenerated] = useState(false);
-  const id = c.owner + ":" + n?.id,
-    draft = drafts[id],
-    text = draft && draft.base === n?.code ? draft.text : (n?.code ?? ""),
-    dirty = n?.kind === "code" && text !== n.code;
-  const setDraft = (next: { id: string; base: string; text: string }) =>
-    setDrafts((old) => ({
-      ...old,
-      [next.id]: { base: next.base, text: next.text },
-    }));
-
   return (
     <div className="graph-code-panel">
+      <CodeDocumentTabs documents={d} />
       <div className="graph-code-toolbar">
         <span>
-          {generated
-            ? "Generated TypeShade"
-            : n?.kind === "code"
-              ? `${n.name} · TypeShade`
-              : "Node code"}
-          {dirty && !generated ? " · unapplied" : ""}
+          {d.generated
+            ? "Graph / Generated source"
+            : `Nodes / ${d.node?.name ?? "Code"} / TypeShade`}
         </span>
-        <button onClick={() => setGenerated(!generated)}>
-          {generated ? "Edit node" : "Generated source"}
-        </button>
-        {n?.kind === "code" && !generated && (
-          <button
-            id="apply-graph-code"
-            className="primary"
-            disabled={c.busy || !dirty}
-            onClick={() => c.edit(n.id, { code: text }, true)}
-          >
-            {c.busy ? "Compiling…" : "Apply code"}
-          </button>
+        {!d.generated && (
+          <>
+            <button
+              disabled={!d.dirty || c.busy}
+              onClick={d.revert}
+              data-tooltip="Discard this draft and restore the sound's applied code."
+            >
+              Revert draft
+            </button>
+            <button
+              id="apply-graph-code"
+              className="primary"
+              disabled={c.busy || !d.dirty || d.conflict}
+              onClick={() => void d.apply()}
+              data-tooltip="Compile and apply this node (Ctrl/Cmd Enter). Audio keeps playing during compilation."
+            >
+              {c.busy ? "Compiling…" : "Apply code"}
+            </button>
+          </>
         )}
       </div>
-      {generated || n?.kind === "code" ? (
-        <textarea
-          id="graph-code"
-          aria-label={generated ? "Generated TypeShade" : "TypeShade node code"}
-          spellCheck={false}
-          readOnly={generated}
-          value={generated ? c.source : text}
-          onChange={(event) =>
-            setDraft({ id, base: n!.code, text: event.target.value })
-          }
-          onKeyDown={(event) => {
-            if (
-              (event.ctrlKey || event.metaKey) &&
-              event.key === "Enter" &&
-              !generated &&
-              n
-            ) {
-              event.preventDefault();
-              c.edit(n.id, { code: text }, true);
-            }
-            if (event.key === "Tab" && !generated) {
-              event.preventDefault();
-              const el = event.currentTarget,
-                at = el.selectionStart;
-              setDraft({
-                id,
-                base: n!.code,
-                text: text.slice(0, at) + "  " + text.slice(el.selectionEnd),
-              });
-              requestAnimationFrame(() => el.setSelectionRange(at + 2, at + 2));
-            }
-          }}
-        />
-      ) : (
-        <p className="panel-hint">
-          Select a Code node to write TypeShade. Connect its input to process an
-          existing signal, or generate audio from p0–p3 and persistent
-          state0–state3. Assign the result to out.
-        </p>
+      {d.conflict && !d.generated && (
+        <div className="code-conflict" role="alert">
+          <span>The applied code changed. Your draft is preserved.</span>
+          <button onClick={d.revert}>Use applied code</button>
+          <button onClick={d.keepDraft}>Keep my draft</button>
+        </div>
       )}
+      <div
+        id="code-document-panel"
+        role="tabpanel"
+        aria-labelledby={`code-tab-${d.generated ? "generated" : `node-${d.id}`}`}
+      >
+        <MonacoCodeEditor
+          documentKey={d.key}
+          value={d.text}
+          readOnly={d.generated}
+          focusRequest={d.focusRequest}
+          diagnostic={
+            d.node && d.diagnosticCurrent
+              ? codeDiagnostic(c.error, d.node.name)
+              : undefined
+          }
+          onChange={d.change}
+          onApply={() => void d.apply()}
+        />
+      </div>
       <GraphCodeReference />
-      <p className="graph-code-status" role={c.error ? "alert" : undefined}>
+      <p className="graph-code-status" role={c.error ? "alert" : "status"}>
         {c.error ||
           (c.busy
             ? "Compiling off the audio thread…"
-            : "Ctrl/⌘ Enter applies code. Draft code is saved to the sound only after a successful compile.")}
+            : d.generated
+              ? "Read-only source for the applied graph. Edit a Code node to change its sound."
+              : d.dirty
+                ? "Unapplied draft · Ctrl/⌘ Enter compiles and applies. Playback uses the last applied code."
+                : "Applied · Ctrl/⌘ Space suggests variables and functions. Ctrl/⌘ F searches this document.")}
       </p>
     </div>
   );

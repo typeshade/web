@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { chromium, type Page, type Locator } from "playwright-core";
 import { preview } from "vite";
+import { readCode, writeCode } from "./check-code-input.ts";
 const server = await preview({
   configFile: "website/vite.config.ts",
   preview: { host: "127.0.0.1", port: 4190, strictPort: true },
@@ -147,16 +148,16 @@ try {
     "Layout and parameters reuse the compiled kernel",
   );
   await p.locator('[data-graph-node="impact"]').focus();
-  const originalCode = await p.locator("#graph-code").inputValue();
-  await p.locator("#graph-code").fill("out = input * p2;");
+  const originalCode = await readCode(p);
+  await writeCode(p, "out = input * p2;");
   await p.locator('[data-graph-node="noise"]').focus();
   await p.locator('[data-graph-node="impact"]').focus();
   assert.equal(
-    await p.locator("#graph-code").inputValue(),
+    await readCode(p),
     "out = input * p2;",
     "Selection keeps the unapplied draft",
   );
-  await p.locator("#graph-code").fill(originalCode);
+  await writeCode(p, originalCode);
   await p.locator("#live-start").click();
   await liveFrames(p, 9600);
   await p.locator("#record-live").click();
@@ -166,7 +167,7 @@ try {
   await p.locator("#editor-main").focus();
   await liveFrames(p, 24000);
   const good = await graph(p);
-  await p.locator("#graph-code").fill("while (true) {}");
+  await writeCode(p, "while (true) {}");
   await p.locator("#apply-graph-code").click();
   await p.getByRole("alert").filter({ hasText: "Loops" }).waitFor();
   assert.deepEqual(
@@ -178,7 +179,7 @@ try {
   assert.equal(await p.evaluate(() => (window as any).nodes), 1);
   const code =
     "state0 = fract(state0 + p0 / sampleRate);\nout = sin(state0 * 6.28318530718) * p2;";
-  await p.locator("#graph-code").fill(code);
+  await writeCode(p, code);
   await p.keyboard.press("Control+Enter");
   await p.waitForFunction(
     (code) =>
@@ -216,7 +217,7 @@ try {
   await p.evaluate(() => {
     (window as any).compileDelay = 600;
   });
-  await p.locator("#graph-code").fill(code + "\nout = out * 0.75;");
+  await writeCode(p, code + "\nout = out * 0.75;");
   await p.locator("#apply-graph-code").click();
   await p
     .getByRole("spinbutton", { name: "Pitch value", exact: true })
@@ -231,14 +232,14 @@ try {
     (await graph(p)).nodes.find((n: any) => n.kind === "code").code,
     code,
   );
-  await p.locator("#graph-code").fill("state0 = sqrt(-abs(p0)); out = state0;");
+  await writeCode(p, "state0 = sqrt(-abs(p0)); out = state0;");
   await p.locator("#apply-graph-code").click();
   await p
     .locator("#status")
     .filter({ hasText: "non-finite samples" })
     .waitFor();
   assert.equal(await p.evaluate(() => (window as any).nodes), 1);
-  await p.locator("#graph-code").fill(code);
+  await writeCode(p, code);
   await p.locator("#apply-graph-code").click();
   await p.waitForFunction(
     (code) =>
@@ -304,9 +305,7 @@ try {
   );
   await undo(p);
   await p.locator('[data-graph-node="noise"]').click({ button: "right" });
-  await p
-    .getByRole("menuitem", { name: /^Duplicate node/ })
-    .click();
+  await p.getByRole("menuitem", { name: /^Duplicate node/ }).click();
   await p.waitForFunction(
     () => document.querySelectorAll("[data-graph-node]").length === 5,
   );

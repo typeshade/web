@@ -1,11 +1,18 @@
-import { useRef } from "react";
+import type { RefObject } from "react";
 import type { Editor } from "../../../useEditor.ts";
 import { useInteractions } from "../../../hooks/interactions/useInteractions.ts";
 import { useWorkspaceLayout } from "../../../hooks/layout/useWorkspaceLayout.ts";
 import { applicationMenu } from "../../../interactions/applicationMenu.ts";
-export function AppMenuBar({ editor: e }: { editor: Editor }) {
-  const file = useRef<HTMLInputElement>(null),
-    menus = useInteractions(),
+export function AppMenuBar({
+  editor: e,
+  file,
+  onCommands,
+}: {
+  editor: Editor;
+  file: RefObject<HTMLInputElement | null>;
+  onCommands: () => void;
+}) {
+  const menus = useInteractions(),
     layout = useWorkspaceLayout(),
     picture = e.state.workspace === "picture";
   function save() {
@@ -18,6 +25,15 @@ export function AppMenuBar({ editor: e }: { editor: Editor }) {
       return;
     }
     const items = applicationMenu(name, e, layout, file, save);
+    if (name === "Window")
+      items.unshift(
+        {
+          label: "Command palette…",
+          shortcut: "Ctrl/⌘ Shift P",
+          action: onCommands,
+        },
+        { separator: true },
+      );
     const rect = origin.getBoundingClientRect();
     menus.openMenu(
       name,
@@ -81,6 +97,17 @@ export function AppMenuBar({ editor: e }: { editor: Editor }) {
             Picture
           </button>
         </div>
+        <button
+          className="command-trigger"
+          aria-label="Open command palette"
+          aria-keyshortcuts="Control+Shift+P Meta+Shift+P"
+          data-tooltip="Search commands (Ctrl/Cmd Shift P). Open code documents with Ctrl/Cmd P."
+          onClick={onCommands}
+        >
+          <span aria-hidden="true">⌕</span>
+          <span className="command-trigger-label">Commands</span>
+          <kbd>Ctrl/⌘ ⇧ P</kbd>
+        </button>
         <button
           className="quiet reset-layout"
           data-tooltip="Restore default panel sizes and show all panels."

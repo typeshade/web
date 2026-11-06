@@ -1,6 +1,6 @@
 import type { Editor } from "../useEditor.ts";
 import { type MenuItem } from "./types.ts";
-import { useWorkspaceLayout } from "../hooks/layout/useWorkspaceLayout.ts";
+import type { useWorkspaceLayout } from "../hooks/layout/useWorkspaceLayout.ts";
 
 export function applicationMenu(
   name: "File" | "Edit" | "Window",
@@ -111,6 +111,12 @@ export function applicationMenu(
             },
             { separator: true },
             { label: "Reset layout", action: layout.reset },
+            {
+              label: "Documentation",
+              action: () => {
+                window.open("/docs/architecture/", "_blank", "noopener");
+              },
+            },
           ];
 
   return items;

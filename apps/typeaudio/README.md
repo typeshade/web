@@ -72,13 +72,36 @@ Fit all / Home frames the network, and Frame / F frames the selection. Zoom butt
 use the viewer center. Panel resizing and monitor switches retain the view during
 the session. Enter on the canvas focuses the selected node; Shift+Tab leaves it.
 
-Select Code and write scalar TypeShade in the lower dock. **Apply code** or
-Ctrl/Cmd+Enter compiles it in a dedicated worker. Failed compilation keeps the
-applied graph and running audio. A result that arrives after a newer graph edit
-is discarded. Drafts survive node selection within the session; only successfully
-applied code is included in local saves, patch exports and Picture projects.
-**Generated source** shows the combined TypeShade kernel. **Code reference**
-documents the available inputs and scalar functions.
+Each Code node opens as a TypeShade document tab in a lazily loaded Monaco editor.
+Tabs retain their drafts, cursor position and editor Undo while switching nodes.
+Syntax coloring, scalar-function/variable completion (Ctrl/Cmd+Space), hover help,
+find/replace, comment toggling and multiple cursors support code editing.
+**Generated.shade** shows the combined applied kernel as a read-only document.
+**Code reference** describes the supported scalar subset; this is not a full
+TypeScript language server or arbitrary JavaScript execution.
+
+**Apply code**, Ctrl/Cmd+Enter, or Ctrl/Cmd+S inside the editor compiles the draft
+in a dedicated worker. Failed compilation keeps the applied graph and audio;
+explicit worker error locations appear on the corresponding code line. A result
+that arrives after a newer graph edit is discarded. Typing during compilation
+keeps the newer buffer while applying only the submitted snapshot. If Undo or an
+import changes applied code under a dirty draft, choose **Use applied code** or
+**Keep my draft** before applying again. **Revert draft** discards that node's
+unapplied edits. Editor Undo changes text; document Undo changes the sound.
+
+Drafts survive Sound/Picture and source-owner switches within this session.
+They are not exported or restored after reload; leaving with unapplied drafts
+triggers the browser's unsaved-change prompt. Only successfully applied code is
+included in local saves, patch exports and Picture projects. These tabs represent
+the current graph's Code nodes and generated source, not independent projects.
+
+**Below**, **Beside** and **Code** place code below the graph, beside it on screens
+at least 1400 px wide, or across the central workspace. Split sizes and code
+layout persist locally. Narrow screens use the stacked layout; **Reset layout**
+restores defaults. Ctrl/Cmd+Shift+P opens searchable application commands, including
+context-dependent graph and layout actions. Ctrl/Cmd+P opens Code documents.
+Arrow keys navigate results, Enter runs the selection, and Escape restores focus.
+The **Commands** button and Window menu provide pointer access.
 
 For example, this node generates a sine wave from exposed Pitch (`p0`) and
 Strength (`p2`) without an audio input:
@@ -298,7 +321,9 @@ Use in Picture adds that draft as a new procedural layer.
   PCM in IndexedDB separately from document/history references. `SoundEditor`,
   `SoundMonitor`, `TonePad` and `Variations` compose the sound workspace.
   `GraphCanvas`, `GraphInspector` and `GraphDock` use `useGraphEditor` for node
-  selection, draft/apply and graph operations. `graph/validateGraph.ts` validates
+  selection, compilation and graph operations. `useCodeDocuments` owns per-owner,
+  per-node drafts; `useMonacoEditor` owns models, editor history and resource disposal.
+  Command search and code layout have separate modules. `graph/validateGraph.ts` validates
   the portable network; `graph/compiler/` separates code validation, source
   generation and the pinned compiler adapter. `graph/dsp.ts` owns stateful execution.
   `Composition`, `Timeline` and `ClipInspector` compose Picture; `Mixer` handles the
@@ -384,7 +409,7 @@ or its undo/redo history; reloading or opening another project resets that histo
   or share them. Session A/B snapshots are not included in patch exports.
 
 `test:browser` runs the workspace, state, device-loss, interaction, sound-design,
-timeline and audio-import browser suites. They cover actual live processing,
+timeline, audio-import, graph, node-workspace and code-workspace browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
 transport and video loops, mobile layout and mocked YouTube recovery. Timeline

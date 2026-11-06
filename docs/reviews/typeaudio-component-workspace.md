@@ -604,3 +604,50 @@ inside the responsive panel.
 The existing graph suite verifies real Live/finite/Picture audio and stale compile
 protection; the wider suites retain Tone, imported audio, timeline and CPU/WebGPU
 regressions. This change makes no new real-time or device-latency claim.
+
+## Code documents and command workspace — 2026-11-06
+
+Code nodes now open in a lazily loaded Monaco editor, with one tab per Code node
+and a separate read-only generated-source document. The supported scalar language
+has syntax coloring, variable/function completion, hover help, find/replace,
+comment toggling and multiple cursors. The editor does not provide a full
+TypeScript language server, arbitrary JavaScript execution or VS Code extensions.
+Duplicate node names receive distinguishing ID suffixes in their document titles.
+The generated document identity cannot collide with a valid imported node ID.
+
+Unapplied buffers belong to a page-level controller keyed by source owner and node.
+They survive node selection, Sound/Picture switches and deletion followed by Undo.
+Monaco owns cursor/view state and text Undo separately from sound-document history.
+Apply code, Ctrl/Cmd+Enter and editor-local Ctrl/Cmd+S compile only the submitted
+snapshot. Typing while it compiles preserves the newer draft. Dirty buffers whose
+applied code changed require an explicit choice before applying; clean buffers
+follow document edits. Revert restores the applied text. Drafts stay in memory,
+are excluded from exports/local document saves and trigger the browser's unsaved
+change prompt on navigation. Tabs represent Code nodes, not multiple projects.
+Explicit worker node/line errors are marked only for the attempted text; no source
+location is invented for unlocated errors. Failed/stale compilation retains audio.
+
+The code dock can sit below the graph, beside it on screens at least 1400 px wide,
+or fill the central workspace. Layout and split size persist, narrow screens fall
+back to a stacked split, and Reset layout restores defaults. The global command
+palette shares File/Edit/Window actions with the menus and adds contextual code,
+graph and workspace actions. Ctrl/Cmd+Shift+P searches commands; Ctrl/Cmd+P opens
+Code documents. Arrow/Enter/Escape handling, disabled actions, modal focus and
+focus restoration are covered. Pointer access uses Commands and the Window menu.
+
+The bounded English review covers document tabs, draft/conflict/compile messages,
+code reference, language help, layout controls, commands, shortcuts and the revised
+README/architecture guide. Desktop split, command palette and 320/390 px layouts
+were inspected. This does not extend the imported-document or translation review.
+Atomic Design boundaries, the authoritative document reducer and compiler/audio
+resource ownership remain intact. Monaco and its editor worker load separately
+from the audio worklet and compiler. The shader/compiler pins, DSP kernels,
+16-node/two-Code limits and file format are unchanged. No new latency claim is made.
+
+Validation: shader/TypeScript/architecture checks, 77 unit tests, ten browser suites,
+shared CSS ownership and repository scope tests. The new browser suite uses real
+Monaco typing, tabs, text Undo, find/completion, readonly source, apply/type-ahead,
+conflict recovery, delete/Undo draft recovery, diagnostics, command search,
+keyboard focus, layout persistence and responsive bounds. The graph suite uses
+Monaco while retaining real Live/finite/Picture audio and stale-compile tests.
+The other suites retain Tone, CPU/WebGPU, timeline, import and state regressions.

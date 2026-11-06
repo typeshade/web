@@ -151,3 +151,8 @@ The node workspace follow-up adds a bounded English review for searchable node
 creation, multi-selection, connection editing, framing and keyboard help. Its
 component review records pure edit-operation tests and real browser gesture,
 audio and persistence coverage.
+
+The code workspace follow-up adds a bounded English review for Monaco Code
+node documents, draft/conflict recovery, split layouts and command/quick-open
+search. The component record documents the scalar-language and session-only
+draft limits, resource boundaries and real editor/audio regression coverage.

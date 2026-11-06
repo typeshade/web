@@ -15,6 +15,7 @@ export function useEditorShortcuts(e: Editor) {
     const handler = (event: KeyboardEvent) => {
       if (
         event.defaultPrevented ||
+        (event.target instanceof Element && event.target.closest(".monaco-editor,dialog")) ||
         (event.target instanceof HTMLElement &&
           event.target.closest('[role="menu"]') &&
           !event.ctrlKey &&

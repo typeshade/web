@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { Dimension } from "./types.ts";
+import type { Dimension, CodeMode } from "./types.ts";
 import type { Sizes } from "./types.ts";
 export const Context = createContext<{
   sizes: Sizes;
@@ -9,4 +9,7 @@ export const Context = createContext<{
   reset: () => void;
   focused: boolean;
   focus: (value: boolean) => void;
+  wide: boolean;
+  codeMode: CodeMode;
+  setCodeMode: (value: CodeMode) => void;
 } | null>(null);
