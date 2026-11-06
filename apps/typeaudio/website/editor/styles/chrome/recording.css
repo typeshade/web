@@ -1,0 +1,19 @@
+.studio-app .render-path-hint {
+  color: var(--muted);
+  font-size: 10px;
+}
+.studio-app button.recording {
+  color: #ffd6cf;
+  border-color: #9f5954;
+  background: #633531;
+}
+@media (max-width: 1200px) {
+  .studio-app .options-bar {
+    gap: 5px;
+  }
+  .studio-app .options-bar .transport-buttons {
+    gap: 5px;
+  }
+}
+
+/* Timeline handles keep editing hit areas separate from the clip body. */

@@ -1,6 +1,8 @@
 import { PcmRecorder } from "./pcm-recorder.ts";
 import { SoundDsp } from "./sound-dsp.ts";
-import { DEFAULT, SAMPLE_RATE, type Patch } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { type Patch } from "./sound/types.ts";
 interface ProcessorBase {
   readonly port: MessagePort;
 }
@@ -71,6 +73,7 @@ class LiveProcessor extends scope.AudioWorkletProcessor {
           type: "meter",
           frames: this.dsp.frames,
           revision: this.dsp.revision,
+          invalidSamples: this.dsp.invalidSamples,
         });
       }
     } catch (error) {

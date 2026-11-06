@@ -1,0 +1,77 @@
+.selected-object {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+  font-size: 11px;
+}
+.selected-object > svg {
+  color: #a899c7;
+}
+.selected-object > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.selected-object small {
+  display: block;
+  font-size: 9px;
+  color: #8f8f8f;
+  margin-top: 4px;
+}
+.property-section {
+  border-top: 1px solid #424242;
+  padding-top: 15px;
+  margin-top: 17px;
+}
+.property-section h3 {
+  font-size: 10px;
+  margin-bottom: 12px;
+}
+.property-section > button {
+  margin-top: 9px;
+  font-size: 10px;
+  width: 100%;
+}
+.inline-property {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.studio-app .inline-property input {
+  width: 110px;
+  max-width: 55%;
+  margin: 0 !important;
+}
+.property-section > .check {
+  margin-top: 13px;
+}
+.clip-properties .button-row {
+  border-top: 1px solid #444;
+  padding-top: 14px;
+  margin-top: 18px;
+}
+.clip-properties .button-row button {
+  font-size: 9px;
+  flex: 1;
+  padding: 4px;
+}
+.inspector-empty {
+  padding: 20px 0;
+  text-align: center;
+  color: #929292;
+  font-size: 11px;
+}
+.inspector-empty svg {
+  width: 30px;
+  height: 30px;
+  opacity: 0.6;
+  margin-bottom: 12px;
+}
+.mixer-panel .parameter + .parameter {
+  margin-top: 17px;
+}
+.mixer-panel details {
+  margin-top: 14px;
+}

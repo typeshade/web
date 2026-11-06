@@ -137,3 +137,12 @@ preview/WAV validation are in the same component workspace record.
 The audio-file follow-up covers the Audio library, imported clip properties,
 portable project files and recovery messages. Its bounded English review and real
 file/storage/PCM checks are recorded in the component workspace review.
+
+The node-graph follow-up adds reviewed English for procedural graph editing,
+TypeShade Code nodes, exposed parameters, compile/recovery messages and the
+in-editor code reference. The same component record describes the implemented
+limits, actual browser audio checks and measured graph computation.
+
+The Atomic Design refactor has a bounded review in that same record. It covers
+the editor architecture guide and revised README, retained UI wording, component
+and controller boundaries, unchanged compiled CSS and browser regression evidence.

@@ -1,4 +1,5 @@
-import { SAMPLE_RATE, type Patch } from "./designer.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { type Patch } from "./sound/types.ts";
 import {
   cueWindow,
   cueEnvelope,
@@ -6,6 +7,7 @@ import {
   type Scene,
 } from "./video-model.ts";
 import { AudioLibrary } from "./editor/audio-library.ts";
+import { patchPrograms } from "./graph/preparePatch.ts";
 export class CueAudio {
   readonly assets = new AudioLibrary();
   context: AudioContext | undefined;
@@ -42,7 +44,10 @@ export class CueAudio {
           { type: "module" },
         );
         this.worker = worker;
+        let settled = false;
         const finish = (error?: string, pcm?: Float32Array) => {
+          if (settled) return;
+          settled = true;
           clearTimeout(timer);
           worker.terminate();
           this.worker = undefined;
@@ -73,7 +78,12 @@ export class CueAudio {
             finish("Invalid cue audio.");
           else finish(undefined, data.wet);
         };
-        worker.postMessage({ patch, backend: "cpu" });
+        void patchPrograms(patch)
+          .then((programs) => {
+            if (this.worker === worker)
+              worker.postMessage({ patch, backend: "cpu", programs });
+          })
+          .catch((error) => finish(String(error)));
       });
     });
     this.queue = next.catch(() => {});

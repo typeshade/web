@@ -30,6 +30,76 @@ are ignored. Vite builds each worker as one module to preserve resident array
 identity even when its URL contains a query string. The separate Vite application
 preserves this compiler pipeline; it consumes the web workspace's shared UI tokens.
 
+## Procedural node graphs
+
+Choose **File → New procedural sound** or **Project → Sounds → New procedural
+sound**. The Impact recipe connects Noise → Code → Lowpass → Output. The Tone
+recipe connects Parameter → Oscillator → Envelope → Output. Start Live, adjust
+the four exposed parameters, and retrigger to hear the beginning again. Switch
+the central viewer between Node network and Waveform / Spectrum.
+
+Drag nodes to arrange the graph and drag an output onto a matching input to
+connect it. Audio ports are blue circles; control ports are gold squares. The
+inspector also provides connection dropdowns. Wheel zooms, middle-drag or the
+Hand tool pans, and Fit frames the network. On the canvas, Enter focuses the
+selected node and Tab opens Add node; Shift+Tab leaves the canvas. Activate an
+output and then an input to connect them with the keyboard. Node context menus
+also open with Shift+F10. Move, duplicate, bypass, disconnect and delete operations
+participate in document Undo/Redo; Escape cancels a node drag.
+
+Select Code and write scalar TypeShade in the lower dock. **Apply code** or
+Ctrl/Cmd+Enter compiles it in a dedicated worker. Failed compilation keeps the
+applied graph and running audio. A result that arrives after a newer graph edit
+is discarded. Drafts survive node selection within the session; only successfully
+applied code is included in local saves, patch exports and Picture projects.
+**Generated source** shows the combined TypeShade kernel. **Code reference**
+documents the available inputs and scalar functions.
+
+For example, this node generates a sine wave from exposed Pitch (`p0`) and
+Strength (`p2`) without an audio input:
+
+```ts
+state0 = fract(state0 + p0 / sampleRate);
+out = sin(state0 * 6.28318530718) * p2;
+```
+
+`input` is the connected audio signal, `time` counts seconds since Retrigger,
+and `sampleRate` is 48000. `p0`–`p3` are editable named parameters. `state0`–`state3`
+are persistent scalar floats; assign the sample to `out`. Scalar variables,
+assignments and `if` are supported, with `sin`, `cos`, `abs`, `min`, `max`, `clamp`,
+`fract`, `floor`, `ceil`, `sqrt`, `exp`, `exp2`, `pow`, `tanh`, `mix`, `select` and
+the `f32`/`u32`/`i32` casts. Code bodies cannot contain loops, functions, imports,
+arrays or browser access. Limits are 1800 characters and 350 syntax elements per
+Code node, two Code nodes and 16 total nodes per graph, and four exposed parameters.
+Graphs must be acyclic and have one Output. Non-finite samples are silenced with
+a Live warning; finite rendering rejects them so a broken graph cannot silently
+export an empty take.
+
+The graph compiles through the pinned TypeShade CPU generator to one scalar
+sample loop. Blob modules install the compiled kernel into the existing
+AudioWorklet and finite-render worker; there is no browser `eval` or compiler on
+the audio callback. Codegen checks reject fallback, nested generated calls and
+callback allocation. The compiler loads lazily when a graph is used. Parameter,
+name and layout edits reuse the kernel. Continuous controls settle over about
+12 ms; code/connection changes preserve unchanged node state and crossfade for
+10 ms. Retrigger resets graph state and its seeded noise. There is no GPU
+readback in this path. Live, WAV and Picture use the same CPU graph DSP.
+
+Each graph replaces the synthesis and effects of its source layer. Output level,
+note hold, source offsets and layer mute still apply; sound-rack effects and
+unison do not process that graph. Graphs can coexist with ordinary source layers
+and imported Picture clips. Output is mono, the Lowpass is one-pole, and sharp
+oscillator shapes are not band-limited. Feedback/delay networks, reusable
+subgraphs, sample-player nodes, stereo buses, parameter automation tracks and a
+game-runtime graph export are not implemented. Patch/project JSON stores the
+editable network; WAV and Record live export its audio.
+
+After building, `pnpm --filter typeaudio-site bench:graph` measures the production
+worklet's graph processing in a dedicated worker: Impact, Tone, a 16-node/two-Code
+graph and four such layers. Results are saved to `artifacts/graph-performance.json`.
+This measures callback computation, not device latency or browser scheduling
+guarantees. Engine and compiler pins are unchanged.
+
 ## Sound exploration
 
 - Live runs on the CPU audio thread at 48 kHz. Controls preserve oscillator phase
@@ -43,13 +113,14 @@ preserves this compiler pipeline; it consumes the web workspace's shared UI toke
   Its clock advances in the audio processor at 128-frame control intervals, without
   UI timers. Beat sync means one cycle per beat at the selected tempo. Depth zero
   disables the modulation. Filter cutoff modulation requires the filter to be on.
-- Render includes LFO and automation. Noise, FM, custom waves, layers, base mute or
+- Render includes LFO and automation. Graphs, noise, FM, custom waves, layers, base mute or
   automation use the same CPU DSP as Live; the backend selector identifies this
   path and disables WebGPU. Basic unmodulated patches retain batched CPU/WebGPU
   rendering. Render plays one note per layer with bounded effect tails.
 - Repeat off now plays one note and its tail. Repeat on loops the complete sound.
-  Retrigger restarts envelopes, automation and LFO clocks while preserving phase
-  and existing effect buffers. Structural layer/start-offset edits retrigger.
+  Retrigger restarts ordinary sound envelopes, automation and LFO clocks while
+  preserving oscillator phase and effect buffers; graph sources reset their state.
+  Structural layer/start-offset edits retrigger.
 - Record live captures the worklet output, including parameter edits and monitor
   selection, for up to 30 seconds. Export take writes mono 48 kHz, 16-bit WAV.
   Stopping playback also finishes the recording. Takes are session-only and must
@@ -181,25 +252,41 @@ sound is edited directly in Sound and immediately updates that layer's patch.
 When an imported audio clip is selected, Sound edits the independent source draft;
 Use in Picture adds that draft as a new procedural layer.
 
-- `model.ts` holds the shared document, selection and undo/redo reducer. History
-  keeps 30 document snapshots; opening a project or replacing media resets it.
-- `useEditor.ts` owns project actions, local persistence, patch library and the
-  engine lifecycle. UI components receive typed state and actions.
+- `state/` separates document types, projection, selection, restoration and the
+  undo/redo reducer. History keeps 30 snapshots; opening a project or replacing
+  media resets it. `hooks/document/useEditorDocument.ts` owns the reducer,
+  persistence and the revision used to reject stale asynchronous results.
+- `useEditor.ts` composes feature controllers from `hooks/`; playback, recording,
+  imports, project files, clip actions and graph editing have separate owners.
+  `hooks/session/useAudioResources.ts` creates and releases the audio resources.
+  UI components receive typed state and actions.
 - `engine/SoundEngine.ts` wraps the existing worklet and finite CPU/WebGPU worker.
   `engine/SceneTransport.ts` follows native/YouTube media time and schedules PCM
   with the existing `CueAudio` cache. UI components do not construct audio nodes.
-- `components/WorkspaceShell` owns workspace tabs, document tools, File commands,
-  transport, tool selection, export and status. `Panel` and `Splitter` provide
-  shared panel structure and keyboard/pointer resizing.
-- `ProjectPanel` browses/imports sounds, audio files and video. `AudioLibraryPanel`
+- `components/atoms/` contains individual visual controls; `molecules/` combines
+  controls into panels, toolbars and inputs; `organisms/` owns feature panels.
+  Each TSX file defines one component. `templates/WorkspaceShell.tsx` composes
+  the application chrome, and `templates/WorkspaceGrid.tsx` arranges panel slots.
+  `pages/StudioPage.tsx` connects the controllers to the workspace.
+- The project organisms browse/import sounds, audio files and video. `AudioLibraryPanel`
   exposes audition, drag/drop, export and removal; `audio-library.ts` stores decoded
   PCM in IndexedDB separately from document/history references. `SoundEditor`,
   `SoundMonitor`, `TonePad` and `Variations` compose the sound workspace.
-  `Composition`, `Timeline` and `Inspector` compose Picture; `Mixer` handles the
+  `GraphCanvas`, `GraphInspector` and `GraphDock` use `useGraphEditor` for node
+  selection, draft/apply and graph operations. `graph/validateGraph.ts` validates
+  the portable network; `graph/compiler/` separates code validation, source
+  generation and the pinned compiler adapter. `graph/dsp.ts` owns stateful execution.
+  `Composition`, `Timeline` and `ClipInspector` compose Picture; `Mixer` handles the
   listening levels.
-- `workspace.css` defines the compact neutral-gray panel system, restrained blue
-  selection color, document tabs, tool rail and desktop/mobile arrangements.
+- `sound/` separates patch types/defaults/presets, limits and validation from
+  envelope sampling, individual PCM effects and spectrum analysis.
+- `styles/index.css` imports feature stylesheets in cascade order for the compact
+  neutral-gray panels, selection color and desktop/mobile arrangements.
   Generated engine documents use their own `docs.css`.
+
+The [editor architecture guide](website/editor/README.md) describes these
+boundaries and how to extend them. `pnpm check:typeaudio` checks the component
+convention, dependency direction, resource ownership and runtime import cycles.
 
 The owner's visual/workflow references are Photoshop and After Effects: a
 project browser, central viewer, lower timeline, selected-object properties and

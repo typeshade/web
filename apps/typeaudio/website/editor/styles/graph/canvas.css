@@ -1,0 +1,67 @@
+.studio-app .graph-network {
+  flex: 1;
+  min-height: 260px;
+}
+.graph-network > .panel-body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.graph-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.graph-toolbar select {
+  max-width: 120px;
+}
+.graph-count {
+  color: var(--muted);
+  font-size: 10px;
+  margin-right: auto;
+}
+.graph-surface {
+  position: relative;
+  flex: 1;
+  min-height: 220px;
+  overflow: hidden;
+  touch-action: none;
+  outline: none;
+  background-color: #202123;
+  background-image: radial-gradient(#44464a 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.graph-surface:focus-visible {
+  box-shadow: inset 0 0 0 1px #8bb4ef;
+}
+.graph-world {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  transform-origin: 0 0;
+}
+.graph-wires {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
+  pointer-events: none;
+}
+.graph-wires path {
+  fill: none;
+  stroke: #91afd3;
+  stroke-width: 2;
+}
+.graph-wires .control {
+  stroke: #c5ad77;
+  stroke-dasharray: 4 3;
+}
+.graph-wires .pending {
+  stroke: #eee;
+  stroke-dasharray: 5 5;
+}

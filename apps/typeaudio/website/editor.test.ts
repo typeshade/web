@@ -1,13 +1,10 @@
 import { describe, it, expect } from "vitest";
-import {
-  reducer,
-  updatePatch,
-  updateScene,
-  projectDocument,
-  type EditorState,
-} from "./editor/model.ts";
+import { reducer } from "./editor/state/documentReducer.ts";
+import { updatePatch, updateScene } from "./editor/state/documentUpdates.ts";
+import { projectDocument } from "./editor/state/documentProjection.ts";
+import { type EditorState } from "./editor/state/documentTypes.ts";
 import { emptyScene } from "./video-model.ts";
-import { DEFAULT } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
 const initial = (): EditorState => ({
   scene: {
     ...emptyScene(),
@@ -31,6 +28,7 @@ const initial = (): EditorState => ({
   past: [],
   future: [],
 });
+
 describe("shared editor document", () => {
   it("edits the selected layer across workspaces and undoes/redoes the complete change", () => {
     let s = reducer(initial(), { type: "select", id: "a" });
@@ -191,10 +189,14 @@ it("treats a legacy source with a different property order as the same document"
     reducer(before, { type: "edit", edit: (d) => updatePatch(d, {}) }),
   ).toBe(before);
 });
+
 describe("document restoration", () => {
   it("restores an explicitly deselected source instead of selecting the first clip", async () => {
     const { vi } = await import("vitest");
-    const { initialDocument, DOCUMENT_KEY } = await import("./editor/model.ts");
+    const { initialDocument } = await import(
+      "./editor/state/restoreDocument.ts"
+    );
+    const { DOCUMENT_KEY } = await import("./editor/state/storageKeys.ts");
     const doc = initial();
     doc.source = {
       name: "Keep Tone",
@@ -223,7 +225,10 @@ describe("document restoration", () => {
   });
   it("migrates legacy independent source Tone without replacing it with a selected clip", async () => {
     const { vi } = await import("vitest");
-    const { initialDocument, SCENE_KEY } = await import("./editor/model.ts");
+    const { initialDocument } = await import(
+      "./editor/state/restoreDocument.ts"
+    );
+    const { SCENE_KEY } = await import("./editor/state/storageKeys.ts");
     vi.stubGlobal("localStorage", {
       getItem: (key: string) =>
         key === SCENE_KEY

@@ -1,0 +1,43 @@
+.graph-parameters {
+  width: 265px;
+  flex: none;
+  border-left: 1px solid var(--border);
+  padding: 9px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-content: start;
+  overflow: auto;
+}
+.graph-exposed {
+  min-width: 0;
+}
+.graph-exposed > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+}
+.graph-exposed label {
+  color: #d1d6e0;
+}
+.graph-exposed code {
+  color: var(--muted);
+  font-size: 9px;
+}
+.graph-exposed input {
+  width: 100%;
+  min-width: 0;
+}
+.graph-exposed input[type="range"] {
+  margin: 5px 0;
+}
+.graph-param-config {
+  display: grid;
+  gap: 4px;
+  margin-top: 5px;
+}
+.studio-app .new-graph-button {
+  margin: 7px 10px 0;
+  flex: none;
+}

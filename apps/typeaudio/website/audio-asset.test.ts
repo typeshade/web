@@ -1,25 +1,16 @@
 import { describe, it, expect } from "vitest";
-import {
-  makeAudioAsset,
-  packAudio,
-  unpackAudio,
-  unpackAudioAssets,
-  validateAudioRef,
-  MAX_AUDIO_FRAMES,
-  MAX_LIBRARY_FRAMES,
-} from "./audio-asset.ts";
-import { DEFAULT } from "./designer.ts";
+import { makeAudioAsset, packAudio, unpackAudio, unpackAudioAssets, validateAudioRef, MAX_AUDIO_FRAMES, MAX_LIBRARY_FRAMES } from "./audio-asset.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
 import { emptyScene, validateScene } from "./video-model.ts";
-import {
-  reducer,
-  projectDocument,
-  updatePatch,
-  type EditorState,
-} from "./editor/model.ts";
+import { reducer } from "./editor/state/documentReducer.ts";
+import { projectDocument } from "./editor/state/documentProjection.ts";
+import { updatePatch } from "./editor/state/documentUpdates.ts";
+import { type EditorState } from "./editor/state/documentTypes.ts";
 const pcm = Float32Array.from(
   { length: 10000 },
   (_, i) => Math.sin(i * 0.03) * 0.8,
 );
+
 describe("portable source audio", () => {
   it("preserves float PCM exactly across chunk boundaries and deduplicates by content", async () => {
     const a = await makeAudioAsset("first.wav", pcm),

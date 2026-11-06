@@ -1,0 +1,25 @@
+.graph-inspector > .panel-body {
+  padding: 12px;
+  overflow: auto;
+}
+.graph-inspector label:not(.check) {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 13px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.graph-inspector select,
+.graph-inspector input {
+  max-width: 100%;
+  min-width: 0;
+}
+.graph-inspector-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 12px;
+}
+.graph-inspector-actions button {
+  flex: 1;
+}

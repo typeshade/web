@@ -1,4 +1,4 @@
-import { DEFAULT } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
 const defaultWave = new Float32Array(DEFAULT.wave);
 import { liveBlock } from "./live-kernel.shade.ts?audio-cpu";
 

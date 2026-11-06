@@ -1,6 +1,6 @@
 import type { Editor } from "./useEditor.ts";
 import type { Cue } from "../video-model.ts";
-import type { MenuItem } from "./interactions.tsx";
+import type { MenuItem } from "./interactions/types.ts";
 export function clipItems(e: Editor, cue: Cue, ids = [cue.id]): MenuItem[] {
   const many = ids.length > 1;
   return [

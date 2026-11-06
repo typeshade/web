@@ -1,4 +1,4 @@
-import { SAMPLE_RATE } from "../designer.ts";
+import { SAMPLE_RATE } from "../sound/constants.ts";
 import { cueRange, type Cue } from "../video-model.ts";
 
 export const MIN_CLIP = 0.01;

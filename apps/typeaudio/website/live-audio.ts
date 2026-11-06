@@ -1,6 +1,10 @@
 import workletUrl from "./live.worklet.ts?worker&url";
-import type { Patch } from "./designer.ts";
+import type { Patch } from "./sound/types.ts";
+import { patchPrograms } from "./graph/preparePatch.ts";
+import { loadGraphModule } from "./graph/loadGraphModule.ts";
+import { graphKey } from "./graph/graphIdentity.ts";
 const modules = new WeakMap<AudioContext, Promise<void>>();
+
 export class LiveAudio {
   private node: AudioWorkletNode | undefined;
   private gain: GainNode | undefined;
@@ -26,9 +30,28 @@ export class LiveAudio {
     }
   }
   private bins = new Float32Array(1024);
+  private installed = "";
+  private updateId = 0;
+  private patchKey(p: Patch) {
+    return JSON.stringify(
+      [p, ...p.layers.map((l) => l.patch)].map((p) =>
+        p.graph ? graphKey(p.graph) : "",
+      ),
+    );
+  }
+  private async install(p: Patch) {
+    for (const program of await patchPrograms(p))
+      await loadGraphModule(program.code, (url) =>
+        this.context!.audioWorklet.addModule(url),
+      );
+  }
   constructor(
     private onError: (message: string) => void,
-    private onMeter: (frames: number, revision: number) => void,
+    private onMeter: (
+      frames: number,
+      revision: number,
+      invalidSamples: number,
+    ) => void,
   ) {}
   async start(
     context: AudioContext,
@@ -48,6 +71,8 @@ export class LiveAudio {
       loaded.catch(() => modules.delete(context));
     }
     await loaded;
+    await this.install(patch);
+    this.installed = this.patchKey(patch);
     if (this.closed) throw new Error("Live start cancelled.");
     const node = new AudioWorkletNode(context, "typeaudio-live", {
       numberOfInputs: 0,
@@ -85,7 +110,8 @@ export class LiveAudio {
           clearTimeout(pending.timer);
           pending.resolve(data.samples.slice(0, data.frames));
         }
-        if (data.type === "meter") this.onMeter(data.frames, data.revision);
+        if (data.type === "meter")
+          this.onMeter(data.frames, data.revision, data.invalidSamples || 0);
       };
     });
     if (this.closed) {
@@ -119,7 +145,21 @@ export class LiveAudio {
     if (this.closed || !this.node || !this.pending) return;
     const next = this.pending;
     this.pending = undefined;
-    this.node.port.postMessage({ type: "patch", ...next });
+    const id = ++this.updateId,
+      key = this.patchKey(next.patch);
+    if (key === this.installed)
+      this.node.port.postMessage({ type: "patch", ...next });
+    else
+      void this.install(next.patch)
+        .then(() => {
+          if (this.closed || id !== this.updateId) return;
+          this.installed = key;
+          this.node?.port.postMessage({ type: "patch", ...next });
+        })
+        .catch((error) => {
+          if (!this.closed && id === this.updateId)
+            this.onError(`Graph unchanged: ${String(error)}`);
+        });
   }
   retrigger(): void {
     this.flushUpdate();

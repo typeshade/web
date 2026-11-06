@@ -1,4 +1,4 @@
-import { WAVE_SIZE } from "./designer.ts";
+import { WAVE_SIZE } from "./sound/constants.ts";
 
 type Expr = (phase: number) => number;
 /** A bounded expression language, compiled once to a wave table outside audio processing.

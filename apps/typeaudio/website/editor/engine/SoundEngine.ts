@@ -1,6 +1,8 @@
 import { LiveAudio } from "../../live-audio.ts";
-import { SAMPLE_RATE, type Patch } from "../../designer.ts";
+import { SAMPLE_RATE } from "../../sound/constants.ts";
+import { type Patch } from "../../sound/types.ts";
 import type { RenderStats } from "../../designer-render.ts";
+import { patchPrograms } from "../../graph/preparePatch.ts";
 export interface Rendered {
   dry: Float32Array;
   wet: Float32Array;
@@ -16,6 +18,7 @@ export interface Rendered {
     wallMs: number;
   };
 }
+
 /** Owns audio resources; UI components never construct worklets or workers. */
 export class SoundEngine {
   context?: AudioContext;
@@ -37,7 +40,7 @@ export class SoundEngine {
     patch: Patch,
     repeat: boolean,
     dry: boolean,
-    meter: (frames: number, revision: number) => void,
+    meter: (frames: number, revision: number, invalidSamples: number) => void,
     error: (message: string) => void,
   ) {
     this.stop();
@@ -118,15 +121,17 @@ export class SoundEngine {
             `\nRequest to result: ${wallMs.toFixed(2)} ms, including worker startup and message transfer.`,
         });
       };
-      try {
-        worker.postMessage({ id, patch, backend });
-      } catch (error) {
-        finish(
-          error instanceof Error ? error : new Error(String(error)),
-          undefined,
-          true,
-        );
-      }
+      void patchPrograms(patch)
+        .then((programs) => {
+          if (!settled) worker.postMessage({ id, patch, backend, programs });
+        })
+        .catch((error) => {
+          finish(
+            error instanceof Error ? error : new Error(String(error)),
+            undefined,
+            true,
+          );
+        });
     });
   }
   cancelRender() {

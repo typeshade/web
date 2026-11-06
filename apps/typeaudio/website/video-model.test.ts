@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
 import {
   cueWindow,
   emptyScene,

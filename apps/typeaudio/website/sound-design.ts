@@ -1,4 +1,4 @@
-import { type Patch, type CurvePoint } from "./designer.ts";
+import { type Patch, type CurvePoint } from "./sound/types.ts";
 
 export function curveAt(
   points: CurvePoint[],
@@ -20,6 +20,7 @@ export function curveAt(
 /** Features whose stateful CPU implementation is shared with the audio worklet. */
 export function needsLiveRenderer(p: Patch): boolean {
   return (
+    !!p.graph ||
     p.baseMuted ||
     p.layers.length > 0 ||
     p.shapeA >= 4 ||
@@ -30,6 +31,7 @@ export function needsLiveRenderer(p: Patch): boolean {
   );
 }
 export function sourceLength(p: Patch): number {
+  if (p.graph) return p.duration;
   return p.duration + p.release + (p.delay ? 2 : 0) + (p.reverb ? 2 : 0);
 }
 export function soundLength(p: Patch): number {

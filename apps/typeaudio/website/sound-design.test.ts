@@ -1,6 +1,8 @@
 import { BLANK, RECIPES } from "./sound-recipes.ts";
 import { describe, expect, it } from "vitest";
-import { DEFAULT, SAMPLE_RATE, validatePatch } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { validatePatch } from "./sound/validatePatch.ts";
 import { curveAt, needsLiveRenderer, soundLength } from "./sound-design.ts";
 import { waveFromExpression } from "./wave-expression.ts";
 import { SoundDsp, renderSound } from "./sound-dsp.ts";

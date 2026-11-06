@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { chromium, type Page, type Locator } from "playwright-core";
 import { preview } from "vite";
-import { DEFAULT } from "./designer.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
 import { emptyScene, type Scene } from "./video-model.ts";
 const server = await preview({
   configFile: "website/vite.config.ts",

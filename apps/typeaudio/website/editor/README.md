@@ -1,0 +1,98 @@
+# Editor architecture
+
+The editor uses Atomic Design for its UI and feature modules for its behavior.
+Each file owns one responsibility. A component, controller, reducer or compiler
+stage has one owning module; consumers import that module directly.
+
+## UI composition
+
+```text
+editor/
+  components/
+    atoms/          Individual controls and visual primitives
+    molecules/      Related controls, inputs, toolbars and panel framing
+    organisms/      Sound, Picture, graph, project and timeline panels
+  templates/        Workspace chrome and panel arrangement
+  pages/            Controller-to-view composition
+  providers/        Shared interaction and layout contexts
+  hooks/            Feature controllers and UI interaction hooks
+  state/            Document data, projection, history and restoration
+  engine/           Sound and scene playback adapters
+  interactions/     Menu contracts and command descriptions
+  layout/           Layout contracts, storage and application
+  shared/           Small utilities with one purpose
+  styles/           Ordered base, layout, control and feature styles
+```
+
+Runtime UI dependencies point from pages through templates, organisms, molecules
+and atoms. A layer can reuse its peers or lower layers. Atoms and molecules receive
+feature state and actions through props; they do not start document or playback
+controllers. Small UI interaction and layout hooks are allowed. Type-only imports
+can describe feature contracts without introducing a runtime dependency.
+
+Every TSX module except the root entry defines one named component matching its
+filename. For example, `Timeline` arranges layers, `TimelineClip` owns a clip's
+gestures and `ClipHandle` renders its accessible handle. `GraphCanvas` composes
+`GraphNodeCard`, `GraphConnections` and `GraphToolbar`; `useGraphViewport` owns
+viewport gestures. Avoid forwarding barrels so an import identifies its owner.
+
+`WorkspaceGrid` accepts panel slots. `WorkspaceShell` composes the menu, document
+bar, transport, tool rail and status. `StudioPage` selects the Sound/Picture panel
+composition and connects feature controllers. Keep media/viewer mounting behavior
+stable when changing that composition: hidden workspaces retain session state.
+
+## State and resource ownership
+
+`useEditorDocument` owns the authoritative reducer, document revision and local
+save. Document changes use this dispatch; feature hooks must not keep a second
+copy of the patch or scene. `state/` stays independent of React UI and audio
+resources. Its reducer owns history and gesture checkpoints, while projection,
+selection, updates and restoration are separate modules.
+
+`useEditor` only composes controllers. Its feature hooks separate playback,
+recording, variation snapshots, saved sounds, clip commands, imported assets,
+media and project files. Transient selection, code drafts, drag previews and
+session settings belong to their corresponding controller or component.
+
+`useAudioResources` owns one `SoundEngine` and one `SceneTransport`, and releases
+them on unmount. UI components cannot construct audio contexts, nodes, workers
+or engines. Playback and scene controllers retain generation guards; imports and
+graph compilation retain document/owner guards. An asynchronous result must not
+replace a newer edit or a different selected source.
+
+The sound domain lives in `website/sound/`, outside the UI hierarchy. Patch types,
+defaults, presets, limits and validation each have a separate owner. Envelope
+sampling, delay, reverb, finite output processing and spectrum analysis also have
+individual modules. Consumers import the operation they need directly.
+
+The graph domain lives in `website/graph/`. Types,
+catalog, node creation, recipes, validation, ordering, identity and parameter
+layout have separate modules. `compilationClient` owns worker requests/cache;
+`compiler/` separates code validation, source emission and kernel generation.
+`preparePatch` resolves layer programs, `loadGraphModule` installs a module and
+`dsp` executes it. The compiler remains in a lazy worker; the audio callback
+does not import it. Live and finite rendering share the same graph DSP.
+
+## Styles and extensions
+
+`styles/index.css` is the stylesheet entry. Its imports preserve the previous
+cascade order. Put changes in the stylesheet for the affected feature; do not
+add another global override block at the end of the entry. Shared site tokens and
+generated documentation styles retain their existing owners.
+
+When extending the editor:
+
+1. Put pure document behavior in `state/` or the relevant domain module. Add a
+   feature action/controller when it needs resources or asynchronous work.
+2. Add one UI component per file at the smallest useful composition level.
+   Connect feature state at an organism or page; pass controls their data/actions.
+3. Keep document edits on the existing dispatch and preserve stale-result guards.
+   Give any new resource one explicit lifecycle owner.
+4. Run the app's `check`, `test` and `build` scripts, then the browser suites that
+   exercise the changed behavior. Broad workspace refactors require `test:browser`.
+
+`scripts/check-editor-architecture.mjs` runs as part of `check`. It checks the
+named-component convention, upward UI imports, feature controllers in primitives,
+document/domain-to-UI imports, UI resource construction, direct compiler imports
+and runtime import cycles. These checks protect the boundaries; review still decides
+whether each module has a coherent responsibility.

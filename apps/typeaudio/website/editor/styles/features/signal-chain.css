@@ -1,0 +1,127 @@
+.sound-dock .panel-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.signal-modules {
+  display: flex;
+  flex-shrink: 0;
+  padding: 10px 11px;
+  border-bottom: 1px solid #171717;
+  gap: 4px;
+  overflow: auto;
+}
+.studio-app .signal-modules button {
+  background: #323232;
+  border-color: #4b4b4b;
+  padding: 6px 9px;
+  font-size: 10px;
+  min-height: 35px;
+  flex: 1;
+}
+.signal-modules button small {
+  font:
+    8px PlexMono,
+    monospace;
+  color: #9297a0;
+}
+.signal-modules button span {
+  font-size: 12px;
+  color: #777;
+  margin-left: auto;
+}
+.studio-app .signal-modules button[aria-pressed="true"] {
+  background: #3c4e68;
+  border-color: #7a98c0;
+  color: #d2e3fd;
+}
+.sound-dock-controls {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr 1fr;
+  gap: 24px;
+  padding: 12px 16px;
+  min-height: 0;
+  overflow: auto;
+}
+.sound-dock-controls h3 {
+  font-size: 10px;
+  margin-bottom: 8px;
+  color: #aaa;
+}
+.tone-pad {
+  height: 115px;
+  position: relative;
+  background: #242830;
+  border: 1px solid #505967;
+  touch-action: none;
+  cursor: crosshair;
+  overflow: hidden;
+  background-image:
+    linear-gradient(#ffffff0a 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff0a 1px, transparent 1px);
+  background-size: 25% 25%;
+}
+.tone-pad > span {
+  font:
+    7px PlexMono,
+    monospace;
+  position: absolute;
+  top: 7px;
+  left: 8px;
+  color: #949fae;
+  pointer-events: none;
+}
+.tone-pad > .pad-axis {
+  top: auto;
+  bottom: 6px;
+  left: auto;
+  right: 8px;
+}
+.tone-pad i {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  transform: translate(-50%, -50%);
+  border: 1px solid #c2d8f7;
+  border-radius: 50%;
+  background: #98bcef;
+  box-shadow: 0 0 0 4px #96b8f117;
+  pointer-events: none;
+}
+.variation-controls > .button-row {
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.studio-app .variation-controls .segmented button {
+  font-size: 9px;
+  padding: 3px 7px;
+}
+.variation-controls > .parameter {
+  margin-bottom: 13px;
+}
+.variation-controls > button {
+  width: 100%;
+  font-size: 10px;
+}
+.sound-summary {
+  font-size: 10px;
+  color: #aaa;
+}
+.sound-summary > span {
+  color: #c7d5e9;
+  font-size: 11px;
+  display: block;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sound-summary > p {
+  font-size: 9px;
+  margin: 4px 0;
+}
+.sound-summary > button {
+  margin-top: 10px;
+  width: 100%;
+  font-size: 10px;
+}

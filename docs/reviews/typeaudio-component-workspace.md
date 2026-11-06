@@ -439,3 +439,117 @@ Local shader/TypeScript checks, 55 unit tests, production build, CSS/scope check
 and all seven browser suites pass. Existing Tone persistence, CPU/WebGPU rendering,
 device-loss recovery, Live processing and timeline preview/WAV checks also pass.
 This evidence does not establish hardware audio latency or support for every codec.
+
+## Procedural graph and TypeShade Code nodes — 2026-11-06
+
+New procedural sound opens an editable network in the Sound viewer. Impact and
+Tone recipes provide starting points; Parameter, Oscillator, Noise, Code, Gain,
+Lowpass, Envelope, Mix and Output nodes can be connected through typed audio and
+control ports. The graph supports dragging, zoom/pan/Fit, pointer and keyboard
+connections, inspector dropdowns, context menus, bypass, duplication and deletion.
+Node dragging is one history edit and Escape cancels it. The lower dock contains
+Code, its generated TypeShade source, a code reference and four named parameters.
+The central viewer can switch to the existing waveform/spectrum monitor.
+
+Code nodes compile actual scalar TypeShade through the pinned CPU generator in a
+lazy dedicated worker. The generated kernel installs as a blob module in the
+existing AudioWorklet and finite-render worker. No browser eval or compiler runs
+in the callback. Validation bounds code size and topology; generated-code checks
+reject fallback, nested kernel calls and allocation expressions. Graphs allow
+16 nodes, two Code nodes, four parameters and one Output, without cycles. Each
+Code body permits 1800 characters and 350 syntax elements, scalar statements and
+the documented math functions. It receives input/time/sampleRate/p0–p3 and four
+persistent scalar state values; it writes out. Loops, helper functions, imports,
+arrays and host access are unavailable.
+
+Parameter/layout/name changes reuse compilation. Controls smooth over about
+12 ms; structural changes retain unchanged node state and crossfade for 10 ms.
+Retrigger resets graph state and seeded noise. Compile failure leaves the applied
+document and audio intact. A compile result cannot replace newer graph edits.
+Unapplied drafts survive node selection within the session; successful code,
+layout and parameters persist in the source, saved sounds and portable projects.
+Project/patch import compiles graphs before committing the document. Live silences
+non-finite samples and reports them; finite rendering rejects such output.
+
+Live, WAV and Picture share CPU graph DSP. A graph owns synthesis/processing for
+its source layer; source level, duration, offsets and mute still apply. Ordinary
+sound-rack effects/unison do not process graph sources. Output is mono, Lowpass is
+one-pole and sharp oscillator shapes are not band-limited. Feedback/delay networks,
+subgraphs, sample-player nodes, stereo buses, parameter automation tracks and a
+game-runtime graph export remain outside this implementation. Engine/compiler
+pins and upstream runtime sources are unchanged.
+
+The bounded English review covers graph menus, ports, node hints/properties,
+parameter controls, code reference, compile/recovery messages and README workflow.
+Desktop and 390 px screenshots were visually reviewed. It does not extend the
+earlier imported-document or translation review.
+
+Unit tests cover typed topology/cycles/limits, actual compiled-kernel block
+independence, forbidden code, exact live-sized/finite PCM parity, parameter state
+continuity, non-finite containment, state carry across recompilation and a noise
+node introduced after playback starts. Browser checks exercise the real compiler,
+AudioWorklet and render worker, PCM recording, successful/failed code swaps,
+delayed compilation with an intervening edit, node drag/Undo/Escape, pointer and
+keyboard connections, context actions, compile reuse, reload and invalid import.
+Portable Picture projects render identical WAVs in a fresh browser context.
+Canonical connection ordering keeps parameter slots stable when JSON properties
+are reordered. Selected-clip graph edits and Undo preserve the independent source.
+
+Local shader/TypeScript checks, 63 unit tests, the production build, CSS/scope
+checks and all eight browser suites pass. The existing CPU/WebGPU, device-loss,
+Tone persistence, imported-audio and timeline checks remain covered.
+
+The compute benchmark runs the production worklet in Chromium 156 in a dedicated
+worker, two trials per scenario, 500 warm-up and 6000 measured 128-frame blocks at
+48 kHz. Impact and Tone have p99 costs of 0.1–0.2 ms; the 16-node/two-Code graph is
+0.2 ms and four such layers are 0.3 ms. Timer resolution is about 0.1 ms. Across
+48000 measured blocks, eight elapsed measurements exceeded the 2.67 ms block
+duration; the maximum was 7.3 ms. These include scheduling pauses and are not
+measurements of actual AudioWorklet underruns or hardware latency. They establish
+bounded tested compute costs, not a hard real-time or arbitrary-program guarantee.
+
+## Atomic Design and responsibility boundaries — 2026-11-06
+
+The editor now separates atoms, molecules, feature organisms, workspace templates
+and the Studio page. Each TSX module owns one named component. The former shell
+is composed from individual menu, document, transport, tool and status components;
+the workspace grid accepts panel slots. Timeline controls/handles, graph nodes,
+connections, code editing, tooltips and context menus have individual owners.
+Feature stylesheets replace the single workspace stylesheet, preserving cascade
+order. The built CSS is byte-identical to the pre-refactor graph implementation.
+
+The former useEditor controller now composes document, audio-session, sound,
+Picture, asset, media and project controllers. One document hook owns the reducer,
+revision and local persistence. One resource hook owns SoundEngine/SceneTransport
+creation and cleanup. Selection, history, document projection and restoration are
+separate modules. Playback generations and import/compile revision guards retain
+their previous behavior, including independent source/clip Tone and stale-result
+protection. No additional copy of the patch or scene was introduced.
+
+Graph types, catalog, creation, recipes, validation, ordering, identity and
+parameters are separated from compilation requests, module installation and DSP.
+Compiler stages separately validate Code, emit source and call the pinned kernel
+generator. The sound domain similarly separates patch definitions, presets,
+validation, envelope sampling, delay, reverb, finite output and spectrum analysis.
+Consumers import the owning module directly. The audio processing algorithms,
+engine/compiler pins, file formats and graph limits are unchanged.
+
+The architecture check runs in the app's check script. It verifies one named
+component per TSX file, downward UI dependencies, props-based feature access for
+primitives, document/domain isolation from UI, audio resource ownership, compiler
+isolation and runtime import cycles. Unit checks exercise accepted type contracts
+and rejected boundary violations. The editor architecture guide documents the
+folder roles, state/resource owners, style order and extension workflow.
+
+This bounded English review covers that guide, the updated application README and
+the retained component labels/tooltips at the extraction boundaries. Existing
+workflow instructions and diagnostic wording were retained because behavior is
+unchanged. Desktop and 390 px graph/workspace screenshots were inspected. This
+does not claim a new review or translation of imported engine documentation.
+
+Shader/TypeScript and architecture checks, 65 unit tests, the production build,
+CSS/scope checks and all eight browser suites pass. Browser coverage includes
+actual CPU/WebGPU rendering, Live audio, graph compilation, Tone persistence,
+context menus/tooltips, resize/drag/Undo, video transport, imported audio and
+portable project/WAV round trips. This is behavior-preservation evidence; it adds
+no new hardware-latency or real-time guarantee.

@@ -1,23 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { DEFAULT, SAMPLE_RATE } from "./designer.ts";
-import {
-  cueRange,
-  cueWindow,
-  cueEnvelope,
-  fadeAt,
-  fadePoints,
-  emptyScene,
-  mixScene,
-  validateScene,
-  type Cue,
-} from "./video-model.ts";
+import { DEFAULT } from "./sound/defaultPatch.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { cueRange, cueWindow, cueEnvelope, fadeAt, fadePoints, emptyScene, mixScene, validateScene, type Cue } from "./video-model.ts";
 import { trimClip, splitClip, moveDelta } from "./editor/clip-edit.ts";
-import {
-  reducer,
-  selectionIds,
-  updateScene,
-  type EditorState,
-} from "./editor/model.ts";
+import { reducer } from "./editor/state/documentReducer.ts";
+import { selectionIds } from "./editor/state/documentProjection.ts";
+import { updateScene } from "./editor/state/documentUpdates.ts";
+import { type EditorState } from "./editor/state/documentTypes.ts";
 const cue = (extra: Partial<Cue> = {}): Cue => ({
   id: "a",
   name: "A",
@@ -27,6 +16,7 @@ const cue = (extra: Partial<Cue> = {}): Cue => ({
   patch: { ...DEFAULT },
   ...extra,
 });
+
 describe("non-destructive timeline editing", () => {
   it("trims and seeks within the original source and round trips old/new projects", () => {
     const c = trimClip(trimClip(cue(), "out", 4, 5), "in", 2, 5);
@@ -120,6 +110,7 @@ describe("non-destructive timeline editing", () => {
     expect(trimClip(cue({ time: 3599.9 }), "in", 3601, 5).time).toBe(3600);
   });
 });
+
 it("toggles/range-selects without changing source Tone and restores group edits in one Undo", () => {
   let s: EditorState = {
     scene: {

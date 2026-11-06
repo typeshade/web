@@ -1,4 +1,6 @@
-import { SAMPLE_RATE, validatePatch, type Patch } from "./designer.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
+import { validatePatch } from "./sound/validatePatch.ts";
+import { type Patch } from "./sound/types.ts";
 import {
   MAX_LIBRARY_FRAMES,
   validateAudioRef,

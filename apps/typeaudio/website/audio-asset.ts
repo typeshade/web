@@ -1,4 +1,4 @@
-import { SAMPLE_RATE } from "./designer.ts";
+import { SAMPLE_RATE } from "./sound/constants.ts";
 export const MAX_AUDIO_SECONDS = 30;
 export const MAX_AUDIO_FRAMES = SAMPLE_RATE * MAX_AUDIO_SECONDS;
 export const MAX_LIBRARY_FRAMES = SAMPLE_RATE * 120;

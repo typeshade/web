@@ -1,0 +1,51 @@
+export const MODULES = [
+  {
+    id: "source",
+    name: "Oscillators",
+    keys: [
+      "shapeA",
+      "shapeB",
+      "frequency",
+      "transpose",
+      "blend",
+      "detune",
+      "voices",
+      "spread",
+      "fmRatio",
+      "fmIndex",
+      "seed",
+    ],
+  },
+  {
+    id: "filter",
+    name: "Filter",
+    toggle: "filter",
+    keys: ["cutoff", "resonance"],
+  },
+  {
+    id: "envelope",
+    name: "Envelope",
+    keys: ["attack", "decay", "sustain", "release", "duration"],
+  },
+  { id: "drive", name: "Drive", toggle: "distortion", keys: ["drive"] },
+  {
+    id: "delay",
+    name: "Delay",
+    toggle: "delay",
+    keys: ["delayTime", "feedback", "delayMix"],
+  },
+  {
+    id: "reverb",
+    name: "Reverb",
+    toggle: "reverb",
+    keys: ["room", "reverbMix"],
+  },
+  {
+    id: "modulation",
+    name: "Modulation",
+    keys: ["lfoTarget", "lfoShape", "lfoRate", "lfoDepth", "lfoSync", "tempo"],
+  },
+  { id: "wave", name: "Wave", keys: [] },
+  { id: "automation", name: "Automation", keys: [] },
+  { id: "output", name: "Output", keys: ["volume"] },
+] as const;

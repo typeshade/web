@@ -1,0 +1,48 @@
+.document-bar {
+  display: flex;
+  align-items: center;
+  background: #292929;
+  border-bottom: 1px solid #141414;
+  min-width: 0;
+}
+.document-tab {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 190px;
+  max-width: 55%;
+  padding: 5px 14px;
+  background: #343434;
+  border-right: 1px solid #141414;
+  font-size: 10px;
+  overflow: hidden;
+}
+.document-tab > span:first-of-type {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-app .document-tab input {
+  border: 0;
+  background: transparent;
+  min-height: 20px;
+  padding: 0;
+  margin: 0 !important;
+  font-size: 10px;
+  max-width: 210px;
+}
+.document-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #9c9c9c;
+  flex-shrink: 0;
+}
+.document-status {
+  margin-left: auto;
+  margin-right: 14px;
+  font-size: 9px;
+  color: #858585;
+  white-space: nowrap;
+}
