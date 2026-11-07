@@ -61,7 +61,13 @@ function pcmHash(wav: Buffer) {
   return createHash("sha256").update(wav).digest("hex");
 }
 async function open(p: Page, id: string) {
-  await p.getByRole("button", { name: "Projects", exact: true }).click();
+  const tasks = p.getByRole("navigation", { name: "Editor tasks" });
+  if (await tasks.isVisible())
+    await tasks.getByRole("button", { name: "Projects", exact: true }).click();
+  await p
+    .getByRole("group", { name: "Project browser" })
+    .getByRole("button", { name: "Projects", exact: true })
+    .click();
   await p.locator(`[data-project="${id}"]`).click();
   await p.waitForFunction(
     (id) =>
@@ -189,7 +195,7 @@ try {
   const exported = await downloaded(p, "#save-project"),
     project = JSON.parse(exported.toString());
   assert.equal(project.schema, "typeaudio.project");
-  assert.equal(project.version, 1);
+  assert.equal(project.version, 2);
   assert.equal(
     project.audioAssets,
     undefined,
@@ -197,13 +203,11 @@ try {
   );
   assert.deepEqual(project.scene, edited);
   await open(p, "frieren-force-B");
-  await p
-    .locator("#project-file")
-    .setInputFiles({
-      name: "edited.typeaudio.json",
-      mimeType: "application/json",
-      buffer: exported,
-    });
+  await p.locator("#project-file").setInputFiles({
+    name: "edited.typeaudio.json",
+    mimeType: "application/json",
+    buffer: exported,
+  });
   await p.waitForFunction(
     () =>
       JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!).origin
@@ -224,26 +228,22 @@ try {
     edited,
     "Reload retains source, space and timing",
   );
-  await p
-    .locator("#project-file")
-    .setInputFiles({
-      name: "future.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify({ ...project, version: 999 })),
-    });
+  await p.locator("#project-file").setInputFiles({
+    name: "future.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify({ ...project, version: 999 })),
+  });
   await p.locator("#status").filter({ hasText: "Import failed" }).waitFor();
   assert.deepEqual(
     await scene(p),
     edited,
     "An unsupported project leaves current edits intact",
   );
-  await p
-    .locator("#project-file")
-    .setInputFiles({
-      name: "slow-project.json",
-      mimeType: "application/json",
-      buffer: exported,
-    });
+  await p.locator("#project-file").setInputFiles({
+    name: "slow-project.json",
+    mimeType: "application/json",
+    buffer: exported,
+  });
   await p.waitForFunction(
     () => !!(window as any).pendingProject["slow-project.json"],
   );
@@ -273,21 +273,27 @@ try {
   mobile.on("pageerror", (error) => errors.push(error.message));
   await mobile.goto(base);
   await open(mobile, "frieren-finale-A");
+  await mobile
+    .getByRole("navigation", { name: "Editor tasks" })
+    .getByRole("button", { name: "Edit", exact: true })
+    .click();
   await mobile.locator("#edit-cue-sound").click();
   await input(mobile, "Character value", 0.6);
   await mobile.getByRole("button", { name: "Picture", exact: true }).click();
+  await mobile
+    .getByRole("navigation", { name: "Editor tasks" })
+    .getByRole("button", { name: "Edit", exact: true })
+    .click();
   await input(mobile, "Room send", 0.2);
   await ready(mobile);
   await mobile.getByRole("button", { name: "File", exact: true }).click();
   const mobileData = await downloaded(mobile, "#save-project");
   await open(mobile, "frieren-red-B");
-  await mobile
-    .locator("#project-file")
-    .setInputFiles({
-      name: "mobile.json",
-      mimeType: "application/json",
-      buffer: mobileData,
-    });
+  await mobile.locator("#project-file").setInputFiles({
+    name: "mobile.json",
+    mimeType: "application/json",
+    buffer: mobileData,
+  });
   await mobile.waitForFunction(
     () =>
       JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!).origin
@@ -306,8 +312,9 @@ try {
   );
   if (artifacts) {
     await mobile
+      .getByRole("navigation", { name: "Editor tasks" })
       .getByRole("button", { name: "Projects", exact: true })
-      .scrollIntoViewIfNeeded();
+      .click();
     await mobile.screenshot({
       path: `${artifacts}/projects-mobile.png`,
       fullPage: true,

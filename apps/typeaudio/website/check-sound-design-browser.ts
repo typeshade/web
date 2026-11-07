@@ -84,14 +84,20 @@ try {
     };
   });
   await p.goto(base);
+  await p.getByRole("button", { name: "Sounds", exact: true }).click();
   assert.equal(await p.locator("[data-recipe]").count(), 3);
   await p.locator('[data-recipe="door"]').click();
   assert.equal((await patch(p)).layers.length, 2);
   await p.locator('[data-source-layer="air"]').click();
-  await p.keyboard.press('Shift+F10');
-  await p.getByRole('menu',{name:'Sound layer actions'}).waitFor();
-  await p.keyboard.press('Escape');
-  assert.equal(await p.locator('[data-source-layer="air"]').evaluate(n=>n===document.activeElement),true);
+  await p.keyboard.press("Shift+F10");
+  await p.getByRole("menu", { name: "Sound layer actions" }).waitFor();
+  await p.keyboard.press("Escape");
+  assert.equal(
+    await p
+      .locator('[data-source-layer="air"]')
+      .evaluate((n) => n === document.activeElement),
+    true,
+  );
   await module(p, "source");
   assert.equal(await p.locator("#shapeA").inputValue(), "4");
   await range(p, "frequency", 440);
@@ -151,13 +157,11 @@ try {
   assert.deepEqual(await patch(p), JSON.parse(json.toString()).patch);
   await p.locator('[data-preset="warm"]').click();
   assert.equal((await patch(p)).layers.length, 0);
-  await p
-    .locator("#patch-file")
-    .setInputFiles({
-      name: "sound.json",
-      mimeType: "application/json",
-      buffer: json,
-    });
+  await p.locator("#patch-file").setInputFiles({
+    name: "sound.json",
+    mimeType: "application/json",
+    buffer: json,
+  });
   await p.waitForFunction(
     () => document.querySelector("#status")!.textContent === "Patch imported.",
   );

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { initialDocument } from "../../state/restoreDocument.ts";
 import { reducer } from "../../state/documentReducer.ts";
 import { SCENE_KEY, DOCUMENT_KEY } from "../../state/storageKeys.ts";
@@ -25,6 +32,7 @@ export function useEditorDocument() {
         "select",
         "selectMany",
         "cancel",
+        "drafts",
       ].includes(action.type)
     )
       editVersion.current++;
@@ -33,34 +41,71 @@ export function useEditorDocument() {
   const [notice, setNotice] = useState(
     "Ready. Choose a preset or import a video.",
   );
+  const [savedValue, setSavedValue] = useState("");
+  const [saveError, setSaveError] = useState(false);
+  const documentValue = useMemo(
+    () =>
+      JSON.stringify({
+        version: 1,
+        scene: state.scene,
+        source: state.source,
+        selected: state.selected,
+        selection: state.selection,
+        drafts: state.drafts ?? {},
+      }),
+    [state.scene, state.source, state.selected, state.selection, state.drafts],
+  );
 
   const latest = useRef({ state });
   latest.current = { state };
   useEffect(() => {
     try {
-      localStorage.setItem(
-        DOCUMENT_KEY,
-        JSON.stringify({
-          version: 1,
-          scene: state.scene,
-          source: state.source,
-          selected: state.selected,
-          selection: state.selection,
-        }),
+      localStorage.setItem(DOCUMENT_KEY, documentValue);
+      setSavedValue(documentValue);
+      setSaveError(false);
+    } catch {
+      setSaveError(true);
+      setNotice(
+        "Browser storage is unavailable. Export your project to keep it.",
       );
-      // Compatibility mirrors are not used to restore a partially written document.
+    }
+  }, [documentValue]);
+  useEffect(() => {
+    // Optional legacy mirrors are not used to restore a partially written document.
+    try {
       localStorage.setItem(SCENE_KEY, JSON.stringify(state.scene));
       localStorage.setItem(
         "typeaudio.editor.source.v1",
         JSON.stringify(state.source),
       );
     } catch {
-      setNotice(
-        "Browser storage is unavailable. Export your project to keep it.",
-      );
+      /* The authoritative document save reports persistence failures. */
     }
-  }, [state.scene, state.source, state.selected, state.selection]);
-  return { state, dispatch, editVersion, notice, setNotice, latest };
+  }, [state.scene, state.source]);
+  const saveStatus = saveError
+    ? "error"
+    : savedValue === documentValue
+      ? "saved"
+      : "saving";
+  useEffect(() => {
+    const guard = (event: BeforeUnloadEvent) => {
+      if (saveStatus !== "saved") {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", guard);
+    return () => window.removeEventListener("beforeunload", guard);
+  }, [saveStatus]);
+  return {
+    state,
+    dispatch,
+    editVersion,
+    notice,
+    setNotice,
+    latest,
+    saveStatus,
+  };
 }
 
 export type DocumentController = ReturnType<typeof useEditorDocument>;

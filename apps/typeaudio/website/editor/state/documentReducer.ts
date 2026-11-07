@@ -32,6 +32,8 @@ function sameData(a: unknown, b: unknown): boolean {
 }
 
 export function reducer(s: EditorState, a: Action): EditorState {
+  // Text history belongs to Monaco; document Undo must preserve in-progress drafts.
+  if (a.type === "drafts") return { ...s, drafts: a.update(s.drafts ?? {}) };
   if (a.type === "begin")
     return s.checkpoint ? s : { ...s, checkpoint: snapshotDocument(s) };
   if (a.type === "commit") return settle(s);
@@ -66,9 +68,12 @@ export function reducer(s: EditorState, a: Action): EditorState {
       ...projectDocument({
         ...s,
         scene,
-        selection: undefined,
-        selected: scene.cues[0]?.id || "",
+        source: a.editor?.source ?? s.source,
+        selection: a.editor?.selection,
+        selected: a.editor?.selected ?? scene.cues[0]?.id ?? "",
       }),
+      drafts: a.editor?.drafts ?? {},
+      documentEpoch: (s.documentEpoch ?? 0) + 1,
       past: [],
       future: [],
     };

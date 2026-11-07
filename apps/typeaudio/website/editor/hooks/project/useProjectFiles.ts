@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { decodeProject } from "../../../project/decodeProject.ts";
 import { encodeProject } from "../../../project/encodeProject.ts";
 import { projectUrl } from "../../../project/catalog.ts";
@@ -12,15 +12,37 @@ import { download } from "../../shared/download.ts";
 import type { DocumentController } from "../document/useEditorDocument.ts";
 import type { EditorResources } from "../session/useAudioResources.ts";
 import type { MediaSource } from "../media/useMediaSource.ts";
+import type { EditorState } from "../../state/documentTypes.ts";
+import type { ProjectCopy } from "../../projects/ProjectHistory.ts";
 export function useProjectFiles(
   { editVersion, dispatch, latest, setNotice }: DocumentController,
-  { assetLibrary, transport }: EditorResources,
+  { assetLibrary, transport, projectHistory }: EditorResources,
   { detach }: MediaSource,
   setAudioRevision: React.Dispatch<React.SetStateAction<number>>,
-  workspace: (next: "picture") => void,
+  workspace: (next: "picture" | "sound") => void,
 ) {
   const projectRequest = useRef(0);
   const [projectLoading, setProjectLoading] = useState(false);
+  const [savedProjects, setSavedProjects] = useState<ProjectCopy[]>([]);
+  const editorState = (s: EditorState) => ({
+    source: s.source,
+    drafts: s.drafts ?? {},
+    selected: s.selected,
+    selection: s.selection ?? [],
+  });
+  function refreshProjects() {
+    try {
+      setSavedProjects(projectHistory.list());
+    } catch (error) {
+      setNotice(String(error));
+    }
+  }
+  useEffect(refreshProjects, []);
+  function checkpoint() {
+    const s = latest.current.state;
+    projectHistory.save(encodeProject(s.scene, [], editorState(s)));
+    refreshProjects();
+  }
   async function loadProject(read: () => Promise<unknown>) {
     const request = ++projectRequest.current,
       version = editVersion.current;
@@ -28,27 +50,31 @@ export function useProjectFiles(
       request === projectRequest.current && version === editVersion.current;
     setProjectLoading(true);
     try {
-      const { scene: next, audioAssets } = decodeProject(await read());
+      const { scene: next, audioAssets, editor } = decodeProject(await read());
       for (const cue of next.cues)
         if (!cue.audio) {
           if (!current()) return;
           await patchPrograms(cue.patch);
         }
+      if (editor) await patchPrograms(editor.source.patch);
       const assets = await unpackAudioAssets(
         audioAssets,
         next.cues.flatMap((c) => (c.audio ? [c.audio] : [])),
       );
       if (!current()) return;
+      checkpoint();
       await assetLibrary.put(assets);
       if (!current()) return;
       detach();
-      dispatch({ type: "open", scene: next });
-      workspace("picture");
+      dispatch({ type: "open", scene: next, editor });
+      workspace(
+        next.cues.length || next.media.kind !== "none" ? "picture" : "sound",
+      );
       setAudioRevision((n) => n + 1);
       transport.current.seek(next.start);
       setNotice(
         next.media.kind === "youtube"
-          ? "Editable project opened. Select a layer to edit its sound; connect the YouTube reference when needed."
+          ? "Project opened. Your previous work is in Saved copies. Select a layer to edit or play the composition."
           : next.media.kind === "none"
             ? "Project opened."
             : `Project opened. Re-select video: ${next.media.name}`,
@@ -80,7 +106,8 @@ export function useProjectFiles(
     });
   }
   async function exportProject() {
-    const snapshot = latest.current.state.scene;
+    const document = latest.current.state,
+      snapshot = document.scene;
     try {
       const refs = [
         ...new Map(
@@ -95,7 +122,7 @@ export function useProjectFiles(
           packAudio({ ...ref, pcm: await assetLibrary.read(ref) }),
         );
       const data = JSON.stringify(
-        encodeProject(snapshot, audioAssets),
+        encodeProject(snapshot, audioAssets, editorState(document)),
         null,
         2,
       );
@@ -107,12 +134,41 @@ export function useProjectFiles(
       );
       setNotice(
         audioAssets.length
-          ? "Exported project with its source audio. Re-select video when reopening."
-          : "Project exported.",
+          ? "Project file saved with source audio and code drafts. Re-select local video when reopening."
+          : "Project file saved, including applied sounds and code drafts.",
       );
     } catch (error) {
       setNotice(`Export failed: ${String(error)}`);
     }
   }
-  return { openProject, openExample, projectLoading, exportProject };
+  const openSavedProject = (id: string) =>
+    loadProject(async () => projectHistory.read(id));
+  function deleteSavedProject(id: string) {
+    try {
+      projectHistory.remove(id);
+      refreshProjects();
+    } catch (error) {
+      setNotice(String(error));
+    }
+  }
+  function saveProjectCopy() {
+    try {
+      checkpoint();
+      setNotice(
+        "Saved an editable project copy in this browser, including code drafts.",
+      );
+    } catch (error) {
+      setNotice(String(error));
+    }
+  }
+  return {
+    openProject,
+    openExample,
+    projectLoading,
+    exportProject,
+    savedProjects,
+    openSavedProject,
+    deleteSavedProject,
+    saveProjectCopy,
+  };
 }

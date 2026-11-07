@@ -22,6 +22,13 @@ export function TransportBar({ editor: e }: { editor: Editor }) {
           </>
         )}
       </div>
+      {e.preview && (
+        <div className="preview-status" role="status">
+          {e.preview.phase === "preparing" ? "Preparing preview" : "Preview"}:{" "}
+          {e.preview.id}
+          <button onClick={e.stopPreview}>Stop preview</button>
+        </div>
+      )}
       <ExportActions editor={e} />
     </div>
   );

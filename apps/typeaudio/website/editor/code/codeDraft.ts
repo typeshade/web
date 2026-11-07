@@ -1,7 +1,4 @@
-export interface CodeDraft {
-  base: string;
-  text: string;
-}
+import type { CodeDraft } from "../../project/editorState.ts";
 
 // '$' cannot occur in a validated graph node ID.
 export const GENERATED_DOCUMENT = "$generated";

@@ -20,7 +20,7 @@ export function useGraphCompilation(e: Editor, owner: string) {
     return () => {
       request.current++;
     };
-  }, [owner]);
+  }, [owner, e.state.documentEpoch]);
   const key = graph ? graphKey(graph) : "";
   useEffect(() => {
     let active = true;
@@ -42,13 +42,18 @@ export function useGraphCompilation(e: Editor, owner: string) {
   async function apply(next: SoundGraph) {
     const id = ++request.current,
       before = JSON.stringify(latest.current.graph),
+      epoch = e.state.documentEpoch,
       sourceOwner = owner;
     setBusy(true);
     setError("");
     try {
       const checked = validateGraph(next),
         program = await prepareGraph(checked);
-      if (id !== request.current || sourceOwner !== latest.current.owner)
+      if (
+        id !== request.current ||
+        sourceOwner !== latest.current.owner ||
+        epoch !== latest.current.e.state.documentEpoch
+      )
         return false;
       if (JSON.stringify(latest.current.graph) !== before)
         throw new Error(

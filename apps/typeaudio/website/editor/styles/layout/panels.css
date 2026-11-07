@@ -32,7 +32,7 @@
   min-height: 190px;
 }
 .inspector-region .panel-body {
-  overflow: visible;
+  overflow: auto;
 }
 .studio-app .utility-panel {
   flex: 0 0 auto;

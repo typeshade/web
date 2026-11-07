@@ -12,6 +12,9 @@ export function useSceneSession(
   { transport }: EditorResources,
   audioRevision: number,
 ) {
+  const [auditioning, setAuditioning] = useState("");
+  const auditionTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(auditionTimer.current), []);
   const [playing, setPlaying] = useState(false),
     [position, setPosition] = useState(0),
     [ready, setReady] = useState(false),
@@ -25,6 +28,8 @@ export function useSceneSession(
     looping = useRef(false);
   const stopScene = useCallback(() => {
     sceneAction.current++;
+    clearTimeout(auditionTimer.current);
+    setAuditioning("");
     transport.current.stop();
     setPosition(transport.current.current());
     setPlaying(false);
@@ -56,7 +61,7 @@ export function useSceneSession(
   }, [state.scene.original, state.scene.effects]);
   const playScene = useCallback(
     async (restart = false) => {
-      sceneAction.current++;
+      stopScene();
       try {
         if (!latest.current.ready)
           throw new Error("Wait for sound clips to prepare.");
@@ -131,6 +136,13 @@ export function useSceneSession(
         current.samples,
         0,
       );
+      setAuditioning(cue.name);
+      auditionTimer.current = setTimeout(
+        () => {
+          if (generation === sceneAction.current) setAuditioning("");
+        },
+        cueRange(cue, pcm.length / SAMPLE_RATE).duration * 1000,
+      );
       setNotice(
         current.state.scene.space
           ? "Auditioning the selected source without the scene room."
@@ -164,6 +176,7 @@ export function useSceneSession(
     );
   }
   return {
+    auditioning,
     playing,
     position,
     sceneReady,

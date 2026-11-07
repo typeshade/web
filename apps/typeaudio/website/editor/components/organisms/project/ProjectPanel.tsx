@@ -9,8 +9,15 @@ import { openContext } from "../../../interactions/openContext.ts";
 import { useInteractions } from "../../../hooks/interactions/useInteractions.ts";
 import { type MenuItem } from "../../../interactions/types.ts";
 import { YouTubeInput } from "../../molecules/media/YouTubeInput.tsx";
+import { SavedProjects } from "./SavedProjects.tsx";
 import { ProjectExamples } from "./ProjectExamples.tsx";
-export function ProjectPanel({ editor: e }: { editor: Editor }) {
+export function ProjectPanel({
+  editor: e,
+  onOpenProject,
+}: {
+  editor: Editor;
+  onOpenProject: () => void;
+}) {
   const { openMenu } = useInteractions();
   function actions(value: SavedSound): MenuItem[] {
     return [
@@ -51,7 +58,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
     ];
   }
   const [tab, setTab] = useState<"project" | "sounds" | "audio" | "examples">(
-      "sounds",
+      "examples",
     ),
     [search, setSearch] = useState("");
   const file = e.videoInput,
@@ -106,15 +113,24 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
           Media
         </button>
       </div>
-      {tab === "sounds" && (
+      <div className="project-file-actions">
+        <button onClick={onOpenProject}>Open project file…</button>
+        <button onClick={() => void e.exportProject()}>
+          Save project file
+        </button>
+      </div>
+      {
         <button
           className="new-graph-button"
-          onClick={() => void e.newGraph()}
+          onClick={() => {
+            setTab("sounds");
+            void e.newGraph();
+          }}
           data-tooltip="Start a procedural sound with a node network, TypeShade code and exposed parameters."
         >
           + New procedural sound
         </button>
-      )}
+      }
       <input
         id="audio-file"
         type="file"
@@ -156,7 +172,10 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
         }}
       />
       {tab === "examples" ? (
-        <ProjectExamples editor={e} />
+        <>
+          <ProjectExamples editor={e} />
+          <SavedProjects editor={e} />
+        </>
       ) : tab === "sounds" ? (
         <>
           <div className="asset-columns">
@@ -250,7 +269,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
           <YouTubeInput editor={e} />
         </div>
       )}
-      <div className="project-bottom">
+      <div className="project-bottom" hidden={tab !== "sounds"}>
         <label>
           {e.selected?.audio ? "Source sound name" : "Sound name"}
           <input
@@ -262,7 +281,7 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
         </label>
         <div className="button-row">
           <button id="save-patch" onClick={e.savePatch}>
-            Save sound
+            Save preset
           </button>
           <button
             id="export-patch"
@@ -286,10 +305,10 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
               )
             }
           >
-            Export
+            Save sound file
           </button>
           <button id="import-patch" onClick={() => patchFile.current?.click()}>
-            Import
+            Open sound file
           </button>
         </div>
         <input
@@ -305,7 +324,8 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
           }}
         />
         <p className="panel-hint">
-          Sounds and projects are saved in this browser.
+          Presets stay in this browser. Project files include all layers and
+          code drafts.
         </p>
       </div>
     </Panel>

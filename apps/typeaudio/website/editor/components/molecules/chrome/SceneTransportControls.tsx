@@ -32,6 +32,15 @@ export function SceneTransportControls({ editor: e }: { editor: Editor }) {
       >
         <Icon name="stop" />
       </button>
+      <span className="playback-scope" role="status">
+        {e.auditioning
+          ? `Dry source · ${e.auditioning}`
+          : e.ready
+            ? e.state.scene.space
+              ? "Composition · room"
+              : "Composition"
+            : "Preparing mix…"}
+      </span>
       <output className="timecode">{e.position.toFixed(3)} s</output>
     </>
   );

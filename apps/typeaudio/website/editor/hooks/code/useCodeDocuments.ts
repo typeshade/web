@@ -1,20 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { GraphEditor } from "../graph/useGraphEditor.ts";
 import {
   codeDocumentKey,
   resolveCodeDraft,
-  type CodeDraft,
   GENERATED_DOCUMENT,
 } from "../../code/codeDraft.ts";
+import type { CodeDraft, CodeDrafts } from "../../../project/editorState.ts";
 
 /** Owns unapplied buffers independently from the sound document and its history. */
 export function useCodeDocuments(c: GraphEditor) {
-  const [drafts, setDrafts] = useState<Record<string, CodeDraft>>({});
+  const drafts = c.e.state.drafts ?? {};
+  const setDrafts = useCallback(
+    (update: (current: CodeDrafts) => CodeDrafts) =>
+      c.e.dispatch({ type: "drafts", update }),
+    [c.e.dispatch],
+  );
   const [active, setActive] = useState({ owner: "", id: "" });
   const [attempt, setAttempt] = useState<{ key: string; text: string }>();
   const [focusRequest, requestFocus] = useState(0);
-  const draftsRef = useRef(drafts);
-  draftsRef.current = drafts;
   const nodes = c.graph?.nodes.filter((n) => n.kind === "code") ?? [];
   const appliedCodes = JSON.stringify(nodes.map((n) => [n.id, n.code]));
   useEffect(() => {
@@ -48,6 +51,7 @@ export function useCodeDocuments(c: GraphEditor) {
       : (nodes[0]?.id ?? GENERATED_DOCUMENT);
   const node = nodes.find((n) => n.id === id);
   const key = codeDocumentKey(c.owner, id);
+  const documentKey = `${c.e.state.documentEpoch ?? 0}:${key}`;
   const buffer = resolveCodeDraft(drafts[key], node?.code ?? "");
   const dirty = !!node && buffer.text !== node.code;
   const generated = id === GENERATED_DOCUMENT;
@@ -77,19 +81,9 @@ export function useCodeDocuments(c: GraphEditor) {
     }
     return applied;
   }
-  useEffect(() => {
-    const guard = (event: BeforeUnloadEvent) => {
-      if (Object.values(draftsRef.current).some((d) => d.text !== d.base)) {
-        event.preventDefault();
-        event.returnValue = "";
-      }
-    };
-    window.addEventListener("beforeunload", guard);
-    return () => window.removeEventListener("beforeunload", guard);
-  }, []);
   return {
     id,
-    key,
+    key: documentKey,
     node,
     generated,
     text,

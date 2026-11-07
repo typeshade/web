@@ -71,6 +71,7 @@ export function GraphCodeEditor({
           }
           onChange={d.change}
           onApply={() => void d.apply()}
+          onSave={() => void c.e.exportProject()}
         />
       </div>
       <GraphCodeReference />
@@ -81,7 +82,7 @@ export function GraphCodeEditor({
             : d.generated
               ? "Read-only source for the applied graph. Edit a Code node to change its sound."
               : d.dirty
-                ? "Unapplied draft · Ctrl/⌘ Enter compiles and applies. Playback uses the last applied code."
+                ? "Draft saved with project · Ctrl/⌘ S: save file · Ctrl/⌘ Enter: apply to sound. Playback uses applied code."
                 : "Applied · Ctrl/⌘ Space: completion · F2: rename · F12: definition · Apply checks audio-node limits.")}
       </p>
     </div>

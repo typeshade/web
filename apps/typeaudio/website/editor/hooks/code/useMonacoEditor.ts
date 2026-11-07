@@ -15,6 +15,7 @@ export interface MonacoEditorProps {
   diagnostic?: CodeDiagnostic;
   onChange: (value: string) => void;
   onApply: () => void;
+  onSave: () => void;
 }
 type Session = {
   m: typeof Monaco;
@@ -113,7 +114,7 @@ export function useMonacoEditor(props: MonacoEditorProps) {
           ) {
             event.preventDefault();
             event.stopPropagation();
-            if (!latest.current.readOnly) latest.current.onApply();
+            latest.current.onSave();
           }
         });
         setSession({ m, editor, models });

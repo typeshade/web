@@ -59,6 +59,7 @@ try {
   await p.goto(base);
   await value(p, "Pitch", "440");
   assert.equal(await p.locator("#frequency").inputValue(), "440");
+  await p.getByRole("button", { name: "Sounds", exact: true }).click();
   assert.equal(
     await p.locator('[data-preset="warm"]').getAttribute("aria-pressed"),
     "false",

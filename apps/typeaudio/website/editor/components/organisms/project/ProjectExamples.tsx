@@ -5,8 +5,8 @@ export function ProjectExamples({ editor: e }: { editor: Editor }) {
   return (
     <div className="project-examples">
       <p className="panel-hint">
-        Open an editable copy with source code, layers, timing and space. Export
-        the current project to keep it before opening another.
+        Preview without changing your work, then open an editable copy. Each
+        passage includes source code, timing and room settings.
       </p>
       {PROJECTS.map((project) => (
         <article className="project-example" key={project.id}>
@@ -15,22 +15,43 @@ export function ProjectExamples({ editor: e }: { editor: Editor }) {
             {project.range} · {project.layers} layers
           </small>
           <p>{project.detail}</p>
-          <div className="button-row">
-            {(["A", "B"] as const).map((variant) => (
-              <button
-                key={variant}
-                data-project={`${project.id}-${variant}`}
-                disabled={e.projectLoading}
-                data-tooltip={`Open variant ${variant} as an editable composition. Changes belong to your copy.`}
-                onClick={() => void e.openExample(`${project.id}-${variant}`)}
-              >
-                Open {variant}
-              </button>
-            ))}
-            <a href={projectUrl(project.id + "-A")} download>
-              JSON
-            </a>
-          </div>
+          {(["A", "B"] as const).map((variant) => {
+            const id = `${project.id}-${variant}`,
+              previewing = e.preview?.id === id;
+            return (
+              <div className="project-variant" key={variant}>
+                <p>
+                  <strong>{variant}</strong> · {project.variants[variant]}
+                </p>
+                <div className="button-row">
+                  <button
+                    data-preview={id}
+                    aria-pressed={previewing}
+                    onClick={() =>
+                      previewing ? e.stopPreview() : void e.previewProject(id)
+                    }
+                  >
+                    {previewing ? "Stop preview" : `Preview ${variant}`}
+                  </button>
+                  <button
+                    data-project={id}
+                    disabled={e.projectLoading}
+                    data-tooltip="Open an editable copy. Your previous project is kept in Saved copies."
+                    onClick={() => void e.openExample(id)}
+                  >
+                    Open {variant}
+                  </button>
+                  <a
+                    href={projectUrl(id)}
+                    download
+                    aria-label={`Download ${project.title} ${variant} source project`}
+                  >
+                    JSON
+                  </a>
+                </div>
+              </div>
+            );
+          })}
         </article>
       ))}
       {e.projectLoading && (
@@ -51,7 +72,7 @@ export function ProjectExamples({ editor: e }: { editor: Editor }) {
           <strong>{e.state.scene.name}</strong>
           <p>{e.state.scene.origin.notes}</p>
           <button onClick={() => void e.exportProject()}>
-            Export edited project
+            Save project file
           </button>
         </div>
       )}

@@ -15,7 +15,8 @@ export function useEditorShortcuts(e: Editor) {
     const handler = (event: KeyboardEvent) => {
       if (
         event.defaultPrevented ||
-        (event.target instanceof Element && event.target.closest(".monaco-editor,dialog")) ||
+        (event.target instanceof Element &&
+          event.target.closest(".monaco-editor,dialog")) ||
         (event.target instanceof HTMLElement &&
           event.target.closest('[role="menu"]') &&
           !event.ctrlKey &&
@@ -40,7 +41,7 @@ export function useEditorShortcuts(e: Editor) {
       }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
         event.preventDefault();
-        picture ? save() : e.savePatch();
+        save();
         return;
       }
       if (picture && (event.ctrlKey || event.metaKey)) {

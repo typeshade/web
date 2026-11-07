@@ -1,0 +1,204 @@
+/* Task navigation keeps playback and project state visible on narrow screens. */
+@media (max-width: 950px) {
+  #root {
+    height: 100dvh;
+    min-height: 0;
+  }
+  .studio-app,
+  .studio-app:has(.preview-status) {
+    display: grid;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    grid-template-rows: 44px auto auto 44px minmax(0, 1fr) 30px;
+  }
+  .studio-app .app-menubar {
+    min-width: 0;
+    overflow-x: auto;
+  }
+  .studio-app .app-menubar :is(button, a) {
+    min-height: 40px;
+    font-size: 12px;
+  }
+  .studio-app .help-link,
+  .document-status {
+    display: none;
+  }
+  .studio-app .document-bar {
+    min-height: 48px;
+    height: auto;
+  }
+  .document-tab {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    padding: 6px 10px;
+    gap: 4px 8px;
+  }
+  .save-state {
+    width: 100%;
+    padding-left: 22px;
+  }
+  .options-bar {
+    padding: 5px 8px;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .transport-buttons {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .studio-app .transport-buttons > button {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .studio-app .export-actions {
+    margin-left: auto;
+  }
+  .studio-app .export-actions button {
+    min-height: 36px;
+    font-size: 11px;
+  }
+  .playback-scope {
+    font-size: 12px;
+  }
+  .preview-status {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .mobile-tasks {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: #292d34;
+    border-bottom: 1px solid #566;
+  }
+  .studio-app .mobile-tasks button {
+    border-radius: 0;
+    border: 0;
+    min-height: 44px;
+    font-size: 13px;
+    background: transparent;
+  }
+  .studio-app .mobile-tasks button[aria-pressed="true"] {
+    background: #3d4a5d;
+    box-shadow: inset 0 -2px #96b8f1;
+  }
+  .editor-body {
+    min-height: 0;
+    overflow: hidden;
+    padding: 3px;
+  }
+  .tool-rail,
+  .workspace > .splitter {
+    display: none;
+  }
+  .studio-app .workspace {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .studio-app
+    .workspace
+    > :is(.project-panel, .viewer-region, .inspector-region, .dock-region) {
+    display: none;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    overflow: auto;
+    margin: 0;
+  }
+  .studio-app[data-mobile-panel="projects"] .workspace > .project-panel,
+  .studio-app[data-mobile-panel="listen"] .workspace > .viewer-region,
+  .studio-app[data-mobile-panel="layers"] .workspace > .dock-region,
+  .studio-app[data-mobile-panel="edit"] .workspace > .inspector-region {
+    display: block;
+  }
+  .studio-app[data-mobile-panel="edit"][data-source-editing="true"]
+    .workspace
+    > .viewer-region {
+    display: block;
+  }
+  .studio-app[data-mobile-panel="edit"][data-source-editing="true"]
+    .workspace
+    > .inspector-region {
+    display: none;
+  }
+  .studio-app .inspector-region > .panel {
+    height: auto;
+    margin-bottom: 6px;
+  }
+  .studio-app .inspector-region .panel-body {
+    overflow: visible;
+  }
+  .studio-app .project-panel .panel-body {
+    height: calc(100% - 32px);
+    overflow: auto;
+  }
+  .studio-app .project-panel :is(button, .asset-row, a),
+  .studio-app
+    .inspector-region
+    :is(button, input:not([type="checkbox"]), select),
+  .studio-app .timeline-tools button,
+  .studio-app .layer-name {
+    min-height: 44px;
+    font-size: 13px;
+  }
+  .studio-app .layer-name {
+    padding: 6px;
+  }
+  .studio-app .layer-name > span > small {
+    font-size: 10px;
+  }
+  .studio-app .source-editing-view {
+    height: auto;
+    min-height: 100%;
+  }
+  .studio-app .source-editing-view > .document-view {
+    flex: none;
+    height: 340px;
+  }
+  .studio-app .source-editing-view .graph-dock-panel {
+    flex: none;
+    min-height: 600px;
+  }
+  .studio-app .source-editing-view .graph-parameters {
+    width: auto;
+    grid-template-columns: 1fr 1fr;
+  }
+  .studio-app .source-editing-view .code-layout-controls {
+    display: none;
+  }
+  .source-breadcrumb {
+    flex-wrap: wrap;
+  }
+  .source-breadcrumb span {
+    flex-basis: 100%;
+    order: -1;
+    padding: 4px;
+  }
+  .studio-app .source-breadcrumb button {
+    min-height: 44px;
+  }
+  .studio-app .mobile-layer-back {
+    display: inline-flex;
+  }
+  .studio-app .graph-code-panel {
+    min-height: 520px;
+  }
+  .studio-app .graph-dock-panel > .panel-body {
+    overflow: visible;
+  }
+  .studio-app .status-bar {
+    min-height: 0;
+    height: 30px;
+    overflow: hidden;
+  }
+  .studio-app #status {
+    font-size: 11px;
+  }
+}

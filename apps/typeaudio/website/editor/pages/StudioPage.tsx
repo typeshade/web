@@ -1,3 +1,4 @@
+import { SourceBreadcrumb } from "../components/molecules/picture/SourceBreadcrumb.tsx";
 import { useEditorShortcuts } from "../hooks/interactions/useEditorShortcuts.ts";
 import { useEditor } from "../useEditor.ts";
 import { WorkspaceShell } from "../templates/WorkspaceShell.tsx";
@@ -23,6 +24,8 @@ export function StudioPage() {
     layout = useWorkspaceLayout(),
     selection = useSoundSelection(e),
     picture = e.state.workspace === "picture";
+  const sourceEditing =
+    picture && e.sourceEditing && !!e.selected && !e.selected.audio;
   const graph = useGraphEditor(
     selection.sourceEditor,
     JSON.stringify([selection.owner, selection.sourceId]),
@@ -50,18 +53,37 @@ export function StudioPage() {
         hasGraph={!!graph.graph && !picture}
         focused={layout.focused}
         codeMode={layout.codeMode}
-        project={<ProjectPanel editor={e} />}
+        project={
+          <ProjectPanel
+            editor={e}
+            onOpenProject={() => projectFile.current?.click()}
+          />
+        }
         viewer={
           <>
-            <SoundViewer editor={e} graph={graph} hidden={picture} />
-            <div className="document-view" hidden={!picture}>
+            <div
+              className={
+                sourceEditing ? "source-editing-view" : "document-view"
+              }
+              hidden={picture && !sourceEditing}
+            >
+              {sourceEditing && <SourceBreadcrumb editor={e} />}
+              <SoundViewer editor={e} graph={graph} hidden={false} />
+              {sourceEditing && graph.graph && (
+                <GraphDock controller={graph} documents={documents} />
+              )}
+              {sourceEditing && !graph.graph && (
+                <SignalChainPanel editor={e} selection={selection} />
+              )}
+            </div>
+            <div className="document-view" hidden={!picture || sourceEditing}>
               <Composition editor={e} />
             </div>
           </>
         }
         inspector={
-          picture ? (
-            <ClipInspector editor={e} />
+          picture && !sourceEditing ? (
+            <ClipInspector editor={e} graph={graph} />
           ) : (
             <SoundProperties editor={e} selection={selection} graph={graph} />
           )

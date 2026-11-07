@@ -77,7 +77,7 @@ describe("editable agent project contract", () => {
 
   it("rejects unsupported projects and invalid positions instead of silently discarding fields", () => {
     expect(() =>
-      decodeProject({ schema: "typeaudio.project", version: 2 }),
+      decodeProject({ schema: "typeaudio.project", version: 999 }),
     ).toThrow(/supported/);
     const raw = example("frieren-red-A");
     raw.scene.cues[0].space.points[0].x = 900;

@@ -29,7 +29,7 @@ export function applicationMenu(
             action: () => file.current?.click(),
           },
           {
-            label: "Export project…",
+            label: "Save project file…",
             id: "save-project",
             shortcut: `${key} S`,
             action: save,
