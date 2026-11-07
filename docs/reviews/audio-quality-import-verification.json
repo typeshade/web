@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-07",
+  "codeCommit": "3c388baddfaee5aa8d939f96aac2f9fb04403182",
+  "applicationBase": "a43e156f9110eeb0b216d677acdec1894ad9162a",
+  "enginePin": "5489ac494e69b5eb2dfae63546cc7643ecfea0f0",
+  "compilerPin": "87af4eb0d9d15f02b66b8341b72cab0944290472",
+  "unitTests": 110,
+  "typecheckArchitectureBuild": "passed",
+  "browser": {
+    "checks": [
+      {
+        "mobileViewport": false,
+        "maximumPcmError": 1,
+        "imported": true,
+        "playback": true,
+        "edited": true,
+        "saved": true,
+        "reopened": true,
+        "reloaded": true
+      },
+      {
+        "mobileViewport": true,
+        "maximumPcmError": 1,
+        "imported": true,
+        "playback": true,
+        "edited": true,
+        "saved": true,
+        "reopened": true,
+        "reloaded": true
+      }
+    ],
+    "errors": [],
+    "physicalPhone": false,
+    "pictureSyncVerified": false
+  },
+  "command": "TYPESHADE_CHROMIUM=<Chromium 156 path> bun scripts/check-quality-project-browser.ts <candidate directory>",
+  "browserVersion": "Chromium 156.0.8078.4",
+  "artifacts": {
+    "mobile.png": "44cdce176f45cc1b12a9c7fbfb0b4bce4045cd20d84829cbe5e3497c7678bfde",
+    "desktop.png": "a70546d0e38e0b73f6ec6e5e50d4a7bbd5979623235bc63c432fd948808852eb",
+    "desktop-saved.json": "251afa156b774d15204cd52185ce3a2e1e4a03d542acff0d1918fa4a77adb877",
+    "mobile-saved.json": "251afa156b774d15204cd52185ce3a2e1e4a03d542acff0d1918fa4a77adb877"
+  },
+  "claims": {
+    "sourceProjectImport": true,
+    "playbackAndStereoExport": true,
+    "roomEditSaveReopenReload": true,
+    "sourceEditSerializationUnitTest": true,
+    "physicalPhone": false,
+    "pictureSyncVerified": false,
+    "humanListeningApproval": false,
+    "deployed": false
+  },
+  "engineEvidence": "https://github.com/typeshade/typeaudio/blob/5fddeb9/docs/continuity/audio-quality-verification.json"
+}
