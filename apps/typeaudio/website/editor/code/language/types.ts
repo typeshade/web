@@ -14,6 +14,7 @@ export interface LanguageDocument {
   text: string;
   version: number;
   mode: "sample" | "module";
+  files?: Record<string, string>;
 }
 export interface LanguageResults {
   completions: readonly TypeshadeCompletionItem[];

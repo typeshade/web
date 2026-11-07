@@ -3,6 +3,8 @@ import { SoundDsp } from "./sound-dsp.ts";
 import { DEFAULT } from "./sound/defaultPatch.ts";
 import { SAMPLE_RATE } from "./sound/constants.ts";
 import { type Patch } from "./sound/types.ts";
+import type { PreparedProgram } from "./functions/types.ts";
+import { registerFunctionPrograms } from "./functions/preparedPrograms.ts";
 interface ProcessorBase {
   readonly port: MessagePort;
 }
@@ -12,7 +14,12 @@ const scope = globalThis as unknown as {
   registerProcessor(
     name: string,
     constructor: new (options: {
-      processorOptions?: { patch?: Patch; repeat?: boolean; dry?: boolean };
+      processorOptions?: {
+        patch?: Patch;
+        repeat?: boolean;
+        dry?: boolean;
+        programs?: PreparedProgram[];
+      };
     }) => ProcessorBase,
   ): void;
 };
@@ -35,18 +42,26 @@ class LiveProcessor extends scope.AudioWorkletProcessor {
       );
   }
   constructor(options: {
-    processorOptions?: { patch?: Patch; repeat?: boolean; dry?: boolean };
+    processorOptions?: {
+      patch?: Patch;
+      repeat?: boolean;
+      dry?: boolean;
+      programs?: PreparedProgram[];
+    };
   }) {
     super();
     if (scope.sampleRate !== SAMPLE_RATE)
       throw new Error("Live mode requires a 48 kHz audio context.");
+    registerFunctionPrograms(options.processorOptions?.programs);
     this.dsp = new SoundDsp(options.processorOptions?.patch || DEFAULT);
     this.dsp.repeat = options.processorOptions?.repeat ?? true;
     this.dsp.dry = options.processorOptions?.dry ?? false;
     this.port.onmessage = ({ data }) => {
       try {
-        if (data.type === "patch")
+        if (data.type === "patch") {
+          registerFunctionPrograms(data.programs);
           this.dsp.update(data.patch, data.repeat, data.dry);
+        }
         if (data.type === "retrigger") this.dsp.retrigger();
         if (data.type === "record-start") this.recording = new PcmRecorder();
         if (data.type === "record-stop") this.finishRecording();

@@ -25,6 +25,12 @@ export function validateDrafts(raw: unknown): CodeDrafts {
     entries.map(([key, value]) => {
       const parts = JSON.parse(key),
         draft = value as CodeDraft;
+      const limit =
+        Array.isArray(parts) &&
+        typeof parts[1] === "string" &&
+        parts[1].startsWith("module:")
+          ? 131072
+          : 32768;
       if (
         !Array.isArray(parts) ||
         parts.length !== 2 ||
@@ -33,8 +39,8 @@ export function validateDrafts(raw: unknown): CodeDrafts {
         !draft ||
         typeof draft.base !== "string" ||
         typeof draft.text !== "string" ||
-        draft.base.length > 32768 ||
-        draft.text.length > 32768
+        draft.base.length > limit ||
+        draft.text.length > limit
       )
         throw new Error("Invalid code draft entry.");
       return [key, { base: draft.base, text: draft.text }];

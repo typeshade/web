@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { disposeGraphCompiler } from "../../../graph/compilationClient.ts";
+import { disposeFunctionCompiler } from "../../../functions/compilationClient.ts";
 import { SoundEngine } from "../../engine/SoundEngine.ts";
 import { SceneTransport } from "../../engine/SceneTransport.ts";
 import { ProjectPreview } from "../../projects/ProjectPreview.ts";
@@ -18,6 +19,7 @@ export function useAudioResources() {
       projectPreview.current.stop();
       sound.current.close();
       disposeGraphCompiler();
+      disposeFunctionCompiler();
       transport.current.close();
     },
     [],

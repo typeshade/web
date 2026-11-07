@@ -35,7 +35,7 @@ export function MonacoCodeEditor(props: MonacoEditorProps) {
         <span>
           {props.readOnly
             ? "Read only"
-            : `${props.value.length} / 1800 characters`}
+            : `${props.value.length} / ${props.mode === "module" ? 131072 : 1800} characters`}
         </span>
         <span>TypeShade · Spaces: 2</span>
       </div>

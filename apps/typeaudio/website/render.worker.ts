@@ -8,6 +8,10 @@ import { validatePatch } from "./sound/validatePatch.ts";
 import { type RenderRequest } from "./sound/types.ts";
 import "typeaudio/graph/runtime";
 import { loadGraphModule } from "./graph/loadGraphModule.ts";
+import {
+  preparedCode,
+  registerFunctionPrograms,
+} from "./functions/preparedPrograms.ts";
 type Backend = RenderRequest["backend"];
 
 const devices = new Map<Backend, Device>();
@@ -46,9 +50,10 @@ async function render(data: RenderRequest): Promise<void> {
     const patch = validatePatch(data.patch);
     for (const program of data.programs ?? [])
       await loadGraphModule(
-        program.code,
+        preparedCode(program),
         (url) => import(/* @vite-ignore */ url),
       );
+    registerFunctionPrograms(data.programs);
     if (!["cpu", "webgpu"].includes(data.backend))
       throw new Error("Select CPU or WebGPU.");
     if (needsLiveRenderer(patch)) {

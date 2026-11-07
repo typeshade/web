@@ -3,6 +3,17 @@ import type { LanguageDocument, LanguageMethod } from "./types.ts";
 import { languageClient } from "./LanguageClient.ts";
 
 const modes = new WeakMap<Monaco.editor.ITextModel, LanguageDocument["mode"]>();
+const projects = new WeakMap<
+  Monaco.editor.ITextModel,
+  () => Record<string, string>
+>();
+export function setModelProject(
+  model: Monaco.editor.ITextModel,
+  files?: () => Record<string, string>,
+) {
+  if (files) projects.set(model, files);
+  else projects.delete(model);
+}
 export function setDocumentMode(
   model: Monaco.editor.ITextModel,
   mode: LanguageDocument["mode"],
@@ -15,6 +26,7 @@ export function snapshot(model: Monaco.editor.ITextModel): LanguageDocument {
     text: model.getValue(),
     version: model.getVersionId(),
     mode: modes.get(model) ?? "sample",
+    files: projects.get(model)?.(),
   };
 }
 /** A cancelled query or a query for an older model version must not change the editor. */

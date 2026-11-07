@@ -11,6 +11,7 @@ import { type MenuItem } from "../../../interactions/types.ts";
 import { YouTubeInput } from "../../molecules/media/YouTubeInput.tsx";
 import { SavedProjects } from "./SavedProjects.tsx";
 import { ProjectExamples } from "./ProjectExamples.tsx";
+import { hasFunctionSources } from "../../../../functions/hasFunctionSources.ts";
 export function ProjectPanel({
   editor: e,
   onOpenProject,
@@ -49,9 +50,21 @@ export function ProjectPanel({
         label: "Export sound…",
         action: () =>
           download(
-            new Blob([JSON.stringify({ version: 1, ...value }, null, 2)], {
-              type: "application/json",
-            }),
+            new Blob(
+              [
+                JSON.stringify(
+                  {
+                    version: hasFunctionSources(value.patch) ? 2 : 1,
+                    ...value,
+                  },
+                  null,
+                  2,
+                ),
+              ],
+              {
+                type: "application/json",
+              },
+            ),
             "typeaudio-patch.json",
           ),
       },
@@ -119,6 +132,16 @@ export function ProjectPanel({
           Save project file
         </button>
       </div>
+      <button
+        className="new-graph-button new-function-button"
+        onClick={() => {
+          setTab("sounds");
+          void e.newFunctionSound();
+        }}
+        data-tooltip="Build sound from complete TypeShade functions. Edit source files, connect typed pins and adjust named controls."
+      >
+        + New function sound
+      </button>
       {
         <button
           className="new-graph-button"
@@ -291,7 +314,7 @@ export function ProjectPanel({
                   [
                     JSON.stringify(
                       {
-                        version: 1,
+                        version: hasFunctionSources(e.state.patch) ? 2 : 1,
                         name: e.state.patchName,
                         patch: e.state.patch,
                       },

@@ -1,6 +1,8 @@
 import type { Patch } from "./types.ts";
 import { DEFAULT } from "./defaultPatch.ts";
 import { validateGraph } from "typeaudio/graph";
+import { validateFunctionDocument } from "typeaudio/function-graph";
+import { validateFunctionLayout } from "../functions/validateLayout.ts";
 import { WAVE_SIZE } from "./constants.ts";
 import { CURVE_LIMITS } from "./limits.ts";
 import { MAX_SOUND_LAYERS } from "./constants.ts";
@@ -12,8 +14,24 @@ export function validatePatch(value: unknown, nested = false): Patch {
   const data = value as Record<string, unknown>;
   const result = { ...DEFAULT };
   result.graph = data.graph == null ? null : validateGraph(data.graph);
+  if (data.functions != null) {
+    if (result.graph)
+      throw new Error("A source cannot use two graph formats at once.");
+    result.functions = validateFunctionDocument(data.functions);
+    result.functionLayout = validateFunctionLayout(data.functionLayout);
+  }
   for (const key of Object.keys(DEFAULT) as (keyof Patch)[]) {
-    if (["graph", "wave", "curves", "layers"].includes(key)) continue;
+    if (
+      [
+        "graph",
+        "functions",
+        "functionLayout",
+        "wave",
+        "curves",
+        "layers",
+      ].includes(key)
+    )
+      continue;
     const v =
       data[key] === undefined &&
       [

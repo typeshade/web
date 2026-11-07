@@ -1,0 +1,96 @@
+import { useEffect, useRef, useState } from "react";
+import type {
+  FunctionGraphDocument,
+  FunctionGraphProgram,
+} from "typeaudio/function-graph";
+import { validateFunctionDocument } from "typeaudio/function-graph";
+import type { Editor } from "../../useEditor.ts";
+import {
+  prepareFunctions,
+  FunctionPreparationError,
+} from "../../../functions/compilationClient.ts";
+import { functionSourceKey } from "../../../functions/sourceKey.ts";
+import type {
+  FunctionProblem,
+  FunctionLayout,
+} from "../../../functions/types.ts";
+
+export function useFunctionCompilation(e: Editor, owner: string) {
+  const graph = e.state.patch.functions,
+    epoch = e.state.documentEpoch;
+  const key = graph ? functionSourceKey(graph) : "";
+  const [program, setProgram] = useState<FunctionGraphProgram>();
+  const [error, setError] = useState("");
+  const [problems, setProblems] = useState<FunctionProblem[]>([]);
+  const [busy, setBusy] = useState(false);
+  const request = useRef(0),
+    latest = useRef({ e, owner, graph });
+  latest.current = { e, owner, graph };
+  useEffect(() => {
+    request.current++;
+    setBusy(false);
+    setError("");
+    setProblems([]);
+    setProgram(undefined);
+  }, [owner, epoch]);
+  useEffect(() => {
+    let active = true;
+    if (graph)
+      void prepareFunctions(graph)
+        .then((p) => {
+          if (active) setProgram(p);
+        })
+        .catch((err) => {
+          if (active) setError(String(err));
+        });
+    return () => {
+      active = false;
+    };
+  }, [key, owner, epoch]);
+  async function apply(raw: FunctionGraphDocument, layout?: FunctionLayout) {
+    const id = ++request.current,
+      before = JSON.stringify(latest.current.graph);
+    setBusy(true);
+    setError("");
+    setProblems([]);
+    try {
+      const next = validateFunctionDocument(raw),
+        prepared = await prepareFunctions(next);
+      const current = latest.current;
+      if (
+        id !== request.current ||
+        owner !== current.owner ||
+        epoch !== current.e.state.documentEpoch
+      )
+        return false;
+      if (JSON.stringify(current.graph) !== before)
+        throw new Error(
+          "The sound changed during preparation. Apply again to keep the newer edits.",
+        );
+      current.e.endEdit();
+      current.e.patch({
+        functions: next,
+        ...(layout ? { functionLayout: layout } : {}),
+      });
+      setProgram(prepared);
+      current.e.setNotice(
+        "Functions applied. Named control edits retain state. Retrigger starts the sound again.",
+      );
+      return true;
+    } catch (err) {
+      if (id === request.current) {
+        setError(String(err));
+        setProblems(
+          err instanceof FunctionPreparationError ? err.problems : [],
+        );
+        latest.current.e.setNotice(
+          "Sound unchanged. Fix the function or connection and apply again.",
+        );
+      }
+      return false;
+    } finally {
+      if (id === request.current) setBusy(false);
+    }
+  }
+  return { program, error, setError, problems, busy, apply, latest };
+}

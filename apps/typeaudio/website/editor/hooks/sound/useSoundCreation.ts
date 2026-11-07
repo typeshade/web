@@ -1,6 +1,8 @@
 import { BLANK } from "../../../sound-recipes.ts";
 import { initialGraph } from "../../../graph/recipes.ts";
 import { prepareGraph } from "../../../graph/compilationClient.ts";
+import { functionPatch } from "../../../functions/initialFunctions.ts";
+import { prepareFunctions } from "../../../functions/compilationClient.ts";
 import { type Workspace } from "../../state/documentTypes.ts";
 import type { DocumentController } from "../document/useEditorDocument.ts";
 import type { PatchActions } from "./createPatchActions.ts";
@@ -42,5 +44,23 @@ export function useSoundCreation(
       setNotice(String(error));
     }
   }
-  return { newSound, newGraph };
+  async function newFunctionSound() {
+    const version = editVersion.current;
+    setNotice("Preparing TypeShade functions…");
+    try {
+      const next = functionPatch();
+      await prepareFunctions(next.functions!);
+      if (version !== editVersion.current) return;
+      stopSound();
+      dispatch({ type: "select", id: "" });
+      patch(next, "Function impact");
+      workspace("sound");
+      setNotice(
+        "Function sound ready. Start Live, connect typed pins, or open a node's TypeShade file.",
+      );
+    } catch (error) {
+      setNotice(String(error));
+    }
+  }
+  return { newSound, newGraph, newFunctionSound };
 }

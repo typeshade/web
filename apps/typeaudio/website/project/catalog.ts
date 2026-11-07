@@ -32,6 +32,7 @@ export const PROJECTS = [
 ] as const;
 
 export function projectUrl(id: string): string {
+  if (id === "function-impact") return "/projects/function-impact.json";
   if (!PROJECTS.some((p) => [p.id + "-A", p.id + "-B"].includes(id)))
     throw new Error("Unknown example project.");
   return `/projects/${id}.json`;

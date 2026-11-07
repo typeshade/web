@@ -2,7 +2,8 @@ import workletUrl from "./live.worklet.ts?worker&url";
 import type { Patch } from "./sound/types.ts";
 import { patchPrograms } from "./graph/preparePatch.ts";
 import { loadGraphModule } from "./graph/loadGraphModule.ts";
-import { graphKey } from "typeaudio/graph";
+import { patchSourceKey } from "./functions/patchSourceKey.ts";
+import { preparedCode } from "./functions/preparedPrograms.ts";
 const modules = new WeakMap<AudioContext, Promise<void>>();
 
 export class LiveAudio {
@@ -34,16 +35,16 @@ export class LiveAudio {
   private updateId = 0;
   private patchKey(p: Patch) {
     return JSON.stringify(
-      [p, ...p.layers.map((l) => l.patch)].map((p) =>
-        p.graph ? graphKey(p.graph) : "",
-      ),
+      [p, ...p.layers.map((l) => l.patch)].map((p) => patchSourceKey(p)),
     );
   }
   private async install(p: Patch) {
-    for (const program of await patchPrograms(p))
-      await loadGraphModule(program.code, (url) =>
+    const programs = await patchPrograms(p);
+    for (const program of programs)
+      await loadGraphModule(preparedCode(program), (url) =>
         this.context!.audioWorklet.addModule(url),
       );
+    return programs;
   }
   constructor(
     private onError: (message: string) => void,
@@ -71,14 +72,14 @@ export class LiveAudio {
       loaded.catch(() => modules.delete(context));
     }
     await loaded;
-    await this.install(patch);
+    const programs = await this.install(patch);
     this.installed = this.patchKey(patch);
     if (this.closed) throw new Error("Live start cancelled.");
     const node = new AudioWorkletNode(context, "typeaudio-live", {
       numberOfInputs: 0,
       numberOfOutputs: 1,
       outputChannelCount: [1],
-      processorOptions: { patch, repeat, dry },
+      processorOptions: { patch, repeat, dry, programs },
     });
     this.node = node;
     node.onprocessorerror = () => {
@@ -151,10 +152,10 @@ export class LiveAudio {
       this.node.port.postMessage({ type: "patch", ...next });
     else
       void this.install(next.patch)
-        .then(() => {
+        .then((programs) => {
           if (this.closed || id !== this.updateId) return;
           this.installed = key;
-          this.node?.port.postMessage({ type: "patch", ...next });
+          this.node?.port.postMessage({ type: "patch", ...next, programs });
         })
         .catch((error) => {
           if (!this.closed && id === this.updateId)

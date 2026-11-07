@@ -2,6 +2,8 @@ import type { Patch } from "./types.ts";
 import { WAVE_SIZE } from "./constants.ts";
 export const DEFAULT: Patch = {
   graph: null,
+  functions: null,
+  functionLayout: {},
   baseMuted: false,
   fmRatio: 2,
   fmIndex: 0,

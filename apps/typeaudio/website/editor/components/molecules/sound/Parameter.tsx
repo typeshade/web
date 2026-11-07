@@ -15,17 +15,20 @@ export function Parameter({
   name,
 }: {
   editor: Editor;
-  name: Exclude<keyof Patch, "graph" | "wave" | "curves" | "layers">;
+  name: Exclude<
+    keyof Patch,
+    "graph" | "functions" | "functionLayout" | "wave" | "curves" | "layers"
+  >;
 }) {
   const gesture = useRef(false),
     { openMenu } = useInteractions();
   const value = e.state.patch[name],
     label =
-      name === "duration" && e.state.patch.graph
+      name === "duration" && (e.state.patch.graph || e.state.patch.functions)
         ? "Source length"
         : labels[name] || name,
     help =
-      name === "duration" && e.state.patch.graph
+      name === "duration" && (e.state.patch.graph || e.state.patch.functions)
         ? "Length of the rendered graph source. Envelope span is a separate exposed parameter."
         : HELP[name],
     limit = parameterLimits(e.state.patch, name),

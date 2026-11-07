@@ -28,6 +28,21 @@ export class TypeShadeSession {
 
   query(request: LanguageRequest): LanguageResults[keyof LanguageResults] {
     const { document: d } = request;
+    for (const [uri, text] of Object.entries(d.files ?? {})) {
+      if (uri === d.uri) continue;
+      const before = this.documents.get(uri);
+      if (before?.document.text === text) continue;
+      const document: LanguageDocument = {
+        uri,
+        text,
+        version: (before?.document.version ?? 0) + 1,
+        mode: "module",
+      };
+      const projection = projectNodeCode(document);
+      if (before) this.service.updateDocument(uri, projection.text);
+      else this.service.openDocument(uri, projection.text);
+      this.documents.set(uri, { document, projection });
+    }
     let saved = this.documents.get(d.uri);
     if (
       !saved ||

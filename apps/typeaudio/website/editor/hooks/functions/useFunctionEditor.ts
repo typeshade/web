@@ -1,0 +1,209 @@
+import { useEffect, useState } from "react";
+import type {
+  FunctionGraphDocument,
+  InputBinding,
+} from "typeaudio/function-graph";
+import { validateFunctionDocument } from "typeaudio/function-graph";
+import type { Editor } from "../../useEditor.ts";
+import { useFunctionCompilation } from "./useFunctionCompilation.ts";
+import {
+  addFunctionInstance,
+  removeFunctionInstance,
+  setFunctionControl,
+  freshFunctionId,
+} from "../../../functions/instanceOperations.ts";
+import { newFunctionDefinition } from "../../../functions/newDefinition.ts";
+import type { MenuItem } from "../../interactions/types.ts";
+
+export function useFunctionEditor(e: Editor, owner: string) {
+  const graph = e.state.patch.functions,
+    layout = e.state.patch.functionLayout ?? {};
+  const compilation = useFunctionCompilation(e, owner);
+  const [selected, setSelected] = useState(""),
+    [file, setFile] = useState("");
+  const [focusRequest, focus] = useState(0);
+  useEffect(() => {
+    setSelected("");
+    setFile("");
+  }, [owner, e.state.documentEpoch]);
+  const id = graph?.nodes.some((n) => n.id === selected)
+    ? selected
+    : graph?.nodes[0]?.id;
+  const node = graph?.nodes.find((n) => n.id === id);
+  const definition = graph?.definitions.find((d) => d.id === node?.definition);
+  const descriptors =
+    compilation.program?.artifacts.map((a) => a.descriptor) ?? [];
+  const descriptor = descriptors.find((d) => d.id === node?.definition);
+  const activeFile =
+    file && graph?.modules[file] !== undefined
+      ? file
+      : (definition?.module ?? Object.keys(graph?.modules ?? {})[0]);
+  const current = () => compilation.latest.current.graph!;
+  function select(id: string) {
+    e.endEdit();
+    setSelected(id);
+    const n = current().nodes.find((n) => n.id === id);
+    setFile(
+      current().definitions.find((d) => d.id === n?.definition)?.module ?? "",
+    );
+  }
+  async function add(definition: string, copy?: string) {
+    const d = descriptors.find((d) => d.id === definition);
+    if (!d || compilation.busy) return;
+    const next = addFunctionInstance(current(), d, copy);
+    const origin = copy
+      ? layout[copy]
+      : { x: 60 + current().nodes.length * 60, y: 240 };
+    if (
+      await compilation.apply(next.graph, {
+        ...layout,
+        [next.id]: { x: (origin?.x ?? 0) + 40, y: (origin?.y ?? 0) + 60 },
+      })
+    )
+      setSelected(next.id);
+  }
+  async function create() {
+    const next = newFunctionDefinition(current()),
+      n = next.nodes.at(-1)!;
+    if (
+      await compilation.apply(next, { ...layout, [n.id]: { x: 80, y: 300 } })
+    ) {
+      setSelected(n.id);
+      setFile(next.definitions.at(-1)!.module);
+      focus((n) => n + 1);
+    }
+  }
+  function bind(node: string, port: string, binding: InputBinding) {
+    const g = current();
+    return compilation.apply({
+      ...g,
+      nodes: g.nodes.map((n) =>
+        n.id === node ? { ...n, inputs: { ...n.inputs, [port]: binding } } : n,
+      ),
+    });
+  }
+  function change(graph: FunctionGraphDocument) {
+    try {
+      e.patch({ functions: validateFunctionDocument(graph) });
+    } catch (error) {
+      compilation.setError(String(error));
+    }
+  }
+  function expose(port: string) {
+    if (!node || !descriptor) return;
+    const pin = descriptor.inputs.find((p) => p.id === port)!;
+    const binding = node.inputs[port],
+      id = freshFunctionId("control");
+    const value =
+      binding?.kind === "constant"
+        ? binding.value
+        : (pin.default ?? (pin.type === "bool" ? false : 0));
+    const g = current();
+    void compilation.apply({
+      ...g,
+      parameters: [
+        ...g.parameters,
+        { id, name: pin.name, type: pin.type, unit: pin.unit, value },
+      ],
+      nodes: g.nodes.map((n) =>
+        n.id === node.id
+          ? {
+              ...n,
+              inputs: {
+                ...n.inputs,
+                [port]: { kind: "parameter", parameter: id },
+              },
+            }
+          : n,
+      ),
+    });
+  }
+  function remove(id: string) {
+    try {
+      void compilation.apply(
+        removeFunctionInstance(current(), descriptors, id),
+      );
+    } catch (error) {
+      compilation.setError(String(error));
+    }
+  }
+  function items(id: string): MenuItem[] {
+    const n = current().nodes.find((n) => n.id === id)!;
+    const d = descriptors.find((d) => d.id === n.definition);
+    return [
+      {
+        label: "Open TypeShade function",
+        action: () => {
+          select(id);
+          focus((n) => n + 1);
+        },
+      },
+      {
+        label: "Duplicate instance",
+        shortcut: "Ctrl/⌘ D",
+        disabled: compilation.busy,
+        action: () => void add(n.definition, id),
+      },
+      {
+        label: "Use as output",
+        checked: current().output.node === id,
+        disabled: compilation.busy || d?.output.role !== "audio",
+        action: () =>
+          void compilation.apply({
+            ...current(),
+            output: { node: id, port: d!.output.id },
+          }),
+      },
+      { separator: true },
+      {
+        label: "Delete instance",
+        danger: true,
+        disabled: compilation.busy || current().output.node === id,
+        action: () => remove(id),
+      },
+    ];
+  }
+  return {
+    e,
+    owner,
+    graph,
+    layout,
+    ...compilation,
+    node,
+    descriptor,
+    descriptors,
+    definition,
+    activeFile,
+    selectFile: setFile,
+    focusRequest,
+    focus: () => focus((n) => n + 1),
+    select,
+    add,
+    create,
+    bind,
+    expose,
+    remove,
+    items,
+    position: (id: string) =>
+      layout[id] ?? {
+        x:
+          40 +
+          Math.max(0, graph?.nodes.findIndex((n) => n.id === id) ?? 0) * 280,
+        y: 80,
+      },
+    move: (id: string, x: number, y: number) =>
+      e.patch({
+        functionLayout: {
+          ...compilation.latest.current.e.state.patch.functionLayout,
+          [id]: {
+            x: Math.max(-20000, Math.min(20000, x)),
+            y: Math.max(-20000, Math.min(20000, y)),
+          },
+        },
+      }),
+    control: (id: string, value: number | boolean) =>
+      change(setFunctionControl(current(), id, value)),
+    update: change,
+  };
+}
+export type FunctionEditor = ReturnType<typeof useFunctionEditor>;
