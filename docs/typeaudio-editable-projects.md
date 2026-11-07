@@ -146,3 +146,36 @@ deployment, verify these same user operations at `audio.typeshade.dev` and colle
 listening feedback. Resume broader engine R1 work after this first milestone;
 retain the [durable recovery index](https://github.com/typeshade/typeaudio/issues/26)
 and the owner's SwiftShader measurement boundary.
+
+## Function sources (project version 3)
+
+Function sounds use the engine's `typeaudio.function-graph` document inside the existing source patch.
+The editor imports raw engine documents through **Open project file…**. The protected project flow still creates a recovery copy.
+`?project=function-impact` opens the same bundled, source-only example.
+
+1. Select **New function sound** in Project or File.
+2. Select an instance to inspect its pins and open its complete TypeShade module.
+3. Edit source files, including imported helpers, then select **Apply source**.
+4. Add an instance from the function list, or create a module with **New function**.
+5. Connect matching output/input pins, or choose a source in the input inspector.
+6. Expose a scalar input as a named control to adjust it during Live.
+7. Select **Use in Picture** to use the source in the existing composition.
+8. Save the project file to retain applied source, incomplete drafts and node positions.
+
+New scalar arguments become block-rate control pins. Their defaults are zero or false.
+Existing parameter names retain stable pin IDs, roles, units and connections.
+Pin settings can change audio/control roles, update rate and units after connections are made compatible.
+Removing or renaming a connected argument fails until every instance disconnects it.
+State and context require explicit bindings; the new-module template includes state, time and sample rate.
+Arbitrary entry-point renaming and graph-wide composition source editing remain separate work.
+
+Projects containing function sources or module drafts use version 3. Legacy source projects retain version 2.
+Older editors must reject version 3. This editor retains legacy scene and project imports without converting their graphs.
+Function sound presets use sound-file version 2. Browser documents containing function sources use envelope version 2;
+they do not update the optional legacy source/scene mirrors. Export a project file for portable recovery.
+
+Functions use the engine's bounded mono CPU profile at 48 kHz in this studio.
+Compilation runs in a Worker before installation; live named control messages do not compile source or reset instance state.
+The studio retains its source replacement crossfade, output gain ramp and source taper.
+Individual function controls are not automatically smoothed. Composition playback still uses prepared audio.
+The [function authoring review](reviews/typeaudio-function-authoring.md) records tests and remaining scope.

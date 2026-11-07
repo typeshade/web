@@ -182,10 +182,11 @@ try {
   await select("level");
   const source = await readCode(p);
   assert.match(source, /import.*math/);
-  const changed = source
+  let changed = source
     .replace("strength: f32", "strength: f32, offset: f32")
     .replace("input * strength", "input * strength * 0.5 + offset");
   await writeCode(p, changed);
+  changed = await readCode(p);
   await select("noise");
   await select("level");
   assert.equal(await readCode(p), changed);
@@ -239,8 +240,9 @@ try {
   );
 
   await select("level");
-  const invalid = changed + "\nexport function unfinished(:\n";
+  let invalid = changed + "\nexport function unfinished(:\n";
   await writeCode(p, invalid);
+  invalid = await readCode(p);
   await p.locator("#mode-live").click();
   await p.locator("#live-start").click();
   await p.waitForFunction(
@@ -286,13 +288,11 @@ try {
       JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).source
         .patch.functions.parameters[0].value === 180,
   );
-  await p
-    .locator("#project-file")
-    .setInputFiles({
-      name: "functions.typeaudio.json",
-      mimeType: "application/json",
-      buffer: file,
-    });
+  await p.locator("#project-file").setInputFiles({
+    name: "functions.typeaudio.json",
+    mimeType: "application/json",
+    buffer: file,
+  });
   await p.waitForFunction(
     () =>
       JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).source
@@ -331,10 +331,35 @@ try {
     () => document.querySelectorAll("[data-function-node]").length === 4,
   );
   await idle();
-  assert.match(await readCode(p), /state: inout<State>/);
+  const freshSource = await readCode(p);
+  assert.match(freshSource, /state: inout<State>/);
+  await writeCode(
+    p,
+    freshSource.replace(
+      "return input * amount;",
+      "return sin(time * 2764.6015) * 0.2;",
+    ),
+  );
+  await p.locator("#apply-function-code").click();
+  await idle();
+  await p
+    .getByRole("button", { name: "Use as sound output", exact: true })
+    .click();
+  await idle();
+  const scratchHash = await wav();
+  assert.notEqual(scratchHash, changedHash);
+  observations.fromScratch = {
+    fullModule: true,
+    oscillatorWavHash: scratchHash,
+  };
   await p.keyboard.press("Control+p");
-  await p.getByRole("dialog", { name: /file|command/i }).waitFor();
+  await p.getByRole("dialog", { name: /document|command/i }).waitFor();
   await p.keyboard.press("Escape");
+  await p.waitForFunction(() =>
+    document
+      .querySelector('.code-problems[data-status="ready"]')
+      ?.textContent?.includes("No language errors"),
+  );
   await p.screenshot({ path: `${directory}/desktop.png` });
 
   // Existing Picture source editing and timeline use the same function source.
@@ -358,13 +383,11 @@ try {
 
   // Raw engine documents remain importable, with no custom page or executable artifact.
   const raw = await readFile("website/public/projects/function-impact.json");
-  await p
-    .locator("#project-file")
-    .setInputFiles({
-      name: "engine-impact.json",
-      mimeType: "application/json",
-      buffer: raw,
-    });
+  await p.locator("#project-file").setInputFiles({
+    name: "engine-impact.json",
+    mimeType: "application/json",
+    buffer: raw,
+  });
   await p.waitForFunction(
     () =>
       JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).source
@@ -412,6 +435,12 @@ try {
   await task(mobile, "Code / FX");
   await mobile.locator('#graph-code[data-ready="true"]').waitFor();
   assert.match(await readCode(mobile), /export function/);
+  await mobile.keyboard.press("ArrowLeft");
+  await mobile.waitForFunction(() =>
+    document
+      .querySelector('.code-problems[data-status="ready"]')
+      ?.textContent?.includes("No language errors"),
+  );
   await mobile.screenshot({ path: `${directory}/mobile-code.png` });
   observations.mobile = {
     widths: [390, 320],

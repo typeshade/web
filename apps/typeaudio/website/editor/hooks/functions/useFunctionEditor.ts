@@ -69,8 +69,9 @@ export function useFunctionEditor(e: Editor, owner: string) {
   async function create() {
     const next = newFunctionDefinition(current()),
       n = next.nodes.at(-1)!;
-    const y = Math.max(80, ...Object.values(layout).map((p) => p.y)) + 300;
-    if (await compilation.apply(next, { ...layout, [n.id]: { x: 80, y } })) {
+    const x =
+      Math.max(40, ...current().nodes.map((n) => layout[n.id]?.x ?? 40)) + 280;
+    if (await compilation.apply(next, { ...layout, [n.id]: { x, y: 80 } })) {
       setSelected(n.id);
       setFile(next.definitions.at(-1)!.module);
       focus((n) => n + 1);
@@ -123,8 +124,11 @@ export function useFunctionEditor(e: Editor, owner: string) {
   }
   function remove(id: string) {
     try {
+      const nextLayout = { ...layout };
+      delete nextLayout[id];
       void compilation.apply(
         removeFunctionInstance(current(), descriptors, id),
+        nextLayout,
       );
     } catch (error) {
       compilation.setError(String(error));

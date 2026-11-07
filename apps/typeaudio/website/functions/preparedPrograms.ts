@@ -16,8 +16,8 @@ export function registerFunctionPrograms(prepared: PreparedProgram[] = []) {
   for (const program of prepared) {
     if (!("schema" in program)) continue;
     const key = functionSourceKey(program.document);
-    if (programs.size >= 64 && !programs.has(key))
-      programs.delete(programs.keys().next().value!);
+    programs.delete(key);
+    if (programs.size >= 64) programs.delete(programs.keys().next().value!);
     programs.set(key, program);
   }
 }

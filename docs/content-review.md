@@ -189,3 +189,11 @@ selection-linked sample documents, built-in settings, actual connection/paramete
 descriptions and read-only generated output. The bounded English review names the
 per-sample execution contract and avoids implying whole-graph TypeScript authoring.
 The default example uses meaningful local names while retaining identical rendered PCM.
+
+The function-authoring continuation reviews the English function/network/source panels,
+New function sound entry, named controls, typed pin settings and compiler-failure messages.
+The wording distinguishes complete modules from the legacy per-sample Code node.
+Apply source compiles all edited modules together; project save preserves incomplete drafts.
+The labels identify the mono CPU profile and independent instance state.
+This is a bounded English studio review. It does not claim site-wide, translation,
+physical-device or independent-user acceptance.

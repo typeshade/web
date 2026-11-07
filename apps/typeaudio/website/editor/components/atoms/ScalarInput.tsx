@@ -46,8 +46,13 @@ export function ScalarInput({
       aria-label={label}
       type="number"
       value={text}
-      min={min ?? (type === "u32" ? 0 : undefined)}
-      max={max}
+      min={
+        min ?? (type === "u32" ? 0 : type === "i32" ? -2147483648 : undefined)
+      }
+      max={
+        max ??
+        (type === "u32" ? 4294967295 : type === "i32" ? 2147483647 : undefined)
+      }
       step={type === "f32" ? "any" : 1}
       disabled={disabled}
       onChange={(event) => {

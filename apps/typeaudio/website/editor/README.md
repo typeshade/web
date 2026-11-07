@@ -130,3 +130,20 @@ named-component convention, upward UI imports, feature controllers in primitives
 document/domain-to-UI imports, UI resource construction, direct compiler imports
 and runtime import cycles. These checks protect the boundaries; review still decides
 whether each module has a coherent responsibility.
+
+## Full TypeShade function authoring
+
+`functions/` outside the editor owns source keys, worker preparation, engine program registration,
+source DSP adaptation and pure graph-instance operations. It does not import editor code.
+The engine owns source reflection, typed connection validation and execution.
+`useFunctionCompilation` rejects late results by source owner, document epoch and current graph identity.
+`useFunctionDocuments` keeps full-module drafts on the existing document store, separately from applied source.
+Monaco models share one virtual source set for imported completion, diagnostics and definition navigation.
+`useFunctionEditor` owns selection and operations. `useFunctionViewport` owns transient pan/zoom and drag transactions.
+
+Function molecules own pins, bindings, controls and edges. Function organisms compose the canvas,
+inspector and code dock in existing workspace slots. The command palette includes module files and source actions.
+Project version 3 preserves function documents, drafts and canvas positions. Existing graph projects keep their version and behavior.
+The source transport and timeline use the existing SoundDsp/Worker/AudioWorklet pipeline.
+`check-function-authoring-browser.ts` exercises source editing, wiring, live state, stale results,
+file recovery, exact WAV regeneration, Picture editing and mobile viewport access.
