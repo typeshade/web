@@ -3,6 +3,11 @@
 Owner direction, 2026-11-06: an agent-authored sound must open in the existing Web editor, remain editable, and save for later editing.
 This milestone precedes further immersive-engine expansion. It does not wait for HRTF or a general game scheduler.
 
+**Published 2026-11-07:** the six Frieren passage projects are available on
+`audio.typeshade.dev`. The [publication record](reviews/typeaudio-frieren-publication.md)
+records the deployed commits, public desktop/mobile checks and the remaining
+YouTube/physical-device/listening verification limits. This is not the full-scene mix.
+
 ## Acceptance
 
 - Open an agent project from JSON or the existing editor's project browser.
@@ -26,11 +31,12 @@ Use TypeAudio's existing graph and room implementations, with an exact engine/co
 The first composition preview may prepare audio before playback. Do not label it a completed game runtime.
 Keep project conversion, validation, playback resources, state and UI components in separate modules.
 
-Implementation is in [Web PR #47](https://github.com/typeshade/web/pull/47), on
+The first implementation was in [Web PR #47](https://github.com/typeshade/web/pull/47), on
 `feat/typeaudio-editable-studies`, based on Web PR #46 at `8517faca763e75dec997fa9ed6f792f4563a1acb`.
-The TypeAudio pin is `86560f83a92ff8374346157000b8a467daa39aab` (room PR #24).
+Its initial TypeAudio pin was `86560f83a92ff8374346157000b8a467daa39aab` (room PR #24).
 The compiler pin is unchanged: `87af4eb0d9d15f02b66b8341b72cab0944290472`.
-No merge or deployment is included. The existing PR chain must be reconciled before publication.
+The later release merged Web #45–#47 and uses engine
+`5489ac494e69b5eb2dfae63546cc7643ecfea0f0`; see the publication record above.
 
 The subsequent [UX review](reviews/typeaudio-editor-ux.md) found blocking inspector reachability,
 candidate-switch recovery and draft/save semantics. Functional test passes do not establish UX
@@ -141,9 +147,10 @@ save/reopen and reproduce the edited WAV, retain reload state, reject stale/inva
 imports and pass the mobile viewport flow. Existing state/timeline/import suites
 must remain green. A mobile viewport is not a physical-device audio test.
 
-Review PR #47 and its verification record first. After an authorized merge and
-deployment, verify these same user operations at `audio.typeshade.dev` and collect
-listening feedback. Resume broader engine R1 work after this first milestone;
+The public-site operations above passed after the authorized merge and deployment.
+Collect listening feedback and physical-phone acceptance next; actual YouTube
+playback remains unverified because the managed browser's script request failed.
+Resume broader engine R1 work after this first milestone;
 retain the [durable recovery index](https://github.com/typeshade/typeaudio/issues/26)
 and the owner's SwiftShader measurement boundary.
 
