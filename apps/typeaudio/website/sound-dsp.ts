@@ -1,15 +1,19 @@
 import { SAMPLE_RATE } from "./sound/constants.ts";
 import { validatePatch } from "./sound/validatePatch.ts";
 import { type Patch } from "./sound/types.ts";
-import { LiveDsp } from "./live-dsp.ts";
+import {
+  createSourceDsp,
+  type SourceDsp,
+} from "./functions/createSourceDsp.ts";
+import { patchSourceKey } from "./functions/patchSourceKey.ts";
 import { soundLength, sourceLength } from "./sound-design.ts";
 import { GraphDsp } from "typeaudio/graph/runtime";
-import { graphKey } from "typeaudio/graph";
+import { FunctionPatchDsp } from "./functions/FunctionPatchDsp.ts";
 interface Layer {
   id: string;
-  dsp: LiveDsp | GraphDsp;
+  dsp: SourceDsp;
   signature: string;
-  previous?: LiveDsp | GraphDsp;
+  previous?: SourceDsp;
   transition: number;
   old: Float32Array;
   offset: number;
@@ -33,7 +37,11 @@ export class SoundDsp {
   get invalidSamples() {
     let count = 0;
     for (const layer of this.layers)
-      if (layer.dsp instanceof GraphDsp) count += layer.dsp.invalidSamples;
+      if (
+        layer.dsp instanceof GraphDsp ||
+        layer.dsp instanceof FunctionPatchDsp
+      )
+        count += layer.dsp.invalidSamples;
     return count;
   }
   constructor(p: Patch) {
@@ -51,16 +59,11 @@ export class SoundDsp {
     const previous = this.layers.map((l) => `${l.id}:${l.offset}`).join("|");
     this.layers = sources.map((s) => {
       const existing = this.layers.find((l) => l.id === s.id);
-      const signature = s.patch.graph ? graphKey(s.patch.graph) : "legacy";
+      const signature = patchSourceKey(s.patch);
       if (existing) {
         if (existing.signature !== signature) {
           const previous = existing.dsp;
-          existing.dsp = s.patch.graph
-            ? new GraphDsp(
-                s.patch,
-                previous instanceof GraphDsp ? previous : undefined,
-              )
-            : new LiveDsp(s.patch);
+          existing.dsp = createSourceDsp(s.patch, previous);
           existing.signature = signature;
           existing.previous = previous;
           existing.transition = 480;
@@ -72,7 +75,7 @@ export class SoundDsp {
       }
       return {
         id: s.id,
-        dsp: s.patch.graph ? new GraphDsp(s.patch) : new LiveDsp(s.patch),
+        dsp: createSourceDsp(s.patch),
         signature,
         transition: 0,
         old: new Float32Array(128),

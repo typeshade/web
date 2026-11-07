@@ -248,7 +248,7 @@ try {
     project = JSON.parse(projectBytes.toString());
   assert.equal(project.audioAssets.length, 1);
   assert.equal(project.audioAssets[0].id, ref.id);
-  assert.equal(project.cues.length, 2);
+  assert.equal(project.scene.cues.length, 2);
   const q = await page();
   q.on("pageerror", (e) => errors.push(e.message));
   await q.goto(base + "/studio/video/");
@@ -264,7 +264,7 @@ try {
   const intact = await doc(q);
   const corrupt = structuredClone(project);
   corrupt.audioAssets[0].id = "0".repeat(64);
-  corrupt.cues[0].audio.id = "0".repeat(64);
+  corrupt.scene.cues[0].audio.id = "0".repeat(64);
   await upload(q, corrupt, "corrupt.json");
   await q.waitForFunction(() =>
     document.querySelector("#status")!.textContent!.includes("checksum"),

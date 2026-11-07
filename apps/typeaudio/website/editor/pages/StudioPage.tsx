@@ -1,3 +1,5 @@
+import { functionCommands } from "../commands/functionCommands.ts";
+import { SourceBreadcrumb } from "../components/molecules/picture/SourceBreadcrumb.tsx";
 import { useEditorShortcuts } from "../hooks/interactions/useEditorShortcuts.ts";
 import { useEditor } from "../useEditor.ts";
 import { WorkspaceShell } from "../templates/WorkspaceShell.tsx";
@@ -18,16 +20,26 @@ import { useCodeDocuments } from "../hooks/code/useCodeDocuments.ts";
 import { useCommandPalette } from "../hooks/interactions/useCommandPalette.ts";
 import { createStudioCommands } from "../commands/createStudioCommands.ts";
 import { CommandPalette } from "../components/organisms/chrome/CommandPalette.tsx";
+import { useFunctionEditor } from "../hooks/functions/useFunctionEditor.ts";
+import { useFunctionDocuments } from "../hooks/functions/useFunctionDocuments.ts";
+import { FunctionCodeDock } from "../components/organisms/functions/FunctionCodeDock.tsx";
 export function StudioPage() {
   const e = useEditor(),
     layout = useWorkspaceLayout(),
     selection = useSoundSelection(e),
     picture = e.state.workspace === "picture";
+  const sourceEditing =
+    picture && e.sourceEditing && !!e.selected && !e.selected.audio;
   const graph = useGraphEditor(
     selection.sourceEditor,
     JSON.stringify([selection.owner, selection.sourceId]),
   );
   const onViewerContextMenu = useViewerContextMenu(e);
+  const functions = useFunctionEditor(
+    selection.sourceEditor,
+    JSON.stringify([selection.owner, selection.sourceId]),
+  );
+  const functionDocuments = useFunctionDocuments(functions);
   const documents = useCodeDocuments(graph),
     palette = useCommandPalette(),
     projectFile = useRef<HTMLInputElement>(null);
@@ -38,6 +50,11 @@ export function StudioPage() {
     layout,
     projectFile,
   );
+  if (functions.graph) {
+    const extra = functionCommands(functions, functionDocuments, layout);
+    commands.files = extra.files;
+    commands.commands.push(...extra.commands);
+  }
   useEditorShortcuts(e);
   return (
     <WorkspaceShell
@@ -47,28 +64,73 @@ export function StudioPage() {
     >
       <WorkspaceGrid
         workspace={e.state.workspace}
-        hasGraph={!!graph.graph && !picture}
+        hasGraph={!!(graph.graph || functions.graph) && !picture}
         focused={layout.focused}
         codeMode={layout.codeMode}
-        project={<ProjectPanel editor={e} />}
+        project={
+          <ProjectPanel
+            editor={e}
+            onOpenProject={() => projectFile.current?.click()}
+          />
+        }
         viewer={
           <>
-            <SoundViewer editor={e} graph={graph} hidden={picture} />
-            <div className="document-view" hidden={!picture}>
+            <div
+              className={
+                sourceEditing ? "source-editing-view" : "document-view"
+              }
+              hidden={picture && !sourceEditing}
+            >
+              {sourceEditing && (
+                <SourceBreadcrumb
+                  editor={e}
+                  sourceName={selection.layer?.name || "Base source"}
+                />
+              )}
+              <SoundViewer
+                editor={e}
+                graph={graph}
+                functions={functions}
+                hidden={false}
+              />
+              {sourceEditing && functions.graph && (
+                <FunctionCodeDock
+                  controller={functions}
+                  documents={functionDocuments}
+                />
+              )}
+              {sourceEditing && graph.graph && (
+                <GraphDock controller={graph} documents={documents} />
+              )}
+              {sourceEditing && !graph.graph && !functions.graph && (
+                <SignalChainPanel editor={e} selection={selection} />
+              )}
+            </div>
+            <div className="document-view" hidden={!picture || sourceEditing}>
               <Composition editor={e} />
             </div>
           </>
         }
         inspector={
-          picture ? (
-            <ClipInspector editor={e} />
+          picture && !sourceEditing ? (
+            <ClipInspector editor={e} graph={graph} />
           ) : (
-            <SoundProperties editor={e} selection={selection} graph={graph} />
+            <SoundProperties
+              editor={e}
+              selection={selection}
+              graph={graph}
+              functions={functions}
+            />
           )
         }
         dock={
           picture ? (
             <Timeline editor={e} />
+          ) : functions.graph ? (
+            <FunctionCodeDock
+              controller={functions}
+              documents={functionDocuments}
+            />
           ) : graph.graph ? (
             <GraphDock controller={graph} documents={documents} />
           ) : (

@@ -345,7 +345,7 @@ try {
   // Export and reopen scene JSON, retaining edits and fade anchors.
   const project = await download(p, "save-project");
   assert.deepEqual(
-    JSON.parse(project.toString()).cues,
+    JSON.parse(project.toString()).scene.cues,
     (await doc(p)).scene.cues,
   );
   await p.locator("#project-file").setInputFiles({

@@ -24,7 +24,15 @@ export function DocumentBar({ editor: e }: { editor: Editor }) {
             {e.selected && !e.selected.audio ? " / Selected layer" : ""}
           </span>
         )}
-        <span className="document-dot" title="Saved in this browser" />
+        <span className={`save-state ${e.saveStatus}`} role="status">
+          {e.saveStatus === "saved"
+            ? "Saved in this browser"
+            : e.saveStatus === "saving"
+              ? "Saving…"
+              : "Not saved — download a project file"}
+          {Object.values(e.state.drafts ?? {}).some((d) => d.text !== d.base) &&
+            " · Code draft"}
+        </span>
       </div>
       <span className="document-status">
         {picture ? "Composition" : "Sound source"} ·{" "}

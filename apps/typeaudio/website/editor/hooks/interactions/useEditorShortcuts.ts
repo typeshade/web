@@ -15,7 +15,8 @@ export function useEditorShortcuts(e: Editor) {
     const handler = (event: KeyboardEvent) => {
       if (
         event.defaultPrevented ||
-        (event.target instanceof Element && event.target.closest(".monaco-editor,dialog")) ||
+        (event.target instanceof Element &&
+          event.target.closest(".monaco-editor,dialog")) ||
         (event.target instanceof HTMLElement &&
           event.target.closest('[role="menu"]') &&
           !event.ctrlKey &&
@@ -32,15 +33,15 @@ export function useEditorShortcuts(e: Editor) {
           target instanceof HTMLInputElement &&
           ["range", "checkbox"].includes(target.type)
         );
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        save();
+        return;
+      }
       if (editable) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
         event.preventDefault();
         event.shiftKey ? e.redo() : e.undo();
-        return;
-      }
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
-        event.preventDefault();
-        picture ? save() : e.savePatch();
         return;
       }
       if (picture && (event.ctrlKey || event.metaKey)) {

@@ -1,5 +1,6 @@
 import type * as Monaco from "monaco-editor/esm/vs/editor/editor.api.js";
 import { queryModel } from "./modelDocuments.ts";
+import { modelBinding } from "./modelBindings.ts";
 import { monacoRange } from "./monacoRange.ts";
 
 export function registerCompletions(m: typeof Monaco) {
@@ -26,10 +27,12 @@ export function registerCompletions(m: typeof Monaco) {
         suggestions: result.map((item) => ({
           label: item.label,
           kind: kinds[item.kind],
-          detail: item.detail,
-          documentation: item.documentation
-            ? { value: item.documentation }
-            : undefined,
+          detail: modelBinding(model, item.label)
+            ? `${item.detail ?? "f32"} · ${modelBinding(model, item.label)}`
+            : item.detail,
+          documentation:
+            modelBinding(model, item.label) ??
+            (item.documentation ? { value: item.documentation } : undefined),
           insertText: item.textEdit?.newText ?? item.insertText ?? item.label,
           insertTextRules:
             item.insertTextFormat === "snippet"

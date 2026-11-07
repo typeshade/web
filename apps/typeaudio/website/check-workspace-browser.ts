@@ -73,15 +73,24 @@ try {
     const w = window as any;
     w.liveNodes = 0;
     w.renderWorkers = 0;
-    w.renderReplies=[];w.renderTerminations=0;w.injectStaleReply=false;
-    w.patchMessages=0;w.lastPatch=undefined;
+    w.renderReplies = [];
+    w.renderTerminations = 0;
+    w.injectStaleReply = false;
+    w.patchMessages = 0;
+    w.lastPatch = undefined;
     const Native = window.AudioWorkletNode;
     window.AudioWorkletNode = class extends Native {
       constructor(...args: ConstructorParameters<typeof AudioWorkletNode>) {
         super(...args);
         w.liveNodes++;
-        const send=this.port.postMessage.bind(this.port);
-        (this.port as any).postMessage=(data:any)=>{if(data.type==='patch'){w.patchMessages++;w.lastPatch=data.patch;}send(data);};
+        const send = this.port.postMessage.bind(this.port);
+        (this.port as any).postMessage = (data: any) => {
+          if (data.type === "patch") {
+            w.patchMessages++;
+            w.lastPatch = data.patch;
+          }
+          send(data);
+        };
       }
     };
     const Worker = window.Worker;
@@ -91,17 +100,35 @@ try {
         const entry = new URL(String(url), location.href);
         entry.searchParams.set("entry", "regression");
         super(entry, options);
-        this.addEventListener('message',(event)=>{
-          if(!(event.data?.id>0))return;
-          w.renderReplies.push({id:event.data.id,tier:event.data.tier,error:event.data.error,timing:event.data.timing});
-          if(w.holdRenderReplies){w.heldRenderReply={worker:this,data:event.data};event.stopImmediatePropagation();return;}
-          if(w.injectStaleReply)this.dispatchEvent(new MessageEvent('message',{data:{id:-1,error:'Obsolete render result'}}));
+        this.addEventListener("message", (event) => {
+          if (!(event.data?.id > 0)) return;
+          w.renderReplies.push({
+            id: event.data.id,
+            tier: event.data.tier,
+            error: event.data.error,
+            timing: event.data.timing,
+          });
+          if (w.holdRenderReplies) {
+            w.heldRenderReply = { worker: this, data: event.data };
+            event.stopImmediatePropagation();
+            return;
+          }
+          if (w.injectStaleReply)
+            this.dispatchEvent(
+              new MessageEvent("message", {
+                data: { id: -1, error: "Obsolete render result" },
+              }),
+            );
         });
       }
-      terminate(){w.renderTerminations++;super.terminate();}
+      terminate() {
+        w.renderTerminations++;
+        super.terminate();
+      }
     };
   });
   await page.goto(base);
+  await page.getByRole("button", { name: "Sounds", exact: true }).click();
   assert.equal(await page.locator("[data-preset]").count(), 6);
   await page.locator("#live-start").click();
   await page.waitForFunction(
@@ -113,36 +140,71 @@ try {
     undefined,
     { timeout: 15000 },
   );
-  const messageCount=await page.evaluate(()=>(window as any).patchMessages);
-  await page.evaluate(()=>{const input=document.querySelector('#frequency') as HTMLInputElement;const set=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!;for(let i=0;i<40;i++){set.call(input,String(400+i));input.dispatchEvent(new Event('input',{bubbles:true}));}});
-  await page.waitForFunction(()=>(window as any).lastPatch?.frequency===439);
-  assert.ok((await page.evaluate(()=>(window as any).patchMessages))-messageCount<=3,'Control bursts must be coalesced before posting to the worklet');
+  const messageCount = await page.evaluate(() => (window as any).patchMessages);
+  await page.evaluate(() => {
+    const input = document.querySelector("#frequency") as HTMLInputElement;
+    const set = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )!.set!;
+    for (let i = 0; i < 40; i++) {
+      set.call(input, String(400 + i));
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+  await page.waitForFunction(
+    () => (window as any).lastPatch?.frequency === 439,
+  );
+  assert.ok(
+    (await page.evaluate(() => (window as any).patchMessages)) - messageCount <=
+      3,
+    "Control bursts must be coalesced before posting to the worklet",
+  );
   // Control delivery must not depend on display frames (background tabs, a
   // stalled visualizer, or a game rendering more slowly than its audio).
-  await page.evaluate(()=>{
-    const w=window as any;
-    w.savedRAF=requestAnimationFrame;w.savedCancelRAF=cancelAnimationFrame;
-    w.pausedFrames=new Map<number,FrameRequestCallback>();let next=-1;
-    window.requestAnimationFrame=callback=>{const id=next--;w.pausedFrames.set(id,callback);return id;};
-    window.cancelAnimationFrame=id=>{if(id<0)w.pausedFrames.delete(id);else w.savedCancelRAF(id);};
-    const input=document.querySelector('#frequency') as HTMLInputElement;
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!.call(input,'440');
-    input.dispatchEvent(new Event('input',{bubbles:true}));
+  await page.evaluate(() => {
+    const w = window as any;
+    w.savedRAF = requestAnimationFrame;
+    w.savedCancelRAF = cancelAnimationFrame;
+    w.pausedFrames = new Map<number, FrameRequestCallback>();
+    let next = -1;
+    window.requestAnimationFrame = (callback) => {
+      const id = next--;
+      w.pausedFrames.set(id, callback);
+      return id;
+    };
+    window.cancelAnimationFrame = (id) => {
+      if (id < 0) w.pausedFrames.delete(id);
+      else w.savedCancelRAF(id);
+    };
+    const input = document.querySelector("#frequency") as HTMLInputElement;
+    Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )!.set!.call(input, "440");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
   });
-  try{
+  try {
     // Let existing display loops reach the paused scheduler. Poll independently
     // of RAF, so the assertion itself cannot wait for a display callback.
     await page.waitForTimeout(80);
-    await page.waitForFunction(()=>(window as any).lastPatch?.frequency===440,undefined,{timeout:2000,polling:10});
+    await page.waitForFunction(
+      () => (window as any).lastPatch?.frequency === 440,
+      undefined,
+      { timeout: 2000, polling: 10 },
+    );
   } finally {
-    await page.evaluate(()=>{
-      const w=window as any;
-      window.requestAnimationFrame=w.savedRAF;
+    await page.evaluate(() => {
+      const w = window as any;
+      window.requestAnimationFrame = w.savedRAF;
       // Resume retained callbacks synchronously with RAF restored. Their loops
       // acquire real handles again; keep cancellation active during this flush.
-      const now=performance.now();
-      for(const [id,callback] of w.pausedFrames){w.pausedFrames.delete(id);callback(now);}
-      window.cancelAnimationFrame=w.savedCancelRAF;
+      const now = performance.now();
+      for (const [id, callback] of w.pausedFrames) {
+        w.pausedFrames.delete(id);
+        callback(now);
+      }
+      window.cancelAnimationFrame = w.savedCancelRAF;
     });
   }
   await range(page, "frequency", 880);
@@ -209,40 +271,93 @@ try {
   await module(page, "envelope");
   await range(page, "duration", 0.5);
   await page.locator("#mode-render").click();
-  await page.evaluate(()=>(window as any).injectStaleReply=true);
+  await page.evaluate(() => ((window as any).injectStaleReply = true));
   await render(page);
-  assert.equal(await page.evaluate(()=>(window as any).renderReplies.at(-1).timing.deviceReused),false);
+  assert.equal(
+    await page.evaluate(
+      () => (window as any).renderReplies.at(-1).timing.deviceReused,
+    ),
+    false,
+  );
   const cpu = await download(page, "download");
   assert.equal(cpu.toString("ascii", 0, 4), "RIFF");
   assert.equal(cpu.length, 44 + Math.ceil((0.5 + 0.35) * 48000) * 2);
   await render(page, "webgpu");
   const gpu = await download(page, "download");
-  await render(page,'webgpu');
-  assert.equal(await page.evaluate(()=>(window as any).renderReplies.at(-1).timing.deviceReused),true);
-  assert.deepEqual(await download(page,'download'),gpu,'Repeated GPU renders must reset voice state');
-  assert.equal(await page.evaluate(()=>(window as any).renderReplies.at(-1).timing.pcmReadbacks),1);
-  assert.equal(await page.evaluate(()=>(window as any).renderReplies.at(-1).timing.batches),3);
-  assert.equal(await page.evaluate(()=>(window as any).renderWorkers),1,'Completed renders must retain their worker across backend changes');
-  assert.equal(await page.evaluate(()=>(window as any).renderTerminations),0);
+  await render(page, "webgpu");
+  assert.equal(
+    await page.evaluate(
+      () => (window as any).renderReplies.at(-1).timing.deviceReused,
+    ),
+    true,
+  );
+  assert.deepEqual(
+    await download(page, "download"),
+    gpu,
+    "Repeated GPU renders must reset voice state",
+  );
+  assert.equal(
+    await page.evaluate(
+      () => (window as any).renderReplies.at(-1).timing.pcmReadbacks,
+    ),
+    1,
+  );
+  assert.equal(
+    await page.evaluate(
+      () => (window as any).renderReplies.at(-1).timing.batches,
+    ),
+    3,
+  );
+  assert.equal(
+    await page.evaluate(() => (window as any).renderWorkers),
+    1,
+    "Completed renders must retain their worker across backend changes",
+  );
+  assert.equal(
+    await page.evaluate(() => (window as any).renderTerminations),
+    0,
+  );
   let max = 0;
   for (let i = 44; i < cpu.length; i += 2)
     max = Math.max(max, Math.abs(cpu.readInt16LE(i) - gpu.readInt16LE(i)));
   assert.ok(max <= 66, `PCM mismatch ${max}`);
-  await module(page,'source');await range(page,'voices',8);
-  await module(page,'envelope');await range(page,'duration',4);
-  await render(page,'cpu');const longCpu=await download(page,'download');
-  await render(page,'webgpu');const longGpu=await download(page,'download');
-  assert.equal(longCpu.length,longGpu.length);
-  let longDifference=0;
-  for(let i=44;i<longCpu.length;i+=2)longDifference=Math.max(longDifference,Math.abs(longCpu.readInt16LE(i)-longGpu.readInt16LE(i)));
-  assert.ok(longDifference<=66,`Long eight-voice PCM mismatch ${longDifference}`);
-  assert.equal(await page.evaluate(()=>(window as any).renderReplies.at(-1).timing.batches),13);
+  await module(page, "source");
+  await range(page, "voices", 8);
+  await module(page, "envelope");
+  await range(page, "duration", 4);
+  await render(page, "cpu");
+  const longCpu = await download(page, "download");
+  await render(page, "webgpu");
+  const longGpu = await download(page, "download");
+  assert.equal(longCpu.length, longGpu.length);
+  let longDifference = 0;
+  for (let i = 44; i < longCpu.length; i += 2)
+    longDifference = Math.max(
+      longDifference,
+      Math.abs(longCpu.readInt16LE(i) - longGpu.readInt16LE(i)),
+    );
+  assert.ok(
+    longDifference <= 66,
+    `Long eight-voice PCM mismatch ${longDifference}`,
+  );
+  assert.equal(
+    await page.evaluate(
+      () => (window as any).renderReplies.at(-1).timing.batches,
+    ),
+    13,
+  );
   await page.locator('[data-preset="glass"]').click();
   await module(page, "envelope");
   await range(page, "duration", 0.5);
   await render(page);
   const wet = await download(page, "download");
-  assert.equal(await page.evaluate(()=>(window as any).renderReplies.at(-1).timing.deviceReused),true,'CPU device must survive a WebGPU round trip');
+  assert.equal(
+    await page.evaluate(
+      () => (window as any).renderReplies.at(-1).timing.deviceReused,
+    ),
+    true,
+    "CPU device must survive a WebGPU round trip",
+  );
   await page.locator("#monitor-dry").click();
   const dry = await download(page, "download");
   assert.notDeepEqual(wet, dry);
@@ -253,24 +368,70 @@ try {
   console.log(
     `PASS real CPU/WebGPU PCM parity (${max}/32768), query-bearing workers, WAV, effects/dry comparison, spectrum, patch save/import validation`,
   );
-  await page.evaluate(()=>(window as any).holdRenderReplies=true);
-  await page.locator('#render').click();
-  await page.waitForFunction(()=>(window as any).heldRenderReply);
-  await page.locator('#live-stop').click();
-  assert.equal(await page.evaluate(()=>(window as any).renderTerminations),1,'Cancelling a pending render must terminate its worker');
-  await page.evaluate(()=>{const w=window as any;w.holdRenderReplies=false;const held=w.heldRenderReply;held.worker.dispatchEvent(new MessageEvent('message',{data:held.data}));});
+  await page.evaluate(() => ((window as any).holdRenderReplies = true));
+  await page.locator("#render").click();
+  await page.waitForFunction(() => (window as any).heldRenderReply);
+  await page.locator("#live-stop").click();
+  assert.equal(
+    await page.evaluate(() => (window as any).renderTerminations),
+    1,
+    "Cancelling a pending render must terminate its worker",
+  );
+  await page.evaluate(() => {
+    const w = window as any;
+    w.holdRenderReplies = false;
+    const held = w.heldRenderReply;
+    held.worker.dispatchEvent(new MessageEvent("message", { data: held.data }));
+  });
   await render(page);
-  assert.equal(await page.evaluate(()=>(window as any).renderWorkers),2);
-  assert.equal(await page.evaluate(()=>(window as any).renderReplies.at(-1).timing.deviceReused),false,'Cancellation must start a fresh device next time');
-  await page.evaluate(()=>{const w=window as any;w.holdRenderReplies=true;w.savedTimeout=window.setTimeout;window.setTimeout=((handler:TimerHandler,delay?:number,...args:any[])=>w.savedTimeout(handler,delay===90000?30:delay,...args)) as typeof setTimeout;});
+  assert.equal(await page.evaluate(() => (window as any).renderWorkers), 2);
+  assert.equal(
+    await page.evaluate(
+      () => (window as any).renderReplies.at(-1).timing.deviceReused,
+    ),
+    false,
+    "Cancellation must start a fresh device next time",
+  );
+  await page.evaluate(() => {
+    const w = window as any;
+    w.holdRenderReplies = true;
+    w.savedTimeout = window.setTimeout;
+    window.setTimeout = ((
+      handler: TimerHandler,
+      delay?: number,
+      ...args: any[]
+    ) =>
+      w.savedTimeout(
+        handler,
+        delay === 90000 ? 30 : delay,
+        ...args,
+      )) as typeof setTimeout;
+  });
   try {
-    await page.locator('#render').click();
-    await page.waitForFunction(()=>document.querySelector('#status')!.textContent!.includes('Render timed out'));
-  } finally {await page.evaluate(()=>{const w=window as any;window.setTimeout=w.savedTimeout;w.holdRenderReplies=false;});}
+    await page.locator("#render").click();
+    await page.waitForFunction(() =>
+      document
+        .querySelector("#status")!
+        .textContent!.includes("Render timed out"),
+    );
+  } finally {
+    await page.evaluate(() => {
+      const w = window as any;
+      window.setTimeout = w.savedTimeout;
+      w.holdRenderReplies = false;
+    });
+  }
   await render(page);
-  assert.equal(await page.evaluate(()=>(window as any).renderWorkers),3);
-  assert.equal(await page.evaluate(()=>(window as any).renderReplies.at(-1).timing.deviceReused),false);
-  console.log(`PASS retained CPU/WebGPU workers/devices, one PCM readback, eight-voice long PCM parity (${longDifference}/32768), wrong request IDs ignored, cancellation/timeout recreate resources`);
+  assert.equal(await page.evaluate(() => (window as any).renderWorkers), 3);
+  assert.equal(
+    await page.evaluate(
+      () => (window as any).renderReplies.at(-1).timing.deviceReused,
+    ),
+    false,
+  );
+  console.log(
+    `PASS retained CPU/WebGPU workers/devices, one PCM readback, eight-voice long PCM parity (${longDifference}/32768), wrong request IDs ignored, cancellation/timeout recreate resources`,
+  );
   await page.locator('[data-preset="warm"]').click();
   await module(page, "envelope");
   await range(page, "duration", 0.5);
@@ -459,7 +620,7 @@ try {
   });
   await ready(page);
   assert.equal(await page.locator("video").isVisible(), false);
-  assert.deepEqual(await scene(page), snapshot);
+  assert.deepEqual(await scene(page), snapshot.scene);
   await page.reload();
   await ready(page);
   assert.equal(await page.locator("[data-cue]").count(), 1);

@@ -1,5 +1,6 @@
 import type { SoundGraph } from "typeaudio/graph";
-import type { GraphProgram } from "typeaudio/graph";
+import type { FunctionGraphDocument } from "typeaudio/function-graph";
+import type { PreparedProgram, FunctionLayout } from "../functions/types.ts";
 export interface CurvePoint {
   time: number;
   value: number;
@@ -17,6 +18,9 @@ export interface SoundLayer {
 
 export interface Patch {
   graph: SoundGraph | null;
+  functions?: FunctionGraphDocument | null;
+  functionLayout?: FunctionLayout;
+  functionComposition?: string | null;
   baseMuted: boolean;
   fmRatio: number;
   fmIndex: number;
@@ -62,5 +66,5 @@ export interface RenderRequest {
   id?: number;
   patch: Patch;
   backend: "cpu" | "webgpu";
-  programs?: GraphProgram[];
+  programs?: PreparedProgram[];
 }

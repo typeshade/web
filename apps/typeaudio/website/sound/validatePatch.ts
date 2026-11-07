@@ -1,18 +1,50 @@
 import type { Patch } from "./types.ts";
 import { DEFAULT } from "./defaultPatch.ts";
-import { LIMITS } from "./limits.ts";
 import { validateGraph } from "typeaudio/graph";
+import { validateFunctionDocument } from "typeaudio/function-graph";
+import { validateFunctionLayout } from "../functions/validateLayout.ts";
 import { WAVE_SIZE } from "./constants.ts";
 import { CURVE_LIMITS } from "./limits.ts";
 import { MAX_SOUND_LAYERS } from "./constants.ts";
+import { parameterLimits } from "./parameterLimits.ts";
 /** Strict validation for stored/imported patches and worker requests. */
 export function validatePatch(value: unknown, nested = false): Patch {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("A patch must be an object.");
   const data = value as Record<string, unknown>;
   const result = { ...DEFAULT };
+  result.graph = data.graph == null ? null : validateGraph(data.graph);
+  if (data.functions != null) {
+    if (result.graph)
+      throw new Error("A source cannot use two graph formats at once.");
+    result.functions = validateFunctionDocument(data.functions);
+    result.functionLayout = validateFunctionLayout(data.functionLayout);
+  }
+  if (data.functionComposition != null) {
+    if (
+      !result.functions ||
+      typeof data.functionComposition !== "string" ||
+      !data.functionComposition.trim() ||
+      data.functionComposition.length > 131072
+    )
+      throw new Error(
+        "Composition source needs a function sound and at most 131072 characters.",
+      );
+    result.functionComposition = data.functionComposition;
+  }
   for (const key of Object.keys(DEFAULT) as (keyof Patch)[]) {
-    if (["graph", "wave", "curves", "layers"].includes(key)) continue;
+    if (
+      [
+        "graph",
+        "functions",
+        "functionLayout",
+        "functionComposition",
+        "wave",
+        "curves",
+        "layers",
+      ].includes(key)
+    )
+      continue;
     const v =
       data[key] === undefined &&
       [
@@ -32,7 +64,7 @@ export function validatePatch(value: unknown, nested = false): Patch {
     if (typeof DEFAULT[key] === "boolean") {
       if (typeof v !== "boolean") throw new Error(`${key} must be on or off.`);
     } else {
-      const [low, high] = LIMITS[key]!;
+      const [low, high] = parameterLimits(result, key);
       if (typeof v !== "number" || !Number.isFinite(v) || v < low || v > high)
         throw new Error(`${key} must be between ${low} and ${high}.`);
       if (
@@ -53,7 +85,6 @@ export function validatePatch(value: unknown, nested = false): Patch {
   }
   if (nested && result.baseMuted)
     throw new Error("Nested layer patches cannot mute the base source.");
-  result.graph = data.graph == null ? null : validateGraph(data.graph);
   const wave = data.wave ?? DEFAULT.wave;
   if (
     !Array.isArray(wave) ||

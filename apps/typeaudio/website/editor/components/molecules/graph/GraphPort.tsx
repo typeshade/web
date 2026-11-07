@@ -6,6 +6,7 @@ import type { Signal } from "typeaudio/graph";
 export function GraphPort({
   endpoint,
   name,
+  binding,
   signal,
   connected,
   busy,
@@ -13,6 +14,7 @@ export function GraphPort({
 }: {
   endpoint: GraphEndpoint;
   name: string;
+  binding?: string;
   signal: Signal;
   connected: boolean;
   busy: boolean;
@@ -45,7 +47,7 @@ export function GraphPort({
       }}
     >
       {input && <i aria-hidden="true" />}
-      {input ? endpoint.port : signal}
+      {input ? endpoint.port : (binding ?? signal)}
       {!input && <i aria-hidden="true" />}
     </button>
   );

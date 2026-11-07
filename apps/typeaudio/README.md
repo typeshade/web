@@ -1,12 +1,13 @@
 # TypeAudio studio
 
 TypeAudio's website lives in this application. The library source is pinned by the
-`sources/typeaudio` submodule at `575b42b`; `src` is a link to that source, not a fork.
+`sources/typeaudio` submodule at `86560f83a92ff8374346157000b8a467daa39aab`;
+`src` is a link to that source, not a fork. This is the room-renderer baseline from
+TypeAudio PR #24. The compiler remains pinned at `87af4eb0d9d15f02b66b8341b72cab0944290472`.
 The initial website was imported from TypeAudio revision
 `1d6eb0d272f6f61fdf81b4023652f033e6261f35` (PRs 19–21), including the worker module
 identity fix, sound designer and synchronous AudioWorklet. Those PRs were closed after the website transfer; they are not needed to
-build this application. The library modules are unchanged between
-these revisions. Documentation comes from the pinned library revision.
+build this application. Documentation comes from the pinned library revision.
 
 ## Development
 
@@ -29,6 +30,58 @@ replace an existing, different compiler installation. Generated shader host view
 are ignored. Vite builds each worker as one module to preserve resident array
 identity even when its URL contains a query string. The separate Vite application
 preserves this compiler pipeline; it consumes the web workspace's shared UI tokens.
+
+## Editable agent projects
+
+The Project browser starts with agent projects, **Open project file…** and
+**Save project file**. Preview A or B to hear its character without replacing your
+work, then open an editable copy of one of the three Frieren passages. Opening a
+project keeps the previous document in **Saved copies**, including code drafts;
+a failed checkpoint leaves current work intact. These copies stay in this browser.
+
+Each project includes procedural layers, Code nodes, parameters, seeds, amplitude
+envelopes, timing and spatial settings. **Connect reference** loads its YouTube
+player on request. Editing and effects playback also work without it.
+
+1. Select a layer in the Picture timeline and adjust its **Sound controls**.
+2. Choose **Edit sound** for nodes/code. The composition transport and timeline stay available.
+3. Use **Apply code** (Ctrl/Cmd+Enter) to change the sound. Parameter edits apply directly.
+4. Play the composition to hear the shared room, or **Audition dry** for the selected source.
+5. Return to **Composition** for timing, position, room send and **Scene space** controls.
+6. Use **Save project file** (Ctrl/Cmd+S, including inside code) for a portable JSON with
+   applied sounds, independent source, selection and unapplied code drafts.
+7. Open that file to continue editing in another session or browser. Incomplete code
+   is retained as a draft; reopening does not apply it to the sound.
+
+At narrow widths, **Listen**, **Layers**, **Edit** and **Projects** show one task at a
+time while project identity and playback remain visible. **Edit** shows layer controls;
+**Edit sound** opens deeper source editing and **Layer controls** returns to properties.
+In the standalone Sound workspace, **Code / FX** opens the lower editing panel.
+
+**Export mix WAV** saves rendered effects audio. **Save preset** keeps one applied
+sound in the browser's sound library, and **Save sound file** exports that applied
+source. These actions are separate from saving the full editable project. The document
+bar reports browser save success/failure and the presence of code drafts.
+
+For these source graphs, **Source length** controls the rendered duration, while
+the exposed **Envelope span** parameter controls the authored amplitude curve.
+
+The source format and agent handoff are documented in
+[the first-milestone contract](../../docs/typeaudio-editable-projects.md).
+The six JSON fixtures are served by this application under `/projects/`.
+Their [provenance manifest](website/public/projects/provenance.json) records hashes
+and the source baseline. Regenerate them from the TypeAudio study with:
+
+```sh
+cd apps/typeaudio
+bun scripts/export-study-projects.ts /path/to/typeaudio/docs/studies/frieren/sound-design
+```
+
+This is an editable stereo source edition of the study, not a bit-identical copy
+of its review masters. The editor retains its source taper and exports the picture
+range without the masters' additional 2.5-second tail handle. Listening review and
+candidate selection remain pending. Composition updates prepare in Workers before
+playback; this does not implement a game event scheduler or binaural rendering.
 
 ## Procedural node graphs
 
@@ -72,24 +125,28 @@ Fit all / Home frames the network, and Frame / F frames the selection. Zoom butt
 use the viewer center. Panel resizing and monitor switches retain the view during
 the session. Enter on the canvas focuses the selected node; Shift+Tab leaves it.
 
-Each Code node opens as a `.sample.ts` tab in a lazily loaded Monaco editor.
-Tabs retain their drafts, cursor position and editor Undo while switching nodes.
+Each Code node opens as a **sample** tab in a lazily loaded Monaco editor.
+Selecting a tab also selects its node. Selecting a built-in node shows its actual
+connections and settings, with no editable body or Apply action. Multiple selection
+shows its members. Returning to Code retains the draft, cursor and editor Undo.
 The pinned public `typeshade/language-service` supplies completion for local
 variables and builtins (Ctrl/Cmd+Space), hover types, call signatures, definitions
 (F12), references and local-variable rename (F2). A separate language worker
 checks drafts while you type. **Problems** lists diagnostics on the visible lines;
 click an error to focus it. The editor also supports find/replace, comments and
-multiple cursors. **Generated.shade.ts** shows the combined applied kernel as a
-read-only document.
+multiple cursors. **Generated kernel · read only** shows the combined applied
+kernel. Selecting any node exits that inspection view.
 
-**Sample code** explains that a node runs once per sample. Expand **Inputs & state**
-to see its implicit bindings and actual parameter names. The language service reads
+The context bar names the actual nodes connected to `input` and `out`.
+Expand **Bindings & state** to follow a connection, focus a shared parameter
+control, and read the per-sample execution contract. Completion and hover for the
+bindings include actual parameter names and connections. The language service reads
 a virtual TypeShade function containing those bindings and maps its answers back
 to the visible body. **Audio-node limits & math reference** describes the separate
 TypeAudio execution restrictions. A clean language check does not replace Apply's
 audio-node validation or permit arbitrary TypeScript module execution.
 
-**Apply code**, Ctrl/Cmd+Enter, or Ctrl/Cmd+S inside the editor compiles the draft
+**Apply code** or Ctrl/Cmd+Enter compiles the draft
 in a dedicated worker. Failed compilation keeps the applied graph and audio;
 explicit worker error locations appear on the corresponding code line. A result
 that arrives after a newer graph edit is discarded. Typing during compilation
@@ -98,16 +155,17 @@ import changes applied code under a dirty draft, choose **Use applied code** or
 **Keep my draft** before applying again. **Revert draft** discards that node's
 unapplied edits. Editor Undo changes text; document Undo changes the sound.
 
-Drafts survive Sound/Picture and source-owner switches within this session.
-They are not exported or restored after reload; leaving with unapplied drafts
-triggers the browser's unsaved-change prompt. Only successfully applied code is
-included in local saves, patch exports and Picture projects. These tabs represent
-the current graph's Code nodes and generated source, not independent projects.
+Drafts survive source/workspace switches, reloads and project saves. Ctrl/Cmd+S
+saves a portable project file without applying those drafts.
+Browser save failures appear in the document bar and enable the unsaved-change
+prompt. Patch/preset exports contain applied sound only; project files include
+both applied sound and draft buffers. These tabs represent the current graph's
+Code nodes and generated source, not independent projects.
 
 **Below**, **Beside** and **Focus code** place code below the graph, beside it on screens
 at least 1400 px wide, or across the central workspace. Split sizes and code
 layout persist locally. Code height is stored separately from the Picture timeline.
-Narrow screens use the stacked layout; **Reset layout**
+Narrow screens use task panels; **Reset layout**
 restores defaults. Ctrl/Cmd+Shift+P opens searchable application commands, including
 context-dependent graph and layout actions. Ctrl/Cmd+P opens Code documents.
 Arrow keys navigate results, Enter runs the selection, and Escape restores focus.
@@ -117,8 +175,10 @@ For example, this node generates a sine wave from exposed Pitch (`p0`) and
 Strength (`p2`) without an audio input:
 
 ```ts
-state0 = fract(state0 + p0 / sampleRate);
-out = sin(state0 * 6.28318530718) * p2;
+const pitch: f32 = p0;
+const strength: f32 = p2;
+state0 = fract(state0 + pitch / sampleRate);
+out = sin(state0 * 6.28318530718) * strength;
 ```
 
 `input` is the connected audio signal, `time` counts seconds since Retrigger,
@@ -133,6 +193,10 @@ Code node, two Code nodes and 16 total nodes per graph, and four exposed paramet
 Graphs must be acyclic and have one Output. Non-finite samples are silenced with
 a Live warning; finite rendering rejects them so a broken graph cannot silently
 export an empty take.
+
+These limits belong to TypeAudio's sample-body contract, not to TypeShade as a
+whole. The editor does not yet author a complete graph as TypeScript or round-trip
+generated engine code into nodes. See the [node/code relationship review](../../docs/reviews/typeaudio-node-code.md).
 
 The graph compiles through the pinned TypeShade CPU generator to one scalar
 sample loop. Blob modules install the compiled kernel into the existing
@@ -395,7 +459,7 @@ clips support the same timing, trim, fade, split, gain, mute and group edits as
 procedural clips. These edits reuse the decoded source without running synthesis.
 The Sound rack's filters, modulation and effects do not process imported clips.
 
-Files stay in this browser. Export project embeds the composition's referenced
+Files stay in this browser. Save project file embeds the composition's referenced
 audio as lossless float PCM, so another browser can open the same composition.
 Project JSON is limited to 40 MiB. Re-select video separately. Missing audio blocks
 preview/WAV export with a recovery message; importing the original file or reopening
@@ -403,7 +467,8 @@ a project with embedded audio restores the source while retaining clip edits.
 If the composition changes during a file import, the file is saved to the library
 without adding a clip. A failed decode, validation or storage write leaves the
 document unchanged. Removal is disabled for audio referenced by the composition
-or its undo/redo history; reloading or opening another project resets that history.
+its undo/redo history, or a saved project copy. Reloading resets Undo, while saved
+project copies remain until explicitly removed.
 
 - Up to 24 cues; ranges span at most 60 seconds within the first hour.
 - Procedural clips use finite CPU renders including LFO, automation and source layers.
@@ -414,17 +479,19 @@ or its undo/redo history; reloading or opening another project resets that histo
 - YouTube uses the [official IFrame API](https://developers.google.com/youtube/iframe_api_reference)
   only on explicit load. Embedded availability depends on the video and network;
   cue synchronization is approximate.
-- Effects WAV is mono 48 kHz, 16-bit PCM for the selected range, including silence
+- Effects WAV is 48 kHz, 16-bit PCM, stereo for spatial projects and mono otherwise,
+  for the selected range, including silence
   and trimmed source ranges, fades and cropped tails. Preview uses the same source
   windows and linear fade envelopes. Original audio and video are excluded. Clipping is reported.
   Sound WAV is a finite render with modulation. Export take saves a recorded performance.
 - Existing version-1 scenes and saved patches remain readable. New audio references
   are optional scene fields; embedded PCM is excluded from local document history.
-  A standalone source draft is retained locally; save/export named sounds to keep
-  or share them. Session A/B snapshots are not included in patch exports.
+  Project files also retain the independent source sound and code drafts. Session
+  sound A/B snapshots are not included in project or patch exports.
 
 `test:browser` runs the workspace, state, device-loss, interaction, sound-design,
-timeline, audio-import, graph, node-workspace and code-workspace browser suites. They cover actual live processing,
+timeline, audio-import, graph, node-workspace, code-workspace, code-language,
+feedback, agent-project, editor-UX and node-code browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
 transport and video loops, mobile layout and mocked YouTube recovery. Timeline
@@ -436,6 +503,12 @@ intervening edits, storage failure and history-protected deletion. The local
 four-second VP8/WebM fixture uses FFmpeg `testsrc2` (160×90, 12 fps, 40 kbps).
 YouTube adapter tests do not establish external video availability. Browser/device
 latency and physical GPU headroom are not established by these checks.
+
+The agent-project suite opens all six source projects, prepares and plays their
+stereo output, and checks source-code/parameter edits, undo/redo, spatial edits,
+WAV regeneration, exported JSON, reload, invalid/stale imports and a 390px mobile
+viewport. Reopening an edited JSON must regenerate the exact edited PCM. Set
+`TYPEAUDIO_PROJECT_ARTIFACTS` to a directory to retain desktop/mobile screenshots.
 
 
 ## Web, engine and compiler feedback

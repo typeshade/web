@@ -1,3 +1,6 @@
+import { useMemo, useRef } from "react";
+import { BuiltinNodeContext } from "../../molecules/code/BuiltinNodeContext.tsx";
+import { nodeContext } from "../../../code/nodeContext.ts";
 import type { GraphEditor } from "../../../hooks/graph/useGraphEditor.ts";
 import type { CodeDocuments } from "../../../hooks/code/useCodeDocuments.ts";
 import { codeDiagnostic } from "../../../code/codeDiagnostic.ts";
@@ -13,16 +16,27 @@ export function GraphCodeEditor({
   controller: GraphEditor;
   documents: CodeDocuments;
 }) {
+  const context = useMemo(
+    () => (c.graph && d.node ? nodeContext(c.graph, d.node) : undefined),
+    [c.graph, d.node],
+  );
+  const visibleCode = !!d.node || d.generated;
+  // Keep Monaco mounted while inspecting built-ins so a return preserves text Undo
+  // and cursor position. A graph without Code does not load Monaco until requested.
+  const lastDocument = useRef<{ key: string; value: string }>(undefined);
+  if (visibleCode) lastDocument.current = { key: d.key, value: d.text };
   return (
     <div className="graph-code-panel">
       <CodeDocumentTabs documents={d} />
       <div className="graph-code-toolbar">
         <span>
           {d.generated
-            ? "Graph / Generated source"
-            : `Nodes / ${d.node?.name ?? "Code"} / Sample code`}
+            ? "Whole graph / Generated engine output"
+            : d.node
+              ? `${d.node.name} / One sample at a time`
+              : "Selected node / Built-in settings"}
         </span>
-        {!d.generated && (
+        {d.node && (
           <>
             <button
               disabled={!d.dirty || c.busy}
@@ -43,11 +57,15 @@ export function GraphCodeEditor({
           </>
         )}
       </div>
-      <CodeContext
-        parameters={c.graph?.parameters ?? []}
-        generated={d.generated}
-      />
-      {d.conflict && !d.generated && (
+      {visibleCode && (
+        <CodeContext
+          graph={c.graph!}
+          node={d.node}
+          generated={d.generated}
+          onSelectNode={d.select}
+        />
+      )}
+      {d.conflict && d.node && (
         <div className="code-conflict" role="alert">
           <span>The applied code changed. Your draft is preserved.</span>
           <button onClick={d.revert}>Use applied code</button>
@@ -59,30 +77,39 @@ export function GraphCodeEditor({
         role="tabpanel"
         aria-labelledby={`code-tab-${d.generated ? "generated" : `node-${d.id}`}`}
       >
-        <MonacoCodeEditor
-          documentKey={d.key}
-          value={d.text}
-          readOnly={d.generated}
-          focusRequest={d.focusRequest}
-          diagnostic={
-            d.node && d.diagnosticCurrent
-              ? codeDiagnostic(c.error, d.node.name)
-              : undefined
-          }
-          onChange={d.change}
-          onApply={() => void d.apply()}
-        />
+        {!visibleCode && <BuiltinNodeContext controller={c} />}
+        {lastDocument.current && (
+          <div className="retained-code-editor" hidden={!visibleCode}>
+            <MonacoCodeEditor
+              documentKey={lastDocument.current.key}
+              value={lastDocument.current.value}
+              readOnly={!d.node}
+              focusRequest={visibleCode ? d.focusRequest : 0}
+              diagnostic={
+                d.node && d.diagnosticCurrent
+                  ? codeDiagnostic(c.error, d.node.name)
+                  : undefined
+              }
+              bindings={context?.bindings}
+              onChange={d.change}
+              onApply={() => void d.apply()}
+              onSave={() => void c.e.exportProject()}
+            />
+          </div>
+        )}
       </div>
-      <GraphCodeReference />
+      {d.node && <GraphCodeReference />}
       <p className="graph-code-status" role={c.error ? "alert" : "status"}>
         {c.error ||
           (c.busy
             ? "Compiling off the audio thread…"
-            : d.generated
-              ? "Read-only source for the applied graph. Edit a Code node to change its sound."
-              : d.dirty
-                ? "Unapplied draft · Ctrl/⌘ Enter compiles and applies. Playback uses the last applied code."
-                : "Applied · Ctrl/⌘ Space: completion · F2: rename · F12: definition · Apply checks audio-node limits.")}
+            : !visibleCode
+              ? "Select a Code node to edit its calculation. Built-in node controls are in Node properties."
+              : d.generated
+                ? "Read-only source for the applied graph. Edit a Code node to change its sound."
+                : d.dirty
+                  ? "Unapplied draft · Ctrl/⌘ S saves this text with the project. Ctrl/⌘ Enter applies it to the sound."
+                  : "Applied · Ctrl/⌘ Space: completion · F2: rename · F12: definition · Apply checks audio-node limits.")}
       </p>
     </div>
   );

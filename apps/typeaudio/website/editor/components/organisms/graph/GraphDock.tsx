@@ -13,13 +13,14 @@ export function GraphDock({
 }) {
   return (
     <Panel
-      title="Code / Parameters"
+      title="Node / Code"
       className="graph-dock-panel"
       actions={<CodeLayoutControls onFocus={documents.focus} />}
     >
       <div className="graph-dock">
         <GraphCodeEditor controller={c} documents={documents} />
         <div className="graph-parameters" aria-label="Exposed parameters">
+          <h3 className="graph-parameters-heading">Shared graph parameters</h3>
           {c.graph?.parameters.map((_, i) => (
             <ExposedParameter key={i} controller={c} index={i} />
           ))}

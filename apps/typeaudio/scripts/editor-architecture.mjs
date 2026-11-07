@@ -50,7 +50,10 @@ export function inspectModule(file, code) {
       );
     if (!ts.isImportDeclaration(node) || !runtimeImport(node)) continue;
     const specifier = node.moduleSpecifier.text;
-    if (/\/editor\//.test(file) && specifier === "typeaudio/graph/compiler")
+    if (
+      /\/editor\//.test(file) &&
+      /^typeaudio\/(?:function-graph|graph)\/compiler$/.test(specifier)
+    )
       errors.push(`The TypeShade compiler belongs in its worker: ${specifier}`);
     if (!specifier.startsWith(".")) continue;
     const target = resolve(dirname(file), specifier).replaceAll("\\", "/");
@@ -79,7 +82,10 @@ export function inspectModule(file, code) {
       );
     if (/\/editor\//.test(file) && /\/graph\/compiler\//.test(target))
       errors.push(`The TypeShade compiler belongs in its worker: ${specifier}`);
-    if (/\/website\/(sound|graph)\//.test(file) && /\/editor\//.test(target))
+    if (
+      /\/website\/(sound|graph|functions)\//.test(file) &&
+      /\/editor\//.test(target)
+    )
       errors.push(`Audio domains cannot depend on the editor: ${specifier}`);
   }
   if (file.endsWith(".tsx") && !file.endsWith("/main.tsx")) {
@@ -121,6 +127,7 @@ export function checkEditorArchitecture(root) {
   const files = [
     ...modules(resolve(root, "website/editor")),
     ...modules(resolve(root, "website/graph")),
+    ...modules(resolve(root, "website/functions")),
     ...modules(resolve(root, "website/sound")),
   ];
   const reports = new Map(

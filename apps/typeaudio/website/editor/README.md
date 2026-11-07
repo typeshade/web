@@ -130,3 +130,33 @@ named-component convention, upward UI imports, feature controllers in primitives
 document/domain-to-UI imports, UI resource construction, direct compiler imports
 and runtime import cycles. These checks protect the boundaries; review still decides
 whether each module has a coherent responsibility.
+
+## Full TypeShade function authoring
+
+`functions/` outside the editor owns source keys, worker preparation, engine program registration,
+source DSP adaptation and pure graph-instance operations. It does not import editor code.
+The engine owns source reflection, typed connection validation and execution.
+`useFunctionCompilation` rejects late results by source owner, document epoch and current graph identity.
+`useFunctionDocuments` keeps full-module drafts on the existing document store, separately from applied source.
+Monaco models share one virtual source set for imported completion, diagnostics and definition navigation.
+`useFunctionEditor` owns selection and operations. `useFunctionViewport` owns transient pan/zoom and drag transactions.
+
+Function molecules own pins, bindings, controls and edges. Function organisms compose the canvas,
+inspector and code dock in existing workspace slots. The command palette includes module files and source actions.
+Project version 3 preserves function documents, drafts and canvas positions. Existing graph projects keep their version and behavior.
+The source transport and timeline use the existing SoundDsp/Worker/AudioWorklet pipeline.
+`check-function-authoring-browser.ts` exercises source editing, wiring, live state, stale results,
+file recovery, exact WAV regeneration, Picture editing and mobile viewport access.
+
+
+The Network virtual module shares Monaco's project, drafts and Undo ownership with the function modules.
+`useFunctionDocuments` excludes it from the engine module map. The compilation Worker applies or validates
+it through the engine composition API, or projects a visual edit against the previous applied source.
+Equivalent execution structure retains the original bindings and node order, so authoring-only edits do not invalidate audio.
+`functionComposition` and `functionLayout` are excluded by `audioPatch`; audible function/control changes remain included.
+
+Composition projects use version 4, sound files version 3 and browser envelopes version 3.
+Automatic draft rebasing uses `reconcileDrafts` and does not count as newer user input during a protected import.
+`FunctionInputRename` owns the input form; engine symbol edits preserve stable port IDs and bindings.
+`check-composition-browser.ts` exercises cross-view changes, rename, source preservation, language tools,
+Live continuity, empty/invalid drafts, conflicts, stale preparations, save/reopen and mobile access.

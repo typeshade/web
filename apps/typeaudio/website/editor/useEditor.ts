@@ -1,3 +1,5 @@
+import { useEditorView } from "./hooks/layout/useEditorView.ts";
+import { useProjectPreview } from "./hooks/project/useProjectPreview.ts";
 import { PRESETS } from "../sound/presets.ts";
 import { RECIPES } from "../sound-recipes.ts";
 import { useEditorDocument } from "./hooks/document/useEditorDocument.ts";
@@ -23,14 +25,25 @@ export function useEditor() {
   const document = useEditorDocument(),
     resources = useAudioResources();
   const { state, dispatch, notice, setNotice } = document;
+  const view = useEditorView(state);
   const sound = useSoundSession(document, resources),
     library = useAudioLibrary(document, resources);
   const scene = useSceneSession(document, resources, library.audioRevision);
-  const workspace = useWorkspaceNavigation(
+  const previews = useProjectPreview(
+    document,
+    resources,
+    sound.stopSound,
+    scene.stopScene,
+  );
+  const navigate = useWorkspaceNavigation(
     document,
     sound.stopSound,
     scene.stopScene,
   );
+  const workspace = (next: "picture" | "sound") => {
+    view.showComposition();
+    navigate(next);
+  };
   const patches = createPatchActions(document),
     scenes = createSceneActions(document, resources, scene);
   const clips = useClipActions(document, resources, scene, scenes, workspace);
@@ -40,6 +53,7 @@ export function useEditor() {
     resources,
     media,
     library.setAudioRevision,
+    workspace,
   );
   const imports = useAudioImport(
     document,
@@ -76,6 +90,7 @@ export function useEditor() {
     dispatch,
     notice,
     setNotice,
+    saveStatus: document.saveStatus,
     workspace,
     ...soundApi,
     ...sceneApi,
@@ -91,6 +106,20 @@ export function useEditor() {
     ...creation,
     ...variations,
     ...sounds,
+    ...view,
+    ...previews,
+    playScene: (restart = false) => {
+      previews.stopPreview();
+      return scene.playScene(restart);
+    },
+    startLive: (...args: Parameters<typeof sound.startLive>) => {
+      previews.stopPreview();
+      return sound.startLive(...args);
+    },
+    auditionCue: (id: string) => {
+      previews.stopPreview();
+      return scene.auditionCue(id);
+    },
     ready: sceneReady,
     sound: resources.sound.current,
     transport: resources.transport.current,

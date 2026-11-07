@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { Editor } from "../../useEditor.ts";
 import { DEFAULT } from "../../../sound/defaultPatch.ts";
-import { LIMITS } from "../../../sound/limits.ts";
+import { parameterLimits } from "../../../sound/parameterLimits.ts";
 import { type Patch } from "../../../sound/types.ts";
 import { openContext } from "../../interactions/openContext.ts";
 import { useInteractions } from "../../hooks/interactions/useInteractions.ts";
@@ -34,7 +34,7 @@ export function NumericValue({
     suppress = useRef(false),
     finished = useRef(false);
   const { openMenu } = useInteractions(),
-    [min, max] = LIMITS[name]!;
+    [min, max] = parameterLimits(e.state.patch, name);
   useLayoutEffect(() => {
     if (editing) {
       input.current?.focus();

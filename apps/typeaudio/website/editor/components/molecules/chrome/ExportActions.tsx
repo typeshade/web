@@ -25,7 +25,7 @@ export function ExportActions({ editor: e }: { editor: Editor }) {
         onClick={picture ? e.exportScene : e.exportSound}
       >
         <Icon name="download" />
-        Export WAV
+        {picture ? "Export mix WAV" : "Export sound WAV"}
       </button>
     </div>
   );

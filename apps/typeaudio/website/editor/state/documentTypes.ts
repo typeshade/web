@@ -1,5 +1,9 @@
 import { type Patch } from "../../sound/types.ts";
 import { type Scene } from "../../video-model.ts";
+import type {
+  CodeDrafts,
+  ProjectEditorState,
+} from "../../project/editorState.ts";
 export type Workspace = "sound" | "picture";
 
 export type Tool = "select" | "hand";
@@ -14,6 +18,8 @@ export interface Document {
 }
 
 export interface EditorState extends Document {
+  drafts?: CodeDrafts;
+  documentEpoch?: number;
   checkpoint?: Document;
   past: Document[];
   future: Document[];
@@ -32,7 +38,9 @@ export type Action =
   | { type: "selectMany"; ids: string[] }
   | { type: "workspace"; workspace: Workspace }
   | { type: "tool"; tool: Tool }
-  | { type: "open"; scene: Scene }
+  | { type: "drafts"; update: (drafts: CodeDrafts) => CodeDrafts }
+  | { type: "reconcileDrafts"; update: (drafts: CodeDrafts) => CodeDrafts }
+  | { type: "open"; scene: Scene; editor?: ProjectEditorState }
   | { type: "media"; media: Scene["media"] };
 
 export type SelectionMode = "toggle" | "range" | "preserve";

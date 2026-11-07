@@ -14,7 +14,13 @@ export function StatusBar({ editor: e }: { editor: Editor }) {
         data-frames={e.meter.frames}
         data-revision={e.meter.revision}
       >
-        {e.busy ? "PROCESSING" : e.live ? "LIVE / CPU" : "48 kHz · MONO"}
+        {e.busy
+          ? "PROCESSING"
+          : e.live
+            ? "LIVE / CPU"
+            : picture && e.state.scene.space
+              ? "48 kHz · STEREO"
+              : "48 kHz · MONO"}
       </span>
     </footer>
   );

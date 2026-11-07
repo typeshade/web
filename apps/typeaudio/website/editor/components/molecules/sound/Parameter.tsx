@@ -4,7 +4,7 @@ import { DEFAULT } from "../../../../sound/defaultPatch.ts";
 import { openContext } from "../../../interactions/openContext.ts";
 import { useInteractions } from "../../../hooks/interactions/useInteractions.ts";
 import type { Editor } from "../../../useEditor.ts";
-import { LIMITS } from "../../../../sound/limits.ts";
+import { parameterLimits } from "../../../../sound/parameterLimits.ts";
 import { SHAPES } from "../../../../sound/constants.ts";
 import { type Patch } from "../../../../sound/types.ts";
 import { labels } from "../../../config/parameterMetadata.ts";
@@ -15,12 +15,29 @@ export function Parameter({
   name,
 }: {
   editor: Editor;
-  name: Exclude<keyof Patch, "graph" | "wave" | "curves" | "layers">;
+  name: Exclude<
+    keyof Patch,
+    | "graph"
+    | "functions"
+    | "functionLayout"
+    | "functionComposition"
+    | "wave"
+    | "curves"
+    | "layers"
+  >;
 }) {
   const gesture = useRef(false),
     { openMenu } = useInteractions();
   const value = e.state.patch[name],
-    limit = LIMITS[name],
+    label =
+      name === "duration" && (e.state.patch.graph || e.state.patch.functions)
+        ? "Source length"
+        : labels[name] || name,
+    help =
+      name === "duration" && (e.state.patch.graph || e.state.patch.functions)
+        ? "Length of the rendered graph source. Envelope span is a separate exposed parameter."
+        : HELP[name],
+    limit = parameterLimits(e.state.patch, name),
     options =
       name === "shapeA" || name === "shapeB"
         ? SHAPES
@@ -63,7 +80,7 @@ export function Parameter({
       data-tooltip={
         name === "lfoRate" && e.state.patch.lfoSync
           ? "Beat sync is on. Rate follows BPM."
-          : HELP[name]
+          : help
       }
       onContextMenu={(event) => {
         if (
@@ -71,21 +88,15 @@ export function Parameter({
           event.target.type !== "range"
         )
           return;
-        openContext(
-          event,
-          openMenu,
-          `parameter-${name}`,
-          `${labels[name] || name} options`,
-          [
-            {
-              label: `Reset ${labels[name] || name}`,
-              action: () => e.patch({ [name]: DEFAULT[name] }),
-            },
-          ],
-        );
+        openContext(event, openMenu, `parameter-${name}`, `${label} options`, [
+          {
+            label: `Reset ${label}`,
+            action: () => e.patch({ [name]: DEFAULT[name] }),
+          },
+        ]);
       }}
     >
-      <label htmlFor={name}>{labels[name] || name}</label>
+      <label htmlFor={name}>{label}</label>
       {options ? (
         <select
           id={name}
@@ -103,7 +114,7 @@ export function Parameter({
           <NumericValue
             editor={e}
             name={name}
-            label={labels[name] || name}
+            label={label}
             unit={units[name] || ""}
             step={step}
             integer={integer}

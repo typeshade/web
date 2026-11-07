@@ -1,3 +1,5 @@
+import type { GraphEditor } from "../../../hooks/graph/useGraphEditor.ts";
+import { ExposedParameter } from "../../molecules/graph/ExposedParameter.tsx";
 import { cueRange } from "../../../../video-model.ts";
 import { trimClip, MIN_CLIP } from "../../../clip-edit.ts";
 import type { Editor } from "../../../useEditor.ts";
@@ -5,7 +7,15 @@ import { useEffect, useRef } from "react";
 import { Panel } from "../../molecules/Panel.tsx";
 import { Icon } from "../../atoms/Icon.tsx";
 import { Mixer } from "./Mixer.tsx";
-export function ClipInspector({ editor: e }: { editor: Editor }) {
+import { SpatialSourceProperties } from "./SpatialSourceProperties.tsx";
+import { RoomProperties } from "./RoomProperties.tsx";
+export function ClipInspector({
+  editor: e,
+  graph,
+}: {
+  editor: Editor;
+  graph: GraphEditor;
+}) {
   const c = e.selected;
   const range = c ? cueRange(c, e.sourceDuration(c)) : undefined;
   const name = useRef<HTMLInputElement>(null);
@@ -17,7 +27,18 @@ export function ClipInspector({ editor: e }: { editor: Editor }) {
   }, [e.renameRequest, c?.id]);
   return (
     <>
-      <Panel title="Properties" className="clip-properties">
+      <Panel
+        title={c?.name || "Layer properties"}
+        className="clip-properties"
+        actions={
+          c &&
+          !c.audio && (
+            <button id="edit-cue-sound" onClick={e.editSource}>
+              Edit sound
+            </button>
+          )
+        }
+      >
         {c ? (
           <>
             <div className="selected-object">
@@ -66,6 +87,18 @@ export function ClipInspector({ editor: e }: { editor: Editor }) {
                 >
                   Import audio…
                 </button>
+              </div>
+            )}
+            {!c.audio && graph.graph && !e.sourceEditing && (
+              <div className="layer-sound-controls property-section">
+                <h3>Sound controls</h3>
+                <p className="panel-hint">
+                  Changes update this layer. Play the composition to hear it in
+                  the room.
+                </p>
+                {graph.graph.parameters.map((_, i) => (
+                  <ExposedParameter key={i} controller={graph} index={i} />
+                ))}
               </div>
             )}
             <div className="property-section">
@@ -206,20 +239,6 @@ export function ClipInspector({ editor: e }: { editor: Editor }) {
                 />
                 Mute layer
               </label>
-              {!c.audio && (
-                <>
-                  <button
-                    id="edit-cue-sound"
-                    className="full"
-                    onClick={() => e.workspace("sound")}
-                  >
-                    Edit sound <Icon name="sound" />
-                  </button>
-                  <p className="panel-hint">
-                    Edits in Sound workspace update this layer.
-                  </p>
-                </>
-              )}
             </div>
             {e.selectedIds.length > 1 && (
               <p className="panel-hint">
@@ -227,13 +246,14 @@ export function ClipInspector({ editor: e }: { editor: Editor }) {
                 apply to all {e.selectedIds.length} selected layers.
               </p>
             )}
+            <SpatialSourceProperties editor={e} />
             <div className="button-row">
               <button
                 id="audition"
                 disabled={!e.ready}
                 onClick={() => void e.auditionCue(c.id)}
               >
-                Audition
+                Audition dry source
               </button>
               <button
                 id="duplicate"
@@ -255,6 +275,7 @@ export function ClipInspector({ editor: e }: { editor: Editor }) {
         )}
       </Panel>
       <Mixer editor={e} />
+      <RoomProperties editor={e} />
     </>
   );
 }

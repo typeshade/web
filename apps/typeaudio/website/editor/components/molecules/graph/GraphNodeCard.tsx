@@ -119,6 +119,7 @@ export function GraphNodeCard({
       {n.kind !== "output" && (
         <GraphPort
           endpoint={{ node: n.id }}
+          binding={n.kind === "code" ? "out" : undefined}
           name={n.name}
           signal={def.output}
           connected={c.graph!.nodes.some((other) =>
@@ -133,7 +134,7 @@ export function GraphNodeCard({
         data-tooltip={NODE_METADATA[n.kind].summary}
       >
         {n.kind === "code"
-          ? "TypeShade · 4 state values"
+          ? "Sample code · input → out"
           : n.kind === "parameter"
             ? `p${n.values[0]} · ${c.graph!.parameters[n.values[0]!]!.name}`
             : n.kind === "output"

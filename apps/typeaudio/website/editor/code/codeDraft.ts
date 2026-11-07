@@ -1,10 +1,8 @@
-export interface CodeDraft {
-  base: string;
-  text: string;
-}
+import type { CodeDraft } from "../../project/editorState.ts";
 
 // '$' cannot occur in a validated graph node ID.
 export const GENERATED_DOCUMENT = "$generated";
+export const SELECTION_DOCUMENT = "$selection";
 
 /** Follow applied edits only while clean. A dirty draft survives Undo and imports. */
 export function resolveCodeDraft(

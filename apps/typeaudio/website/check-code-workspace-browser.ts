@@ -118,7 +118,7 @@ try {
   assert.equal(await applied(p), original);
   assert.equal(await p.locator("[data-graph-node]").count(), 4);
   await writeCode(p, "out = input * 0.3;");
-  await p.keyboard.press("Control+s");
+  await p.keyboard.press("Control+Enter");
   await waitApplied(p, "out = input * 0.3;");
   // Type ahead while compilation is delayed; only the submitted snapshot gets applied.
   await p.evaluate(() => {
@@ -161,9 +161,10 @@ try {
   assert.equal(await readCode(p), "out = input * 0.6;");
   await p.locator(`[data-graph-node="${second}"]`).focus();
   await p.keyboard.press("Delete");
-  await p.waitForFunction(
-    () => document.querySelectorAll('[role="tab"]').length === 2,
-  );
+  await p
+    .locator(`[id="code-tab-node-${second}"]`)
+    .waitFor({ state: "detached" });
+  await p.locator("#code-tab-node-impact").waitFor();
   await p.locator("#undo").click();
   await p.locator(`[id="code-tab-node-${second}"]`).click();
   assert.equal(
@@ -300,6 +301,10 @@ try {
   );
   for (const width of [390, 320]) {
     await p.setViewportSize({ width, height: 844 });
+    await p
+      .getByRole("navigation", { name: "Editor tasks" })
+      .getByRole("button", { name: "Code / FX", exact: true })
+      .click();
     await p.locator(".code-layout-bottom").waitFor();
     assert.equal(
       await p

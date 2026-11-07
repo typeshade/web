@@ -36,7 +36,7 @@ try {
       postMessage(message: any, options?: any) {
         if (
           this.language &&
-          message.method === "diagnostics" &&
+          (message.method === "diagnostics" || message.method === "rename") &&
           w.languageDelay
         ) {
           const delay = w.languageDelay;
@@ -66,8 +66,9 @@ try {
     );
   }
   await clean();
-  const initial = await p.evaluate(() =>
-    localStorage.getItem("typeaudio.editor.document.v1"),
+  const initial = await p.evaluate(
+    () =>
+      JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).source,
   );
   const host = await p.locator("#graph-code").boundingBox();
   assert.ok(
@@ -111,12 +112,21 @@ try {
   await p.keyboard.press("F2");
   const rename = p.locator(".rename-box input");
   await rename.fill("pitch");
+  await p.evaluate(() => {
+    (window as any).languageDelay = 500;
+  });
   await p.keyboard.press("Enter");
   await p.waitForFunction(
     () =>
       !document.querySelector(".rename-box") ||
       (document.querySelector(".rename-box") as HTMLElement).style.display ===
         "none",
+  );
+  await p.waitForFunction(() =>
+    Object.values(
+      JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!)
+        .drafts ?? {},
+    ).some((d: any) => d.text === "const pitch: f32 = 440;\nout = sin(pitch);"),
   );
   assert.equal(await readCode(p), "const pitch: f32 = 440;\nout = sin(pitch);");
 
@@ -137,6 +147,9 @@ try {
     .getByRole("button")
     .filter({ hasText: "missingName" })
     .waitFor();
+  await p.waitForFunction(
+    () => document.querySelectorAll(".squiggly-error").length >= 2,
+  );
   assert.ok((await p.locator(".squiggly-error").count()) >= 2);
   await problems.getByRole("button").filter({ hasText: "missingName" }).click();
   assert.match(
@@ -152,9 +165,11 @@ try {
       frames + 24000,
     frames,
   );
-  assert.equal(
-    await p.evaluate(() =>
-      localStorage.getItem("typeaudio.editor.document.v1"),
+  assert.deepEqual(
+    await p.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!)
+          .source,
     ),
     initial,
     "Language analysis never applies a draft",

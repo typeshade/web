@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SAMPLE_RATE } from "../../../sound/constants.ts";
 import { cueRange, mixScene } from "../../../video-model.ts";
 import { wav } from "../../../audio.ts";
+import { stereoWav } from "../../../scene/stereoWav.ts";
+import { sceneRenderKey } from "../../../scene/sceneRenderKey.ts";
 import { download } from "../../shared/download.ts";
 import type { DocumentController } from "../document/useEditorDocument.ts";
 import type { EditorResources } from "../session/useAudioResources.ts";
@@ -10,13 +12,14 @@ export function useSceneSession(
   { transport }: EditorResources,
   audioRevision: number,
 ) {
+  const [auditioning, setAuditioning] = useState("");
+  const auditionTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(auditionTimer.current), []);
   const [playing, setPlaying] = useState(false),
     [position, setPosition] = useState(0),
     [ready, setReady] = useState(false),
     [samples, setSamples] = useState(new Map<string, Float32Array>());
-  const cueKey = JSON.stringify(
-      state.scene.cues.map((c) => [c.id, c.audio ?? c.patch]),
-    ),
+  const cueKey = sceneRenderKey(state.scene),
     preparedKey = useRef("");
   const sceneReady = ready && preparedKey.current === cueKey,
     latest = useRef({ state, samples, ready: sceneReady });
@@ -25,6 +28,8 @@ export function useSceneSession(
     looping = useRef(false);
   const stopScene = useCallback(() => {
     sceneAction.current++;
+    clearTimeout(auditionTimer.current);
+    setAuditioning("");
     transport.current.stop();
     setPosition(transport.current.current());
     setPlaying(false);
@@ -56,7 +61,7 @@ export function useSceneSession(
   }, [state.scene.original, state.scene.effects]);
   const playScene = useCallback(
     async (restart = false) => {
-      sceneAction.current++;
+      stopScene();
       try {
         if (!latest.current.ready)
           throw new Error("Wait for sound clips to prepare.");
@@ -123,6 +128,7 @@ export function useSceneSession(
       transport.current.audio.schedule(
         {
           ...current.state.scene,
+          space: undefined,
           start: 0,
           end: cueRange(cue, pcm.length / SAMPLE_RATE).duration,
           cues: [{ ...cue, time: 0, muted: false }],
@@ -130,13 +136,36 @@ export function useSceneSession(
         current.samples,
         0,
       );
-      setNotice("Auditioning selected clip.");
+      setAuditioning(cue.name);
+      auditionTimer.current = setTimeout(
+        () => {
+          if (generation === sceneAction.current) setAuditioning("");
+        },
+        cueRange(cue, pcm.length / SAMPLE_RATE).duration * 1000,
+      );
+      setNotice(
+        current.state.scene.space
+          ? "Auditioning the selected source without the scene room."
+          : "Auditioning selected clip.",
+      );
     } catch (error) {
       if (generation === sceneAction.current) setNotice(String(error));
     }
   }
   function exportScene() {
     if (!sceneReady) return;
+    if (state.scene.space) {
+      const pcm = transport.current.audio.spatial.read(state.scene);
+      if (!pcm) return;
+      download(
+        new Blob([stereoWav(pcm, state.scene.effects)], { type: "audio/wav" }),
+        "typeaudio-effects-stereo.wav",
+      );
+      setNotice(
+        `Exported the stereo effects composition.${pcm.peak * state.scene.effects > 1 ? " Clipping detected; lower Effects level." : ""}`,
+      );
+      return;
+    }
     const result = mixScene(state.scene, samples, SAMPLE_RATE);
     download(
       new Blob([wav(result.pcm, SAMPLE_RATE)], { type: "audio/wav" }),
@@ -147,6 +176,7 @@ export function useSceneSession(
     );
   }
   return {
+    auditioning,
     playing,
     position,
     sceneReady,

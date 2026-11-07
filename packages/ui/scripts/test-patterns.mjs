@@ -184,14 +184,56 @@ try {
 
   const hint = page.getByRole("button", { name: "Explain configuration" });
   const tip = page.getByRole("tooltip");
+  // Focusing an offscreen action scrolls it into view. Wait for the resulting
+  // scroll event, not just the synchronous focus event that first opens a hint.
+  await page.setViewportSize({ width: 1440, height: 400 });
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  assert.ok(
+    await hint.evaluate((el) => el.getBoundingClientRect().bottom < 0),
+    "The keyboard action starts above the viewport",
+  );
   await hint.focus();
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
   await tip.waitFor();
   assert.equal(
     await hint.getAttribute("aria-describedby"),
     await tip.getAttribute("id"),
   );
+  const tipTop = await tip.evaluate((el) => el.getBoundingClientRect().top);
+  await page.evaluate(() => window.scrollBy(0, 20));
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  assert.ok(await tip.isVisible(), "The focused hint survives scrolling");
+  assert.equal(
+    await tip.evaluate((el) => el.getBoundingClientRect().top),
+    tipTop - 20,
+    "The hint follows its trigger",
+  );
   await page.keyboard.press("Escape");
   assert.ok(await tip.isHidden());
+  await page.evaluate(() => window.scrollBy(0, 20));
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  assert.ok(await tip.isHidden(), "Scrolling does not reopen a dismissed hint");
   await opener.focus();
   await hint.hover();
   await tip.waitFor();
@@ -199,6 +241,7 @@ try {
   assert.ok(await tip.isVisible(), "Hint remains hoverable");
   await page.keyboard.press("Escape");
   assert.ok(await tip.isHidden(), "Escape dismisses a pointer-triggered hint");
+  await page.setViewportSize({ width: 1440, height: 1000 });
 
   for (const theme of ["light", "dark"]) {
     if (theme === "dark") {

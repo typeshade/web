@@ -4,7 +4,7 @@ import type { DocumentController } from "../document/useEditorDocument.ts";
 import type { EditorResources } from "../session/useAudioResources.ts";
 export function useAudioLibrary(
   { latest, setNotice }: DocumentController,
-  { assetLibrary }: EditorResources,
+  { assetLibrary, projectHistory }: EditorResources,
 ) {
   const [audioAssets, setAudioAssets] = useState<AudioAssetRef[]>([]),
     [audioRevision, setAudioRevision] = useState(0);
@@ -16,16 +16,17 @@ export function useAudioLibrary(
   }, [assetLibrary, audioRevision]);
   function audioInUse(id: string) {
     const s = latest.current.state;
-    return [
-      s,
-      ...s.past,
-      ...s.future,
-      ...(s.checkpoint ? [s.checkpoint] : []),
-    ].some((d) => d.scene.cues.some((c) => c.audio?.id === id));
+    return (
+      [s, ...s.past, ...s.future, ...(s.checkpoint ? [s.checkpoint] : [])].some(
+        (d) => d.scene.cues.some((c) => c.audio?.id === id),
+      ) || projectHistory.usesAudio(id)
+    );
   }
   async function removeAudio(id: string) {
     if (audioInUse(id)) {
-      setNotice("This audio is used by the composition or its undo history.");
+      setNotice(
+        "This audio is used by the composition, its undo history or a saved project copy.",
+      );
       return;
     }
     try {
