@@ -161,9 +161,10 @@ try {
   assert.equal(await readCode(p), "out = input * 0.6;");
   await p.locator(`[data-graph-node="${second}"]`).focus();
   await p.keyboard.press("Delete");
-  await p.waitForFunction(
-    () => document.querySelectorAll('[role="tab"]').length === 2,
-  );
+  await p
+    .locator(`[id="code-tab-node-${second}"]`)
+    .waitFor({ state: "detached" });
+  await p.locator("#code-tab-node-impact").waitFor();
   await p.locator("#undo").click();
   await p.locator(`[id="code-tab-node-${second}"]`).click();
   assert.equal(

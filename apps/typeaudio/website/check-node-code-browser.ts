@@ -34,6 +34,14 @@ try {
     "out = input * 0.25;",
     "Inspecting another node preserves the draft",
   );
+  await p.keyboard.press("Control+z");
+  assert.notEqual(
+    await readCode(p),
+    "out = input * 0.25;",
+    "Node inspection preserves code Undo",
+  );
+  await p.keyboard.press("Control+Shift+z");
+  assert.equal(await readCode(p), "out = input * 0.25;");
   assert.equal(
     await p
       .locator(".graph-node.primary-selection")
@@ -46,6 +54,12 @@ try {
   );
   await p.locator(".code-context summary").click();
   assert.match(await p.locator(".code-bindings").innerText(), /p0.*Pitch/s);
+  await p.locator('[data-code-parameter="0"]').click();
+  assert.equal(
+    await p.evaluate(() => document.activeElement?.id),
+    "graph-param-0",
+    "The binding link focuses the actual parameter control",
+  );
   await p.locator('.code-bindings [data-code-target="noise"]').click();
   assert.equal(await p.locator("#apply-graph-code").isVisible(), false);
   await p.locator("#code-tab-node-impact").click();
@@ -58,6 +72,7 @@ try {
   await writeCode(p, "out = p");
   await p.keyboard.press("Control+Space");
   await p.locator(".suggest-widget.visible").waitFor();
+  await p.locator(".suggest-widget.visible").getByText(/Pitch/).waitFor();
   assert.match(await p.locator(".suggest-widget.visible").innerText(), /Pitch/);
   await p.keyboard.press("Escape");
   await writeCode(p, "out = input * 0.25;");

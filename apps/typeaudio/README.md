@@ -125,18 +125,22 @@ Fit all / Home frames the network, and Frame / F frames the selection. Zoom butt
 use the viewer center. Panel resizing and monitor switches retain the view during
 the session. Enter on the canvas focuses the selected node; Shift+Tab leaves it.
 
-Each Code node opens as a `.sample.ts` tab in a lazily loaded Monaco editor.
-Tabs retain their drafts, cursor position and editor Undo while switching nodes.
+Each Code node opens as a **sample** tab in a lazily loaded Monaco editor.
+Selecting a tab also selects its node. Selecting a built-in node shows its actual
+connections and settings, with no editable body or Apply action. Multiple selection
+shows its members. Returning to Code retains the draft, cursor and editor Undo.
 The pinned public `typeshade/language-service` supplies completion for local
 variables and builtins (Ctrl/Cmd+Space), hover types, call signatures, definitions
 (F12), references and local-variable rename (F2). A separate language worker
 checks drafts while you type. **Problems** lists diagnostics on the visible lines;
 click an error to focus it. The editor also supports find/replace, comments and
-multiple cursors. **Generated.shade.ts** shows the combined applied kernel as a
-read-only document.
+multiple cursors. **Generated kernel · read only** shows the combined applied
+kernel. Selecting any node exits that inspection view.
 
-**Sample code** explains that a node runs once per sample. Expand **Inputs & state**
-to see its implicit bindings and actual parameter names. The language service reads
+The context bar names the actual nodes connected to `input` and `out`.
+Expand **Bindings & state** to follow a connection, focus a shared parameter
+control, and read the per-sample execution contract. Completion and hover for the
+bindings include actual parameter names and connections. The language service reads
 a virtual TypeShade function containing those bindings and maps its answers back
 to the visible body. **Audio-node limits & math reference** describes the separate
 TypeAudio execution restrictions. A clean language check does not replace Apply's
@@ -171,8 +175,10 @@ For example, this node generates a sine wave from exposed Pitch (`p0`) and
 Strength (`p2`) without an audio input:
 
 ```ts
-state0 = fract(state0 + p0 / sampleRate);
-out = sin(state0 * 6.28318530718) * p2;
+const pitch: f32 = p0;
+const strength: f32 = p2;
+state0 = fract(state0 + pitch / sampleRate);
+out = sin(state0 * 6.28318530718) * strength;
 ```
 
 `input` is the connected audio signal, `time` counts seconds since Retrigger,
@@ -187,6 +193,10 @@ Code node, two Code nodes and 16 total nodes per graph, and four exposed paramet
 Graphs must be acyclic and have one Output. Non-finite samples are silenced with
 a Live warning; finite rendering rejects them so a broken graph cannot silently
 export an empty take.
+
+These limits belong to TypeAudio's sample-body contract, not to TypeShade as a
+whole. The editor does not yet author a complete graph as TypeScript or round-trip
+generated engine code into nodes. See the [node/code relationship review](../../docs/reviews/typeaudio-node-code.md).
 
 The graph compiles through the pinned TypeShade CPU generator to one scalar
 sample loop. Blob modules install the compiled kernel into the existing
@@ -481,7 +491,7 @@ project copies remain until explicitly removed.
 
 `test:browser` runs the workspace, state, device-loss, interaction, sound-design,
 timeline, audio-import, graph, node-workspace, code-workspace, code-language,
-feedback, agent-project and editor-UX browser suites. They cover actual live processing,
+feedback, agent-project, editor-UX and node-code browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
 transport and video loops, mobile layout and mocked YouTube recovery. Timeline

@@ -183,3 +183,9 @@ and mobile task labels. Project save includes unapplied drafts; Apply code and W
 export remain separate actions. The bounded implementation and its actual browser
 verification are recorded in [the editor UX review](reviews/typeaudio-editor-ux.md).
 No site-wide, translation, physical-device or independent-user acceptance is claimed.
+
+The subsequent [node/code relationship review](reviews/typeaudio-node-code.md) covers
+selection-linked sample documents, built-in settings, actual connection/parameter
+descriptions and read-only generated output. The bounded English review names the
+per-sample execution contract and avoids implying whole-graph TypeScript authoring.
+The default example uses meaningful local names while retaining identical rendered PCM.

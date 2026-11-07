@@ -66,7 +66,9 @@ as the working example. `decodeProject` validates the full document before impor
 
 The graph validator and compiler remain the authority for supported operations.
 Code nodes use TypeAudio's bounded per-sample TypeShade subset; they are not arbitrary
-TypeScript modules. The study conversion separates source material and amplitude
+TypeScript modules. The [node/code relationship review](reviews/typeaudio-node-code.md)
+explains actual cables, shared parameter bindings, state and read-only engine output.
+The study conversion separates source material and amplitude
 envelope into two Code nodes. The four exposed parameters are Pitch, Decay,
 Envelope span and Character. Source positions use room coordinates in metres,
 with X right, Y up and negative Z forward. Trajectory time follows the source

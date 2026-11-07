@@ -147,6 +147,9 @@ try {
     .getByRole("button")
     .filter({ hasText: "missingName" })
     .waitFor();
+  await p.waitForFunction(
+    () => document.querySelectorAll(".squiggly-error").length >= 2,
+  );
   assert.ok((await p.locator(".squiggly-error").count()) >= 2);
   await problems.getByRole("button").filter({ hasText: "missingName" }).click();
   assert.match(
