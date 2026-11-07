@@ -159,7 +159,7 @@ export function useFunctionEditor(e: Editor, owner: string) {
     );
     return buffer.text !== applied || buffer.conflict;
   });
-  function openComposition(id?: string) {
+  function openComposition(id: string | undefined = node?.id) {
     setFile(FUNCTION_COMPOSITION_PATH);
     const key = codeDocumentKey(owner, `module:${FUNCTION_COMPOSITION_PATH}`);
     const buffer =

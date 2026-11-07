@@ -379,6 +379,7 @@ try {
     .waitFor();
   assert.deepEqual((await stored()).source, beforeImport.source);
   await p.getByRole("button", { name: "Revert file", exact: true }).click();
+  await network();
   await p.screenshot({ path: `${directory}/desktop.png` });
   observations.desktop = {
     genuineCalls: true,
@@ -433,6 +434,14 @@ try {
     );
   }
   await mobile.setViewportSize({ width: 390, height: 844 });
+  await mobile
+    .getByRole("button", { name: "Network code", exact: true })
+    .click();
+  await mobile.waitForFunction(() =>
+    document
+      .querySelector('.code-problems[data-status="ready"]')
+      ?.textContent?.includes("No language errors"),
+  );
   await mobile.screenshot({ path: `${directory}/mobile.png` });
   observations.mobile = {
     widths: [390, 320],

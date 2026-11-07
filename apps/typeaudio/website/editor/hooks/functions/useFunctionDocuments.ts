@@ -118,6 +118,7 @@ export function useFunctionDocuments(c: FunctionEditor) {
     ),
     tabs: Object.entries(files).map(([path, text]) => ({
       path,
+      composition: path === FUNCTION_COMPOSITION_PATH,
       label:
         path === FUNCTION_COMPOSITION_PATH ? "Network" : path.split("/").at(-1),
       dirty: text !== appliedFiles[path],

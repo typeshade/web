@@ -39,7 +39,9 @@ export function FunctionCodeDock({
             role="tab"
             aria-selected={tab.path === d.path}
             key={tab.path}
-            onClick={() => c.selectFile(tab.path)}
+            onClick={() =>
+              tab.composition ? c.openComposition() : c.selectFile(tab.path)
+            }
             title={tab.path}
           >
             {tab.label}
