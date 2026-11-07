@@ -20,6 +20,7 @@ export function morphPatch(a: Patch, b: Patch, amount: number): Patch {
         "graph",
         "functions",
         "functionLayout",
+        "functionComposition",
         "wave",
         "curves",
         "layers",
@@ -42,6 +43,8 @@ export function morphPatch(a: Patch, b: Patch, amount: number): Patch {
   result.curves = structuredClone(t < 0.5 ? a.curves : b.curves);
   result.layers = structuredClone(t < 0.5 ? a.layers : b.layers);
   result.graph = structuredClone(t < 0.5 ? a.graph : b.graph);
+  result.functionComposition =
+    (t < 0.5 ? a.functionComposition : b.functionComposition) ?? null;
   result.functions = structuredClone(
     (t < 0.5 ? a.functions : b.functions) ?? null,
   );

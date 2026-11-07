@@ -20,12 +20,25 @@ export function validatePatch(value: unknown, nested = false): Patch {
     result.functions = validateFunctionDocument(data.functions);
     result.functionLayout = validateFunctionLayout(data.functionLayout);
   }
+  if (data.functionComposition != null) {
+    if (
+      !result.functions ||
+      typeof data.functionComposition !== "string" ||
+      !data.functionComposition.trim() ||
+      data.functionComposition.length > 131072
+    )
+      throw new Error(
+        "Composition source needs a function sound and at most 131072 characters.",
+      );
+    result.functionComposition = data.functionComposition;
+  }
   for (const key of Object.keys(DEFAULT) as (keyof Patch)[]) {
     if (
       [
         "graph",
         "functions",
         "functionLayout",
+        "functionComposition",
         "wave",
         "curves",
         "layers",

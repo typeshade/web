@@ -11,7 +11,7 @@ import { type MenuItem } from "../../../interactions/types.ts";
 import { YouTubeInput } from "../../molecules/media/YouTubeInput.tsx";
 import { SavedProjects } from "./SavedProjects.tsx";
 import { ProjectExamples } from "./ProjectExamples.tsx";
-import { hasFunctionSources } from "../../../../functions/hasFunctionSources.ts";
+import { patchFileVersion } from "../../../../sound/patchFileVersion.ts";
 export function ProjectPanel({
   editor: e,
   onOpenProject,
@@ -54,7 +54,7 @@ export function ProjectPanel({
               [
                 JSON.stringify(
                   {
-                    version: hasFunctionSources(value.patch) ? 2 : 1,
+                    version: patchFileVersion(value.patch),
                     ...value,
                   },
                   null,
@@ -314,7 +314,7 @@ export function ProjectPanel({
                   [
                     JSON.stringify(
                       {
-                        version: hasFunctionSources(e.state.patch) ? 2 : 1,
+                        version: patchFileVersion(e.state.patch),
                         name: e.state.patchName,
                         patch: e.state.patch,
                       },

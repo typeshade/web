@@ -1,3 +1,5 @@
+import { hasCompositionSources } from "../../../functions/hasCompositionSources.ts";
+import { hasCompositionDrafts } from "../../../project/hasCompositionDrafts.ts";
 import { hasFunctionSources } from "../../../functions/hasFunctionSources.ts";
 import {
   useCallback,
@@ -47,10 +49,14 @@ export function useEditorDocument() {
   const functionDocument =
     hasFunctionSources(state.source.patch) ||
     state.scene.cues.some((c) => hasFunctionSources(c.patch));
+  const compositionDocument =
+    hasCompositionSources(state.source.patch) ||
+    state.scene.cues.some((c) => hasCompositionSources(c.patch)) ||
+    hasCompositionDrafts(state.drafts);
   const documentValue = useMemo(
     () =>
       JSON.stringify({
-        version: functionDocument ? 2 : 1,
+        version: compositionDocument ? 3 : functionDocument ? 2 : 1,
         scene: state.scene,
         source: state.source,
         selected: state.selected,
@@ -64,6 +70,7 @@ export function useEditorDocument() {
       state.selection,
       state.drafts,
       functionDocument,
+      compositionDocument,
     ],
   );
 
@@ -82,7 +89,7 @@ export function useEditorDocument() {
     }
   }, [documentValue]);
   useEffect(() => {
-    if (functionDocument) return;
+    if (functionDocument || compositionDocument) return;
     // Optional legacy mirrors are not used to restore a partially written document.
     try {
       localStorage.setItem(SCENE_KEY, JSON.stringify(state.scene));
@@ -93,7 +100,7 @@ export function useEditorDocument() {
     } catch {
       /* The authoritative document save reports persistence failures. */
     }
-  }, [state.scene, state.source, functionDocument]);
+  }, [state.scene, state.source, functionDocument, compositionDocument]);
   const saveStatus = saveError
     ? "error"
     : savedValue === documentValue

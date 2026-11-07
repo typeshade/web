@@ -9,15 +9,28 @@ export async function patchPrograms(p: Patch): Promise<PreparedProgram[]> {
     p.graph ? [p.graph] : [],
   );
   const functions = [p, ...p.layers.map((l) => l.patch)].flatMap((p) =>
-    p.functions ? [p.functions] : [],
+    p.functions
+      ? [{ graph: p.functions, composition: p.functionComposition }]
+      : [],
   );
   const programs = await Promise.all([
     ...[...new Map(graphs.map((g) => [graphKey(g), g])).values()].map(
       prepareGraph,
     ),
     ...[
-      ...new Map(functions.map((g) => [functionSourceKey(g), g])).values(),
-    ].map((graph) => prepareFunctions(graph)),
+      ...new Map(
+        functions.map((g) => [
+          functionSourceKey(g.graph) + (g.composition ?? ""),
+          g,
+        ]),
+      ).values(),
+    ].map(({ graph, composition }) =>
+      prepareFunctions(
+        graph,
+        false,
+        composition ? { mode: "validate", source: composition } : undefined,
+      ),
+    ),
   ]);
   const registrations = new Set(
     programs.flatMap((p) =>

@@ -1,3 +1,5 @@
+import { hasCompositionSources } from "../functions/hasCompositionSources.ts";
+import { hasCompositionDrafts } from "./hasCompositionDrafts.ts";
 import type { Scene } from "../video-model.ts";
 import type { ProjectEditorState } from "./editorState.ts";
 import { hasFunctionSources } from "../functions/hasFunctionSources.ts";
@@ -15,10 +17,15 @@ export function encodeProject(
         Object.keys(editor.drafts).some((key) =>
           JSON.parse(key)[1]?.startsWith("module:"),
         )));
+  const composition =
+    scene.cues.some((c) => hasCompositionSources(c.patch)) ||
+    (editor &&
+      (hasCompositionSources(editor.source.patch) ||
+        hasCompositionDrafts(editor.drafts)));
   if (editor)
     return {
       schema: "typeaudio.project",
-      version: functions ? 3 : 2,
+      version: composition ? 4 : functions ? 3 : 2,
       scene,
       editor,
       ...assets,

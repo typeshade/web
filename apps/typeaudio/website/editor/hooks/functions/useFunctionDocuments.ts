@@ -1,3 +1,4 @@
+import { FUNCTION_COMPOSITION_PATH } from "typeaudio/function-graph";
 import { useEffect } from "react";
 import type { FunctionEditor } from "./useFunctionEditor.ts";
 import { codeDocumentKey, resolveCodeDraft } from "../../code/codeDraft.ts";
@@ -6,14 +7,22 @@ import { codeDocumentKey, resolveCodeDraft } from "../../code/codeDraft.ts";
 export function useFunctionDocuments(c: FunctionEditor) {
   const drafts = c.e.state.drafts ?? {},
     graph = c.graph;
+  const compositionSource =
+    c.e.state.patch.functionComposition ?? c.program?.composition?.source;
+  const appliedFiles: Record<string, string> = {
+    ...graph?.modules,
+    ...(compositionSource
+      ? { [FUNCTION_COMPOSITION_PATH]: compositionSource }
+      : {}),
+  };
   const keyFor = (path: string) => codeDocumentKey(c.owner, `module:${path}`);
-  const source = JSON.stringify(graph?.modules ?? {});
+  const source = JSON.stringify(appliedFiles);
   useEffect(() => {
     c.e.dispatch({
       type: "drafts",
       update: (current) => {
         let next = current;
-        for (const [path, applied] of Object.entries(graph?.modules ?? {})) {
+        for (const [path, applied] of Object.entries(appliedFiles)) {
           const key = keyFor(path),
             before = current[key];
           if (!before) continue;
@@ -26,10 +35,10 @@ export function useFunctionDocuments(c: FunctionEditor) {
     });
   }, [c.owner, source]);
   const path = c.activeFile ?? "",
-    applied = graph?.modules[path] ?? "";
+    applied = appliedFiles[path] ?? "";
   const buffer = resolveCodeDraft(drafts[keyFor(path)], applied);
   const files = Object.fromEntries(
-    Object.entries(graph?.modules ?? {}).map(([path, applied]) => [
+    Object.entries(appliedFiles).map(([path, applied]) => [
       path,
       resolveCodeDraft(drafts[keyFor(path)], applied).text,
     ]),
@@ -38,7 +47,7 @@ export function useFunctionDocuments(c: FunctionEditor) {
     c.clearProblems();
     c.setError("");
     const key = keyFor(path),
-      applied = graph?.modules[path] ?? "";
+      applied = appliedFiles[path] ?? "";
     c.e.dispatch({
       type: "drafts",
       update: (current) => ({
@@ -47,7 +56,7 @@ export function useFunctionDocuments(c: FunctionEditor) {
       }),
     });
   }
-  const conflicts = Object.entries(graph?.modules ?? {})
+  const conflicts = Object.entries(appliedFiles)
     .filter(
       ([path, source]) =>
         resolveCodeDraft(drafts[keyFor(path)], source).conflict,
@@ -55,17 +64,28 @@ export function useFunctionDocuments(c: FunctionEditor) {
     .map(([path]) => path);
   async function apply() {
     if (!graph || c.busy || conflicts.length) return;
-    const modules = files;
+    const { [FUNCTION_COMPOSITION_PATH]: source, ...modules } = files;
+    const composition =
+      source && source !== compositionSource
+        ? { mode: "apply" as const, source }
+        : undefined;
     if (
-      await c.apply({ ...c.latest.current.graph!, modules }, undefined, true)
+      await c.apply(
+        { ...c.latest.current.graph!, modules },
+        undefined,
+        true,
+        composition,
+      )
     ) {
       c.e.dispatch({
         type: "drafts",
         update: (current) => ({
           ...current,
           ...Object.fromEntries(
-            Object.entries(modules).map(([path, text]) => {
+            Object.entries(files).map(([path, text]) => {
               const key = keyFor(path);
+              if (path === FUNCTION_COMPOSITION_PATH && !composition)
+                return [key, current[key] ?? { base: text, text }];
               return [key, { base: text, text: current[key]?.text ?? text }];
             }),
           ),
@@ -85,6 +105,8 @@ export function useFunctionDocuments(c: FunctionEditor) {
   }
   return {
     path,
+    applied,
+    composition: path === FUNCTION_COMPOSITION_PATH,
     text: buffer.text,
     files,
     conflicts,
@@ -92,11 +114,13 @@ export function useFunctionDocuments(c: FunctionEditor) {
     key: `${c.e.state.documentEpoch ?? 0}:${c.owner}:${path}`,
     projectKey: `${c.e.state.documentEpoch ?? 0}:${c.owner}`,
     dirty: Object.entries(files).some(
-      ([path, text]) => text !== graph?.modules[path],
+      ([path, text]) => text !== appliedFiles[path],
     ),
     tabs: Object.entries(files).map(([path, text]) => ({
       path,
-      dirty: text !== graph?.modules[path],
+      label:
+        path === FUNCTION_COMPOSITION_PATH ? "Network" : path.split("/").at(-1),
+      dirty: text !== appliedFiles[path],
     })),
     change,
     apply,

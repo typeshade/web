@@ -1,3 +1,5 @@
+import { hasCompositionSources } from "../functions/hasCompositionSources.ts";
+import { hasCompositionDrafts } from "./hasCompositionDrafts.ts";
 import { validateScene, emptyScene } from "../video-model.ts";
 import { validateEditorState } from "./editorState.ts";
 import { functionPatch } from "../functions/initialFunctions.ts";
@@ -22,20 +24,33 @@ export function decodeProject(raw: unknown) {
   if (data.schema !== undefined) {
     if (
       data.schema !== "typeaudio.project" ||
-      (data.version !== 1 && data.version !== 2 && data.version !== 3)
+      (data.version !== 1 &&
+        data.version !== 2 &&
+        data.version !== 3 &&
+        data.version !== 4)
     )
       throw new Error(
-        "Use a supported TypeAudio project (typeaudio.project, version 1, 2 or 3).",
+        "Use a supported TypeAudio project (typeaudio.project, version 1, 2, 3 or 4).",
       );
     const scene = validateScene(data.scene),
       editor =
         data.version === 1 ? undefined : validateEditorState(data.editor);
     if (
-      data.version !== 3 &&
+      Number(data.version) < 3 &&
       (scene.cues.some((c) => hasFunctionSources(c.patch)) ||
         (editor && hasFunctionSources(editor.source.patch)))
     )
       throw new Error("Function sounds require project version 3.");
+    if (
+      data.version !== 4 &&
+      (scene.cues.some((c) => hasCompositionSources(c.patch)) ||
+        (editor &&
+          (hasCompositionSources(editor.source.patch) ||
+            hasCompositionDrafts(editor.drafts))))
+    )
+      throw new Error(
+        "Composition source and drafts require project version 4.",
+      );
     return {
       scene,
       audioAssets: data.audioAssets,

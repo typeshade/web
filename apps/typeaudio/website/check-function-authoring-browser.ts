@@ -278,7 +278,7 @@ try {
   await p.locator("#live-stop").click();
   const file = await save();
   const exported = JSON.parse(file.toString());
-  assert.equal(exported.version, 3);
+  assert.equal(exported.version, 4);
   assert.ok(
     Object.values(exported.editor.drafts).some((d: any) => d.text === invalid),
   );
@@ -384,7 +384,7 @@ try {
     reflectedPins: true,
     staleApplyGuard: true,
     timelineSource: true,
-    projectVersion: 3,
+    projectVersion: 4,
   };
 
   // Raw engine documents remain importable, with no custom page or executable artifact.

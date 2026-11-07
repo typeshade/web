@@ -14,6 +14,7 @@ export interface MonacoEditorProps {
   value: string;
   readOnly: boolean;
   focusRequest: number;
+  focusLine?: number;
   diagnostic?: CodeDiagnostic;
   bindings?: Readonly<Record<string, string>>;
   onChange: (value: string) => void;
@@ -312,9 +313,20 @@ export function useMonacoEditor(props: MonacoEditorProps) {
   useEffect(() => {
     if (session && props.focusRequest > handledFocus.current) {
       handledFocus.current = props.focusRequest;
+      if (props.focusLine) {
+        const position = {
+          lineNumber: Math.min(
+            props.focusLine,
+            session.editor.getModel()?.getLineCount() ?? props.focusLine,
+          ),
+          column: 1,
+        };
+        session.editor.setPosition(position);
+        session.editor.revealPositionInCenter(position);
+      }
       session.editor.focus();
     }
-  }, [session, props.focusRequest]);
+  }, [session, props.focusRequest, props.documentKey]);
   const projectSource = JSON.stringify(props.project?.files);
   useEffect(() => {
     if (props.project)

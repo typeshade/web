@@ -16,7 +16,18 @@ export function FunctionCodeDock({
     <Panel
       title="TypeShade source"
       className="graph-dock-panel function-code-panel"
-      actions={<CodeLayoutControls onFocus={c.focus} />}
+      actions={
+        <>
+          <button
+            disabled={!c.program?.composition}
+            onClick={() => c.openComposition()}
+            data-tooltip="Edit the function calls that define this network."
+          >
+            Network code
+          </button>
+          <CodeLayoutControls onFocus={c.focus} />
+        </>
+      }
     >
       <div
         className="function-file-tabs"
@@ -31,14 +42,19 @@ export function FunctionCodeDock({
             onClick={() => c.selectFile(tab.path)}
             title={tab.path}
           >
-            {tab.path.split("/").at(-1)}
+            {tab.label}
             {tab.dirty ? " •" : ""}
           </button>
         ))}
       </div>
       <div className="function-code-actions">
         <span>
-          {d.path} <small>Complete TypeShade module</small>
+          {d.path}{" "}
+          <small>
+            {d.composition
+              ? "Calls define nodes; state and context are explicit."
+              : "Complete TypeShade module"}
+          </small>
         </span>
         <button
           id="apply-function-code"
@@ -48,10 +64,7 @@ export function FunctionCodeDock({
         >
           {c.busy ? "Preparing…" : "Apply source"}
         </button>
-        <button
-          disabled={c.busy || d.text === c.graph?.modules[d.path]}
-          onClick={d.revert}
-        >
+        <button disabled={c.busy || d.text === d.applied} onClick={d.revert}>
           Revert file
         </button>
       </div>
@@ -68,6 +81,7 @@ export function FunctionCodeDock({
         mode="module"
         readOnly={false}
         focusRequest={c.focusRequest}
+        focusLine={c.focusLine}
         project={{ key: d.projectKey, path: d.path, files: d.files }}
         onChange={(text) => d.change(d.path, text)}
         onModuleChange={d.change}
@@ -76,6 +90,11 @@ export function FunctionCodeDock({
         onSave={() => void c.e.exportProject()}
         diagnostic={problem && { line: problem.line, message: problem.message }}
       />
+      {!!c.program?.compositionError && (
+        <p className="function-error">
+          Network code unavailable: {c.program.compositionError}
+        </p>
+      )}
       {!!c.error && (
         <div className="function-error" role="alert">
           {c.error}

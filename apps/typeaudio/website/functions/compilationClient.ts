@@ -1,9 +1,10 @@
-import type {
-  FunctionGraphDocument,
-  FunctionGraphProgram,
-} from "typeaudio/function-graph";
+import type { FunctionGraphDocument } from "typeaudio/function-graph";
 import { functionSourceKey } from "./sourceKey.ts";
-import type { FunctionProblem } from "./types.ts";
+import type {
+  FunctionProblem,
+  PreparedFunctions,
+  CompositionRequest,
+} from "./types.ts";
 
 export class FunctionPreparationError extends Error {
   constructor(
@@ -18,12 +19,12 @@ let worker: Worker | undefined,
 const pending = new Map<
   number,
   {
-    resolve: (p: FunctionGraphProgram) => void;
+    resolve: (p: PreparedFunctions) => void;
     reject: (e: Error) => void;
     timer: ReturnType<typeof setTimeout>;
   }
 >();
-const cache = new Map<string, Promise<FunctionGraphProgram>>();
+const cache = new Map<string, Promise<PreparedFunctions>>();
 
 export function disposeFunctionCompiler() {
   worker?.terminate();
@@ -39,8 +40,9 @@ export function disposeFunctionCompiler() {
 export function prepareFunctions(
   document: FunctionGraphDocument,
   synchronize = false,
-): Promise<FunctionGraphProgram> {
-  const key = `${synchronize ? "edit:" : ""}${functionSourceKey(document)}`,
+  composition?: CompositionRequest,
+): Promise<PreparedFunctions> {
+  const key = `${synchronize ? "edit:" : ""}${functionSourceKey(document)}:${JSON.stringify(composition)}`,
     existing = cache.get(key);
   if (existing) return existing;
   if (!worker) {
@@ -59,10 +61,10 @@ export function prepareFunctions(
     };
   }
   const id = ++sequence;
-  const result = new Promise<FunctionGraphProgram>((resolve, reject) => {
+  const result = new Promise<PreparedFunctions>((resolve, reject) => {
     const timer = setTimeout(disposeFunctionCompiler, 30000);
     pending.set(id, { resolve, reject, timer });
-    worker!.postMessage({ id, document, synchronize });
+    worker!.postMessage({ id, document, synchronize, composition });
   });
   if (cache.size >= 16) cache.delete(cache.keys().next().value!);
   cache.set(key, result);

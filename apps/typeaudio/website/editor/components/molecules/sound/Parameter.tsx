@@ -17,7 +17,13 @@ export function Parameter({
   editor: Editor;
   name: Exclude<
     keyof Patch,
-    "graph" | "functions" | "functionLayout" | "wave" | "curves" | "layers"
+    | "graph"
+    | "functions"
+    | "functionLayout"
+    | "functionComposition"
+    | "wave"
+    | "curves"
+    | "layers"
   >;
 }) {
   const gesture = useRef(false),

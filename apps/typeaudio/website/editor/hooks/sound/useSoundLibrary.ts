@@ -5,7 +5,7 @@ import { PATCH_KEY } from "../../state/storageKeys.ts";
 import type { DocumentController } from "../document/useEditorDocument.ts";
 import type { SavedSound } from "../../state/types.ts";
 import type { PatchActions } from "./createPatchActions.ts";
-import { hasFunctionSources } from "../../../functions/hasFunctionSources.ts";
+import { patchFileVersion } from "../../../sound/patchFileVersion.ts";
 export function useSoundLibrary(
   { state, editVersion, setNotice }: DocumentController,
   { patch }: PatchActions,
@@ -53,11 +53,13 @@ export function useSoundLibrary(
         throw new Error("Sound files must be smaller than 5 MB.");
       const p = JSON.parse(await file.text());
       if (!current()) return;
-      if (p.version !== 1 && p.version !== 2)
+      if (p.version !== 1 && p.version !== 2 && p.version !== 3)
         throw new Error("Unsupported sound version.");
       const imported = validatePatch(p.patch);
-      if (hasFunctionSources(imported) && p.version !== 2)
-        throw new Error("Function sounds require sound file version 2.");
+      if (p.version < patchFileVersion(imported))
+        throw new Error(
+          `This sound requires sound file version ${patchFileVersion(imported)}.`,
+        );
       await patchPrograms(imported);
       if (!current()) return;
       patch(imported, String(p.name || "Imported patch").slice(0, 40));

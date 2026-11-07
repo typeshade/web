@@ -20,6 +20,7 @@ export interface Patch {
   graph: SoundGraph | null;
   functions?: FunctionGraphDocument | null;
   functionLayout?: FunctionLayout;
+  functionComposition?: string | null;
   baseMuted: boolean;
   fmRatio: number;
   fmIndex: number;

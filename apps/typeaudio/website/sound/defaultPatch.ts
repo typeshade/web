@@ -4,6 +4,7 @@ export const DEFAULT: Patch = {
   graph: null,
   functions: null,
   functionLayout: {},
+  functionComposition: null,
   baseMuted: false,
   fmRatio: 2,
   fmIndex: 0,

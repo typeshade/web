@@ -11,7 +11,7 @@ export function functionCommands(
   const files: StudioCommand[] = d.tabs.map((tab) => ({
     id: `function.file.${tab.path}`,
     group: "TypeShade module",
-    label: tab.path + (tab.dirty ? " · unapplied" : ""),
+    label: (tab.label ?? tab.path) + (tab.dirty ? " · unapplied" : ""),
     run: () => {
       c.e.workspace("sound");
       layout.focus(false);
@@ -40,7 +40,7 @@ export function functionCommands(
       id: "function.revert",
       group: "Code",
       label: "Revert current module draft",
-      disabled: c.busy || d.text === c.graph?.modules[d.path],
+      disabled: c.busy || d.text === d.applied,
       run: d.revert,
     },
     ...(["bottom", "right", "code"] as const).map(

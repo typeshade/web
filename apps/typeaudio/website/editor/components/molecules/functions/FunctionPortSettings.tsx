@@ -1,3 +1,4 @@
+import { FunctionInputRename } from "./FunctionInputRename.tsx";
 import type { FunctionPort } from "typeaudio/function-graph";
 import type { FunctionEditor } from "../../../hooks/functions/useFunctionEditor.ts";
 
@@ -13,6 +14,7 @@ export function FunctionPortSettings({
       <summary data-tooltip="Types come from TypeShade. Role, update rate and units describe this pin in every instance.">
         Pin settings
       </summary>
+      <FunctionInputRename controller={c} port={port} />
       <label>
         Role and update rate
         <select
