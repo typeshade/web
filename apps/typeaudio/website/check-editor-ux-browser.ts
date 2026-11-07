@@ -205,6 +205,36 @@ try {
   );
   await p.evaluate(() => (window as any).restoreStorage());
 
+  await p.evaluate((k) => {
+    const set = Storage.prototype.setItem;
+    (window as any).restoreStorage = () => {
+      Storage.prototype.setItem = set;
+    };
+    Storage.prototype.setItem = function (key, value) {
+      if (key === k) throw new DOMException("Blocked", "QuotaExceededError");
+      set.call(this, key, value);
+    };
+  }, documentKey);
+  await p.locator("#scene-name").fill("Keep this unsaved edit");
+  await p.locator(".save-state.error").waitFor();
+  assert.match(await p.locator(".save-state").innerText(), /Not saved/);
+  const rescuePending = p.waitForEvent("download");
+  await p.keyboard.press("Control+s");
+  const rescued = JSON.parse(
+    (await readFile((await (await rescuePending).path())!)).toString(),
+  );
+  assert.equal(
+    rescued.scene.name,
+    "Keep this unsaved edit",
+    "File save rescues the current state when browser storage fails",
+  );
+  assert.ok(
+    Object.values(rescued.editor.drafts).some((d: any) => d.text === draft),
+  );
+  await p.evaluate(() => (window as any).restoreStorage());
+  await p.locator("#scene-name").fill(unsaved.scene.name);
+  await p.locator(".save-state.saved").waitFor();
+
   // The file is portable to another browser context; its draft has never compiled.
   const mobile = await browser.newPage({
     viewport: { width: 390, height: 844 },

@@ -153,15 +153,15 @@ unapplied edits. Editor Undo changes text; document Undo changes the sound.
 
 Drafts survive source/workspace switches, reloads and project saves. Ctrl/Cmd+S
 saves a portable project file without applying those drafts.
-They are not exported or restored after reload; leaving with unapplied drafts
-triggers the browser's unsaved-change prompt. Only successfully applied code is
-included in local saves, patch exports and Picture projects. These tabs represent
-the current graph's Code nodes and generated source, not independent projects.
+Browser save failures appear in the document bar and enable the unsaved-change
+prompt. Patch/preset exports contain applied sound only; project files include
+both applied sound and draft buffers. These tabs represent the current graph's
+Code nodes and generated source, not independent projects.
 
 **Below**, **Beside** and **Focus code** place code below the graph, beside it on screens
 at least 1400 px wide, or across the central workspace. Split sizes and code
 layout persist locally. Code height is stored separately from the Picture timeline.
-Narrow screens use the stacked layout; **Reset layout**
+Narrow screens use task panels; **Reset layout**
 restores defaults. Ctrl/Cmd+Shift+P opens searchable application commands, including
 context-dependent graph and layout actions. Ctrl/Cmd+P opens Code documents.
 Arrow keys navigate results, Enter runs the selection, and Escape restores focus.
@@ -449,7 +449,7 @@ clips support the same timing, trim, fade, split, gain, mute and group edits as
 procedural clips. These edits reuse the decoded source without running synthesis.
 The Sound rack's filters, modulation and effects do not process imported clips.
 
-Files stay in this browser. Export project embeds the composition's referenced
+Files stay in this browser. Save project file embeds the composition's referenced
 audio as lossless float PCM, so another browser can open the same composition.
 Project JSON is limited to 40 MiB. Re-select video separately. Missing audio blocks
 preview/WAV export with a recovery message; importing the original file or reopening
@@ -457,7 +457,8 @@ a project with embedded audio restores the source while retaining clip edits.
 If the composition changes during a file import, the file is saved to the library
 without adding a clip. A failed decode, validation or storage write leaves the
 document unchanged. Removal is disabled for audio referenced by the composition
-or its undo/redo history; reloading or opening another project resets that history.
+its undo/redo history, or a saved project copy. Reloading resets Undo, while saved
+project copies remain until explicitly removed.
 
 - Up to 24 cues; ranges span at most 60 seconds within the first hour.
 - Procedural clips use finite CPU renders including LFO, automation and source layers.
@@ -475,12 +476,12 @@ or its undo/redo history; reloading or opening another project resets that histo
   Sound WAV is a finite render with modulation. Export take saves a recorded performance.
 - Existing version-1 scenes and saved patches remain readable. New audio references
   are optional scene fields; embedded PCM is excluded from local document history.
-  A standalone source draft is retained locally; save/export named sounds to keep
-  or share them. Session A/B snapshots are not included in patch exports.
+  Project files also retain the independent source sound and code drafts. Session
+  sound A/B snapshots are not included in project or patch exports.
 
 `test:browser` runs the workspace, state, device-loss, interaction, sound-design,
 timeline, audio-import, graph, node-workspace, code-workspace, code-language,
-feedback and agent-project browser suites. They cover actual live processing,
+feedback, agent-project and editor-UX browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
 transport and video loops, mobile layout and mocked YouTube recovery. Timeline

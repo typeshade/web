@@ -92,10 +92,51 @@ Then observe independent users opening a supplied project, finding a named layer
 sound, comparing the result and saving/reopening it. Record completion, wrong turns and points
 where an explanation was needed. No such user-study result is claimed here.
 
-## Separate release status
+## Release status at the audit checkpoint
 
 PR #47 remains a draft and has not been deployed. The latest observed studio CI run,
 [42316613497](https://github.com/typeshade/web/actions/runs/42316613497), failed the code-language
 rename assertion at the implementation head. The root cause is not established by this UX review.
 Earlier local functional passes remain local evidence; they do not mean the current CI is green.
 Resolve that failure and the P0 findings before treating the first milestone as ready for release.
+
+
+## Approved implementation follow-up, 2026-11-07
+
+The owner approved the corrections. Web PR #47 now contains them in the existing
+application. Application build `554cd538ee25b5cf9a32ebf706dd78bfd839550e` is the local
+verification baseline. The [verification receipt](typeaudio-editor-ux-verification.json)
+separates that build from earlier regression runs and records the remaining limits.
+
+| Finding | Implemented correction | Verification |
+| --- | --- | --- |
+| U01 | Properties has a scrollable body. The selected layer and Edit sound stay in the panel header; mobile property headers stick during scrolling. | An actual wheel input moved the 465px body through 1602px of overflow. The editing action remained inside the viewport. |
+| U02 | Opening another project first saves a recoverable copy. Saved copies is near the project entry actions. A failed checkpoint blocks replacement; referenced imported audio is protected from deletion. | Edited A → B → recovered A retained both applied source and its draft. Injected quota failure left current work intact. |
+| U03 | Project version 2 retains applied sounds, independent source, selection and unapplied Code buffers. Ctrl/Cmd+S saves that file; Ctrl/Cmd+Enter applies code. | An incomplete draft survived file export, a fresh browser context, reload and candidate recovery without changing executable code. File save also rescued current edits while browser storage was blocked. |
+| U04 | Projects is the initial browser tab, with visible Open project, Save project and New procedural sound actions. Allowlisted `?project=` links enter their composition through the same protected import path. | Fresh entry exposes Open project; a direct red-A link opened Picture with its authored layers. |
+| U05 | Listen, Layers, Edit and Projects replace the narrow-screen page stack. Project identity and playback stay outside the panel scroller. | Every task at 320×844 and 390×844 kept a 44px Play target visible; document dimensions matched the viewport. |
+| U06 | Source editing opens inside Picture with a layer/source breadcrumb, an explicit return, and the composition transport and timeline retained. Primary parameters are also available directly in layer properties. | Parameter/code edits, selected-layer identity, timeline visibility and contextual node framing passed. |
+| U07 | Transport labels identify composition/room playback, dry-source audition and pending mix preparation. Candidate preview has its own visible preparing/playing state and Stop action. | Preview, full composition and dry-source actions retain separate scheduling paths; ordinary playback and prepared stereo tests passed. |
+| U08 | Each A/B candidate has a sound-character description, disposable preview resources and a separate Open copy action. | Playing or stopping a preview changed neither the document nor saved copies. Cancelling pending preparation did not start it later. |
+| U09 | Save project file, Save preset, Save sound file and Export mix/sound WAV name their scope. The document bar reflects actual browser writes and pending drafts. | Ctrl/Cmd+S from both code and a name field downloaded a project; blocked browser writes showed Not saved. |
+| U10 | Primary property labels are larger; mobile playback, property, asset and task controls have larger targets. Essential sound controls precede deeper node/code editing. | Screenshots were inspected; native inspector scrolling and contextual node bounds passed. This is not a complete accessibility audit. |
+
+The previous CI rename assertion read the editor immediately after the rename box
+closed. The language worker can still be resolving the rename at that point. The
+browser test now injects 500ms of worker latency and waits for the exact resulting
+draft before asserting the renamed text. It retains the exact-text assertion and
+checks that analysis has not modified applied source. The local language suite passed.
+
+Local checks passed: compiler/type/architecture checks, 92 tests in 18 files,
+production build, all 13 existing browser suites and the new UX suite. The receipt
+records which checks used `57b0492` and which reran after the UI refinements at
+`554cd53`. Initial legacy-test failures expected Sound after Edit sound or assumed
+the Sounds browser tab remained open after reload; tests now follow the explicit
+contextual editing and Projects entry flow. Audio/state assertions were retained.
+
+Remaining review concerns are independent-user task observation, physical-phone
+keyboard/audio behavior and broader accessibility coverage. Secondary controls and
+advanced node editing still need that usability feedback. The six passages remain
+subject to listening review. The implementation has not been merged or deployed;
+check the PR's current CI, reconcile its stack, and obtain publication authorization
+before treating the production site as updated.

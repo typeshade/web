@@ -82,8 +82,11 @@ The editor imports legacy flat version-1 scenes and version-1 project envelopes.
 `editor` object containing the independent `source`, `selected`, `selection` and
 `drafts`. Draft keys identify the source owner and Code node. Each entry holds
 `base` (the applied code on which typing began) and `text` (the retained buffer).
+Drafts are bounded to 256 entries, 32,768 characters per buffer and 2 MB total.
 Drafts may contain incomplete or invalid code; saving never compiles or applies them.
 The running sound and exported WAV use applied code in `scene.cues[].patch.graph`.
+Direct links such as `/?project=frieren-red-A` open an allowlisted catalog project
+through the same checkpoint and validation flow.
 Complete version-1 source fixtures remain valid agent handoffs; the editor adds its
 working state when users save them. Older editors reject version 2 explicitly.
 
