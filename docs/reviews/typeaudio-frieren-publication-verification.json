@@ -1,0 +1,194 @@
+{
+  "schema": "typeaudio.frieren-publication-verification",
+  "version": 1,
+  "recordedAt": "2026-11-07T06:44:03.093386+00:00",
+  "site": "https://audio.typeshade.dev/",
+  "versions": {
+    "web": "94bb1cf9f0176aa1fafa24eac3e88fba04a25972",
+    "typeaudio": "5489ac494e69b5eb2dfae63546cc7643ecfea0f0",
+    "typeshade": "87af4eb0d9d15f02b66b8341b72cab0944290472",
+    "dirty": false
+  },
+  "mergedPullRequests": [
+    45,
+    46,
+    47
+  ],
+  "deployment": {
+    "workflowRun": "https://github.com/typeshade/web/actions/runs/42347572090",
+    "conclusion": "success",
+    "worker": "typeaudio-site",
+    "id": "581c8754-97aa-4bd2-b7f1-33dd3d67176b",
+    "createdAt": "2026-11-07T06:40:12.466272Z",
+    "versions": [
+      {
+        "version_id": "d5f68fe1-1d9e-4c75-915b-880c034a12d0",
+        "percentage": 100
+      }
+    ],
+    "rollbackVersion": "a68f4425-aca6-49b2-92a4-c68cd4319f1d",
+    "githubHostedHttpProbe": {
+      "result": "blocked",
+      "status": 403,
+      "reason": "cf-mitigated: challenge"
+    },
+    "independentCloudflareApiCheck": "2026-11-07T06:40:46.492029+00:00"
+  },
+  "browser": {
+    "checkedAt": "2026-11-07T06:41:35.633Z",
+    "url": "https://audio.typeshade.dev",
+    "browser": "156.0.8078.4",
+    "checks": [
+      {
+        "id": "frieren-red-A",
+        "sourceSha256": "037b5c1c924e42c3db6dfabea1fdbc4d31a5f5dd829c9428f387f5432f87bffe",
+        "wavSha256": "32487409c6204954fcffac4436fea6f0f700b9488c651012820b45d326225d33",
+        "layers": 15,
+        "range": [
+          20,
+          30
+        ],
+        "publicLinkStatus": 200,
+        "sourceStatus": 200,
+        "nonzeroStereo": true,
+        "url": "https://audio.typeshade.dev/?project=frieren-red-A"
+      },
+      {
+        "id": "frieren-red-B",
+        "sourceSha256": "61d0c22e8614d2b953b3eef17d3000ee6ea42b41d49a197df936958042d64315",
+        "wavSha256": "c1c1f2f5e398b01d6e58f532cf5ecf58f91f13834ea8c0492084256bde3b7a23",
+        "layers": 15,
+        "range": [
+          20,
+          30
+        ],
+        "publicLinkStatus": 200,
+        "sourceStatus": 200,
+        "nonzeroStereo": true,
+        "url": "https://audio.typeshade.dev/?project=frieren-red-B"
+      },
+      {
+        "id": "frieren-force-A",
+        "sourceSha256": "f75d1750f73b2fb3ae8c202e2bfa4739958fab54126d4e7625cf713797c91f76",
+        "wavSha256": "d17b30c9423392c4ea6dea28e4bc51ed606c3f036aa018e49be035d96c0b5bb7",
+        "layers": 17,
+        "range": [
+          136.5,
+          149.7
+        ],
+        "publicLinkStatus": 200,
+        "sourceStatus": 200,
+        "nonzeroStereo": true,
+        "url": "https://audio.typeshade.dev/?project=frieren-force-A"
+      },
+      {
+        "id": "frieren-force-B",
+        "sourceSha256": "0c4679c377cd2a8bef5ac8fca495d96f3729a7df820ae80ceef1646cb0868908",
+        "wavSha256": "86f719343cfe0acebb4249280a4f5c61d8a104096b0b5adf6023c33243cbe4dc",
+        "layers": 17,
+        "range": [
+          136.5,
+          149.7
+        ],
+        "publicLinkStatus": 200,
+        "sourceStatus": 200,
+        "nonzeroStereo": true,
+        "url": "https://audio.typeshade.dev/?project=frieren-force-B"
+      },
+      {
+        "id": "frieren-finale-A",
+        "sourceSha256": "efafdf94da40e5cdbf101d761044dca3a388603019274b2db0b0b92954c65419",
+        "wavSha256": "7c64aa90fcb05fe356a065bc631da2899e2cf7568197fabff5d38c62cae117da",
+        "layers": 15,
+        "range": [
+          173,
+          189.314625
+        ],
+        "publicLinkStatus": 200,
+        "sourceStatus": 200,
+        "nonzeroStereo": true,
+        "url": "https://audio.typeshade.dev/?project=frieren-finale-A"
+      },
+      {
+        "id": "frieren-finale-B",
+        "sourceSha256": "875776d2aca56af2ac8027002fbad83a39903bb86978d5ad90f5e659ba169372",
+        "wavSha256": "878607e590d5ce13074e50f3ec985dc0b18ff3b0a9ff2b9c369d0db43808511d",
+        "layers": 15,
+        "range": [
+          173,
+          189.314625
+        ],
+        "publicLinkStatus": 200,
+        "sourceStatus": 200,
+        "nonzeroStereo": true,
+        "url": "https://audio.typeshade.dev/?project=frieren-finale-B"
+      }
+    ],
+    "desktopEditsSaveReopenReload": "passed",
+    "mobile390EditsSaveReopen": "passed",
+    "physicalDeviceAudio": "not tested",
+    "listeningAcceptance": "pending",
+    "errors": []
+  },
+  "publicBuildMetadata": {
+    "checkedAt": "2026-11-07T06:41:34.951Z",
+    "versions": {
+      "web": "94bb1cf9f0176aa1fafa24eac3e88fba04a25972",
+      "typeaudio": "5489ac494e69b5eb2dfae63546cc7643ecfea0f0",
+      "typeshade": "87af4eb0d9d15f02b66b8341b72cab0944290472",
+      "dirty": false
+    },
+    "publicSite": "https://audio.typeshade.dev/",
+    "result": "passed"
+  },
+  "mobilePlayback": {
+    "checkedAt": "2026-11-07T06:42:32.235Z",
+    "viewport": [
+      390,
+      844
+    ],
+    "touch": true,
+    "project": "frieren-red-A",
+    "clock": "20.508 s",
+    "scheduledBuffers": 1,
+    "result": "passed",
+    "physicalDevice": false
+  },
+  "youtubeReference": {
+    "videoId": "YHCqcyX9N3s",
+    "checkedAt": "2026-11-07T06:41:35.125Z",
+    "result": "blocked in verification environment",
+    "request": "https://www.youtube.com/iframe_api",
+    "networkError": "net::ERR_TUNNEL_CONNECTION_FAILED",
+    "authoredRangeAfterFailure": [
+      20,
+      30
+    ],
+    "videoPlaybackVerified": false
+  },
+  "method": "Adapted the committed agent-project browser suite to the public origin without a local Vite server. Added direct project links, exact fixture-byte comparisons and exported build-version verification. No application or external-player mocks. Separate touch-emulated mobile playback and real YouTube connection attempts.",
+  "limits": [
+    "Three A/B passage studies, not a finished full-scene mix.",
+    "No listening acceptance or candidate selection.",
+    "Mobile viewport/touch emulation is not a physical-phone or speaker/headphone test.",
+    "YouTube script transport failed in the managed environment; video playback and audiovisual synchronization are unverified.",
+    "Source-edition renders retain the documented taper/range differences from the earlier review masters."
+  ],
+  "screenshots": [
+    {
+      "name": "projects-mobile.png",
+      "sha256": "04316e20ca505744f7b67845410bd1ec7acc08bdfcddba76b2528750ecf41893",
+      "storage": "local verification artifacts; visual inspection recorded in the publication note"
+    },
+    {
+      "name": "projects-desktop.png",
+      "sha256": "b0c294bd3d0c81df1026003f8d5295c100d0c995bc8f35773b9ce71442f679bb",
+      "storage": "local verification artifacts; visual inspection recorded in the publication note"
+    },
+    {
+      "name": "listen-mobile.png",
+      "sha256": "f3fff3ad7b373e1ad19d95d2a83d8c19c11d3e17f0e7a726199d09b3888eefb6",
+      "storage": "local verification artifacts; visual inspection recorded in the publication note"
+    }
+  ]
+}
