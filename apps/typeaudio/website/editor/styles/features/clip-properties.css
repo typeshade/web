@@ -75,3 +75,22 @@
 .mixer-panel details {
   margin-top: 14px;
 }
+
+.trajectory-points fieldset {
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid #414141;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+.trajectory-points label {
+  min-width: 0;
+}
+.trajectory-points input {
+  width: 100%;
+  min-width: 0;
+}
+.trajectory-points button {
+  grid-column: 1 / -1;
+}

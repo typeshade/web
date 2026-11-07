@@ -132,16 +132,35 @@ export function Composition({ editor: e }: { editor: Editor }) {
         {e.mediaKind === "none" && (
           <div className="viewer-empty">
             <Icon name="film" />
-            <strong>{e.state.scene.media.kind === "youtube" ? "YouTube reference" : "No footage"}</strong>
-            <span>{e.state.scene.media.kind === "youtube" ? "Edit and play the composition now, or connect its video reference." : "Import a video from the Project panel."}</span>
-            {e.state.scene.media.kind === "youtube" ? <button className="primary"
-              onClick={() => e.loadYouTube(`https://www.youtube.com/watch?v=${e.state.scene.media.id}`)}>Connect reference</button> :
-            <button
-              className="primary"
-              onClick={() => e.videoInput.current?.click()}
-            >
-              Import video…
-            </button>}
+            <strong>
+              {e.state.scene.media.kind === "youtube"
+                ? "YouTube reference"
+                : "No footage"}
+            </strong>
+            <span>
+              {e.state.scene.media.kind === "youtube"
+                ? "Edit and play the composition now, or connect its video reference."
+                : "Import a video from the Project panel."}
+            </span>
+            {e.state.scene.media.kind === "youtube" ? (
+              <button
+                className="primary"
+                onClick={() =>
+                  e.loadYouTube(
+                    `https://www.youtube.com/watch?v=${e.state.scene.media.id}`,
+                  )
+                }
+              >
+                Connect reference
+              </button>
+            ) : (
+              <button
+                className="primary"
+                onClick={() => e.videoInput.current?.click()}
+              >
+                Import video…
+              </button>
+            )}
             <small>Or build an effects track without video.</small>
           </div>
         )}

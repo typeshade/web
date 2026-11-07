@@ -1,12 +1,13 @@
 # TypeAudio studio
 
 TypeAudio's website lives in this application. The library source is pinned by the
-`sources/typeaudio` submodule at `575b42b`; `src` is a link to that source, not a fork.
+`sources/typeaudio` submodule at `86560f83a92ff8374346157000b8a467daa39aab`;
+`src` is a link to that source, not a fork. This is the room-renderer baseline from
+TypeAudio PR #24. The compiler remains pinned at `87af4eb0d9d15f02b66b8341b72cab0944290472`.
 The initial website was imported from TypeAudio revision
 `1d6eb0d272f6f61fdf81b4023652f033e6261f35` (PRs 19–21), including the worker module
 identity fix, sound designer and synchronous AudioWorklet. Those PRs were closed after the website transfer; they are not needed to
-build this application. The library modules are unchanged between
-these revisions. Documentation comes from the pinned library revision.
+build this application. Documentation comes from the pinned library revision.
 
 ## Development
 
@@ -29,6 +30,45 @@ replace an existing, different compiler installation. Generated shader host view
 are ignored. Vite builds each worker as one module to preserve resident array
 identity even when its URL contains a query string. The separate Vite application
 preserves this compiler pipeline; it consumes the web workspace's shared UI tokens.
+
+## Editable agent projects
+
+Open **Project → Projects** and choose A or B for one of the three Frieren passages.
+Each project includes every procedural layer, its Code nodes, parameters, seed,
+amplitude envelope, timeline and spatial configuration. No rendered audio is needed
+to reopen these projects. The YouTube reference is retained; **Connect reference**
+loads the external player only when requested. Editing and effects playback also
+work without it.
+
+1. Select a layer in the Picture timeline.
+2. Choose **Edit sound** to edit its parameters or either Code node.
+3. Use **Apply code** after code edits. Parameter edits apply directly.
+4. Return to **Picture** to prepare and play the updated stereo composition.
+5. Adjust timing, source position points, room send or the **Scene space** controls.
+6. Use **File → Export project…** to keep the editable source JSON.
+7. Use **File → Open project…** to continue editing it in another session or browser.
+
+**Export WAV** saves the prepared effects mix, not the editable project. Single-layer
+**Audition** plays its dry source; composition playback includes the shared room.
+For these source graphs, **Source length** controls the rendered duration, while
+the exposed **Envelope span** parameter controls the authored amplitude curve.
+
+The source format and agent handoff are documented in
+[the first-milestone contract](../../docs/typeaudio-editable-projects.md).
+The six JSON fixtures are served by this application under `/projects/`.
+Their [provenance manifest](website/public/projects/provenance.json) records hashes
+and the source baseline. Regenerate them from the TypeAudio study with:
+
+```sh
+cd apps/typeaudio
+bun scripts/export-study-projects.ts /path/to/typeaudio/docs/studies/frieren/sound-design
+```
+
+This is an editable stereo source edition of the study, not a bit-identical copy
+of its review masters. The editor retains its source taper and exports the picture
+range without the masters' additional 2.5-second tail handle. Listening review and
+candidate selection remain pending. Composition updates prepare in Workers before
+playback; this does not implement a game event scheduler or binaural rendering.
 
 ## Procedural node graphs
 
@@ -414,7 +454,8 @@ or its undo/redo history; reloading or opening another project resets that histo
 - YouTube uses the [official IFrame API](https://developers.google.com/youtube/iframe_api_reference)
   only on explicit load. Embedded availability depends on the video and network;
   cue synchronization is approximate.
-- Effects WAV is mono 48 kHz, 16-bit PCM for the selected range, including silence
+- Effects WAV is 48 kHz, 16-bit PCM, stereo for spatial projects and mono otherwise,
+  for the selected range, including silence
   and trimmed source ranges, fades and cropped tails. Preview uses the same source
   windows and linear fade envelopes. Original audio and video are excluded. Clipping is reported.
   Sound WAV is a finite render with modulation. Export take saves a recorded performance.
@@ -424,7 +465,8 @@ or its undo/redo history; reloading or opening another project resets that histo
   or share them. Session A/B snapshots are not included in patch exports.
 
 `test:browser` runs the workspace, state, device-loss, interaction, sound-design,
-timeline, audio-import, graph, node-workspace and code-workspace browser suites. They cover actual live processing,
+timeline, audio-import, graph, node-workspace, code-workspace, code-language,
+feedback and agent-project browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
 transport and video loops, mobile layout and mocked YouTube recovery. Timeline
@@ -436,6 +478,12 @@ intervening edits, storage failure and history-protected deletion. The local
 four-second VP8/WebM fixture uses FFmpeg `testsrc2` (160×90, 12 fps, 40 kbps).
 YouTube adapter tests do not establish external video availability. Browser/device
 latency and physical GPU headroom are not established by these checks.
+
+The agent-project suite opens all six source projects, prepares and plays their
+stereo output, and checks source-code/parameter edits, undo/redo, spatial edits,
+WAV regeneration, exported JSON, reload, invalid/stale imports and a 390px mobile
+viewport. Reopening an edited JSON must regenerate the exact edited PCM. Set
+`TYPEAUDIO_PROJECT_ARTIFACTS` to a directory to retain desktop/mobile screenshots.
 
 
 ## Web, engine and compiler feedback

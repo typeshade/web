@@ -2,7 +2,10 @@ import { SAMPLE_RATE } from "./sound/constants.ts";
 import { validatePatch } from "./sound/validatePatch.ts";
 import { type Patch } from "./sound/types.ts";
 import type { SceneSpace, CueSpace, ProjectOrigin } from "./scene/types.ts";
-import { validateSceneSpace, validateCueSpace } from "./scene/validateSceneSpace.ts";
+import {
+  validateSceneSpace,
+  validateCueSpace,
+} from "./scene/validateSceneSpace.ts";
 import { validateOrigin } from "./project/validateOrigin.ts";
 import {
   MAX_LIBRARY_FRAMES,

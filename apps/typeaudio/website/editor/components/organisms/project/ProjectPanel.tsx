@@ -50,7 +50,9 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
       },
     ];
   }
-  const [tab, setTab] = useState<"project" | "sounds" | "audio" | "examples">("sounds"),
+  const [tab, setTab] = useState<"project" | "sounds" | "audio" | "examples">(
+      "sounds",
+    ),
     [search, setSearch] = useState("");
   const file = e.videoInput,
     patchFile = e.patchInput;
@@ -82,7 +84,12 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
       }
     >
       <div className="panel-tabs" role="group" aria-label="Project browser">
-        <button aria-pressed={tab === "examples"} onClick={() => setTab("examples")}>Projects</button>
+        <button
+          aria-pressed={tab === "examples"}
+          onClick={() => setTab("examples")}
+        >
+          Projects
+        </button>
         <button
           aria-pressed={tab === "sounds"}
           onClick={() => setTab("sounds")}
@@ -148,7 +155,9 @@ export function ProjectPanel({ editor: e }: { editor: Editor }) {
           event.target.value = "";
         }}
       />
-      {tab === "examples" ? <ProjectExamples editor={e} /> : tab === "sounds" ? (
+      {tab === "examples" ? (
+        <ProjectExamples editor={e} />
+      ) : tab === "sounds" ? (
         <>
           <div className="asset-columns">
             <span>Name</span>

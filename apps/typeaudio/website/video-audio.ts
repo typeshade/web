@@ -96,7 +96,8 @@ export class CueAudio {
     const generation = ++this.prepareGeneration;
     const result = new Map<string, Float32Array>();
     for (const cue of scene.cues) {
-      if (generation !== this.prepareGeneration || this.closed) throw new Error("Preparation superseded.");
+      if (generation !== this.prepareGeneration || this.closed)
+        throw new Error("Preparation superseded.");
       result.set(
         cue.id,
         cue.audio
@@ -104,10 +105,12 @@ export class CueAudio {
           : await this.render(cue.patch),
       );
     }
-    if (generation !== this.prepareGeneration || this.closed) throw new Error("Preparation superseded.");
+    if (generation !== this.prepareGeneration || this.closed)
+      throw new Error("Preparation superseded.");
     if (scene.space) await this.spatial.prepare(scene, result);
     else this.spatial.close();
-    if (generation !== this.prepareGeneration || this.closed) throw new Error("Preparation superseded.");
+    if (generation !== this.prepareGeneration || this.closed)
+      throw new Error("Preparation superseded.");
     return result;
   }
   setLevel(level: number): void {
@@ -149,11 +152,13 @@ export class CueAudio {
       buffer.copyToChannel(new Float32Array(pcm.left), 0);
       buffer.copyToChannel(new Float32Array(pcm.right), 1);
       const source = ctx.createBufferSource();
-      source.buffer = buffer; source.playbackRate.value = rate;
+      source.buffer = buffer;
+      source.playbackRate.value = rate;
       source.connect(this.bus);
       source.onended = () => source.disconnect();
       source.start(now + Math.max(0, scene.start - origin) / rate, offset);
-      this.nodes.push(source); this.scheduled = 1;
+      this.nodes.push(source);
+      this.scheduled = 1;
       return;
     }
     for (const cue of scene.cues) {

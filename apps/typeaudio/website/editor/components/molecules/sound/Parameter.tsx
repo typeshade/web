@@ -20,6 +20,14 @@ export function Parameter({
   const gesture = useRef(false),
     { openMenu } = useInteractions();
   const value = e.state.patch[name],
+    label =
+      name === "duration" && e.state.patch.graph
+        ? "Source length"
+        : labels[name] || name,
+    help =
+      name === "duration" && e.state.patch.graph
+        ? "Length of the rendered graph source. Envelope span is a separate exposed parameter."
+        : HELP[name],
     limit = parameterLimits(e.state.patch, name),
     options =
       name === "shapeA" || name === "shapeB"
@@ -63,7 +71,7 @@ export function Parameter({
       data-tooltip={
         name === "lfoRate" && e.state.patch.lfoSync
           ? "Beat sync is on. Rate follows BPM."
-          : HELP[name]
+          : help
       }
       onContextMenu={(event) => {
         if (
@@ -71,21 +79,15 @@ export function Parameter({
           event.target.type !== "range"
         )
           return;
-        openContext(
-          event,
-          openMenu,
-          `parameter-${name}`,
-          `${labels[name] || name} options`,
-          [
-            {
-              label: `Reset ${labels[name] || name}`,
-              action: () => e.patch({ [name]: DEFAULT[name] }),
-            },
-          ],
-        );
+        openContext(event, openMenu, `parameter-${name}`, `${label} options`, [
+          {
+            label: `Reset ${label}`,
+            action: () => e.patch({ [name]: DEFAULT[name] }),
+          },
+        ]);
       }}
     >
-      <label htmlFor={name}>{labels[name] || name}</label>
+      <label htmlFor={name}>{label}</label>
       {options ? (
         <select
           id={name}
@@ -103,7 +105,7 @@ export function Parameter({
           <NumericValue
             editor={e}
             name={name}
-            label={labels[name] || name}
+            label={label}
             unit={units[name] || ""}
             step={step}
             integer={integer}

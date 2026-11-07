@@ -149,6 +149,13 @@ try {
   await p.waitForFunction(
     () => !!(window as any).pendingText["slow-project.json"],
   );
+  assert.equal(
+    await p.locator("#editor-main").getAttribute("data-workspace"),
+    "sound",
+    "Pending imports leave the current workspace intact",
+  );
+  await workspace(p, "Picture");
+  await ready(p);
   await p.locator("#scene-name").fill("Newer project name");
   await p.evaluate(() => (window as any).pendingText["slow-project.json"]());
   await p.waitForTimeout(100);

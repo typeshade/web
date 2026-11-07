@@ -1,7 +1,12 @@
 import type { ListenerPose } from "typeaudio/spatial";
 import type { RoomDefinition } from "typeaudio/spatial/room";
 
-export interface PositionPoint { time: number; x: number; y: number; z: number }
+export interface PositionPoint {
+  time: number;
+  x: number;
+  y: number;
+  z: number;
+}
 export interface CueSpace {
   points: PositionPoint[];
   spread: number;

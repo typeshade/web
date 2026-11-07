@@ -131,7 +131,11 @@ export function useSceneSession(
         current.samples,
         0,
       );
-      setNotice(current.state.scene.space ? "Auditioning the selected source without the scene room." : "Auditioning selected clip.");
+      setNotice(
+        current.state.scene.space
+          ? "Auditioning the selected source without the scene room."
+          : "Auditioning selected clip.",
+      );
     } catch (error) {
       if (generation === sceneAction.current) setNotice(String(error));
     }
@@ -141,8 +145,13 @@ export function useSceneSession(
     if (state.scene.space) {
       const pcm = transport.current.audio.spatial.read(state.scene);
       if (!pcm) return;
-      download(new Blob([stereoWav(pcm, state.scene.effects)], { type: "audio/wav" }), "typeaudio-effects-stereo.wav");
-      setNotice(`Exported the stereo effects composition.${pcm.peak * state.scene.effects > 1 ? " Clipping detected; lower Effects level." : ""}`);
+      download(
+        new Blob([stereoWav(pcm, state.scene.effects)], { type: "audio/wav" }),
+        "typeaudio-effects-stereo.wav",
+      );
+      setNotice(
+        `Exported the stereo effects composition.${pcm.peak * state.scene.effects > 1 ? " Clipping detected; lower Effects level." : ""}`,
+      );
       return;
     }
     const result = mixScene(state.scene, samples, SAMPLE_RATE);

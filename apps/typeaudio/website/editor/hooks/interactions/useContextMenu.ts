@@ -5,7 +5,10 @@ import type { MenuState } from "../../interactions/types.ts";
 export function useContextMenu() {
   const [menu, setMenu] = useState<MenuState>(),
     menuRef = useRef<HTMLDivElement>(null),
-    currentMenu = useRef(menu);
+    currentMenu = useRef(menu),
+    openedScroll = useRef(
+      new Map<EventTarget, { left: number; top: number }>(),
+    );
   currentMenu.current = menu;
   function dismiss(restore = false) {
     const origin = currentMenu.current?.origin;
@@ -35,7 +38,20 @@ export function useContextMenu() {
       dismiss();
     };
     const scroll = (event: Event) => {
-      if (!menuRef.current?.contains(event.target as Node)) close();
+      if (menuRef.current?.contains(event.target as Node)) return;
+      const before = openedScroll.current.get(event.target!),
+        target =
+          event.target === document ? document.scrollingElement : event.target;
+      // Bringing the menu button into view can queue a scroll event before the
+      // click. Dismiss only if its container has moved since this menu opened.
+      if (
+        before &&
+        target instanceof Element &&
+        before.left === target.scrollLeft &&
+        before.top === target.scrollTop
+      )
+        return;
+      close();
     };
     window.addEventListener("blur", close);
     window.addEventListener("resize", close);
@@ -53,12 +69,24 @@ export function useContextMenu() {
     point: { x: number; y: number },
     origin?: HTMLElement | SVGElement | null,
   ) {
+    const anchor = origin ?? (document.activeElement as HTMLElement);
+    openedScroll.current.clear();
+    for (let node: Element | null = anchor; node; node = node.parentElement)
+      openedScroll.current.set(node, {
+        left: node.scrollLeft,
+        top: node.scrollTop,
+      });
+    if (document.scrollingElement)
+      openedScroll.current.set(document, {
+        left: document.scrollingElement.scrollLeft,
+        top: document.scrollingElement.scrollTop,
+      });
     setMenu({
       key,
       label,
       items,
       ...point,
-      origin: origin ?? (document.activeElement as HTMLElement),
+      origin: anchor,
     });
   }
   return { menu, menuRef, openMenu, dismiss, choose };

@@ -50,8 +50,8 @@ export function useProjectFiles(
         next.media.kind === "youtube"
           ? "Editable project opened. Select a layer to edit its sound; connect the YouTube reference when needed."
           : next.media.kind === "none"
-          ? "Project opened."
-          : `Project opened. Re-select video: ${next.media.name}`,
+            ? "Project opened."
+            : `Project opened. Re-select video: ${next.media.name}`,
       );
     } catch (error) {
       if (current()) setNotice(`Import failed: ${String(error)}`);
@@ -61,16 +61,21 @@ export function useProjectFiles(
   }
   async function openProject(file: File) {
     return loadProject(async () => {
-      if (file.size > MAX_PROJECT_BYTES) throw new Error("Project files must be smaller than 40 MB, including embedded audio.");
+      if (file.size > MAX_PROJECT_BYTES)
+        throw new Error(
+          "Project files must be smaller than 40 MB, including embedded audio.",
+        );
       return JSON.parse(await file.text());
     });
   }
   async function openExample(id: string) {
     return loadProject(async () => {
       const response = await fetch(projectUrl(id));
-      if (!response.ok) throw new Error("This example project could not be loaded.");
+      if (!response.ok)
+        throw new Error("This example project could not be loaded.");
       const text = await response.text();
-      if (text.length > MAX_PROJECT_BYTES) throw new Error("Project file is too large.");
+      if (text.length > MAX_PROJECT_BYTES)
+        throw new Error("Project file is too large.");
       return JSON.parse(text);
     });
   }
@@ -96,7 +101,9 @@ export function useProjectFiles(
       );
       download(
         new Blob([data], { type: "application/json" }),
-        snapshot.origin ? `${snapshot.name.replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}.typeaudio.json` : "typeaudio-scene.json",
+        snapshot.origin
+          ? `${snapshot.name.replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}.typeaudio.json`
+          : "typeaudio-scene.json",
       );
       setNotice(
         audioAssets.length
