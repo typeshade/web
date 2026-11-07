@@ -19,7 +19,7 @@ export function useFunctionDocuments(c: FunctionEditor) {
   const source = JSON.stringify(appliedFiles);
   useEffect(() => {
     c.e.dispatch({
-      type: "drafts",
+      type: "reconcileDrafts",
       update: (current) => {
         let next = current;
         for (const [path, applied] of Object.entries(appliedFiles)) {

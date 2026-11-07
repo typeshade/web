@@ -25,6 +25,8 @@ export function useEditorDocument() {
   }));
   const editVersion = useRef(0);
   const dispatch = useCallback((action: Action) => {
+    // Background draft rebasing follows applied source; it is not a newer user edit.
+    // In-flight imports still reject real typing, document edits and selection changes.
     if (
       [
         "edit",

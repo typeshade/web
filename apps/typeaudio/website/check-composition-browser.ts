@@ -343,6 +343,11 @@ try {
   await p
     .getByRole("button", { name: "+ New function sound", exact: true })
     .click();
+  await p.waitForFunction(
+    () =>
+      JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).source
+        .patch.functions.parameters[0].value === 180,
+  );
   await p.locator("#project-file").setInputFiles({
     name: "network.typeaudio.json",
     mimeType: "application/json",

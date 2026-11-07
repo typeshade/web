@@ -39,6 +39,7 @@ export type Action =
   | { type: "workspace"; workspace: Workspace }
   | { type: "tool"; tool: Tool }
   | { type: "drafts"; update: (drafts: CodeDrafts) => CodeDrafts }
+  | { type: "reconcileDrafts"; update: (drafts: CodeDrafts) => CodeDrafts }
   | { type: "open"; scene: Scene; editor?: ProjectEditorState }
   | { type: "media"; media: Scene["media"] };
 

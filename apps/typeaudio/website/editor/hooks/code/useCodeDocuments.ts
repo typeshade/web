@@ -27,23 +27,26 @@ export function useCodeDocuments(c: GraphEditor) {
   const nodes = c.graph?.nodes.filter((n) => n.kind === "code") ?? [];
   const appliedCodes = JSON.stringify(nodes.map((n) => [n.id, n.code]));
   useEffect(() => {
-    setDrafts((current) => {
-      let next = current;
-      for (const [id, applied] of JSON.parse(appliedCodes) as [
-        string,
-        string,
-      ][]) {
-        const key = codeDocumentKey(c.owner, id),
-          saved = current[key];
-        if (!saved) continue;
-        const resolved = resolveCodeDraft(saved, applied);
-        if (resolved.base !== saved.base || resolved.text !== saved.text)
-          next = {
-            ...next,
-            [key]: { base: resolved.base, text: resolved.text },
-          };
-      }
-      return next;
+    c.e.dispatch({
+      type: "reconcileDrafts",
+      update: (current) => {
+        let next = current;
+        for (const [id, applied] of JSON.parse(appliedCodes) as [
+          string,
+          string,
+        ][]) {
+          const key = codeDocumentKey(c.owner, id),
+            saved = current[key];
+          if (!saved) continue;
+          const resolved = resolveCodeDraft(saved, applied);
+          if (resolved.base !== saved.base || resolved.text !== saved.text)
+            next = {
+              ...next,
+              [key]: { base: resolved.base, text: resolved.text },
+            };
+        }
+        return next;
+      },
     });
   }, [c.owner, appliedCodes]);
   // An explicit generated view lasts until the next canvas selection, even if
