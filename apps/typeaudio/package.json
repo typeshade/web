@@ -19,7 +19,8 @@
     "bench:live": "bun website/check-live-performance.ts",
     "bench:graph": "GRAPH_BENCH=1 bun website/check-live-performance.ts",
     "bench:render": "bun website/check-render-performance.ts",
-    "feedback": "node scripts/prepare.mjs && bun ../../sources/typeaudio/scripts/feedback.ts"
+    "feedback": "node scripts/prepare.mjs && bun ../../sources/typeaudio/scripts/feedback.ts",
+    "export:quality": "node scripts/prepare.mjs && bun --tsconfig-override website/tsconfig.json scripts/export-quality-project.ts"
   },
   "devDependencies": {
     "@types/node": "25.6.0",
