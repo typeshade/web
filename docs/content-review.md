@@ -163,3 +163,10 @@ adds one English File command, **Export graph reproduction…**, plus its result
 message. The wording names an applied graph snapshot and excludes layer mixing,
 prior edits and playback timing. No translation or broader imported-content review
 is claimed. The TypeAudio README records reproduction and compiler proposal limits.
+
+The TypeAudio language-editor follow-up reviews the English Sample code context,
+input/state descriptions, live Problems panel, analysis retry and Focus code action.
+The wording distinguishes TypeShade language diagnostics from the narrower audio-node
+execution contract and explains when drafts reach playback. Browser coverage checks
+completion, live errors, navigation/rename, stale results and continued AudioWorklet
+progress. This is a bounded studio UI review, not a broader site or translation review.

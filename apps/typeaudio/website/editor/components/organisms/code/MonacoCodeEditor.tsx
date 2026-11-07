@@ -2,6 +2,7 @@ import {
   useMonacoEditor,
   type MonacoEditorProps,
 } from "../../../hooks/code/useMonacoEditor.ts";
+import { CodeProblems } from "../../molecules/code/CodeProblems.tsx";
 
 export function MonacoCodeEditor(props: MonacoEditorProps) {
   const editor = useMonacoEditor(props);
@@ -19,6 +20,13 @@ export function MonacoCodeEditor(props: MonacoEditorProps) {
             ? "The code editor could not load. Reload the page to retry."
             : "Loading code editor…"}
         </p>
+      )}
+      {editor.ready && (
+        <CodeProblems
+          analysis={editor.analysis}
+          onReveal={editor.revealProblem}
+          onRetry={editor.retryAnalysis}
+        />
       )}
       <div className="code-position">
         <span>

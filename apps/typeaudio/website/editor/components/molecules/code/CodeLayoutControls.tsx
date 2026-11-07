@@ -41,7 +41,7 @@ export function CodeLayoutControls({ onFocus }: { onFocus: () => void }) {
           onFocus();
         }}
       >
-        Code
+        Focus code
       </button>
     </div>
   );

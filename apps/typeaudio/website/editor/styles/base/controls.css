@@ -4,6 +4,7 @@
   --inspector-width: 300px;
   --timeline-height: 270px;
   --code-width: 420px;
+  --code-height: 430px;
 }
 #root {
   height: 100dvh;

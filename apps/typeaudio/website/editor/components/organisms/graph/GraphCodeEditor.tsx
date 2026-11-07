@@ -4,6 +4,7 @@ import { codeDiagnostic } from "../../../code/codeDiagnostic.ts";
 import { GraphCodeReference } from "../../molecules/graph/GraphCodeReference.tsx";
 import { CodeDocumentTabs } from "../../molecules/code/CodeDocumentTabs.tsx";
 import { MonacoCodeEditor } from "../code/MonacoCodeEditor.tsx";
+import { CodeContext } from "../../molecules/code/CodeContext.tsx";
 
 export function GraphCodeEditor({
   controller: c,
@@ -19,7 +20,7 @@ export function GraphCodeEditor({
         <span>
           {d.generated
             ? "Graph / Generated source"
-            : `Nodes / ${d.node?.name ?? "Code"} / TypeShade`}
+            : `Nodes / ${d.node?.name ?? "Code"} / Sample code`}
         </span>
         {!d.generated && (
           <>
@@ -42,6 +43,10 @@ export function GraphCodeEditor({
           </>
         )}
       </div>
+      <CodeContext
+        parameters={c.graph?.parameters ?? []}
+        generated={d.generated}
+      />
       {d.conflict && !d.generated && (
         <div className="code-conflict" role="alert">
           <span>The applied code changed. Your draft is preserved.</span>
@@ -77,7 +82,7 @@ export function GraphCodeEditor({
               ? "Read-only source for the applied graph. Edit a Code node to change its sound."
               : d.dirty
                 ? "Unapplied draft · Ctrl/⌘ Enter compiles and applies. Playback uses the last applied code."
-                : "Applied · Ctrl/⌘ Space suggests variables and functions. Ctrl/⌘ F searches this document.")}
+                : "Applied · Ctrl/⌘ Space: completion · F2: rename · F12: definition · Apply checks audio-node limits.")}
       </p>
     </div>
   );
