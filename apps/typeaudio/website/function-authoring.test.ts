@@ -1,3 +1,5 @@
+import { audioPatch } from "./sound/audioPatch.ts";
+import { newFunctionDefinition } from "./functions/newDefinition.ts";
 import { describe, expect, it } from "vitest";
 import { compileFunctionGraph } from "typeaudio/function-graph/compiler";
 import { functionPatch } from "./functions/initialFunctions.ts";
@@ -28,6 +30,39 @@ function install(p = functionPatch()) {
   return { p, program };
 }
 describe("editable TypeShade function sounds", () => {
+  it("keeps node positions out of audio identity while retaining audible source and control edits", () => {
+    const p = functionPatch(),
+      moved = structuredClone(p);
+    moved.functionLayout!.noise = { x: 800, y: 500 };
+    expect(audioPatch(moved)).toEqual(audioPatch(p));
+    moved.functions!.parameters[0]!.value = 500;
+    expect(audioPatch(moved)).not.toEqual(audioPatch(p));
+    const layered = {
+      ...p,
+      layers: [
+        { id: "layer", name: "Layer", patch: p, offset: 0, muted: false },
+      ],
+    };
+    expect(
+      audioPatch({
+        ...layered,
+        layers: [
+          { ...layered.layers[0]!, patch: { ...p, functionLayout: {} } },
+        ],
+      }),
+    ).toEqual(audioPatch(layered));
+    expect(p.functionLayout!.noise).not.toEqual({ x: 800, y: 500 });
+  });
+  it("creates a complete reusable module with explicit time, sample rate and per-instance state", () => {
+    const next = newFunctionDefinition(functionPatch().functions!);
+    const descriptor = compileFunctionGraph(next).artifacts.at(-1)!.descriptor;
+    expect(descriptor.state!.fields[0]!.name).toBe("memory");
+    expect(descriptor.context.map((c) => c.value)).toEqual([
+      "time",
+      "sampleRate",
+    ]);
+    expect(descriptor.inputs.map((p) => p.name)).toEqual(["input", "amount"]);
+  });
   it("imports the engine source, retains drafts and positions, and reproduces edited audio after a project round trip", () => {
     const source = functionPatch();
     const imported = decodeProject(source.functions);

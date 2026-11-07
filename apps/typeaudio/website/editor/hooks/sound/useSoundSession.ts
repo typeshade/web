@@ -8,6 +8,7 @@ import type { DocumentController } from "../document/useEditorDocument.ts";
 import type { EditorResources } from "../session/useAudioResources.ts";
 import { createLivePlayback } from "./createLivePlayback.ts";
 import { createFiniteRender } from "./createFiniteRender.ts";
+import { audioPatch } from "../../../sound/audioPatch.ts";
 export function useSoundSession(
   { state, setNotice }: DocumentController,
   resources: EditorResources,
@@ -26,7 +27,7 @@ export function useSoundSession(
     [auto, setAuto] = useState(false),
     [renderLoop, setRenderLoop] = useState(false);
 
-  const patchKey = JSON.stringify(state.patch),
+  const patchKey = JSON.stringify(audioPatch(state.patch)),
     rendered = renderCache?.patchKey === patchKey ? renderCache : undefined;
   const [meter, setMeter] = useState({ frames: 0, revision: 0 }),
     soundGeneration = useRef(0);
@@ -42,7 +43,7 @@ export function useSoundSession(
 
   useEffect(() => {
     sound.current.update(state.patch, repeat, dry);
-  }, [state.patch, repeat, dry]);
+  }, [patchKey, repeat, dry]);
   const context = {
     state,
     setNotice,
@@ -68,7 +69,7 @@ export function useSoundSession(
     if (!auto || mode !== "render" || state.workspace !== "sound") return;
     const timer = setTimeout(() => void renderRef.current(true), 400);
     return () => clearTimeout(timer);
-  }, [auto, mode, state.patch, state.workspace]);
+  }, [auto, mode, patchKey, state.workspace]);
   function setMode(next: "live" | "render") {
     stopSound();
     setModeState(next);

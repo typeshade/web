@@ -128,6 +128,11 @@ try {
     (await stored(p)).source.patch.functionLayout.body,
     beforeLayout.body,
   );
+  assert.equal(
+    await p.locator("#download").isEnabled(),
+    true,
+    "Canvas motion retains the rendered sound",
+  );
   await p.getByRole("button", { name: "Undo", exact: true }).click();
   assert.deepEqual((await stored(p)).source.patch.functionLayout, beforeLayout);
   await node.focus();
@@ -144,10 +149,11 @@ try {
   await idle();
   const duplicate = (await graph()).nodes.at(-1).id;
   assert.equal((await graph()).nodes.at(-1).definition, "resonator");
-  await p.locator(`[data-function-output="${duplicate}"]`).click();
   await p
-    .locator('[data-function-input="level"][data-function-port="in"]')
-    .click();
+    .locator(`[data-function-output="${duplicate}"]`)
+    .dragTo(
+      p.locator('[data-function-input="level"][data-function-port="in"]'),
+    );
   await idle();
   assert.equal(
     (await graph()).nodes.find((n: any) => n.id === "level").inputs.in.node,

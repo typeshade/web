@@ -1,4 +1,5 @@
 import type { SoundPlaybackContext } from "./playbackTypes.ts";
+import { audioPatch } from "../../../sound/audioPatch.ts";
 export function createFiniteRender(context: SoundPlaybackContext) {
   const {
     stopSound,
@@ -23,7 +24,7 @@ export function createFiniteRender(context: SoundPlaybackContext) {
     try {
       const result = await sound.current.render(state.patch, backend);
       if (generation !== soundGeneration.current) return;
-      if (JSON.stringify(latest.current.state.patch) !== patchKey) {
+      if (JSON.stringify(audioPatch(latest.current.state.patch)) !== patchKey) {
         setBusy(false);
         setNotice("Sound changed. Render again to hear the current settings.");
         return;

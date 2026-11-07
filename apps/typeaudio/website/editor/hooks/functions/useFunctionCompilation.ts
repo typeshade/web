@@ -53,7 +53,10 @@ export function useFunctionCompilation(e: Editor, owner: string) {
     synchronize = false,
   ) {
     const id = ++request.current,
-      before = JSON.stringify(latest.current.graph);
+      before = JSON.stringify(latest.current.graph),
+      beforeLayout = JSON.stringify(
+        latest.current.e.state.patch.functionLayout,
+      );
     setBusy(true);
     setError("");
     setProblems([]);
@@ -67,7 +70,11 @@ export function useFunctionCompilation(e: Editor, owner: string) {
         epoch !== current.e.state.documentEpoch
       )
         return false;
-      if (JSON.stringify(current.graph) !== before)
+      if (
+        JSON.stringify(current.graph) !== before ||
+        (layout &&
+          JSON.stringify(current.e.state.patch.functionLayout) !== beforeLayout)
+      )
         throw new Error(
           "The sound changed during preparation. Apply again to keep the newer edits.",
         );
