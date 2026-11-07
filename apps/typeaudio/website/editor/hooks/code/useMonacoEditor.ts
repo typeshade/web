@@ -5,6 +5,7 @@ import {
   observeLanguageModel,
   type LanguageAnalysis,
 } from "../../code/language/observeLanguageModel.ts";
+import { setModelBindings } from "../../code/language/modelBindings.ts";
 import type { TypeshadeRange } from "typeshade/language-service";
 
 export interface MonacoEditorProps {
@@ -13,6 +14,7 @@ export interface MonacoEditorProps {
   readOnly: boolean;
   focusRequest: number;
   diagnostic?: CodeDiagnostic;
+  bindings?: Readonly<Record<string, string>>;
   onChange: (value: string) => void;
   onApply: () => void;
   onSave: () => void;
@@ -171,6 +173,7 @@ export function useMonacoEditor(props: MonacoEditorProps) {
         },
       );
     }
+    setModelBindings(entry.model, props.bindings);
     syncing.current = true;
     if (entry.model.getValue() !== props.value)
       entry.model.setValue(props.value);
@@ -211,6 +214,7 @@ export function useMonacoEditor(props: MonacoEditorProps) {
     props.value,
     props.readOnly,
     props.diagnostic,
+    props.bindings,
     instance,
   ]);
   useEffect(() => {

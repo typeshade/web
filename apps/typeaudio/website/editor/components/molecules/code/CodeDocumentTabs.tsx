@@ -42,11 +42,17 @@ export function CodeDocumentTabs({
           data-tooltip={
             doc.id === GENERATED_DOCUMENT
               ? "Compiled graph source. Read only."
-              : `${doc.label}${doc.dirty ? " — unapplied changes" : " — applied code"}`
+              : doc.kind === "settings"
+                ? "Built-in node settings. Select a Code node to edit its calculation."
+                : `${doc.label}${doc.dirty ? " — unapplied changes" : " — applied code"}`
           }
         >
           <span className="code-file-icon" aria-hidden="true">
-            {doc.id === GENERATED_DOCUMENT ? "ƒ" : "{}"}
+            {doc.id === GENERATED_DOCUMENT
+              ? "ƒ"
+              : doc.kind === "settings"
+                ? "◇"
+                : "{}"}
           </span>
           <span>{doc.label}</span>
           {doc.dirty && (

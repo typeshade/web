@@ -1,0 +1,82 @@
+.retained-code-editor {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+.builtin-node-context {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+  color: #cbd1da;
+}
+.studio-app .builtin-node-context h3 {
+  color: #d8e2ef;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.studio-app .builtin-node-context p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 8px 0;
+  max-width: 70ch;
+}
+.builtin-node-context dl {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+}
+.builtin-node-context dl > div {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.builtin-node-context dt {
+  min-width: 100px;
+  color: #a4b6ce;
+}
+.builtin-node-context dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.code-context summary {
+  min-width: 0;
+}
+.code-context summary > :is(strong, span) {
+  overflow-wrap: anywhere;
+}
+.code-context summary span:last-child {
+  flex-shrink: 0;
+}
+.code-connection-links,
+.code-parameter-links {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.studio-app .code-parameter-links button {
+  font-size: 11px;
+}
+.studio-app .code-parameter-links code {
+  color: #a8c9f7;
+}
+.studio-app .node-bypass-notice {
+  color: #efcd91;
+  font-size: 12px;
+}
+.graph-parameters-heading {
+  grid-column: 1 / -1;
+}
+@media (max-width: 950px) {
+  .studio-app :is(.builtin-node-context, .code-bindings) button {
+    min-height: 44px;
+  }
+  .builtin-node-context dl > div {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}

@@ -60,7 +60,9 @@ jobs:
         if: always()
         with:
           name: typeaudio-editor-ux
-          path: apps/typeaudio/artifacts/ux/
+          path: |
+            apps/typeaudio/artifacts/ux/
+            apps/typeaudio/artifacts/node-code/
       - uses: actions/upload-artifact@v4
         with:
           name: typeaudio-studio

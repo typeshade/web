@@ -1,11 +1,17 @@
 import type { GraphNode } from "typeaudio/graph";
 import type { SoundGraph } from "typeaudio/graph";
 import { createNode } from "./createNode.ts";
-export const IMPACT_CODE = `// p0: pitch, p1: decay, p2: strength, p3: texture
-state0 = fract(state0 + p0 * (1 + 0.6 * exp(-time * 45)) / sampleRate);
-const body: f32 = sin(state0 * 6.28318530718) * exp(-time / max(0.01, p1));
-const contact: f32 = input * exp(-time * 90) * p3;
-out = (body + contact) * p2 * min(1, time * 2400);`;
+export const IMPACT_CODE = `// Read the graph's four controls using meaningful local names.
+const pitch: f32 = p0;
+const decay: f32 = p1;
+const strength: f32 = p2;
+const texture: f32 = p3;
+const excitation: f32 = input;
+// state0 keeps the oscillator phase between samples.
+state0 = fract(state0 + pitch * (1 + 0.6 * exp(-time * 45)) / sampleRate);
+const body: f32 = sin(state0 * 6.28318530718) * exp(-time / max(0.01, decay));
+const contact: f32 = excitation * exp(-time * 90) * texture;
+out = (body + contact) * strength * min(1, time * 2400);`;
 
 export function initialGraph(recipe: "impact" | "tone" = "impact"): SoundGraph {
   const output = createNode("output", "output", 700, 130);

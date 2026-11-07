@@ -1,50 +1,99 @@
-import type { GraphParameter } from "typeaudio/graph";
+import type { GraphNode, SoundGraph } from "typeaudio/graph";
+import { nodeContext } from "../../../code/nodeContext.ts";
 
 export function CodeContext({
-  parameters,
+  graph,
+  node,
   generated,
+  onSelectNode,
 }: {
-  parameters: readonly GraphParameter[];
+  graph: SoundGraph;
+  node?: GraphNode;
   generated: boolean;
+  onSelectNode: (id: string) => void;
 }) {
-  return generated ? (
-    <p className="code-context-generated">
-      Compiled graph · Read only · Edit a node’s Sample code to change the
-      sound.
-    </p>
-  ) : (
+  if (generated)
+    return (
+      <p className="code-context-generated">
+        Engine output for the whole graph · Read only. This is compiled from the
+        nodes; edit a Code node's sample body to change its calculation.
+      </p>
+    );
+  if (!node) return null;
+  const context = nodeContext(graph, node);
+  return (
     <details className="code-context">
       <summary>
-        <strong>Sample code</strong>
+        <strong>
+          {context.source?.name ?? "Silence (0)"} → <code>input</code>
+        </strong>
         <span>
-          Runs once per sample · Assign <code>out</code>
+          <code>out</code> →{" "}
+          {context.targets.map((t) => t.node.name).join(", ") || "Unconnected"}
         </span>
-        <span>Inputs &amp; state</span>
+        <span>Bindings &amp; state</span>
       </summary>
+      {node.bypass && (
+        <p className="node-bypass-notice">
+          Bypassed: audio passes through the input without executing this code.
+        </p>
+      )}
       <div className="code-bindings">
         <p>
-          <code>input: f32</code> Audio from the connected input.{" "}
-          <code>out: f32</code> This node’s output.
+          This body runs once for each audio sample, at 48,000 samples per
+          second. Read <code>input: f32</code> and assign <code>out: f32</code>.
         </p>
+        <div className="code-connection-links">
+          <span>Input:</span>
+          {context.source ? (
+            <button
+              data-code-target={context.source.id}
+              onClick={() => onSelectNode(context.source!.id)}
+            >
+              {context.source.name}
+            </button>
+          ) : (
+            <span>Unconnected · input = 0</span>
+          )}
+          <span>Output:</span>
+          {context.targets.map(({ node: target, port }) => (
+            <button
+              key={`${target.id}:${port}`}
+              data-code-target={target.id}
+              onClick={() => onSelectNode(target.id)}
+            >
+              {target.name} · {port}
+            </button>
+          ))}
+        </div>
+        <p>Shared graph parameters (available without a cable):</p>
+        <div className="code-parameter-links">
+          {[0, 1, 2, 3].map((i) => (
+            <button
+              key={i}
+              data-code-parameter={i}
+              disabled={!graph.parameters[i]}
+              onClick={() =>
+                document.getElementById(`graph-param-${i}`)?.focus()
+              }
+            >
+              <code>p{i}</code> {graph.parameters[i]?.name ?? "Unassigned (0)"}
+            </button>
+          ))}
+        </div>
         <p>
           <code>time: f32</code> Seconds since Retrigger.{" "}
           <code>sampleRate: f32</code> 48000 Hz.
         </p>
         <p>
-          {[0, 1, 2, 3].map((i) => (
-            <span className="code-binding" key={i}>
-              <code>p{i}</code> {parameters[i]?.name ?? "Unassigned (0)"}
-            </span>
-          ))}
-        </p>
-        <p>
           <code>state0…state3: f32</code> Values kept between samples. Retrigger
-          resets them to zero.
+          resets them to zero. Local variables are recalculated for every
+          sample.
         </p>
         <p>
-          Declare local variables for intermediate values. Apply code checks
-          this node’s audio limits and updates the sound; typing only changes
-          your draft.
+          Apply code changes this node's calculation. Its cables, other nodes
+          and graph parameters stay in the graph editor. Functions and imports
+          are outside this sample-body contract.
         </p>
       </div>
     </details>

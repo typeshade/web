@@ -41,6 +41,7 @@ export function useGraphSelection(graph: SoundGraph | null, owner: string) {
   }
   const selectedIds = getSelection();
   return {
+    selectionVersion: value,
     selectedIds,
     selected: graph?.nodes.find((n) => n.id === selectedIds.at(-1)),
     getSelection,
