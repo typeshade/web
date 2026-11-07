@@ -175,3 +175,11 @@ The wording distinguishes TypeShade language diagnostics from the narrower audio
 execution contract and explains when drafts reach playback. Browser coverage checks
 completion, live errors, navigation/rename, stale results and continued AudioWorklet
 progress. This is a bounded studio UI review, not a broader site or translation review.
+
+
+The approved TypeAudio UX follow-up reviews the English project entry, Saved copies,
+variant preview, contextual source breadcrumb, playback scope, browser-save status
+and mobile task labels. Project save includes unapplied drafts; Apply code and WAV
+export remain separate actions. The bounded implementation and its actual browser
+verification are recorded in [the editor UX review](reviews/typeaudio-editor-ux.md).
+No site-wide, translation, physical-device or independent-user acceptance is claimed.

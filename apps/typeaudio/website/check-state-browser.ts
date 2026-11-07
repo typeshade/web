@@ -151,8 +151,8 @@ try {
   );
   assert.equal(
     await p.locator("#editor-main").getAttribute("data-workspace"),
-    "sound",
-    "Pending imports leave the current workspace intact",
+    "picture",
+    "Pending imports leave the contextual source workspace intact",
   );
   await workspace(p, "Picture");
   await ready(p);

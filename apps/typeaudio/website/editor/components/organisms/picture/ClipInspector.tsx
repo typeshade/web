@@ -28,7 +28,7 @@ export function ClipInspector({
   return (
     <>
       <Panel
-        title="Layer properties"
+        title={c?.name || "Layer properties"}
         className="clip-properties"
         actions={
           c &&

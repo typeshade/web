@@ -39,7 +39,7 @@ export function useEditorDocument() {
     rawDispatch(action);
   }, []);
   const [notice, setNotice] = useState(
-    "Ready. Choose a preset or import a video.",
+    "Ready. Open an editable project or create a procedural sound.",
   );
   const [savedValue, setSavedValue] = useState("");
   const [saveError, setSaveError] = useState(false);

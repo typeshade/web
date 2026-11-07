@@ -33,15 +33,15 @@ export function useEditorShortcuts(e: Editor) {
           target instanceof HTMLInputElement &&
           ["range", "checkbox"].includes(target.type)
         );
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        save();
+        return;
+      }
       if (editable) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
         event.preventDefault();
         event.shiftKey ? e.redo() : e.undo();
-        return;
-      }
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
-        event.preventDefault();
-        save();
         return;
       }
       if (picture && (event.ctrlKey || event.metaKey)) {

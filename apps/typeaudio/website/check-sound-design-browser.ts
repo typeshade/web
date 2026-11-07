@@ -155,6 +155,7 @@ try {
   const json = await download(p, "export-patch");
   await p.reload();
   assert.deepEqual(await patch(p), JSON.parse(json.toString()).patch);
+  await p.getByRole("button", { name: "Sounds", exact: true }).click();
   await p.locator('[data-preset="warm"]').click();
   assert.equal((await patch(p)).layers.length, 0);
   await p.locator("#patch-file").setInputFiles({

@@ -67,7 +67,12 @@ export function StudioPage() {
               }
               hidden={picture && !sourceEditing}
             >
-              {sourceEditing && <SourceBreadcrumb editor={e} />}
+              {sourceEditing && (
+                <SourceBreadcrumb
+                  editor={e}
+                  sourceName={selection.layer?.name || "Base source"}
+                />
+              )}
               <SoundViewer editor={e} graph={graph} hidden={false} />
               {sourceEditing && graph.graph && (
                 <GraphDock controller={graph} documents={documents} />

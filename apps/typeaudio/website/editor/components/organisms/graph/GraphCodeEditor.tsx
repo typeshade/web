@@ -82,7 +82,7 @@ export function GraphCodeEditor({
             : d.generated
               ? "Read-only source for the applied graph. Edit a Code node to change its sound."
               : d.dirty
-                ? "Draft saved with project · Ctrl/⌘ S: save file · Ctrl/⌘ Enter: apply to sound. Playback uses applied code."
+                ? "Unapplied draft · Ctrl/⌘ S saves this text with the project. Ctrl/⌘ Enter applies it to the sound."
                 : "Applied · Ctrl/⌘ Space: completion · F2: rename · F12: definition · Apply checks audio-node limits.")}
       </p>
     </div>

@@ -173,8 +173,8 @@ export function ProjectPanel({
       />
       {tab === "examples" ? (
         <>
-          <ProjectExamples editor={e} />
           <SavedProjects editor={e} />
+          <ProjectExamples editor={e} />
         </>
       ) : tab === "sounds" ? (
         <>

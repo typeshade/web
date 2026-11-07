@@ -118,6 +118,17 @@ try {
   );
   assert.equal(await p.locator("#play").isVisible(), true);
   assert.equal(await p.locator("[data-cue]").first().isVisible(), true);
+  const canvas = await p.locator(".graph-surface").boundingBox();
+  assert.ok(canvas);
+  for (const node of await p.locator("[data-graph-node]").all()) {
+    const b = await node.boundingBox();
+    assert.ok(
+      b &&
+        b.y >= canvas.y - 1 &&
+        b.y + b.height <= canvas.y + canvas.height + 1,
+      "Initial node framing stays inside the contextual canvas",
+    );
+  }
   await p.locator("#code-tab-node-material").click();
   const applied = beforePreview.scene.cues[0].patch.graph.nodes.find(
     (n: any) => n.id === "material",
@@ -143,6 +154,7 @@ try {
   const copy = p
     .locator("[data-saved-project]")
     .filter({ hasText: "UX edited A" });
+  await p.locator(".saved-projects summary").click();
   await copy.getByRole("button", { name: "Open copy", exact: true }).click();
   await p.waitForFunction(
     () =>
@@ -202,13 +214,11 @@ try {
   mobile.setDefaultTimeout(30000);
   mobile.on("pageerror", (error) => errors.push(error.message));
   await mobile.goto("http://127.0.0.1:4197");
-  await mobile
-    .locator("#project-file")
-    .setInputFiles({
-      name: "draft.typeaudio.json",
-      mimeType: "application/json",
-      buffer: bytes,
-    });
+  await mobile.locator("#project-file").setInputFiles({
+    name: "draft.typeaudio.json",
+    mimeType: "application/json",
+    buffer: bytes,
+  });
   await ready(mobile);
   for (const width of [390, 320]) {
     await mobile.setViewportSize({ width, height: 844 });
@@ -263,6 +273,22 @@ try {
   await mobile.locator("#stop").click();
   await task(mobile, "Projects");
   await mobile.screenshot({ path: `${output}/mobile-projects.png` });
+  const linked = await browser.newPage({
+    viewport: { width: 1280, height: 900 },
+  });
+  linked.on("pageerror", (error) => errors.push(error.message));
+  await linked.goto("http://127.0.0.1:4197/?project=frieren-red-A");
+  await ready(linked);
+  assert.equal((await stored(linked)).scene.origin.id, "frieren-red-A");
+  assert.equal(
+    await linked.locator("#editor-main").getAttribute("data-workspace"),
+    "picture",
+  );
+  // Saving while a name input is focused has the same meaning as saving from code.
+  await linked.locator("#scene-name").focus();
+  const nameSave = linked.waitForEvent("download");
+  await linked.keyboard.press("Control+s");
+  assert.equal(await (await nameSave).failure(), null);
   assert.deepEqual(errors, []);
   observations.portableScene = intact.scene.name;
   await writeFile(

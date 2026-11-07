@@ -34,7 +34,7 @@ No merge or deployment is included. The existing PR chain must be reconciled bef
 
 The subsequent [UX review](reviews/typeaudio-editor-ux.md) found blocking inspector reachability,
 candidate-switch recovery and draft/save semantics. Functional test passes do not establish UX
-acceptance. Correct these findings before releasing the first milestone.
+acceptance. The approved corrections are implemented on the same branch; their browser verification and remaining usability limits are recorded in that review.
 
 ## Authoring contract
 
@@ -77,11 +77,27 @@ A preview WAV alone does not meet this milestone. Return the editable JSON along
 any optional listening reference. Validate and compile every source before handoff.
 Use an explicit listening-review status; technical checks do not select an artistic candidate.
 
-Legacy flat version-1 scene JSON still imports and exports. Projects with space or
-origin metadata use the envelope so older editors reject them rather than silently
-discarding these fields. Unsupported versions and invalid documents leave the current
-editor document intact. Pending imports also leave the current workspace intact;
-successful imports switch to Picture. Newer edits invalidate a delayed import.
+The editor imports legacy flat version-1 scenes and version-1 project envelopes.
+**Save project file** now writes a version-2 envelope with the same `scene` and an
+`editor` object containing the independent `source`, `selected`, `selection` and
+`drafts`. Draft keys identify the source owner and Code node. Each entry holds
+`base` (the applied code on which typing began) and `text` (the retained buffer).
+Drafts may contain incomplete or invalid code; saving never compiles or applies them.
+The running sound and exported WAV use applied code in `scene.cues[].patch.graph`.
+Complete version-1 source fixtures remain valid agent handoffs; the editor adds its
+working state when users save them. Older editors reject version 2 explicitly.
+
+Before opening another project, the editor checkpoints its current source, scene,
+selection and drafts into **Projects → Saved copies**. These copies stay in browser
+storage; their imported audio remains in IndexedDB and is protected from library
+deletion while referenced. They are not cloud backups. A failed checkpoint blocks
+replacement without evicting old copies. Users can remove old copies or save portable
+project files. Portable files embed referenced imported audio, but not local video.
+
+Unsupported versions and invalid documents leave current work intact. Newer edits,
+including draft typing, invalidate a delayed import. Successful imports select Picture
+for a composition or Sound for a standalone source. A document generation separates
+Monaco models and pending compilation even when two projects reuse node IDs.
 
 ## Ownership and playback
 
@@ -96,7 +112,9 @@ room processes every source continuously, including pre-range source history.
 Composition playback and WAV export consume the same prepared stereo result.
 Source, timing, trim, gain, trajectory and room edits invalidate that result;
 the Effects fader only changes the output level. A stale render cannot enable playback
-for a newer document. Selected-layer audition remains dry and says so in the status.
+for a newer document. Selected-layer audition remains dry and labels that scope beside the transport.
+Candidate preview owns disposable audio resources and never replaces the working
+document. Stopping it or starting composition/source playback cancels that preview.
 
 The six fixtures cover three separate passages, with A/B candidates and 15, 17 and
 15 layers respectively. They are not the full 189-second mix. They preserve the

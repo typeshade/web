@@ -2,8 +2,8 @@ import type { Editor } from "../../../useEditor.ts";
 
 export function SavedProjects({ editor: e }: { editor: Editor }) {
   return (
-    <section className="saved-projects" aria-label="Saved copies">
-      <h3>Saved copies</h3>
+    <details className="saved-projects">
+      <summary>Saved copies ({e.savedProjects.length})</summary>
       <p>
         Opening a project keeps your previous work here, including code drafts.
         Copies stay in this browser.
@@ -36,6 +36,6 @@ export function SavedProjects({ editor: e }: { editor: Editor }) {
           </div>
         </div>
       ))}
-    </section>
+    </details>
   );
 }

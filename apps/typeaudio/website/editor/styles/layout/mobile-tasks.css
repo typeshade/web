@@ -202,3 +202,28 @@
     font-size: 11px;
   }
 }
+
+@media (max-width: 950px) {
+  .studio-app .inspector-region > .panel {
+    overflow: visible;
+  }
+  .inspector-region .panel-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .studio-app .saved-projects summary {
+    min-height: 44px;
+  }
+  .source-editing-view .graph-surface {
+    min-height: 80px;
+  }
+}
+
+@media (max-width: 950px) {
+  .studio-app
+    :is(.inspector-region, .project-panel, .timeline-tools, .graph-parameters)
+    :is(input:not([type="range"], [type="checkbox"]), select) {
+    font-size: 16px;
+  }
+}

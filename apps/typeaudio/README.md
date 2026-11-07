@@ -33,23 +33,36 @@ preserves this compiler pipeline; it consumes the web workspace's shared UI toke
 
 ## Editable agent projects
 
-Open **Project → Projects** and choose A or B for one of the three Frieren passages.
-Each project includes every procedural layer, its Code nodes, parameters, seed,
-amplitude envelope, timeline and spatial configuration. No rendered audio is needed
-to reopen these projects. The YouTube reference is retained; **Connect reference**
-loads the external player only when requested. Editing and effects playback also
-work without it.
+The Project browser starts with agent projects, **Open project file…** and
+**Save project file**. Preview A or B to hear its character without replacing your
+work, then open an editable copy of one of the three Frieren passages. Opening a
+project keeps the previous document in **Saved copies**, including code drafts;
+a failed checkpoint leaves current work intact. These copies stay in this browser.
 
-1. Select a layer in the Picture timeline.
-2. Choose **Edit sound** to edit its parameters or either Code node.
-3. Use **Apply code** after code edits. Parameter edits apply directly.
-4. Return to **Picture** to prepare and play the updated stereo composition.
-5. Adjust timing, source position points, room send or the **Scene space** controls.
-6. Use **File → Export project…** to keep the editable source JSON.
-7. Use **File → Open project…** to continue editing it in another session or browser.
+Each project includes procedural layers, Code nodes, parameters, seeds, amplitude
+envelopes, timing and spatial settings. **Connect reference** loads its YouTube
+player on request. Editing and effects playback also work without it.
 
-**Export WAV** saves the prepared effects mix, not the editable project. Single-layer
-**Audition** plays its dry source; composition playback includes the shared room.
+1. Select a layer in the Picture timeline and adjust its **Sound controls**.
+2. Choose **Edit sound** for nodes/code. The composition transport and timeline stay available.
+3. Use **Apply code** (Ctrl/Cmd+Enter) to change the sound. Parameter edits apply directly.
+4. Play the composition to hear the shared room, or **Audition dry** for the selected source.
+5. Return to **Composition** for timing, position, room send and **Scene space** controls.
+6. Use **Save project file** (Ctrl/Cmd+S, including inside code) for a portable JSON with
+   applied sounds, independent source, selection and unapplied code drafts.
+7. Open that file to continue editing in another session or browser. Incomplete code
+   is retained as a draft; reopening does not apply it to the sound.
+
+At narrow widths, **Listen**, **Layers**, **Edit** and **Projects** show one task at a
+time while project identity and playback remain visible. **Edit** shows layer controls;
+**Edit sound** opens deeper source editing and **Layer controls** returns to properties.
+In the standalone Sound workspace, **Code / FX** opens the lower editing panel.
+
+**Export mix WAV** saves rendered effects audio. **Save preset** keeps one applied
+sound in the browser's sound library, and **Save sound file** exports that applied
+source. These actions are separate from saving the full editable project. The document
+bar reports browser save success/failure and the presence of code drafts.
+
 For these source graphs, **Source length** controls the rendered duration, while
 the exposed **Envelope span** parameter controls the authored amplitude curve.
 
@@ -129,7 +142,7 @@ to the visible body. **Audio-node limits & math reference** describes the separa
 TypeAudio execution restrictions. A clean language check does not replace Apply's
 audio-node validation or permit arbitrary TypeScript module execution.
 
-**Apply code**, Ctrl/Cmd+Enter, or Ctrl/Cmd+S inside the editor compiles the draft
+**Apply code** or Ctrl/Cmd+Enter compiles the draft
 in a dedicated worker. Failed compilation keeps the applied graph and audio;
 explicit worker error locations appear on the corresponding code line. A result
 that arrives after a newer graph edit is discarded. Typing during compilation
@@ -138,7 +151,8 @@ import changes applied code under a dirty draft, choose **Use applied code** or
 **Keep my draft** before applying again. **Revert draft** discards that node's
 unapplied edits. Editor Undo changes text; document Undo changes the sound.
 
-Drafts survive Sound/Picture and source-owner switches within this session.
+Drafts survive source/workspace switches, reloads and project saves. Ctrl/Cmd+S
+saves a portable project file without applying those drafts.
 They are not exported or restored after reload; leaving with unapplied drafts
 triggers the browser's unsaved-change prompt. Only successfully applied code is
 included in local saves, patch exports and Picture projects. These tabs represent

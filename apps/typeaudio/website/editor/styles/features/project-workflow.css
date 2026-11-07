@@ -12,10 +12,7 @@
 .saved-projects {
   padding: 12px;
 }
-.studio-app .saved-projects h3 {
-  font-size: 13px;
-  color: #ddd;
-}
+
 .saved-projects p {
   color: #bbb;
   font-size: 12px;
@@ -121,7 +118,7 @@
 }
 .source-editing-view > .document-view {
   flex: 1;
-  min-height: 110px;
+  min-height: 260px;
   height: auto;
 }
 .source-editing-view > .graph-dock-panel {
@@ -148,4 +145,28 @@
 
 .viewer-region:has(.source-editing-view) {
   overflow: auto;
+}
+
+.saved-projects summary {
+  cursor: pointer;
+  font-size: 13px;
+  padding: 8px 0;
+  color: #ddd;
+}
+.source-editing-view .graph-network {
+  min-height: 0;
+}
+.source-editing-view .graph-surface {
+  min-height: 80px;
+}
+.source-editing-view :is(.graph-toolbar, .graph-footer) {
+  flex-shrink: 0;
+}
+.clip-properties .panel-header h2 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.clip-properties .panel-actions {
+  flex-shrink: 0;
 }

@@ -313,6 +313,7 @@ try {
   console.log(
     "PASS direct numeric input/scrub/cancel, one-gesture Undo/Redo, native sliders, preset state, pointer/keyboard tooltips and menus, persistent layout, focus viewer",
   );
+  await p.getByRole("button", { name: "Sounds", exact: true }).click();
   for (const preset of ["warm", "bass"]) {
     await p.locator(`[data-preset="${preset}"]`).click({ button: "right" });
     await p

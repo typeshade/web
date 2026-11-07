@@ -35,11 +35,12 @@ export function ProjectExamples({ editor: e }: { editor: Editor }) {
                   </button>
                   <button
                     data-project={id}
+                    aria-label={`Open editable copy ${project.title} ${variant}`}
                     disabled={e.projectLoading}
                     data-tooltip="Open an editable copy. Your previous project is kept in Saved copies."
                     onClick={() => void e.openExample(id)}
                   >
-                    Open {variant}
+                    Open copy
                   </button>
                   <a
                     href={projectUrl(id)}

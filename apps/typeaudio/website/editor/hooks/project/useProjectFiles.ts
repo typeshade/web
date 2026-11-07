@@ -38,6 +38,17 @@ export function useProjectFiles(
     }
   }
   useEffect(refreshProjects, []);
+  useEffect(() => {
+    const id = new URL(location.href).searchParams.get("project");
+    if (!id) return;
+    const timer = setTimeout(() => {
+      void openExample(id);
+      const url = new URL(location.href);
+      url.searchParams.delete("project");
+      history.replaceState(history.state, "", url);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
   function checkpoint() {
     const s = latest.current.state;
     projectHistory.save(encodeProject(s.scene, [], editorState(s)));
