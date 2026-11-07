@@ -156,6 +156,7 @@ Equivalent execution structure retains the original bindings and node order, so 
 `functionComposition` and `functionLayout` are excluded by `audioPatch`; audible function/control changes remain included.
 
 Composition projects use version 4, sound files version 3 and browser envelopes version 3.
+Automatic draft rebasing uses `reconcileDrafts` and does not count as newer user input during a protected import.
 `FunctionInputRename` owns the input form; engine symbol edits preserve stable port IDs and bindings.
 `check-composition-browser.ts` exercises cross-view changes, rename, source preservation, language tools,
 Live continuity, empty/invalid drafts, conflicts, stale preparations, save/reopen and mobile access.
