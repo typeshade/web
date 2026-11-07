@@ -52,6 +52,10 @@ covers the editable-project flow on Web PR #47. It records browser reproductions
 and label findings, unresolved release blockers and a proposed task flow. It is not a new
 all-site editorial pass, translation review or study with independent users.
 
+The owner subsequently approved the [Frieren editable-study publication](reviews/typeaudio-frieren-publication.md).
+That record covers the six passage projects, their release boundary, a reproduced
+shared-tooltip defect, and the production verification; it is not a full-scene mix approval.
+
 API range evidence: [1–200](reviews/typeshade-api.md),
 [201–359](reviews/typeshade-api-documents-range.md),
 [360–518](reviews/typeshade-api-lessons-range.md).
