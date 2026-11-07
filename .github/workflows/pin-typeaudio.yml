@@ -1,0 +1,76 @@
+name: pin TypeAudio
+on:
+  workflow_dispatch:
+    inputs:
+      engine_sha:
+        description: Full merged TypeAudio commit to promote with its compiler pin
+        required: true
+        type: string
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+concurrency:
+  group: pin-typeaudio
+  cancel-in-progress: false
+jobs:
+  pin:
+    if: github.ref == 'refs/heads/main' && vars.WEBSITE_OPERATIONS_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      ENGINE_SHA: ${{ inputs.engine_sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git submodule update --init sources/typeaudio
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - name: Select the engine and compiler pair
+        run: node apps/typeaudio/scripts/promote-engine.mjs "$ENGINE_SHA"
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm check:typeaudio && pnpm test:typeaudio && pnpm build:typeaudio
+      - run: pnpm --filter typeaudio-site exec playwright-core install --with-deps chromium
+      - run: pnpm --filter typeaudio-site test:browser
+      - run: pnpm --filter typeaudio-site feedback --out .feedback/promotion.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: typeaudio-promotion-feedback
+          include-hidden-files: true
+          path: apps/typeaudio/.feedback/
+      - name: Propose the verified pair
+        run: |
+          if git diff --quiet -- sources/typeaudio apps/typeaudio/package.json pnpm-lock.yaml; then
+            echo "This version pair is already pinned." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          branch="pin/typeaudio-${ENGINE_SHA:0:12}"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "A promotion branch already exists: $branch. Preserve its review changes and inspect its PR."
+            exit 1
+          fi
+          git switch -c "$branch"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sources/typeaudio apps/typeaudio/package.json pnpm-lock.yaml
+          git commit -m "TypeAudio: promote engine ${ENGINE_SHA:0:12} with its compiler pin"
+          git push origin "$branch"
+          cat > "$RUNNER_TEMP/typeaudio-pin.md" <<'BODY'
+          Promotes a merged TypeAudio revision and the exact TypeShade compiler it declares.
+
+          This workflow passed the studio type checks, unit tests, build, browser suites and shared engine reproductions before opening the PR. The workflow artifact records the tested versions and CPU results. Hardware audio deadline validation remains separate.
+
+          No automatic merge or deployment is performed. Check the dispatched branch CI before merging.
+          BODY
+          gh pr create --head "$branch" --base main --title "TypeAudio: promote engine ${ENGINE_SHA:0:12}" --body-file "$RUNNER_TEMP/typeaudio-pin.md"
+          gh workflow run typeaudio.yml --ref "$branch"
+          gh workflow run ci.yml --ref "$branch"

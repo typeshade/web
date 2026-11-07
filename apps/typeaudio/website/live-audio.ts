@@ -2,7 +2,7 @@ import workletUrl from "./live.worklet.ts?worker&url";
 import type { Patch } from "./sound/types.ts";
 import { patchPrograms } from "./graph/preparePatch.ts";
 import { loadGraphModule } from "./graph/loadGraphModule.ts";
-import { graphKey } from "./graph/graphIdentity.ts";
+import { graphKey } from "typeaudio/graph";
 const modules = new WeakMap<AudioContext, Promise<void>>();
 
 export class LiveAudio {

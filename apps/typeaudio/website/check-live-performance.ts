@@ -7,7 +7,7 @@ import { RECIPES } from "./sound-recipes.ts";
 import { DEFAULT } from "./sound/defaultPatch.ts";
 import { createNode } from "./graph/createNode.ts";
 import { initialGraph } from "./graph/recipes.ts";
-import { compileGraph } from "./graph/compiler/compileGraph.ts";
+import { compileGraph } from "typeaudio/graph/compiler";
 const fullGraph = initialGraph();
 
 let from = "filter";

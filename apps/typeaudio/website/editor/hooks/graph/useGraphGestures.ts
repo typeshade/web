@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import type { GraphEditor } from "./useGraphEditor.ts";
 import type { GraphViewport } from "./useGraphViewport.ts";
-import type { GraphNode } from "../../../graph/types.ts";
+import type { GraphNode } from "typeaudio/graph";
 import {
   moveNodes,
   nodeHeight,

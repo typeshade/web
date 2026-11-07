@@ -3,8 +3,8 @@ import { validatePatch } from "./sound/validatePatch.ts";
 import { type Patch } from "./sound/types.ts";
 import { LiveDsp } from "./live-dsp.ts";
 import { soundLength, sourceLength } from "./sound-design.ts";
-import { GraphDsp } from "./graph/dsp.ts";
-import { graphKey } from "./graph/graphIdentity.ts";
+import { GraphDsp } from "typeaudio/graph/runtime";
+import { graphKey } from "typeaudio/graph";
 interface Layer {
   id: string;
   dsp: LiveDsp | GraphDsp;

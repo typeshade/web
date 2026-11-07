@@ -1,5 +1,5 @@
-import type { GraphNode, SoundGraph } from "../../graph/types.ts";
-import { orderedNodes } from "../../graph/orderGraph.ts";
+import type { GraphNode, SoundGraph } from "typeaudio/graph";
+import { orderedNodes } from "typeaudio/graph";
 import { WIDTH, nodeHeight } from "./graphGeometry.ts";
 
 /** Lay out a DAG left to right, including disconnected nodes, without changing signal order. */

@@ -1,4 +1,4 @@
-import type { GraphNode, NodeKind } from "../../graph/types.ts";
+import type { GraphNode, NodeKind } from "typeaudio/graph";
 import { WIDTH, nodeHeight, type Point } from "./graphGeometry.ts";
 
 /** Place a new node near the requested point without moving existing nodes. */

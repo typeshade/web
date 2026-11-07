@@ -1,4 +1,4 @@
-import type { NodeKind } from "../../graph/types.ts";
+import type { NodeKind } from "typeaudio/graph";
 export const NODE_METADATA: Record<
   NodeKind,
   { category: string; summary: string }

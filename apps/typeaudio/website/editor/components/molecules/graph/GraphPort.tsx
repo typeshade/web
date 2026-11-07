@@ -2,7 +2,7 @@ import type {
   GraphEndpoint,
   GraphConnectionsController,
 } from "../../../hooks/graph/useGraphConnections.ts";
-import type { Signal } from "../../../../graph/types.ts";
+import type { Signal } from "typeaudio/graph";
 export function GraphPort({
   endpoint,
   name,

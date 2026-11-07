@@ -26,7 +26,6 @@ export const FUNCTIONS: Record<string, { args: string[]; help: string }> = {
   sqrt: { args: ["x"], help: "Square root; use a nonnegative x." },
   exp: { args: ["x"], help: "e raised to x." },
   exp2: { args: ["x"], help: "2 raised to x." },
-  pow: { args: ["x", "y"], help: "x raised to y." },
   tanh: { args: ["x"], help: "Hyperbolic tangent; useful for soft clipping." },
   mix: { args: ["a", "b", "t"], help: "Linear interpolation from a to b." },
   select: {

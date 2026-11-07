@@ -1,5 +1,5 @@
-import { graphKey } from "./graphIdentity.ts";
-import type { GraphProgram } from "./program.ts";
+import { graphKey } from "typeaudio/graph";
+import type { GraphProgram } from "typeaudio/graph";
 import type { Patch } from "../sound/types.ts";
 import { prepareGraph } from "./compilationClient.ts";
 export async function patchPrograms(p: Patch): Promise<GraphProgram[]> {

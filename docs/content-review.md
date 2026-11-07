@@ -156,3 +156,10 @@ The code workspace follow-up adds a bounded English review for Monaco Code
 node documents, draft/conflict recovery, split layouts and command/quick-open
 search. The component record documents the scalar-language and session-only
 draft limits, resource boundaries and real editor/audio regression coverage.
+
+
+The cross-repository feedback follow-up moves graph execution into TypeAudio and
+adds one English File command, **Export graph reproduction…**, plus its result
+message. The wording names an applied graph snapshot and excludes layer mixing,
+prior edits and playback timing. No translation or broader imported-content review
+is claimed. The TypeAudio README records reproduction and compiler proposal limits.

@@ -1,4 +1,4 @@
-import type { SoundGraph } from "./types.ts";
+import type { SoundGraph } from "typeaudio/graph";
 
 export function removeNodes(graph: SoundGraph, selected: string[]): SoundGraph {
   const removed = new Set(

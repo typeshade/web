@@ -11,7 +11,7 @@ export function GraphCodeReference() {
         Use scalar variables, assignments and if statements. Functions:{" "}
         <code>
           sin, cos, abs, min, max, clamp, fract, floor, ceil, sqrt, exp, exp2,
-          pow, tanh, mix, select, f32, u32, i32
+          tanh, mix, select, f32, u32, i32
         </code>
         .
       </p>

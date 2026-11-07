@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { GraphEditor } from "./useGraphEditor.ts";
 import type { GraphViewport } from "./useGraphViewport.ts";
 import type { NodeAttachment } from "../../../graph/insertNode.ts";
-import type { NodeKind } from "../../../graph/types.ts";
+import type { NodeKind } from "typeaudio/graph";
 import type { Point } from "../../shared/graphGeometry.ts";
 export function useGraphNodePicker(c: GraphEditor, viewport: GraphViewport) {
   const [request, setRequest] = useState<{

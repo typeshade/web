@@ -1,5 +1,5 @@
-import type { SoundGraph } from "../graph/types.ts";
-import type { GraphProgram } from "../graph/program.ts";
+import type { SoundGraph } from "typeaudio/graph";
+import type { GraphProgram } from "typeaudio/graph";
 export interface CurvePoint {
   time: number;
   value: number;

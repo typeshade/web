@@ -1,7 +1,7 @@
 import type { Patch } from "./types.ts";
 import { DEFAULT } from "./defaultPatch.ts";
 import { LIMITS } from "./limits.ts";
-import { validateGraph } from "../graph/validateGraph.ts";
+import { validateGraph } from "typeaudio/graph";
 import { WAVE_SIZE } from "./constants.ts";
 import { CURVE_LIMITS } from "./limits.ts";
 import { MAX_SOUND_LAYERS } from "./constants.ts";

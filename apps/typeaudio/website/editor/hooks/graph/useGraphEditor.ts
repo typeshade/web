@@ -1,8 +1,8 @@
 import { useRef } from "react";
 import type { Editor } from "../../useEditor.ts";
-import { DEFINITIONS } from "../../../graph/catalog.ts";
+import { DEFINITIONS } from "typeaudio/graph";
 import { initialGraph } from "../../../graph/recipes.ts";
-import { validateGraph } from "../../../graph/validateGraph.ts";
+import { validateGraph } from "typeaudio/graph";
 import { connectNodes, connectionError } from "../../../graph/connectNodes.ts";
 import {
   duplicateNodes,
@@ -10,7 +10,7 @@ import {
 } from "../../../graph/duplicateNodes.ts";
 import { removeNodes } from "../../../graph/removeNodes.ts";
 import { insertNode, type NodeAttachment } from "../../../graph/insertNode.ts";
-import type { GraphNode, NodeKind, SoundGraph } from "../../../graph/types.ts";
+import type { GraphNode, NodeKind, SoundGraph } from "typeaudio/graph";
 import type { MenuItem } from "../../interactions/types.ts";
 import type { GraphView } from "../../shared/graphGeometry.ts";
 import { graphPlacement } from "../../shared/graphPlacement.ts";

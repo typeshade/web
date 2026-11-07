@@ -25,6 +25,12 @@ describe("editor architecture boundaries", () => {
   it("rejects mixed component files, UI resource ownership and domain-to-UI imports", () => {
     expect(
       inspectModule(
+        "/app/website/editor/hooks/graph/useGraphEditor.ts",
+        'import {compileGraph} from "typeaudio/graph/compiler";',
+      ).errors.join(),
+    ).toMatch(/belongs in its worker/);
+    expect(
+      inspectModule(
         "/app/website/editor/components/atoms/Button.tsx",
         "export function Button(){return <button/>;} export function Label(){return <span/>;}",
       ).errors.join(),

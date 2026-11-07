@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { initialGraph } from "./graph/recipes.ts";
 import { createNode } from "./graph/createNode.ts";
-import { validateGraph } from "./graph/validateGraph.ts";
+import { validateGraph } from "typeaudio/graph";
 import { duplicateNodes } from "./graph/duplicateNodes.ts";
 import { removeNodes } from "./graph/removeNodes.ts";
 import { connectNodes, connectionError } from "./graph/connectNodes.ts";
 import { insertNode, insertionError } from "./graph/insertNode.ts";
-import { graphKey } from "./graph/graphIdentity.ts";
+import { graphKey } from "typeaudio/graph";
 import { arrangeGraph } from "./editor/shared/graphLayout.ts";
 import { graphPlacement } from "./editor/shared/graphPlacement.ts";
 import { moveNodes, nodeHeight, WIDTH } from "./editor/shared/graphGeometry.ts";

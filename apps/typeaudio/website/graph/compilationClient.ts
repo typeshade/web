@@ -1,6 +1,6 @@
-import { graphKey } from "./graphIdentity.ts";
-import { type SoundGraph } from "./types.ts";
-import type { GraphProgram } from "./program.ts";
+import { graphKey } from "typeaudio/graph";
+import { type SoundGraph } from "typeaudio/graph";
+import type { GraphProgram } from "typeaudio/graph";
 let worker: Worker | undefined,
   nextId = 0;
 

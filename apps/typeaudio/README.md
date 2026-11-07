@@ -115,7 +115,7 @@ out = sin(state0 * 6.28318530718) * p2;
 and `sampleRate` is 48000. `p0`–`p3` are editable named parameters. `state0`–`state3`
 are persistent scalar floats; assign the sample to `out`. Scalar variables,
 assignments and `if` are supported, with `sin`, `cos`, `abs`, `min`, `max`, `clamp`,
-`fract`, `floor`, `ceil`, `sqrt`, `exp`, `exp2`, `pow`, `tanh`, `mix`, `select` and
+`fract`, `floor`, `ceil`, `sqrt`, `exp`, `exp2`, `tanh`, `mix`, `select` and
 the `f32`/`u32`/`i32` casts. Code bodies cannot contain loops, functions, imports,
 arrays or browser access. Limits are 1800 characters and 350 syntax elements per
 Code node, two Code nodes and 16 total nodes per graph, and four exposed parameters.
@@ -146,7 +146,8 @@ After building, `pnpm --filter typeaudio-site bench:graph` measures the producti
 worklet's graph processing in a dedicated worker: Impact, Tone, a 16-node/two-Code
 graph and four such layers. Results are saved to `artifacts/graph-performance.json`.
 This measures callback computation, not device latency or browser scheduling
-guarantees. Engine and compiler pins are unchanged.
+guarantees. The graph implementation is now owned by the pinned TypeAudio engine;
+the TypeShade compiler pin remains unchanged.
 
 ## Sound exploration
 
@@ -323,9 +324,9 @@ Use in Picture adds that draft as a new procedural layer.
   `GraphCanvas`, `GraphInspector` and `GraphDock` use `useGraphEditor` for node
   selection, compilation and graph operations. `useCodeDocuments` owns per-owner,
   per-node drafts; `useMonacoEditor` owns models, editor history and resource disposal.
-  Command search and code layout have separate modules. `graph/validateGraph.ts` validates
-  the portable network; `graph/compiler/` separates code validation, source
-  generation and the pinned compiler adapter. `graph/dsp.ts` owns stateful execution.
+  Command search and code layout have separate modules. Public `typeaudio/graph`
+  entries own portable validation, compiler integration and stateful execution.
+  The website retains graph editing operations, its compiler worker and module loading.
   `Composition`, `Timeline` and `ClipInspector` compose Picture; `Mixer` handles the
   listening levels.
 - `sound/` separates patch types/defaults/presets, limits and validation from
@@ -421,3 +422,37 @@ intervening edits, storage failure and history-protected deletion. The local
 four-second VP8/WebM fixture uses FFmpeg `testsrc2` (160×90, 12 fps, 40 kbps).
 YouTube adapter tests do not establish external video availability. Browser/device
 latency and physical GPU headroom are not established by these checks.
+
+
+## Web, engine and compiler feedback
+
+File → **Export graph reproduction…** downloads the applied graph voice with
+its Web, TypeAudio and TypeShade commits. It includes parameters, seed-bearing
+nodes, duration, CPU backend and browser environment. It excludes media,
+unapplied code drafts, layer mixing, transport end fades and prior edits.
+Nothing is uploaded. The format identifies this as a snapshot, not an event recording.
+
+From the TypeAudio repository, `bun run feedback reproduction.json --out .feedback/report.json`
+compiles and replays the case without the editor. The report retains generated
+TypeShade source, PCM statistics, compilation time and cold/warm DSP timing.
+CPU timings do not measure browser scheduling or actual audio output underruns.
+The sequence format also supports frame-stamped parameter, volume and retrigger
+scenarios; automatic recording of a live editing session is not implemented.
+
+The website and engine run the same fixtures from `sources/typeaudio/fixtures/feedback/`.
+The compiler candidate workflows verify the installed source archive and run the
+engine corpus. Candidate parity compares fixture identities, PCM fingerprints,
+signal statistics and event counts against the pinned compiler.
+
+The `pin TypeAudio` workflow takes a full merged engine commit, adopts its exact
+compiler pin, validates the studio and opens a promotion PR. It preserves existing
+promotion branches and does not automatically merge or deploy. The website's
+prepare step rejects divergent engine/compiler pins and shares one installed
+compiler runtime with the engine source. Package entry aliases are derived from
+the engine's public exports, not a second list of internal files.
+
+The graph adapter still uses private TypeShade code generation inside TypeAudio.
+[Proposal 0122](https://github.com/typeshade/typeshade/pull/1037) records the requested
+synchronous CPU artifact contract. Its implementation and the website's separate
+legacy synthesizer adapter retirement remain pending. No new official compiler
+API is claimed by this integration.

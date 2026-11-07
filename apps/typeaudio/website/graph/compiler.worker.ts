@@ -1,4 +1,4 @@
-import { compileGraph } from "./compiler/compileGraph.ts";
+import { compileGraph } from "typeaudio/graph/compiler";
 self.onmessage = ({ data }) => {
   try {
     self.postMessage({ id: data.id, program: compileGraph(data.graph) });
