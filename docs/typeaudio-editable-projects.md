@@ -32,6 +32,10 @@ The TypeAudio pin is `86560f83a92ff8374346157000b8a467daa39aab` (room PR #24).
 The compiler pin is unchanged: `87af4eb0d9d15f02b66b8341b72cab0944290472`.
 No merge or deployment is included. The existing PR chain must be reconciled before publication.
 
+The subsequent [UX review](reviews/typeaudio-editor-ux.md) found blocking inspector reachability,
+candidate-switch recovery and draft/save semantics. Functional test passes do not establish UX
+acceptance. Correct these findings before releasing the first milestone.
+
 ## Authoring contract
 
 Agents deliver a JSON file with this envelope:
