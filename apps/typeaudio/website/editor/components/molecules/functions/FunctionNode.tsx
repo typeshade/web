@@ -153,9 +153,9 @@ export function FunctionNode({
             event.stopPropagation();
             if (wire) connect(node.id, port.id);
           }}
-          onClick={() => {
+          onClick={(event) => {
             c.select(node.id);
-            if (wire) connect(node.id, port.id);
+            if (wire && event.detail === 0) connect(node.id, port.id);
           }}
         >
           <i aria-hidden="true" />

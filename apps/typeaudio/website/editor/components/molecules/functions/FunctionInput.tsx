@@ -1,3 +1,4 @@
+import { FunctionPortSettings } from "./FunctionPortSettings.tsx";
 import type { FunctionPort } from "typeaudio/function-graph";
 import type { FunctionEditor } from "../../../hooks/functions/useFunctionEditor.ts";
 import { connectionOptions } from "../../../../functions/connectionOptions.ts";
@@ -94,6 +95,7 @@ export function FunctionInput({
             Expose {port.name}
           </button>
         )}
+      <FunctionPortSettings controller={c} port={port} />
     </div>
   );
 }

@@ -28,7 +28,20 @@ export function useFunctionViewport(c: FunctionEditor) {
       x = Math.min(...points.map((p) => p.x)),
       y = Math.min(...points.map((p) => p.y)),
       width = Math.max(...points.map((p) => p.x + 240)) - x,
-      height = Math.max(...points.map((p) => p.y + 240)) - y,
+      height =
+        Math.max(
+          ...c.graph.nodes.map(
+            (n, i) =>
+              points[i]!.y +
+              Math.max(
+                200,
+                150 +
+                  (c.descriptors.find((d) => d.id === n.definition)?.inputs
+                    .length ?? 3) *
+                    30,
+              ),
+          ),
+        ) - y,
       scale = Math.max(
         0.25,
         Math.min(
@@ -133,6 +146,10 @@ export function useFunctionViewport(c: FunctionEditor) {
       finish(true);
     };
   }, [c.owner, c.e.state.documentEpoch]);
+  useEffect(() => {
+    const timer = setTimeout(fit, 0);
+    return () => clearTimeout(timer);
+  }, [c.graph?.nodes.length]);
   return { surface, view, fit, zoom, down, move, finish };
 }
 export type FunctionViewport = ReturnType<typeof useFunctionViewport>;

@@ -10,7 +10,7 @@ export function newFunctionDefinition(graph: FunctionGraphDocument) {
     modules: {
       ...graph.modules,
       [module]:
-        '"use typeshade";\n\nexport function process(input: f32, amount: f32): f32 {\n  return input * amount;\n}\n',
+        '"use typeshade";\n\nexport class State { memory: f32 = 0; }\nexport function createState(): State { return new State(); }\n\nexport function process(state: inout<State>, time: f32, sampleRate: f32, input: f32, amount: f32): f32 {\n  return input * amount;\n}\n',
     },
     definitions: [
       ...graph.definitions,
@@ -19,11 +19,14 @@ export function newFunctionDefinition(graph: FunctionGraphDocument) {
         version: 1,
         module,
         export: "process",
+        context: { time: "time" as const, sampleRate: "sampleRate" as const },
+        state: { parameter: "state", initializer: "createState", version: 1 },
         inputs: {
           input: {
             id: "signal",
             role: "audio" as const,
             rate: "sample" as const,
+            unit: "amplitude",
             default: 0,
           },
           amount: {
@@ -33,7 +36,12 @@ export function newFunctionDefinition(graph: FunctionGraphDocument) {
             default: 1,
           },
         },
-        output: { id: "out", role: "audio" as const, rate: "sample" as const },
+        output: {
+          id: "out",
+          role: "audio" as const,
+          rate: "sample" as const,
+          unit: "amplitude",
+        },
       },
     ],
     nodes: [...graph.nodes, { id, definition: id, inputs: {} }],

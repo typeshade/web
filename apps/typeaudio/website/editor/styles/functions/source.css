@@ -71,3 +71,17 @@
     flex-basis: 100%;
   }
 }
+
+.function-port-settings {
+  font-size: 10px;
+  color: var(--muted);
+  margin: 6px 0;
+}
+.function-port-settings summary {
+  cursor: pointer;
+}
+.function-port-settings label {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}

@@ -57,6 +57,10 @@ export function useMonacoEditor(props: MonacoEditorProps) {
   const moduleUri = (key: string, path: string) =>
     `file:///typeaudio/${instance}/${encodeURIComponent(key)}${path}`;
   const handledFocus = useRef(0);
+  const navigation = useRef<{
+    path: string;
+    selection?: Monaco.IRange | Monaco.IPosition;
+  }>(undefined);
   useLayoutEffect(() => {
     latest.current = props;
   });
@@ -98,14 +102,17 @@ export function useMonacoEditor(props: MonacoEditorProps) {
         });
         const models: Session["models"] = new Map();
         const opener = m.editor.registerEditorOpener({
-          openCodeEditor: (_source, resource) => {
+          openCodeEditor: (_source, resource, selection) => {
             const project = latest.current.project;
             const path =
               project &&
               Object.keys(project.files).find(
-                (path) => moduleUri(project.key, path) === resource.toString(),
+                (path) =>
+                  m.Uri.parse(moduleUri(project.key, path)).toString() ===
+                  resource.toString(),
               );
             if (!path) return false;
+            navigation.current = { path, selection };
             latest.current.onOpenModule?.(path);
             return true;
           },
@@ -215,7 +222,9 @@ export function useMonacoEditor(props: MonacoEditorProps) {
                     .filter((e) =>
                       e.model.uri
                         .toString()
-                        .startsWith(moduleUri(project.key, "/")),
+                        .startsWith(
+                          m.Uri.parse(moduleUri(project.key, "/")).toString(),
+                        ),
                     )
                     .map((e) => [e.model.uri.toString(), e.model.getValue()]),
                 )
@@ -246,6 +255,20 @@ export function useMonacoEditor(props: MonacoEditorProps) {
       if (entry.view) editor.restoreViewState(entry.view);
       setCursor(editor.getPosition() ?? { lineNumber: 1, column: 1 });
       setAnalysis(entry.analysis);
+    }
+    if (project && navigation.current?.path === project.path) {
+      const selection = navigation.current.selection;
+      navigation.current = undefined;
+      if (selection) {
+        if ("startLineNumber" in selection) {
+          editor.setSelection(selection);
+          editor.revealRangeInCenter(selection);
+        } else {
+          editor.setPosition(selection);
+          editor.revealPositionInCenter(selection);
+        }
+      }
+      editor.focus();
     }
     editor.updateOptions({
       readOnly: props.readOnly,

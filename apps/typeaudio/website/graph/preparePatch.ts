@@ -11,12 +11,22 @@ export async function patchPrograms(p: Patch): Promise<PreparedProgram[]> {
   const functions = [p, ...p.layers.map((l) => l.patch)].flatMap((p) =>
     p.functions ? [p.functions] : [],
   );
-  return Promise.all([
+  const programs = await Promise.all([
     ...[...new Map(graphs.map((g) => [graphKey(g), g])).values()].map(
       prepareGraph,
     ),
     ...[
       ...new Map(functions.map((g) => [functionSourceKey(g), g])).values(),
-    ].map(prepareFunctions),
+    ].map((graph) => prepareFunctions(graph)),
   ]);
+  const registrations = new Set(
+    programs.flatMap((p) =>
+      "schema" in p ? p.artifacts.map((a) => a.key) : [],
+    ),
+  );
+  if (registrations.size > 64)
+    throw new Error(
+      "This sound needs more than 64 prepared functions. Reduce unique definitions across its layers.",
+    );
+  return programs;
 }

@@ -1,3 +1,4 @@
+import { hasFunctionSources } from "../../../functions/hasFunctionSources.ts";
 import {
   useCallback,
   useEffect,
@@ -43,17 +44,27 @@ export function useEditorDocument() {
   );
   const [savedValue, setSavedValue] = useState("");
   const [saveError, setSaveError] = useState(false);
+  const functionDocument =
+    hasFunctionSources(state.source.patch) ||
+    state.scene.cues.some((c) => hasFunctionSources(c.patch));
   const documentValue = useMemo(
     () =>
       JSON.stringify({
-        version: 1,
+        version: functionDocument ? 2 : 1,
         scene: state.scene,
         source: state.source,
         selected: state.selected,
         selection: state.selection,
         drafts: state.drafts ?? {},
       }),
-    [state.scene, state.source, state.selected, state.selection, state.drafts],
+    [
+      state.scene,
+      state.source,
+      state.selected,
+      state.selection,
+      state.drafts,
+      functionDocument,
+    ],
   );
 
   const latest = useRef({ state });
@@ -71,6 +82,7 @@ export function useEditorDocument() {
     }
   }, [documentValue]);
   useEffect(() => {
+    if (functionDocument) return;
     // Optional legacy mirrors are not used to restore a partially written document.
     try {
       localStorage.setItem(SCENE_KEY, JSON.stringify(state.scene));
@@ -81,7 +93,7 @@ export function useEditorDocument() {
     } catch {
       /* The authoritative document save reports persistence failures. */
     }
-  }, [state.scene, state.source]);
+  }, [state.scene, state.source, functionDocument]);
   const saveStatus = saveError
     ? "error"
     : savedValue === documentValue

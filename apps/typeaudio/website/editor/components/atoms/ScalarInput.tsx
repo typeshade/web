@@ -63,6 +63,7 @@ export function ScalarInput({
         event.stopPropagation();
         if (event.key === "Enter") event.currentTarget.blur();
         if (event.key === "Escape") {
+          event.currentTarget.value = String(value);
           setText(String(value));
           event.currentTarget.blur();
         }

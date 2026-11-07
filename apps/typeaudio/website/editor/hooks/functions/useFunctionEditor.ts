@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type {
   FunctionGraphDocument,
   InputBinding,
+  PortMetadata,
 } from "typeaudio/function-graph";
 import { validateFunctionDocument } from "typeaudio/function-graph";
 import type { Editor } from "../../useEditor.ts";
@@ -57,7 +58,10 @@ export function useFunctionEditor(e: Editor, owner: string) {
     if (
       await compilation.apply(next.graph, {
         ...layout,
-        [next.id]: { x: (origin?.x ?? 0) + 40, y: (origin?.y ?? 0) + 60 },
+        [next.id]: {
+          x: (origin?.x ?? 0) + 40,
+          y: (origin?.y ?? 0) + Math.max(260, 150 + d.inputs.length * 30),
+        },
       })
     )
       setSelected(next.id);
@@ -65,9 +69,8 @@ export function useFunctionEditor(e: Editor, owner: string) {
   async function create() {
     const next = newFunctionDefinition(current()),
       n = next.nodes.at(-1)!;
-    if (
-      await compilation.apply(next, { ...layout, [n.id]: { x: 80, y: 300 } })
-    ) {
+    const y = Math.max(80, ...Object.values(layout).map((p) => p.y)) + 300;
+    if (await compilation.apply(next, { ...layout, [n.id]: { x: 80, y } })) {
       setSelected(n.id);
       setFile(next.definitions.at(-1)!.module);
       focus((n) => n + 1);
@@ -203,6 +206,21 @@ export function useFunctionEditor(e: Editor, owner: string) {
       }),
     control: (id: string, value: number | boolean) =>
       change(setFunctionControl(current(), id, value)),
+    configurePort: (name: string, metadata: Partial<PortMetadata>) =>
+      compilation.apply({
+        ...current(),
+        definitions: current().definitions.map((d) =>
+          d.id === node?.definition
+            ? {
+                ...d,
+                inputs: {
+                  ...d.inputs,
+                  [name]: { ...d.inputs[name]!, ...metadata },
+                },
+              }
+            : d,
+        ),
+      }),
     update: change,
   };
 }

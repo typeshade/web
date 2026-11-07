@@ -31,7 +31,8 @@ export function initialDocument(): Document & { drafts: CodeDrafts } {
     const raw = localStorage.getItem(DOCUMENT_KEY);
     if (raw) {
       const saved = JSON.parse(raw);
-      if (saved.version !== 1) throw new Error("Unsupported document");
+      if (saved.version !== 1 && saved.version !== 2)
+        throw new Error("Unsupported document");
       const nextScene = validateScene(saved.scene);
       const nextSource = {
         patch: validatePatch(saved.source.patch),

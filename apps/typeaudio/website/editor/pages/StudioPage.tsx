@@ -1,3 +1,4 @@
+import { functionCommands } from "../commands/functionCommands.ts";
 import { SourceBreadcrumb } from "../components/molecules/picture/SourceBreadcrumb.tsx";
 import { useEditorShortcuts } from "../hooks/interactions/useEditorShortcuts.ts";
 import { useEditor } from "../useEditor.ts";
@@ -49,6 +50,11 @@ export function StudioPage() {
     layout,
     projectFile,
   );
+  if (functions.graph) {
+    const extra = functionCommands(functions, functionDocuments, layout);
+    commands.files = extra.files;
+    commands.commands.push(...extra.commands);
+  }
   useEditorShortcuts(e);
   return (
     <WorkspaceShell

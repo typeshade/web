@@ -19,6 +19,11 @@ export function applicationMenu(
             action: e.newSound,
           },
           {
+            label: "New function sound",
+            id: "new-function",
+            action: () => void e.newFunctionSound(),
+          },
+          {
             label: "New procedural sound",
             id: "new-graph",
             action: () => void e.newGraph(),

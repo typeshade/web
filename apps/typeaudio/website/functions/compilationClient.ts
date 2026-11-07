@@ -38,8 +38,9 @@ export function disposeFunctionCompiler() {
 
 export function prepareFunctions(
   document: FunctionGraphDocument,
+  synchronize = false,
 ): Promise<FunctionGraphProgram> {
-  const key = functionSourceKey(document),
+  const key = `${synchronize ? "edit:" : ""}${functionSourceKey(document)}`,
     existing = cache.get(key);
   if (existing) return existing;
   if (!worker) {
@@ -61,7 +62,7 @@ export function prepareFunctions(
   const result = new Promise<FunctionGraphProgram>((resolve, reject) => {
     const timer = setTimeout(disposeFunctionCompiler, 30000);
     pending.set(id, { resolve, reject, timer });
-    worker!.postMessage({ id, document });
+    worker!.postMessage({ id, document, synchronize });
   });
   if (cache.size >= 16) cache.delete(cache.keys().next().value!);
   cache.set(key, result);

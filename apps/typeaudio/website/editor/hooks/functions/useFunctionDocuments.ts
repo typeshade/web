@@ -35,6 +35,8 @@ export function useFunctionDocuments(c: FunctionEditor) {
     ]),
   );
   function change(path: string, text: string) {
+    c.clearProblems();
+    c.setError("");
     const key = keyFor(path),
       applied = graph?.modules[path] ?? "";
     c.e.dispatch({
@@ -54,7 +56,9 @@ export function useFunctionDocuments(c: FunctionEditor) {
   async function apply() {
     if (!graph || c.busy || conflicts.length) return;
     const modules = files;
-    if (await c.apply({ ...c.latest.current.graph!, modules })) {
+    if (
+      await c.apply({ ...c.latest.current.graph!, modules }, undefined, true)
+    ) {
       c.e.dispatch({
         type: "drafts",
         update: (current) => ({

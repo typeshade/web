@@ -47,7 +47,11 @@ export function useFunctionCompilation(e: Editor, owner: string) {
       active = false;
     };
   }, [key, owner, epoch]);
-  async function apply(raw: FunctionGraphDocument, layout?: FunctionLayout) {
+  async function apply(
+    raw: FunctionGraphDocument,
+    layout?: FunctionLayout,
+    synchronize = false,
+  ) {
     const id = ++request.current,
       before = JSON.stringify(latest.current.graph);
     setBusy(true);
@@ -55,7 +59,7 @@ export function useFunctionCompilation(e: Editor, owner: string) {
     setProblems([]);
     try {
       const next = validateFunctionDocument(raw),
-        prepared = await prepareFunctions(next);
+        prepared = await prepareFunctions(next, synchronize);
       const current = latest.current;
       if (
         id !== request.current ||
@@ -69,7 +73,9 @@ export function useFunctionCompilation(e: Editor, owner: string) {
         );
       current.e.endEdit();
       current.e.patch({
-        functions: next,
+        functions: synchronize
+          ? { ...prepared.document, parameters: next.parameters }
+          : next,
         ...(layout ? { functionLayout: layout } : {}),
       });
       setProgram(prepared);
@@ -92,5 +98,14 @@ export function useFunctionCompilation(e: Editor, owner: string) {
       if (id === request.current) setBusy(false);
     }
   }
-  return { program, error, setError, problems, busy, apply, latest };
+  return {
+    program,
+    error,
+    setError,
+    problems,
+    clearProblems: () => setProblems([]),
+    busy,
+    apply,
+    latest,
+  };
 }
