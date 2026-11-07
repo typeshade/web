@@ -1,6 +1,7 @@
 # TypeAudio function authoring in the existing editor
 
-Status: implemented and locally verified, 2026-11-07. Continues Web PR #47.
+Status: historical E2b checkpoint, implemented and locally verified on 2026-11-07.
+The later [composition continuation](typeaudio-composition-editing.md) adds Network source and connected-input rename to Web PR #47.
 Application checkpoint: `6c9f0838f297cbcea684fbe1b8577624f879dee2`.
 Previous Web baseline: `63216066bb8a2109d0c7e5b6286500b04ab39cb0`.
 Engine: TypeAudio `346efb4cbe7d0c288b919c6155e96ffd9bda292d`, PR #30.

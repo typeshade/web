@@ -147,7 +147,7 @@ listening feedback. Resume broader engine R1 work after this first milestone;
 retain the [durable recovery index](https://github.com/typeshade/typeaudio/issues/26)
 and the owner's SwiftShader measurement boundary.
 
-## Function sources (project version 3)
+## Function sources (project versions 3 and 4)
 
 Function sounds use the engine's `typeaudio.function-graph` document inside the existing source patch.
 The editor imports raw engine documents through **Open project file…**. The protected project flow still creates a recovery copy.
@@ -165,17 +165,43 @@ The editor imports raw engine documents through **Open project file…**. The pr
 New scalar arguments become block-rate control pins. Their defaults are zero or false.
 Existing parameter names retain stable pin IDs, roles, units and connections.
 Pin settings can change audio/control roles, update rate and units after connections are made compatible.
-Removing or renaming a connected argument fails until every instance disconnects it.
+Removing a connected argument fails until every instance disconnects it.
+Use **Pin settings → Source parameter → Rename input** to rename a connected argument and its references while retaining pin IDs.
+Apply or revert existing source drafts before this separate rename operation.
 State and context require explicit bindings; the new-module template includes state, time and sample rate.
-Arbitrary entry-point renaming and graph-wide composition source editing remain separate work.
+Arbitrary entry-point renaming remains separate work.
 
-Projects containing function sources or module drafts use version 3. Legacy source projects retain version 2.
-Older editors must reject version 3. This editor retains legacy scene and project imports without converting their graphs.
+Projects containing function sources or module drafts use version 3. Composition source or drafts use version 4.
+Legacy source projects retain version 2.
+Older editors must reject unsupported versions. This editor retains legacy scene and project imports without converting their graphs.
 Function sound presets use sound-file version 2. Browser documents containing function sources use envelope version 2;
-they do not update the optional legacy source/scene mirrors. Export a project file for portable recovery.
+composition source raises these to sound-file version 3 and browser-envelope version 3.
+Function documents do not update the optional legacy source/scene mirrors. Export a project file for portable recovery.
 
 Functions use the engine's bounded mono CPU profile at 48 kHz in this studio.
 Compilation runs in a Worker before installation; live named control messages do not compile source or reset instance state.
 The studio retains its source replacement crossfade, output gain ramp and source taper.
 Individual function controls are not automatically smoothed. Composition playback still uses prepared audio.
 The [function authoring review](reviews/typeaudio-function-authoring.md) records tests and remaining scope.
+
+## Network source
+
+Select the **Network** tab to edit the function calls that define the node network.
+Imports refer to actual TypeShade modules. State, time and sample rate appear as explicit arguments.
+A `const` function call is one node; its arguments are constants, named controls or previous node outputs.
+The final `return` chooses the sound output. Stable identity annotations keep local symbol names separate from node IDs.
+Right-click a node and select **Locate call in composition** to reach its call. Definition navigation opens its processing module.
+
+Edit a call and select **Apply source** to update the canvas. Reconnect pins to update the applied call source.
+The composition entry supports this static call structure. Put loops, conditions and processing expressions inside function modules.
+Unsupported composition edits remain drafts with source diagnostics. Existing valid audio stays applied.
+State classes used by Network source must be exported; private state remains valid for node-only source imports.
+
+Visual projection preserves unrelated helpers and comments. Comments inside replaced arguments or deleted nodes may move beside a statement.
+A dirty Network draft is retained if a visual edit changes its applied source. Resolve the conflict with **Keep this draft** or **Revert file**.
+Keeping the draft establishes the new comparison base; applying it then applies the connections written in that draft.
+Changing a named control value does not rewrite the composition text. Comment-only composition changes do not update Live audio.
+
+The source is stored in `Patch.functionComposition`. Saved source must describe the same graph as `Patch.functions`.
+The importer validates this relationship before replacing the current project. Save incomplete work as a draft, not as applied source.
+Read the [composition editing record](reviews/typeaudio-composition-editing.md) for verification and remaining scope.

@@ -197,3 +197,10 @@ Apply source compiles all edited modules together; project save preserves incomp
 The labels identify the mono CPU profile and independent instance state.
 This is a bounded English studio review. It does not claim site-wide, translation,
 physical-device or independent-user acceptance.
+
+
+The composition continuation reviews the English Network tab, call-location action, input rename form,
+source-conflict recovery and version-mismatch messages. Wording distinguishes static composition calls
+from full processing bodies and explains the effect of keeping a conflicting draft.
+The [bounded review](reviews/typeaudio-composition-editing.md) records actual browser and source-preservation checks.
+This does not extend the earlier site-wide editorial scope or claim translation, listening or physical-device acceptance.

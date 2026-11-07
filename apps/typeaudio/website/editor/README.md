@@ -147,3 +147,15 @@ Project version 3 preserves function documents, drafts and canvas positions. Exi
 The source transport and timeline use the existing SoundDsp/Worker/AudioWorklet pipeline.
 `check-function-authoring-browser.ts` exercises source editing, wiring, live state, stale results,
 file recovery, exact WAV regeneration, Picture editing and mobile viewport access.
+
+
+The Network virtual module shares Monaco's project, drafts and Undo ownership with the function modules.
+`useFunctionDocuments` excludes it from the engine module map. The compilation Worker applies or validates
+it through the engine composition API, or projects a visual edit against the previous applied source.
+Equivalent execution structure retains the original bindings and node order, so authoring-only edits do not invalidate audio.
+`functionComposition` and `functionLayout` are excluded by `audioPatch`; audible function/control changes remain included.
+
+Composition projects use version 4, sound files version 3 and browser envelopes version 3.
+`FunctionInputRename` owns the input form; engine symbol edits preserve stable port IDs and bindings.
+`check-composition-browser.ts` exercises cross-view changes, rename, source preservation, language tools,
+Live continuity, empty/invalid drafts, conflicts, stale preparations, save/reopen and mobile access.

@@ -8,12 +8,18 @@ export async function codeInput(page: Page) {
 }
 export async function writeCode(page: Page, text: string) {
   await codeInput(page);
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.evaluate((source) => navigator.clipboard.writeText(source), text);
   await page.keyboard.press("Control+a");
-  await page.keyboard.insertText(text);
+  // Paste a module as one edit; typing embedded newlines would repeatedly auto-indent it.
+  await page.keyboard.press("Control+v");
 }
 export async function readCode(page: Page) {
-  const input = await codeInput(page);
+  await codeInput(page);
   await page.keyboard.press("Control+Home");
   await page.keyboard.press("Control+a");
-  return input.inputValue();
+  // Monaco abbreviates long selections in its input textarea. Copy uses the complete model.
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.keyboard.press("Control+c");
+  return page.evaluate(() => navigator.clipboard.readText());
 }

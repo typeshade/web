@@ -10,10 +10,10 @@ export function useFunctionDocuments(c: FunctionEditor) {
   const compositionSource =
     c.e.state.patch.functionComposition ?? c.program?.composition?.source;
   const appliedFiles: Record<string, string> = {
-    ...graph?.modules,
     ...(compositionSource
       ? { [FUNCTION_COMPOSITION_PATH]: compositionSource }
       : {}),
+    ...graph?.modules,
   };
   const keyFor = (path: string) => codeDocumentKey(c.owner, `module:${path}`);
   const source = JSON.stringify(appliedFiles);
@@ -66,7 +66,7 @@ export function useFunctionDocuments(c: FunctionEditor) {
     if (!graph || c.busy || conflicts.length) return;
     const { [FUNCTION_COMPOSITION_PATH]: source, ...modules } = files;
     const composition =
-      source && source !== compositionSource
+      source !== undefined && source !== compositionSource
         ? { mode: "apply" as const, source }
         : undefined;
     if (

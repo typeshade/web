@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { newFunctionDefinition } from "./functions/newDefinition.ts";
+import { describe, expect, it, vi } from "vitest";
 import { FUNCTION_COMPOSITION_PATH } from "typeaudio/function-graph";
 import {
   applyFunctionComposition,
@@ -191,4 +192,58 @@ describe("composition source authoring", () => {
       ).some((d) => d.severity === "error"),
     ).toBe(true);
   });
+});
+
+it("keeps original bindings for authoring-only worker edits and rejects empty or mismatched composition", async () => {
+  const graph = newFunctionDefinition(functionPatch().functions!);
+  graph.nodes.reverse();
+  const program = compileFunctionGraph(graph),
+    source = projectFunctionComposition(program).source;
+  let reply: any;
+  const worker = {
+    onmessage: undefined as undefined | ((event: any) => void),
+    postMessage: (value: any) => {
+      reply = value;
+    },
+  };
+  vi.stubGlobal("self", worker);
+  try {
+    await import("./functions/compiler.worker.ts");
+    worker.onmessage!({
+      data: {
+        id: 1,
+        document: graph,
+        composition: {
+          mode: "apply",
+          source: source + "\n// preserve defaults",
+        },
+      },
+    });
+    expect(reply.error).toBeUndefined();
+    expect(reply.program.document).toEqual(graph);
+    worker.onmessage!({
+      data: {
+        id: 2,
+        document: graph,
+        composition: { mode: "apply", source: "" },
+      },
+    });
+    expect(reply.error).toMatch(/Provide one exported sound/);
+    worker.onmessage!({
+      data: {
+        id: 3,
+        document: graph,
+        composition: {
+          mode: "validate",
+          source: source.replace(
+            "gain(body, strength, time)",
+            "gain(noise, strength, time)",
+          ),
+        },
+      },
+    });
+    expect(reply.error).toMatch(/Saved composition does not match/);
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });

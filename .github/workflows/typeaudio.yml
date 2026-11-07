@@ -64,6 +64,7 @@ jobs:
             apps/typeaudio/artifacts/ux/
             apps/typeaudio/artifacts/node-code/
             apps/typeaudio/artifacts/function-authoring/
+            apps/typeaudio/artifacts/composition-authoring/
       - uses: actions/upload-artifact@v4
         with:
           name: typeaudio-studio

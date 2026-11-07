@@ -25,14 +25,14 @@ self.onmessage = ({ data }) => {
     let composition, compositionError;
     if (request?.mode === "apply" || request?.mode === "validate") {
       const result = applyFunctionComposition(program, request.source ?? "");
-      if (
-        request.mode === "validate" &&
-        compositionIdentity(result.program) !== compositionIdentity(program)
-      )
+      const changed =
+        compositionIdentity(result.program) !== compositionIdentity(program);
+      if (request.mode === "validate" && changed)
         throw new Error(
           "Saved composition does not match its applied graph. Open a matching project revision or restore the source draft.",
         );
-      if (request.mode === "apply") program = result.program;
+      // Keep omitted defaults and node order stable for comment/local-name-only edits.
+      if (request.mode === "apply" && changed) program = result.program;
       composition = result.composition;
     } else if (request?.mode === "project") {
       try {
