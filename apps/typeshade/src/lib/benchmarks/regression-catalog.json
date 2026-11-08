@@ -16,12 +16,12 @@
   ],
   "builds": [
     {
-      "revision": "8c088df785a238d84423e7a1f303dcde69bc050e",
-      "runtime": "8c088df785a238d84423e7a1f303dcde69bc050e",
-      "runtimeDigest": "6a2b7e2c63c29a625ab6be427fd6f407641085e46a4f54672068018867516106",
+      "revision": "49056a9834204de82fdcf00afa4f3f744998cc4f",
+      "runtime": "49056a9834204de82fdcf00afa4f3f744998cc4f",
+      "runtimeDigest": "9c0370a405e46f27598a8f36af268d20ed7eb6a8f80490d7ce985b65b4acc698",
       "inputProjection": true,
-      "url": "/benchmarks/artifacts/6a2b7e2c63c29a625ab6be427fd6f407641085e46a4f54672068018867516106.js",
-      "bytes": 568788,
+      "url": "/benchmarks/artifacts/9c0370a405e46f27598a8f36af268d20ed7eb6a8f80490d7ce985b65b4acc698.js",
+      "bytes": 589618,
       "cases": [
         {
           "id": "layout-aos-8-read-1",
@@ -468,7 +468,13 @@
           "separate": false,
           "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\nexport const main = compute([64], function main(\n  gid: builtin<\"global_invocation_id\", vec3u>,\n  lid: builtin<\"local_invocation_id\", vec3u>,\n  wid: builtin<\"workgroup_id\", vec3u>,\n  sgi: builtin<\"subgroup_invocation_id\", u32>,\n  sgid: builtin<\"subgroup_id\", u32>,\n  nsg: builtin<\"num_subgroups\", u32>,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    for (let j: u32 = 0; j < nsg; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n});\n",
           "features": ["subgroups"],
-          "refused": "TS8024 Unknown builtin \"subgroup_id\". Did you mean \"subgroup_size\"?"
+          "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>, @builtin(workgroup_id) wid: vec3<u32>, @builtin(subgroup_invocation_id) sgi: u32, @builtin(subgroup_id) sgid: u32, @builtin(num_subgroups) nsg: u32) {\n  let v = subgroupAdd(src[gid.x]);\n  if ((sgi == 0u)) {\n    tile[sgid] = v;\n  }\n  workgroupBarrier();\n  if ((lid.x == 0u)) {\n    var s: u32 = 0u;\n    for (var j: u32 = 0u; (j < nsg); j = j + 1u) {\n      s += tile[j];\n    }\n    out[wid.x] = s;\n  }\n}\n",
+          "shader": "afbb8ce9ed83146f4f9f9ec4d4b962526e1819a3bc006d09b9cf6f57681907ad",
+          "bindings": [
+            { "name": "args", "binding": 0, "group": 0 },
+            { "name": "src", "binding": 1, "group": 0 },
+            { "name": "out", "binding": 2, "group": 0 }
+          ]
         },
         {
           "id": "reduction-subgroup-levels",
@@ -483,7 +489,13 @@
           "separate": false,
           "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\nexport const main = compute([64], function main(\n  gid: builtin<\"global_invocation_id\", vec3u>,\n  lid: builtin<\"local_invocation_id\", vec3u>,\n  wid: builtin<\"workgroup_id\", vec3u>,\n  sgi: builtin<\"subgroup_invocation_id\", u32>,\n  sgs: builtin<\"subgroup_size\", u32>,\n  sgid: builtin<\"subgroup_id\", u32>,\n  nsg: builtin<\"num_subgroups\", u32>,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  let y: u32 = 0;\n  if (lid.x < nsg) { y = tile[lid.x]; }\n  const w = subgroupAdd(y);\n  workgroupBarrier();\n  if (sgi === 0) { tile[sgid] = w; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    const m = (nsg + sgs - 1) / sgs;\n    for (let j: u32 = 0; j < m; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n});\n",
           "features": ["subgroups"],
-          "refused": "TS8024 Unknown builtin \"subgroup_id\". Did you mean \"subgroup_size\"?"
+          "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>, @builtin(workgroup_id) wid: vec3<u32>, @builtin(subgroup_invocation_id) sgi: u32, @builtin(subgroup_size) sgs: u32, @builtin(subgroup_id) sgid: u32, @builtin(num_subgroups) nsg: u32) {\n  let v = subgroupAdd(src[gid.x]);\n  if ((sgi == 0u)) {\n    tile[sgid] = v;\n  }\n  workgroupBarrier();\n  var y: u32 = 0u;\n  if ((lid.x < nsg)) {\n    y = tile[lid.x];\n  }\n  let w = subgroupAdd(y);\n  workgroupBarrier();\n  if ((sgi == 0u)) {\n    tile[sgid] = w;\n  }\n  workgroupBarrier();\n  if ((lid.x == 0u)) {\n    var s: u32 = 0u;\n    let m = (nsg + sgs - 1u) / sgs;\n    for (var j: u32 = 0u; (j < m); j = j + 1u) {\n      s += tile[j];\n    }\n    out[wid.x] = s;\n  }\n}\n",
+          "shader": "2bf49f5a7cef580522ead9f5d930f174c12f8c670625389966d6308ae2b408ec",
+          "bindings": [
+            { "name": "args", "binding": 0, "group": 0 },
+            { "name": "src", "binding": 1, "group": 0 },
+            { "name": "out", "binding": 2, "group": 0 }
+          ]
         },
         {
           "id": "atomics-bins-1-subgroup",
@@ -498,7 +510,13 @@
           "separate": false,
           "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\nexport const main = compute([64], function main(gid: builtin<\"global_invocation_id\", vec3u>): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  const v = subgroupAdd(x);\n  if (subgroupElect()) { atomicAdd(out[0], v); }\n});\n",
           "features": ["subgroups"],
-          "refused": "TS8004 Unknown function \"subgroupAdd\". Declare it in this file, or import it from another shader module."
+          "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<atomic<u32>>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  var x: u32 = 0u;\n  if ((i < args.n)) {\n    x = src[i];\n  }\n  let v = subgroupAdd(x);\n  if (subgroupElect()) {\n    _ = atomicAdd(&out[0], v);\n  }\n}\n",
+          "shader": "e1a481e22af7864a2ee94b49523324dabf3d471dfc688744574a963c63a315b3",
+          "bindings": [
+            { "name": "args", "binding": 0, "group": 0 },
+            { "name": "src", "binding": 1, "group": 0 },
+            { "name": "out", "binding": 2, "group": 0 }
+          ]
         },
         {
           "id": "atomics-bins-1-workgroup",
@@ -524,12 +542,12 @@
       ]
     },
     {
-      "revision": "cdb12dc0397dc9742b41f4b09a5fee57c315a28b",
-      "runtime": "cdb12dc0397dc9742b41f4b09a5fee57c315a28b",
-      "runtimeDigest": "8aa0245280631d78fbea01af7700ead5e975778c11aedcc9ca1c086f7e399f8c",
+      "revision": "415b276a7408936cb483d05ca8bb39e797b05966",
+      "runtime": "415b276a7408936cb483d05ca8bb39e797b05966",
+      "runtimeDigest": "c798bff39a467f25d5514734c89845564daa2f755aa4a341e80687fc1d4f8efd",
       "inputProjection": true,
-      "url": "/benchmarks/artifacts/8aa0245280631d78fbea01af7700ead5e975778c11aedcc9ca1c086f7e399f8c.js",
-      "bytes": 570154,
+      "url": "/benchmarks/artifacts/c798bff39a467f25d5514734c89845564daa2f755aa4a341e80687fc1d4f8efd.js",
+      "bytes": 590732,
       "cases": [
         {
           "id": "layout-aos-8-read-1",
@@ -1050,5 +1068,5 @@
       ]
     }
   ],
-  "digest": "2cfc0a9e7e9a0f734c3df478c75a91af8abc203191a5ae69dcec5bbd4c934b99"
+  "digest": "3e5b4c19a6e0dc5b9b59b3e68d23c0d30a1b243e57b6b5ae6260a06e72d79558"
 }
