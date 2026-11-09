@@ -1,7 +1,7 @@
 ---
 id: production-emit
-source: 43a73d0c628a8eac2b1128078cd4c7fa822d90fd7087b4426e75318a34952966
-sourceLine: 2662
+source: c9f32ca47314cbd272ba285c9dd2de272070848a8d410b73eaf3a643865c313d
+sourceLine: 2847
 ---
 
 이 페이지는 배포용 변환을 코드 생성 호출에 조합하고, 변경된 식별자가 포함된 드라이버 로그를 원래 이름으로 해석하는 방법을 설명합니다.
@@ -29,15 +29,13 @@ function terrainShade(uv: vec2): vec4 {
   return vec4(h, h * 0.5, 0.25, 1.) * u.tint;
 }
 
-@vertex
-export function vs(@builtin("vertex_index") vi: u32): vec4 {
+export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): vec4 {
   return vec4(f32(vi & 1) * 4. - 1., f32(vi >> 1) * 4. - 1., 0., 1.);
-}
+});
 
-@fragment
-export function fs(@builtin("position") p: vec4): vec4 {
+export const fs = fragment(function fs(p: builtin<"position", vec4>): vec4 {
   return terrainShade(p.xy * 0.01);
-}
+});
 ```
 
 ### 플러그인 묶음

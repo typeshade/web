@@ -500,14 +500,15 @@ function printable(code: RawCode): RawCode {
     referenceProse(text).replace(/\bshader-dsl\b/g, 'typeshade');
   // The registry's old source-file fragment has no target. Keep the compiler's diagnostic
   // intact; the documentation hint links to the corresponding published guide instead.
-  const hint = code.code === 'SD0030'
-    ? editorialSourceText(
-        code.hint ?? '',
-        'AUTHORING.md#capabilities--extensions',
-        '[Capabilities and extensions](authoringCapabilities)',
-        'SD0030 documentation hint',
-      )
-    : code.hint;
+  const hint =
+    code.code === 'SD0030'
+      ? editorialSourceText(
+          code.hint ?? '',
+          'AUTHORING.md#capabilities--extensions',
+          '[Capabilities and extensions](authoringCapabilities)',
+          'SD0030 documentation hint',
+        )
+      : code.hint;
   return {
     ...code,
     docs: code.docs.map(prose).filter((p) => p.length > 0),
@@ -648,17 +649,15 @@ interface CounterpartSpec {
 // it can. The trigger is held to producing its code and the fix to compiling clean, below.
 const EXAMPLES: Readonly<Record<string, ExampleSpec>> = {
   TS8001: {
-    trigger: `@fragment
-export function main(@location(0) uv: vec2): vec4 {
+    trigger: `export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8002: {
@@ -668,10 +667,9 @@ function shade(x: float): f32 {
   return x * 0.5
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, shade(uv.x), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
@@ -679,10 +677,9 @@ function shade(x: f32): f32 {
   return x * 0.5
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, shade(uv.x), 1.)
-}
+});
 `,
   },
   TS8003: {
@@ -690,37 +687,33 @@ export function main(@location(0) uv: vec2): vec4 {
 function gain(value: f32 | null | undefined): f32 {
   return value * 2.
 }
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, gain(null), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 function gain(value: f32 | null | undefined): f32 {
   if (value == null) { return 0. }
   return value * 2.
 }
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, gain(null), 1.)
-}
+});
 `,
   },
   TS8004: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, brightness(uv), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 import { brightness } from "./brightness.shade.ts"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, brightness(uv), 1.)
-}
+});
 `,
     files: {
       'brightness.shade.ts': `"use typeshade"
@@ -734,28 +727,25 @@ export function brightness(uv: vec2): f32 {
   TS8005: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const g = uv.x
   g = g * 2.
   return vec4(g, g, g, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = uv.x
   g = g * 2.
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
   TS8006: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = 0.
   let n: i32 = 8
   for (let i = 0; i < n; i++) {
@@ -763,12 +753,11 @@ export function main(@location(0) uv: vec2): vec4 {
     g += 0.1
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = 0.
   let n: i32 = 8
   const count = n
@@ -777,131 +766,121 @@ export function main(@location(0) uv: vec2): vec4 {
     g += 0.1
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
   TS8007: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = uv.x
   while (true) {
     g = g * 0.5
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = uv.x
   for (let i = 0; i < 4; i++) {
     g = g * 0.5
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
   TS8008: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = 0.
   for (let t: f32 = 0.; t < 1.; t += 0.25) {
     g += t * uv.x
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = 0.
   for (let i = 0; i < 4; i++) {
     g += f32(i) * 0.25 * uv.x
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
   TS8009: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   if (uv.x > 0.5) {
     break
   }
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   if (uv.x > 0.5) {
     return vec4(0., 0., 0., 1.)
   }
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8010: {
     trigger: `"use typeshade"
 
 class Tint {
-  rgb: vec3
-  alpha: f32
+  rgb!: vec3
+  alpha!: f32
 }
 
 function tint(uv: vec2): Tint {
   return { rgb: vec3(uv, 0.) }
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(tint(uv).rgb, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 class Tint {
-  rgb: vec3
-  alpha: f32
+  rgb!: vec3
+  alpha!: f32
 }
 
 function tint(uv: vec2): Tint {
   return { rgb: vec3(uv, 0.), alpha: 1. }
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(tint(uv).rgb, 1.)
-}
+});
 `,
   },
   TS8013: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   try {
     return vec4(uv, 0., 1.)
   } catch (e) {
     return vec4(0., 0., 0., 1.)
   }
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8014: {
@@ -910,23 +889,21 @@ export function main(@location(0) uv: vec2): vec4 {
 let frame = 0
 frame++
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 class Uniforms {
-  frame: f32
+  frame!: f32
 }
 
 declare const u: uniform<Uniforms>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, fract(u.frame / 60.), 1.)
-}
+});
 `,
   },
   TS8015: {
@@ -935,49 +912,43 @@ export function main(@location(0) uv: vec2): vec4 {
 declare const data: storage<array<f32>, "read_write">
 declare const k: uniform<f32>
 
-@compute([64])
-export function double(@builtin("global_invocation_id") id: vec3u): void {
+export const double = compute([64], function double(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, k, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute([64])
-export function double(@builtin("global_invocation_id") id: vec3u): void {
+export const double = compute([64], function double(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 `,
   },
   TS8016: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const w = array<f32, 3>(0.2, 0.5, 0.3)
   return vec4(uv, w[3], 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const w = array<f32, 3>(0.2, 0.5, 0.3)
   return vec4(uv, w[2], 1.)
-}
+});
 `,
   },
   TS8017: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = 0.
   switch (i32(uv.x * 4.)) {
     case 0: g = 0.25; break
@@ -985,12 +956,11 @@ export function main(@location(0) uv: vec2): vec4 {
     default: g = 1.
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = 0.
   switch (i32(uv.x * 4.)) {
     case 0: g = 0.25; break
@@ -998,42 +968,38 @@ export function main(@location(0) uv: vec2): vec4 {
     default: g = 1.
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
   TS8018: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   vec2(uv).x = 1.
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let st = uv
   st.x = 1.
   return vec4(st, 0., 1.)
-}
+});
 `,
   },
   TS8019: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8020: {
@@ -1043,10 +1009,9 @@ function shade(x?: f32, y: f32): f32 {
   return (x ?? 0.5) * y
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, shade(uv.x, uv.y), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
@@ -1054,10 +1019,9 @@ function shade(y: f32, x?: f32): f32 {
   return (x ?? 0.5) * y
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, shade(uv.y, uv.x), 1.)
-}
+});
 `,
   },
   TS8021: {
@@ -1070,10 +1034,9 @@ function shade(x: f32): f32 {
   return x * 0.5
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, shade(uv.x), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
@@ -1084,28 +1047,25 @@ function shade(x: f32): f32 {
   return x * 0.5
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, shade(uv.x), 1.)
-}
+});
 `,
   },
   TS8022: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, gain, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 const gain = 0.5
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, gain, 1.)
-}
+});
 `,
   },
   TS8023: {
@@ -1119,10 +1079,9 @@ function shade(x: f32): f32 {
   return x * 0.25
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, shade(uv.x), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
@@ -1134,42 +1093,37 @@ function shadeQuarter(x: f32): f32 {
   return x * 0.25
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, shade(uv.x) + shadeQuarter(uv.y), 1.)
-}
+});
 `,
   },
   TS8024: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@builtin("frag_coord") p: vec4): vec4 {
+export const main = fragment(function main(p: builtin<"frag_coord", vec4>): vec4 {
   return vec4(p.xy / 512., 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@builtin("position") p: vec4): vec4 {
+export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
   return vec4(p.xy / 512., 0., 1.)
-}
+});
 `,
   },
   TS8025: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@builtin("vertex_index") i: u32): vec4 {
+export const main = fragment(function main(i: builtin<"vertex_index", u32>): vec4 {
   return vec4(f32(i), 0., 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@builtin("position") p: vec4): vec4 {
+export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
   return vec4(p.x / 512., 0., 0., 1.)
-}
+});
 `,
   },
   TS8026: {
@@ -1177,105 +1131,96 @@ export function main(@builtin("position") p: vec4): vec4 {
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute([32, 16, 1])
-export function main(@builtin("global_invocation_id") id: vec3u): void {
+export const main = compute([32, 16, 1], function main(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 `,
     fix: `"use typeshade"
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute([16, 16, 1])
-export function main(@builtin("global_invocation_id") id: vec3u): void {
+export const main = compute([16, 16, 1], function main(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 `,
   },
   TS8027: {
     trigger: `"use typeshade"
 
 class Uniforms {
-  m: mat3x2<f64>
+  m!: mat3x2<f64>
 }
 
 declare const u: uniform<Uniforms>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 class Uniforms {
-  m: mat3<f64>
+  m!: mat3<f64>
 }
 
 declare const u: uniform<Uniforms>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8028: {
     trigger: `"use typeshade"
 
-@fragmnt
+@fragment
 export function main(@location(0) uv: vec2): vec4 {
   return vec4(uv, 0., 1.)
 }
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8029: {
     trigger: `"use typeshade"
 
-class FsIn {
-  @builtin("position") pos: vec4
+interface FsIn {
+  pos: builtin<"position", vec4>
   uv: vec2
 }
 
-@fragment
-export function main(v: FsIn): vec4 {
+export const main = fragment(function main(v: FsIn): vec4 {
   return vec4(v.uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-class FsIn {
-  @builtin("position") pos: vec4
-  @location(0) uv: vec2
+interface FsIn {
+  pos: builtin<"position", vec4>
+  uv: location<0, vec2>
 }
 
-@fragment
-export function main(v: FsIn): vec4 {
+export const main = fragment(function main(v: FsIn): vec4 {
   return vec4(v.uv, 0., 1.)
-}
+});
 `,
   },
   TS8030: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8031: {
@@ -1288,10 +1233,9 @@ function fold(x: f32): f32 {
   return fold(x * 0.5)
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, fold(uv.x * 8.), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
@@ -1306,10 +1250,9 @@ function fold(x: f32): f32 {
   return y
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, fold(uv.x * 8.), 1.)
-}
+});
 `,
   },
   TS8032: {
@@ -1321,15 +1264,14 @@ function count(): f32 {
   return f32(u.length)
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, count(), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 class UData {
-  items: array<f32, 3>
+  items!: array<f32, 3>
 }
 
 declare const u: uniform<UData>
@@ -1338,10 +1280,9 @@ function count(): f32 {
   return f32(u.items.length)
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, count(), 1.)
-}
+});
 `,
   },
   TS8033: {
@@ -1349,81 +1290,73 @@ export function main(@location(0) uv: vec2): vec4 {
 
 let tile: workgroup<array<f32, 64>>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, tile[0], 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 let tile: array<f32, 64>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, tile[0], 1.)
-}
+});
 `,
   },
   TS8034: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   workgroupBarrier()
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8035: {
     trigger: `"use typeshade"
 
 class Ray {
-  origin: vec3
+  origin!: vec3
   static count: f32 = 0.
   static { Ray.count = 1. }
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 class Ray {
-  origin: vec3
+  origin!: vec3
   static count: f32 = 1.
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8036: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const n = vec3(0., 0., 1.)
   return vec4(uv, dot(n, uv), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const n = vec3(0., 0., 1.)
   return vec4(uv, dot(n, vec3(uv, 1.)), 1.)
-}
+});
 `,
   },
   TS8037: {
@@ -1431,35 +1364,31 @@ export function main(@location(0) uv: vec2): vec4 {
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute(64)
-export function main(@builtin("global_invocation_id") id: vec3u): void {
+export const main = compute(64, function main(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 `,
     fix: `"use typeshade"
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute([64])
-export function main(@builtin("global_invocation_id") id: vec3u): void {
+export const main = compute([64], function main(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 `,
   },
   TS8038: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2<f64>): vec4 {
+export const main = fragment(function main(uv: location<0, vec2<f64>>): vec4 {
   return vec4(f32(uv.x), f32(uv.y), 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv.x, uv.y, 0., 1.)
-}
+});
 `,
   },
   TS8041: {
@@ -1468,20 +1397,18 @@ export function main(@location(0) uv: vec2): vec4 {
 declare const tex: texture_2d<f32>
 declare const smp: sampler
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return textureSample(tex, smp, vec3(uv, 0.))
-}
+});
 `,
     fix: `"use typeshade"
 
 declare const tex: texture_2d<f32>
 declare const smp: sampler
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return textureSample(tex, smp, uv)
-}
+});
 `,
   },
   TS8050: {
@@ -1490,50 +1417,46 @@ export function main(@location(0) uv: vec2): vec4 {
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute([64])
-export function main(@builtin("global_invocation_id") id: vec3u): void {
+export const main = compute([64], function main(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 `,
     fix: `"use typeshade"
 "enable f16";
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute([64])
-export function main(@builtin("global_invocation_id") id: vec3u): void {
+export const main = compute([64], function main(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 `,
   },
   TS8051: {
     trigger: `"use typeshade"
 
 class Uniforms {
-  on: bool
-  gain: f32
+  on!: bool
+  gain!: f32
 }
 
 declare const u: uniform<Uniforms>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv * u.gain, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 class Uniforms {
-  on: u32
-  gain: f32
+  on!: u32
+  gain!: f32
 }
 
 declare const u: uniform<Uniforms>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv * u.gain, 0., 1.)
-}
+});
 `,
   },
   TS8052: {
@@ -1542,64 +1465,58 @@ export function main(@location(0) uv: vec2): vec4 {
 declare const tex: texture_2d<f32>
 declare const smp: sampler
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   if (uv.x > 0.5) {
     return textureSample(tex, smp, uv)
   }
   return vec4(0., 0., 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 declare const tex: texture_2d<f32>
 declare const smp: sampler
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const c = textureSample(tex, smp, uv)
   if (uv.x > 0.5) {
     return c
   }
   return vec4(0., 0., 0., 1.)
-}
+});
 `,
   },
   TS8053: {
     deprecations: true,
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const k = 2
   return vec4(uv * k, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const k = 2.
   return vec4(uv * k, 0., 1.)
-}
+});
 `,
   },
   TS8068: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const arguments = uv.x * 0.5
   return vec4(uv * arguments, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const w = uv.x * 0.5
   return vec4(uv * w, 0., 1.)
-}
+});
 `,
   },
   TS8069: {
@@ -1607,19 +1524,17 @@ export function main(@location(0) uv: vec2): vec4 {
 
 "use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 const width = 640
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   TS8071: {
@@ -1631,15 +1546,13 @@ function lift(x: f32): f32 {
   return x
 }
 
-@vertex
-export function vs(@builtin("vertex_index") vi: u32): vec4 {
+export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): vec4 {
   return vec4(lift(f32(vi)), 0., 0., 1.)
-}
+});
 
-@fragment
-export function fs(@builtin("position") p: vec4): vec4 {
+export const fs = fragment(function fs(p: builtin<"position", vec4>): vec4 {
   return vec4(p.x, 0., 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
@@ -1647,34 +1560,30 @@ function lift(x: f32): f32 {
   return x
 }
 
-@vertex
-export function vs(@builtin("vertex_index") vi: u32): vec4 {
+export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): vec4 {
   return vec4(lift(f32(vi)), 0., 0., 1.)
-}
+});
 
-@fragment
-export function fs(@builtin("position") p: vec4): vec4 {
+export const fs = fragment(function fs(p: builtin<"position", vec4>): vec4 {
   console.log("x =", p.x)
   return vec4(p.x, 0., 0., 1.)
-}
+});
 `,
   },
   TS8072: {
     trigger: `"use typeshade"
 import { wave } from "./wav.shade.ts"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, wave(uv), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 import { wave } from "./wave.shade.ts"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, wave(uv), 1.)
-}
+});
 `,
     files: {
       'wave.shade.ts': `"use typeshade"
@@ -1688,19 +1597,17 @@ export function wave(p: vec2): f32 {
   TS8075: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g: f32
   if (uv.x > 0.5) {
     g = 1.
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g: f32
   if (uv.x > 0.5) {
     g = 1.
@@ -1708,20 +1615,19 @@ export function main(@location(0) uv: vec2): vec4 {
     g = 0.25
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
   TS8077: {
     trigger: `"use typeshade"
 
-@workgroup_size([128])
-export function total(xs: array<f32>): f32 {
+export const total = workgroup_size([128], function total(xs: array<f32>): f32 {
   let s = 0.
   for (let i: u32 = 0; i < xs.length; i++) {
     s += xs[i]
   }
   return s
-}
+});
 `,
     fix: `"use typeshade"
 
@@ -1734,28 +1640,48 @@ export function total(xs: array<f32>): f32 {
 }
 `,
   },
+  TS8078: {
+    trigger: `"use typeshade"
+
+const shade = numerics(["fast-math"], function shade(x: f32): f32 {
+  return x * 0. + x
+})
+
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
+  return vec4(shade(uv.x), uv.y, 0., 1.)
+});
+`,
+    fix: `"use typeshade"
+
+const shade = numerics(["finite-math"], function shade(x: f32): f32 {
+  return x * 0. + x
+})
+
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
+  return vec4(shade(uv.x), uv.y, 0., 1.)
+});
+`,
+  },
   TS8099: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = 0.
   do {
     g += 0.5
   } while (g < 1.)
   return vec4(g, g, g, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   let g = 0.5
   while (g < 1.) {
     g += 0.5
   }
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
   SD0030: {
@@ -1763,31 +1689,28 @@ export function main(@location(0) uv: vec2): vec4 {
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute([64])
-export function double(@builtin("global_invocation_id") id: vec3u): void {
+export const double = compute([64], function double(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 declare const data: storage<array<f32>, "read_write">
 
-@compute([64])
-export function double(@builtin("global_invocation_id") id: vec3u): void {
+export const double = compute([64], function double(id: builtin<"global_invocation_id", vec3u>): void {
   data[id.x] = data[id.x] * 2.
-}
+});
 `,
   },
   SD0043: {
     trigger: `"use typeshade"
 
 class Uniforms {
-  x: f64
+  x!: f64
 }
 
 declare const u: uniform<Uniforms>
@@ -1796,15 +1719,14 @@ function df64_add(a: f32, b: f32): f32 {
   return a + b
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, df64_add(f32(u.x * u.x), 0.), 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
 class Uniforms {
-  x: f64
+  x!: f64
 }
 
 declare const u: uniform<Uniforms>
@@ -1813,28 +1735,25 @@ function addNarrow(a: f32, b: f32): f32 {
   return a + b
 }
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, addNarrow(f32(u.x * u.x), 0.), 1.)
-}
+});
 `,
   },
   SD0108: {
     trigger: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const g = smoothstep(0.8, 0.2, uv.x)
   return vec4(g, g, g, 1.)
-}
+});
 `,
     fix: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const g = 1. - smoothstep(0.2, 0.8, uv.x)
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
 };
@@ -1847,96 +1766,87 @@ const COUNTERPARTS: Readonly<Record<string, CounterpartSpec>> = {
     code: 'TS8003',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const m = mat3(1., 0., 0., 0., 1., 0., 0., 0., 1.)
   return vec4(m * uv, 1.)
-}
+});
 `,
   },
   SD0002: {
     code: 'TS8003',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(vec3(1., 0., 0.) + uv, 1.)
-}
+});
 `,
   },
   SD0003: {
     code: 'TS8003',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const b = uv.x > 0.5
   return vec4(uv, b + 1., 1.)
-}
+});
 `,
   },
   SD0004: {
     code: 'TS8003',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const m = mat2(1., 0., 0., 1.)
   const k = m + 1.
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   SD0006: {
     code: 'TS8022',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const s = uv.x
   return vec4(s.x, 0., 0., 1.)
-}
+});
 `,
   },
   SD0007: {
     code: 'TS8022',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv.x, uv.y, uv.z, 1.)
-}
+});
 `,
   },
   SD0008: {
     code: 'TS8022',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const s = uv.x
   return vec4(s.xy, 0., 1.)
-}
+});
 `,
   },
   SD0009: {
     code: 'TS8003',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, select(0., 1., uv.x), 1.)
-}
+});
 `,
   },
   SD0010: {
     code: 'TS8003',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, uv.x > 0.5 ? uv : 1., 1.)
-}
+});
 `,
   },
   SD0014: {
@@ -1945,10 +1855,9 @@ export function main(@location(0) uv: vec2): vec4 {
 
 declare const tint: override<vec3>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   SD0015: {
@@ -1958,41 +1867,37 @@ export function main(@location(0) uv: vec2): vec4 {
 declare const tex: texture_2d_array<f32>
 declare const smp: sampler
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   return textureSample(tex, smp, uv, 1.5)
-}
+});
 `,
   },
   SD0017: {
     code: 'TS8003',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const k: i32 = 3000000000
   return vec4(uv, f32(k), 1.)
-}
+});
 `,
   },
   SD0020: {
     code: 'TS8010',
     program: `"use typeshade"
 
-class VsOut {
-  @builtin("position") pos: vec4
-  @location(0) uv: vec2
+interface VsOut {
+  pos: builtin<"position", vec4>
+  uv: location<0, vec2>
 }
 
-@vertex
-export function vs(@builtin("vertex_index") i: u32): VsOut {
+export const vs = vertex(function vs(i: builtin<"vertex_index", u32>): VsOut {
   return { pos: vec4(0., 0., 0., 1.), uv: vec2(0., 0.) }
-}
+});
 
-@fragment
-export function fs(@location(1) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<1, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   // A matrix of doubles has a df64 body for `*` alone. Since proposal 0008 the front end refuses
@@ -2003,59 +1908,54 @@ export function fs(@location(1) uv: vec2): vec4 {
     program: `"use typeshade"
 
 class Uniforms {
-  m: mat3<f64>
+  m!: mat3<f64>
 }
 
 declare const u: uniform<Uniforms>
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const k = u.m + u.m
   return vec4(uv, 0., 1.)
-}
+});
 `,
   },
   SD0044: {
     code: 'TS8038',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) d: f64): vec4 {
+export const main = fragment(function main(d: location<0, f64>): vec4 {
   return vec4(f32(d), 0., 0., 1.)
-}
+});
 `,
   },
   SD0107: {
     code: 'TS8005',
     program: `"use typeshade"
 
-@fragment
-export function main(@location(0) uv: vec2): vec4 {
+export const main = fragment(function main(uv: location<0, vec2>): vec4 {
   const g = uv.x
   g = g * 2.
   return vec4(g, g, g, 1.)
-}
+});
 `,
   },
   SD0109: {
     code: 'TS8099',
     program: `"use typeshade"
 
-class VsOut {
-  @builtin("position") pos: vec4
-  @location(0) uv: vec2
+interface VsOut {
+  pos: builtin<"position", vec4>
+  uv: location<0, vec2>
 }
 
-@vertex
-export function vs(@builtin("vertex_index") i: u32): VsOut {
+export const vs = vertex(function vs(i: builtin<"vertex_index", u32>): VsOut {
   const x = f32(i)
   return { pos: vec4(x, dpdx(x), 0., 1.), uv: vec2(0., 0.) }
-}
+});
 
-@fragment
-export function fs(v: VsOut): vec4 {
+export const fs = fragment(function fs(v: VsOut): vec4 {
   return vec4(v.uv, 0., 1.)
-}
+});
 `,
   },
 };

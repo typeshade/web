@@ -13,7 +13,7 @@ const { locale } = Astro.props;
 const c = copyFor(locale).mnist.walkthrough;
 const shaderPath = 'vendor/shader-dsl/journeys/mnist/softmax.shade.ts';
 const shader = readFileSync(path.resolve(shaderPath), 'utf8');
-const matches = [...shader.matchAll(/^@compute\(\[\d+\]\)\s*\nexport function (\w+)\(/gm)];
+const matches = [...shader.matchAll(/^export const (\w+) = compute\(\[\d+\], function \1\(/gm)];
 const expected = ['forward', 'objective', 'reduce', 'backward', 'update', 'predict'];
 const actual = matches.map((m) => m[1]);
 if (actual.join('|') !== expected.join('|'))

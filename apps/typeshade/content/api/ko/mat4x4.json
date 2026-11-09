@@ -1,0 +1,8 @@
+{
+  "slug": "mat4x4",
+  "source": "b40164413e695b64729a973d8e0fd4b87ce0dfec1e4568dfedc858734719e59e",
+  "texts": {
+    "summary": "호스트 값으로서의 mat4x4입니다. 성분 16개를 열 우선 순서로 담은 readonly 튜플입니다.",
+    "description": "`mat4x4<f64>`는 `f64` 성분을 담습니다(규칙 4.4)."
+  }
+}

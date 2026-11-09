@@ -1,0 +1,7 @@
+{
+  "slug": "vec3u-type",
+  "source": "01fd9642f866568a31dec2333b464fde9d55c968058dd9164972c2ed0f96537e",
+  "texts": {
+    "summary": "호스트 값으로서의 vec3u입니다. u32 세 개로 된 readonly 튜플입니다."
+  }
+}

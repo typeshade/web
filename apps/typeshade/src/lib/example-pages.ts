@@ -125,10 +125,12 @@ function sourceOf(file: string): string {
 }
 
 // Where the shader starts in one of these files, so the code pane opens on it and the reader
-// scrolls up for the header. A `.shade.ts` file declares a stage with `@vertex`, `@fragment`
-// or `@compute`. A file with none opens on its first export. The file's own text is never
+// scrolls up for the header. A `.shade.ts` file declares a stage with a stage call,
+// `export const fs = fragment(function fs(…) { … })` (compiler change 0111), or with the decorated
+// form `@vertex`, `@fragment` or `@compute` it replaces. A file with none opens on its first export. The file's own text is never
 // touched.
-const STAGE_LINE = /^[\t ]*(?:@vertex|@fragment|@compute)\b/;
+const STAGE_LINE =
+  /^[\t ]*(?:export\s+const\s+\w+\s*=\s*(?:vertex|fragment|compute)\(|@vertex|@fragment|@compute)\b/;
 const EXPORT_LINE = /^[\t ]*export\b/;
 
 function entryLineOf(id: string, source: string): number {

@@ -494,11 +494,13 @@ test('a subgroup case is refused by a build that predates it, and skipped as uns
     'reduction-subgroup-levels',
   ]);
   expect(regressionCatalog.builds.every((b) => b.cases.length === 26)).toBe(true);
-  // The baseline build predates compiler change 0117 and refuses the three programs that use
-  // the subgroup built-in functions; the candidate compiles all four into its own WGSL.
+  // Both builds of the comparison (cdb12dc0 and e30bbe57) carry compiler change 0117, so
+  // neither refuses the three programs that use the subgroup built-in functions, and each
+  // compiles all four into its own WGSL. A baseline that predates 0117 refuses exactly those
+  // three; the comparison of 8c088df and cdb12dc0 held that before this pin.
   const refusedOn = (build: number) =>
     regressionCatalog.builds[build]!.cases.filter((c) => 'refused' in c).map((c) => c.id);
-  expect(refusedOn(0).sort()).toEqual(needing.map((c) => c.id).sort());
+  expect(refusedOn(0)).toEqual([]);
   expect(refusedOn(1)).toEqual([]);
   for (const c of SUBGROUP_CASES) {
     const built = regressionCatalog.builds[1]!.cases.find((x) => x.id === c.id)!;
@@ -508,7 +510,10 @@ test('a subgroup case is refused by a build that predates it, and skipped as uns
   }
   const skip = (r: RegressionRecord) => {
     for (const row of r.results)
-      if (needing.some((c) => c.id === row.id) && row.build === 'candidate')
+      if (
+        needing.some((c) => c.id === row.id) &&
+        (row.build === 'candidate' || !refusedOn(0).includes(row.id))
+      )
         Object.assign(row, {
           status: 'failed',
           reason: 'unsupported',
@@ -531,17 +536,21 @@ test('a subgroup case is refused by a build that predates it, and skipped as uns
   skip(withFeature);
   expect(() => parseAnyRecord(withFeature)).toThrow();
   // A refused row stands only where the catalog records the refusal, and measures nothing.
-  const measured = pairedRecord();
-  measured.results.find(
-    (row) => row.id === 'reduction-subgroup' && row.build === 'baseline',
-  )!.wallMs = [1];
-  expect(() => parseAnyRecord(measured)).toThrow();
-  const ran = pairedRecord();
-  Object.assign(
-    ran.results.find((row) => row.id === 'reduction-subgroup' && row.build === 'baseline')!,
-    { status: 'passed', reason: 'none', wallMs: [1, 2, 3] },
-  );
-  expect(() => parseAnyRecord(ran)).toThrow();
+  // The checks run when the baseline build refuses a case, which a comparison against a
+  // build that predates 0117 does.
+  if (refusedOn(0).includes('reduction-subgroup')) {
+    const measured = pairedRecord();
+    measured.results.find(
+      (row) => row.id === 'reduction-subgroup' && row.build === 'baseline',
+    )!.wallMs = [1];
+    expect(() => parseAnyRecord(measured)).toThrow();
+    const ran = pairedRecord();
+    Object.assign(
+      ran.results.find((row) => row.id === 'reduction-subgroup' && row.build === 'baseline')!,
+      { status: 'passed', reason: 'none', wallMs: [1, 2, 3] },
+    );
+    expect(() => parseAnyRecord(ran)).toThrow();
+  }
   const forged = pairedRecord();
   Object.assign(
     forged.results.find((row) => row.id === 'reduction-subgroup' && row.build === 'candidate')!,
@@ -562,12 +571,12 @@ test('a subgroup case is refused by a build that predates it, and skipped as uns
   skip(without);
   expect(parseAnyRecord(without).status).toBe('complete');
   // The reference pairing reads the subgroup cases against their references within a build,
-  // so the refusing baseline pairs only the case it compiled.
+  // so a refusing baseline pairs only the case it compiled.
   const pairs = summarizeFixed([withFeature]).filter((g) => g.metric === 'wallMs');
   expect(pairs.every((g) => g.fixed === 'atomics-bins-1-workgroup')).toBe(true);
   expect(pairs.map((g) => g.build).sort()).toEqual(['baseline', 'candidate']);
   const full = summarizeFixed([pairedRecord()]).filter((g) => g.metric === 'wallMs');
-  expect(full.filter((g) => g.build === 'baseline')).toHaveLength(1);
+  expect(full.filter((g) => g.build === 'baseline')).toHaveLength(4 - refusedOn(0).length);
   expect(full.filter((g) => g.build === 'candidate')).toHaveLength(4);
 });
 test('calibration is bounded and device validity uses only measured samples', () => {
@@ -747,8 +756,8 @@ test('application references cover cold fields, insertion order and output corru
 test('paired ratios require a complete same-adapter run and expose sample spread', () => {
   const r = pairedRecord();
   const pairs = pairedResults(r);
-  // The three subgroup cases the baseline build refuses have no pair.
-  expect(pairs).toHaveLength(31);
+  // Both builds compile every case, the subgroup ones among them, so each case has a pair.
+  expect(pairs).toHaveLength(34);
   expect(pairs[0]!.wallRatio).toBe(2);
   expect(pairs[0]!.bufferRatio).toBe(2);
   expect(pairs[0]!.baselineWallP90).toBe(4);

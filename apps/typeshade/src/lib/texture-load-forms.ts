@@ -57,7 +57,7 @@ export function textureForms(name: string): readonly TextureForm[] | undefined {
   const forms = probes.map(([texture, call, wrap]): TextureForm => {
     const value = wrap ? `vec4(${call}, 0., 0., 1.)` : call;
     const e = emitted(
-      `declare const t: ${texture}\n\n@fragment\nexport function fs(): vec4 {\n  return ${value}\n}\n`,
+      `declare const t: ${texture}\n\nexport const fs = fragment(function fs(): vec4 {\n  return ${value}\n});\n`,
     );
     return {
       texture,

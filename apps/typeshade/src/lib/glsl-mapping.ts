@@ -94,88 +94,76 @@ const GLSL_NO_FORM: readonly TypeProbe[] = [
   probe('atomic', 'atomic<u32>', 'storage'),
 ];
 
-const UBO_SNIPPET = `class Block { scale: f32; tint: vec3 }
+const UBO_SNIPPET = `class Block { scale!: f32; tint!: vec3 }
 declare const u: uniform<Block>
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv * u.scale, u.tint.x, 1.)
-}
+});
 `;
 
 const LOOSE_UNIFORM_SNIPPET = `declare const scale: uniform<f32>
 
-@fragment
-export function fs(): vec4 {
+export const fs = fragment(function fs(): vec4 {
   return vec4(scale, 0., 0., 1.)
-}
+});
 `;
 
 const STORAGE_READ_SNIPPET = `declare const src: storage<array<f32>>
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(src[i32(uv.x)], 0., 0., 1.)
-}
+});
 `;
 
 const OVERRIDE_SNIPPET = `const tint: override<f32> = 0.85
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv * tint, 0., 1.)
-}
+});
 `;
 
-const VARYING_SNIPPET = `class VsOut { @builtin("position") pos: vec4; @location(0) uv: vec2 }
+const VARYING_SNIPPET = `interface VsOut { pos: builtin<"position", vec4>; uv: location<0, vec2> }
 
-@vertex
-export function vs(@builtin("vertex_index") vi: u32): VsOut {
+export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): VsOut {
   return { pos: vec4(f32(vi), 0., 0., 1.), uv: vec2(f32(vi), 0.) }
-}
+});
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-}
+});
 `;
 
 const SHADOW_SNIPPET = `declare const shadowMap: texture_depth_2d
 declare const shadowSmp: sampler_comparison
 
-@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   return vec4(textureSampleCompare(shadowMap, shadowSmp, uv, 0.5), 0., 0., 1.)
-}
+});
 `;
 
-export const FRAGCOORD_SNIPPET = `@fragment
-export function fs(@builtin("position") p: vec4): vec4 {
+export const FRAGCOORD_SNIPPET = `export const fs = fragment(function fs(p: builtin<"position", vec4>): vec4 {
   return p
-}
+});
 `;
 
-export const VERTEX_ID_SNIPPET = `@vertex
-export function vs(@builtin("vertex_index") vi: u32, @builtin("instance_index") ii: u32): vec4 {
+export const VERTEX_ID_SNIPPET = `export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>, ii: builtin<"instance_index", u32>): vec4 {
   return vec4(f32(vi), f32(ii), 0., 1.)
-}
+});
 
-@fragment
-export function fs(): vec4 {
+export const fs = fragment(function fs(): vec4 {
   return vec4(1., 0., 0., 1.)
-}
+});
 `;
 
-export const FRONT_FACING_SNIPPET = `class Out { @builtin("frag_depth") depth: f32; @location(0) color: vec4 }
+export const FRONT_FACING_SNIPPET = `interface Out { depth: builtin<"frag_depth", f32>; color: location<0, vec4> }
 
-@fragment
-export function fs(@builtin("front_facing") facing: bool): Out {
+export const fs = fragment(function fs(facing: builtin<"front_facing", bool>): Out {
   return { depth: 0.5, color: vec4(f32(facing), 0., 0., 1.) }
-}
+});
 `;
 
-const OPERATOR_SNIPPET = `@fragment
-export function fs(@location(0) uv: vec2): vec4 {
+const OPERATOR_SNIPPET = `export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
   const floorMod = mod(uv.x, 0.5)
   const truncMod = uv.x % 0.5
   const below: vec2b = uv < vec2(0.5, 0.25)
@@ -183,7 +171,7 @@ export function fs(@location(0) uv: vec2): vec4 {
   const picked = select(uv.x, uv.y, below.x)
   const blended = select(vec2(0., 0.), vec2(1., 1.), below)
   return vec4(floorMod + blended.x, truncMod + blended.y, picked, f32(below.y) + f32(same.x))
-}
+});
 `;
 
 /** The GLSL text the registry writes for one builtin, with placeholder arguments. */
@@ -300,42 +288,46 @@ function build(): GlslMapping {
       row(
         'out',
         pick(varyings.glslVertex, 'out vec2 uv;', 'varying snippet'),
-        '@location(0) uv: vec2',
+        'uv: location<0, vec2>',
       ),
       row(
         'in',
         pick(varyings.glslFragment, 'in vec2 uv;', 'varying snippet'),
-        '@location(0) uv: vec2',
+        'uv: location<0, vec2>',
       ),
       row('target', pick(varyings.glslFragment, 'out vec4 _ret;', 'varying snippet'), ': vec4'),
     ],
     capabilities,
     variables: [
-      row('glPosition', nameIn(vertexId, 'gl_Position', 'vertex snippet'), '@builtin("position")'),
+      row(
+        'glPosition',
+        nameIn(vertexId, 'gl_Position', 'vertex snippet'),
+        'builtin<"position", vec4>',
+      ),
       row(
         'glFragCoord',
         nameIn(fragCoord, 'gl_FragCoord', 'fragment snippet'),
-        '@builtin("position")',
+        'builtin<"position", vec4>',
       ),
       row(
         'glVertexID',
         nameIn(vertexId, 'uint(gl_VertexID)', 'vertex snippet'),
-        '@builtin("vertex_index")',
+        'builtin<"vertex_index", u32>',
       ),
       row(
         'glInstanceID',
         nameIn(vertexId, 'uint(gl_InstanceID)', 'vertex snippet'),
-        '@builtin("instance_index")',
+        'builtin<"instance_index", u32>',
       ),
       row(
         'glFrontFacing',
         nameIn(frontFacing, 'gl_FrontFacing', 'front facing snippet'),
-        '@builtin("front_facing")',
+        'builtin<"front_facing", bool>',
       ),
       row(
         'glFragDepth',
         nameIn(frontFacing, 'gl_FragDepth', 'front facing snippet'),
-        '@builtin("frag_depth")',
+        'builtin<"frag_depth", f32>',
       ),
     ],
     absentVariables: [

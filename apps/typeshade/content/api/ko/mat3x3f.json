@@ -1,0 +1,7 @@
+{
+  "slug": "mat3x3f",
+  "source": "d43b45c4b1502f792ce56ec819ec334ca0d8eb90c7e0a268165ae3843c6d8a84",
+  "texts": {
+    "summary": "WGSL의 mat3x3f이며, mat3x3와 같은 타입입니다."
+  }
+}

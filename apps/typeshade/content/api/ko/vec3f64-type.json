@@ -1,0 +1,7 @@
+{
+  "slug": "vec3f64-type",
+  "source": "e77325718081a2c7c4b2acb8ed37870ae40d4fc7856725ce5eb5401adc92f881",
+  "texts": {
+    "summary": "호스트 값으로서의 vec3f64입니다(규칙 4.4). f64 세 개로 된 readonly 튜플입니다."
+  }
+}

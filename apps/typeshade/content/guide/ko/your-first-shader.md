@@ -1,7 +1,7 @@
 ---
 id: your-first-shader
-source: fd98901e623d7833819a2e1865b96ddb57873072e04b23b38294dd4c525fb83c
-sourceLine: 148
+source: 532efc5caedf56fb7ce97ae46dd89977f69dd9696bd726d77e3ad5630c5ca739
+sourceLine: 157
 ---
 
 이 예제는 TypeScript로 작성한 진입점 두 개로 화면을 색상 그라데이션으로 채웁니다. 같은 모듈을 WebGPU용 WGSL과 WebGL2용 GLSL ES 3.00으로 생성하고, 각 호출이 반환하는 문자열을 설명합니다.
@@ -16,30 +16,29 @@ sourceLine: 148
 
 ### 버텍스 진입점
 
-진입점(entry point)은 GPU가 직접 호출하는 함수입니다. 버텍스, 프래그먼트, 컴퓨트 인보케이션마다 실행되며, 이 예제는 앞의 두 종류를 사용합니다. 최상위 `export function`에 스테이지 데코레이터 `@vertex`, `@fragment`, `@compute` 중 하나를 붙이면 진입점이 됩니다. 나머지 함수는 일반 헬퍼입니다.
+진입점(entry point)은 GPU가 직접 호출하는 함수입니다. 버텍스, 프래그먼트, 컴퓨트 인보케이션마다 실행되며, 이 예제는 앞의 두 종류를 사용합니다. 함수를 스테이지 호출 `vertex(f)`, `fragment(f)`, `compute([64], f)` 중 하나로 감싸고 최상위 `export const`에 담으면 진입점이 됩니다: `export const vs = vertex(function vs(…) { … });`. 나머지 함수는 일반 헬퍼입니다. 이 형태는 일반 `tsc --strict`도 받아들입니다. 이전 릴리스의 데코레이터 형태 `@vertex export function vs(…)`는 마이그레이션 릴리스 다음 릴리스까지 계속 받아들이며, `tshc migrate`가 파일을 새 형태로 바꿔 씁니다.
 
-버텍스 스테이지는 버텍스마다 한 번 실행됩니다. 클립 공간 위치와 프래그먼트 스테이지에 필요한 값을 IO 구조체에 담아 전달합니다. IO 구조체는 필드마다 속성이 붙은 클래스입니다. `@builtin("position")`은 하드웨어가 직접 사용하는 값을 표시합니다. `@location(0)`은 삼각형 위에서 보간된 뒤 프래그먼트 스테이지가 읽는 값을 표시합니다.
+버텍스 스테이지는 버텍스마다 한 번 실행됩니다. 클립 공간 위치와 프래그먼트 스테이지에 필요한 값을 IO 구조체에 담아 전달합니다. IO 구조체는 필드마다 타입에 속성을 적은 인터페이스(또는 클래스나 `type`)입니다. `builtin<"position", vec4>`는 하드웨어가 직접 사용하는 값을 표시합니다. `location<0, vec2>`는 삼각형 위에서 보간된 뒤 프래그먼트 스테이지가 읽는 값을 표시합니다.
 
 ```ts
-class VsOut {
-  @builtin("position") pos: vec4;
-  @location(0) uv: vec2;
+interface VsOut {
+  pos: builtin<"position", vec4>;
+  uv: location<0, vec2>;
 }
 ```
 
 WGSL은 `clip_distances`를 뺀 모든 내장 값의 타입을 정해 둡니다. 그래서 컴파일러는 작성한 타입을
-id와 대조합니다. `@builtin("position")`을 `vec4`가 아닌 필드에 붙이면 오류가 납니다.
+id와 대조합니다. `T`가 `vec4`가 아닌 `builtin<"position", T>`는 오류입니다.
 
 이 셰이더에는 버텍스 버퍼가 없습니다. 화면을 덮는 버텍스 세 개를 그리고, 그 위치는 버텍스
 인덱스만으로 계산합니다. 스테이지 입력은 같은 속성을 붙인 평범한 매개변수입니다.
 
 ```ts
-@vertex
-export function vs(@builtin("vertex_index") vi: u32): VsOut {
+export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): VsOut {
   const x = f32(vi & 1) * 4. - 1.;
   const y = f32(vi >> 1) * 4. - 1.;
   return { pos: vec4(x, y, 0., 1.), uv: vec2(x * 0.5 + 0.5, y * 0.5 + 0.5) };
-}
+});
 ```
 
 `vi`는 `u32`이고, `f32(vi & 1)`이 이 값을 변환합니다. 소수점 없이 쓴 숫자는 옆 피연산자의 정수
@@ -54,16 +53,15 @@ export function vs(@builtin("vertex_index") vi: u32): VsOut {
 `vec2`입니다.
 
 ```ts
-@fragment
-export function fs(vo: VsOut): vec4 {
+export const fs = fragment(function fs(vo: VsOut): vec4 {
   const shade = 1. - vo.uv.y;
   return vec4(vo.uv.x, shade, 0.5, 1.);
-}
+});
 ```
 
-프래그먼트가 구조체 없이 값만 돌려주면 그 값은 첫 번째 색상 어태치먼트인 `@location(0)`으로
+프래그먼트가 구조체 없이 값만 돌려주면 그 값은 첫 번째 색상 어태치먼트인 location 0으로
 갑니다. 따라서 따로 적을 것이 없습니다. 구조체를 돌려줄 때는 색상 어태치먼트마다
-`@location(n)` 필드를 하나씩 둡니다.
+`location<n, T>` 필드를 하나씩 둡니다.
 
 ### 모듈 조립하기
 
@@ -72,23 +70,21 @@ export function fs(vo: VsOut): vec4 {
 ```ts
 "use typeshade";
 
-class VsOut {
-  @builtin("position") pos: vec4;
-  @location(0) uv: vec2;
+interface VsOut {
+  pos: builtin<"position", vec4>;
+  uv: location<0, vec2>;
 }
 
-@vertex
-export function vs(@builtin("vertex_index") vi: u32): VsOut {
+export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): VsOut {
   const x = f32(vi & 1) * 4. - 1.;
   const y = f32(vi >> 1) * 4. - 1.;
   return { pos: vec4(x, y, 0., 1.), uv: vec2(x * 0.5 + 0.5, y * 0.5 + 0.5) };
-}
+});
 
-@fragment
-export function fs(vo: VsOut): vec4 {
+export const fs = fragment(function fs(vo: VsOut): vec4 {
   const shade = 1. - vo.uv.y;
   return vec4(vo.uv.x, shade, 0.5, 1.);
-}
+});
 ```
 
 다른 셰이더 파일을 가져오는 파일은 그 파일과 함께 모듈 하나가 됩니다. 쓰는 법은

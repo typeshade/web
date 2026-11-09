@@ -1,0 +1,7 @@
+{
+  "slug": "vec2f64-type",
+  "source": "6418fde3c4baa16ef66862562f7a4de58c97adc4ee1f2ac445a460eaba959c9f",
+  "texts": {
+    "summary": "호스트 값으로서의 vec2f64입니다(규칙 4.4). f64 두 개로 된 readonly 튜플입니다."
+  }
+}

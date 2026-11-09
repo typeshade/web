@@ -1,0 +1,7 @@
+{
+  "slug": "vec4b",
+  "source": "593a5db86b74a0f46fd9e8a6a2591128566a6df661fe572d7648200386b50c20",
+  "texts": {
+    "summary": "호스트 값으로서의 vec4b입니다. bool 네 개로 된 readonly 튜플입니다."
+  }
+}

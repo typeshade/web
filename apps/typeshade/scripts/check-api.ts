@@ -13,6 +13,7 @@ import {
   SENTENCE,
   apiEntries,
   assignSlugs,
+  exportKey,
   hostMentions,
   unresolvedLinkCount,
 } from '../src/lib/api.ts';
@@ -68,9 +69,10 @@ for (const entry of entries) {
 
 // A slug two exports share is decided by the names, so the same pair keeps the same pages at
 // the next pin. Every member of a colliding group but the first carries its kind.
-const expected = assignSlugs(entries.map((e) => ({ name: e.name, kind: e.kind })));
+const keyOf = (e: ApiEntry): string => exportKey(e.name, e.modules[0] ?? '');
+const expected = assignSlugs(entries.map((e) => ({ name: e.name, kind: e.kind, key: keyOf(e) })));
 for (const entry of entries) {
-  const want = expected.get(entry.name);
+  const want = expected.get(keyOf(entry));
   if (want && want !== entry.slug)
     fail(entry, `slug ${entry.slug} is not the ${want} its name and kind ask for`);
 }

@@ -1,8 +1,8 @@
 ---
 id: values-and-mutation
-source: db841d4f72e018d8d385438fef640b9c6650a1fa072afaea50e103dbc183f38e
-sourceLine: 344
-rules: 11.12 30yuoBdpwkfDlJLbGKIzbnlOXHnKqWPpqDe7V6UDujU=, 6.2 X1TddP_Ob7b4QaR9Qbuoo1UgPCngNA5JdtbbWwd_lOc=, 6.10 suiaQZS1y-SaWxDmJXHL21Qzp_yYkddUlpCNV8AsLVc=, 8.13 aNXyjNJvi1bR7zPmCgF2WJ0PmaP_Qk6WWqXOOuEbzCg=, 8.14 SP-Fa9DtpBru_e2Zuh3x8ZUFrqweaTrNrJs-c8RHbE0=, 8.17 iy_UhoCMHYdgpfUXu8eRAllyZo67mQ2c6BRfQtMcIYY=, 7.6 kyzs2Ws4Mk2xUgP_v9ZM_z6jm_3zIWP2-BekxmeHpC8=, 8.25 kf3cBLjGMs8IwKcbQz-CZKCza4XRYOMQfRhX4ueQFq0=, 12.7 Mvr2vY3Krl66Bglu9ejs51aqLb_3vraF1hO4FLdrK48=, 2.3 r7XKZw0j-Hb5AH5VaQM8ueWwC512ZArtkVGU0ccfsOE=, 4.8 ZaXqxS6SImuhTEXg74x7e6A4X5QWcoGarvtV45ZRA4I=, 5.3 AlhLu-cJSNgGl-ltXEFlhL7eWs5_USuUdEImJEf0Eb4=, 5.4 RphTFmChXNrzoLVIpKED02ndV41w4BSuuRjq3nTUtVM=, 6.3 HrFOiH7tAJqEuKnDGy0ONc5jMJLadIKmvRR6CZc2FK8=, 7.1 slGgWLh0LvX-AtHwWav2IAGdVekgx7fNu2sYqitl4Kk=, 7.4 Emky1db0T6Mhf0H1_VyxRD8Ub8JLKEB_0DqK59uhD-M=, 7.5 4308LIgSysAnlue51NfkW0VyNcY9-VTAPwyWJ1UyQN4=, 7.10 3lGjzZUWGw-ZKwJftj0FW4dk59DA_93RfSYdpPpXAkA=, 8.18 WSJEXSLWucW9-ovejXz9e-mLa7u8vqZrdwezeNyrr7M=, 8.19 2D92Uur_1PtJq4PAX_vx-kOcr0i4SbSGiaNJkCSbJ_g=, 12.6 kuInDVEKCI_Qu_9zVLzT--W8UeBj0WgdX22sRWA_VNY=, 2.1 nwiyGBq4biNPSwuqSRZQ0n2m5uoSNXdsq3yUaVZj5sQ=, 4.1 nBREyZ8OMiZOapVAwVoV3KZvTGWXeAjHPhZPgZ0B9H8=, 4.6 RwdafG75jJiCMgm6Du1X3zVcPigfJdPEwfy6iWlDksU=, 7.8 fyWaTaGHHUsBo-fTN-eap0uAUPB1U1v3TNqAC_1wgPU=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=
+source: 63837ea1158192758c9c0b43aef48d2eb506f9136a75e78334305adb6751a9dc
+sourceLine: 343
+rules: 11.12 30yuoBdpwkfDlJLbGKIzbnlOXHnKqWPpqDe7V6UDujU=, 6.2 X1TddP_Ob7b4QaR9Qbuoo1UgPCngNA5JdtbbWwd_lOc=, 6.10 suiaQZS1y-SaWxDmJXHL21Qzp_yYkddUlpCNV8AsLVc=, 8.13 aNXyjNJvi1bR7zPmCgF2WJ0PmaP_Qk6WWqXOOuEbzCg=, 8.14 SP-Fa9DtpBru_e2Zuh3x8ZUFrqweaTrNrJs-c8RHbE0=, 8.17 iy_UhoCMHYdgpfUXu8eRAllyZo67mQ2c6BRfQtMcIYY=, 7.6 GMsX5wNgIEXEAZ7s8jNra2oroSJknOZi_ucTQ2GzOgQ=, 8.25 YA_aCQVarZYOhnVQ93ZZ3Z2VnLmSKkB70xDcX8W9rZM=, 12.7 Mvr2vY3Krl66Bglu9ejs51aqLb_3vraF1hO4FLdrK48=, 2.3 r7XKZw0j-Hb5AH5VaQM8ueWwC512ZArtkVGU0ccfsOE=, 4.8 ZaXqxS6SImuhTEXg74x7e6A4X5QWcoGarvtV45ZRA4I=, 5.3 AlhLu-cJSNgGl-ltXEFlhL7eWs5_USuUdEImJEf0Eb4=, 5.4 RphTFmChXNrzoLVIpKED02ndV41w4BSuuRjq3nTUtVM=, 6.3 HrFOiH7tAJqEuKnDGy0ONc5jMJLadIKmvRR6CZc2FK8=, 7.1 slGgWLh0LvX-AtHwWav2IAGdVekgx7fNu2sYqitl4Kk=, 7.4 Emky1db0T6Mhf0H1_VyxRD8Ub8JLKEB_0DqK59uhD-M=, 7.5 4308LIgSysAnlue51NfkW0VyNcY9-VTAPwyWJ1UyQN4=, 7.10 3lGjzZUWGw-ZKwJftj0FW4dk59DA_93RfSYdpPpXAkA=, 8.18 WSJEXSLWucW9-ovejXz9e-mLa7u8vqZrdwezeNyrr7M=, 8.19 2D92Uur_1PtJq4PAX_vx-kOcr0i4SbSGiaNJkCSbJ_g=, 12.6 kuInDVEKCI_Qu_9zVLzT--W8UeBj0WgdX22sRWA_VNY=, 2.1 nwiyGBq4biNPSwuqSRZQ0n2m5uoSNXdsq3yUaVZj5sQ=, 4.1 nBREyZ8OMiZOapVAwVoV3KZvTGWXeAjHPhZPgZ0B9H8=, 4.6 RwdafG75jJiCMgm6Du1X3zVcPigfJdPEwfy6iWlDksU=, 7.8 fyWaTaGHHUsBo-fTN-eap0uAUPB1U1v3TNqAC_1wgPU=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=
 ---
 
 이 페이지는 중간값의 선언, 타입 표기, 값의 변경, 상수와 변수의 차이를 설명합니다.
@@ -100,7 +100,7 @@ o.pos.x = 2.; // and a component of one
 | 성분      | `.x .y .z .w` · `.r .g .b .a` · `.xy .rgb .zxy …` |
 | 인덱스    | `xs[i]`                                           |
 | 삼항      | `c ? a : b`                                       |
-| 거듭제곱  | `a ** b`, 곧 `pow(a, b)`                          |
+| 거듭제곱  | `a ** b`, WGSL의 `pow(a, b)`로 내려갑니다         |
 
 일부 연산은 내장 함수로 표현합니다. `select(f, t, c)`는 WGSL의 인자 순서를 사용합니다. 조건은 마지막이며, `select(f, t, c)`는 `c ? t : f`와 같습니다. `mod(x, y)`는 나눗셈 결과를 내림해 구하는 나머지입니다. 좌표 반복이나 각도 순환처럼 피연산자가 음수일 수 있는 계산에 사용합니다. `%`는 WGSL의 절삭 기반 나머지이므로 음수 피연산자에서 결과가 다릅니다. `radians`와 `degrees`는 각도 단위를 변환하므로 변환 상수를 직접 적거나 반올림할 필요가 없습니다.
 

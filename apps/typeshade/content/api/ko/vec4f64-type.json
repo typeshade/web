@@ -1,0 +1,7 @@
+{
+  "slug": "vec4f64-type",
+  "source": "12492ce6527939acfd88e55aa4b584c0d0400a6c136a6f5258e5f9ff872cb9c3",
+  "texts": {
+    "summary": "호스트 값으로서의 vec4f64입니다(규칙 4.4). f64 네 개로 된 readonly 튜플입니다."
+  }
+}

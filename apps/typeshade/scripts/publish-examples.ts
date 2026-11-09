@@ -69,7 +69,8 @@ const FORMER_HOST = /\bX-?GIS (#\d+)/g;
 const clean = (text: string): string =>
   text.replace(/\r\n/g, '\n').trimEnd().replace(FORMER_HOST, '$1');
 
-const STAGE_LINE = /^[\t ]*(?:@vertex|@fragment|@compute)\b/;
+const STAGE_LINE =
+  /^[\t ]*(?:export\s+const\s+\w+\s*=\s*(?:vertex|fragment|compute)\(|@vertex|@fragment|@compute)\b/;
 const EXPORT_LINE = /^[\t ]*export\b/;
 function entryLineOf(source: string): number {
   const lines = source.split('\n');

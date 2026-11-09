@@ -60,7 +60,7 @@ test('unlocated backend errors and warnings are retained', () => {
 
 test('a real backend warning survives alongside usable WGSL', () => {
   const result = compile(
-    '"use typeshade";\ndeclare const u: uniform<f32>;\n@fragment function main(): vec4 { return vec4(u, u, u, 1.0); }',
+    '"use typeshade";\ndeclare const u: uniform<f32>;\nconst main = fragment(function main(): vec4 { return vec4(u, u, u, 1.0); });',
     { fileName: entry },
   );
   expect(result.wgsl).toBeDefined();

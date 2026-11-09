@@ -20,8 +20,8 @@ if (errors.length > 0 || !compiled.module) {
   throw new Error('[mnist-browser] TypeShade shader compilation failed: ' + errors.map((d) => d.message).join('; '));
 }
 const packJson = JSON.stringify(packModule(compiled.module)).replace(/</g, '\\u003c');
-const forwardStart = source.indexOf('@compute([64])\nexport function forward(');
-const forwardEnd = source.indexOf('@compute([64])\nexport function objective(', forwardStart);
+const forwardStart = source.indexOf('export const forward = compute([64], function forward(');
+const forwardEnd = source.indexOf('export const objective = compute([64], function objective(', forwardStart);
 if (forwardStart < 0 || forwardEnd < 0)
   throw new Error('[mnist-lab] Forward stage no longer matches the visible code');
 const forwardExample = source.slice(forwardStart, forwardEnd).trim();

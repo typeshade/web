@@ -1,0 +1,7 @@
+{
+  "slug": "bool-type",
+  "source": "4251a43973bcb77c255c7cf17cbb2d918e2a4d0e8d259df7ab432fe84377dc34",
+  "texts": {
+    "summary": "호스트 값으로서의 bool입니다. 불리언이며, 숫자 타입처럼 자기 이름을 가집니다."
+  }
+}

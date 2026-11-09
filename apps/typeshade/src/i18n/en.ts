@@ -582,13 +582,14 @@ export const en = {
         },
         attribute: {
           name: 'Attributes',
-          summary: 'The decorators that mark an entry point and bind a field to the pipeline.',
-          description: `The ${facts.languageAttributes} decorators the compiler reads: they mark an entry, set a workgroup size, bind a field, qualify a varying or an output, or set how a check is reported.`,
+          summary:
+            'The decorated form of the entry attributes, which the stage calls and attribute types replace.',
+          description: `The ${facts.languageAttributes} decorators of the earlier form, which the compiler reads with a \`TS8028\` warning, each beside the stage call or attribute type that replaces it.`,
         },
         builtin: {
           name: 'Builtin values',
-          summary: 'The `@builtin(...)` ids the pipeline supplies, with the stage each belongs to.',
-          description: `The ${facts.languageBuiltinValues} \`@builtin(...)\` ids the pipeline hands a shader or takes back from it, each with the type WGSL fixes for it and the stage it belongs to.`,
+          summary: 'The ids `builtin<N, T>` names, with the stage each belongs to.',
+          description: `The ${facts.languageBuiltinValues} ids of \`builtin<N, T>\`, the values the pipeline hands a shader or takes back from it, each with the type WGSL fixes for it and the stage it belongs to.`,
         },
         function: {
           name: 'Functions',
@@ -620,6 +621,7 @@ export const en = {
         f64: 'Emulated double',
         constructors: 'Constructors',
         resources: 'Arrays and bindings',
+        stages: 'Stage calls',
       },
     },
     // The error codes at /reference/errors/: one page per code in the compiler's two
@@ -742,8 +744,9 @@ export const en = {
         MISSING_DIRECTIVE:
           'A file compiled as TypeShade that has no `"use typeshade"` directive at all.',
         TYPE_MISMATCH:
-          'Two types that do not fit where they meet (an operator, a condition, a declaration, a return or an argument), a read of an optional value (`T | undefined`, `T | null` or `T | null | undefined`) that no test narrowed (Rule 7.10), or a constant the compiler folds that WGSL refuses: a shift amount past 31, a divisor of 0, clamp bounds that cross, an f32 past its range or a builtin call outside its domain, such as `pow(-2., 2.)`.',
-        UNKNOWN_FN: 'A call to a function the file neither declares nor imports.',
+          'Two types that do not fit where they meet (an operator, a condition, a declaration, a return or an argument), a read of an optional value (`T | undefined`, `T | null` or `T | null | undefined`) that no test narrowed (Rule 7.10), or a constant the compiler folds that WGSL refuses: a shift amount past 31, a divisor of 0, clamp bounds that cross, an f32 past its range or a builtin call outside its domain, such as `Math.pow(-2., 2.)`.',
+        UNKNOWN_FN:
+          'A call to a function the file neither declares nor imports, or to a builtin the language removed because ECMAScript spells it, such as `arrayLength(xs)`, whose message names `xs.length` (Rule 9.9).',
         CONST_ASSIGN:
           'An assignment to a name that cannot change, such as a `const` or a read-only resource.',
         LOOP_BOUND:
@@ -1148,10 +1151,10 @@ export const en = {
       failed: 'It could not be sent. Try again later.',
     },
     galleryLink: 'Gallery',
-    // Shown while the file declares no `@vertex` entry of its own, which is when the page
+    // Shown while the file declares no `vertex(f)` entry of its own, which is when the page
     // compiles it behind the fullscreen triangle src/lib/live-shader-contract.ts fixes.
     preludeNote:
-      'This file declares no `@vertex` entry, so it is compiled behind a fullscreen triangle that hands the fragment stage a `uv` running 0 to 1. The tabs and the canvas show that program.',
+      'This file declares no `vertex(f)` entry, so it is compiled behind a fullscreen triangle that hands the fragment stage a `uv` running 0 to 1. The tabs and the canvas show that program.',
     // The emit options the compiler takes, as controls over what the code tabs show.
     emit: {
       title: 'Emit options',
@@ -1371,8 +1374,8 @@ export const en = {
         },
         {
           title: 'Shader stages',
-          code: '@vertex / @fragment / @compute',
-          body: 'Declare vertex, fragment and compute entry points with decorators. Use uniform and storage declarations to access data from your application.',
+          code: 'vertex(f) / fragment(f) / compute([64], f)',
+          body: 'Declare vertex, fragment and compute entry points with stage calls. Use uniform and storage declarations to access data from your application.',
         },
         {
           title: 'Vite integration',
@@ -1418,7 +1421,7 @@ export const en = {
         'Write the shader and the application that runs it in separate files. Add `"use typeshade"` to the shader file, which defines GPU types, resources and entry points.',
       boundaryBullets: [
         '`"use typeshade"` marks a shader file.',
-        'Parameters marked with `@builtin(...)` receive the values the GPU supplies to an entry point.',
+        'Parameters typed `builtin<N, T>` receive the values the GPU supplies to an entry point.',
         'Declare GPU resources with `uniform<T>` and `storage<T>`.',
       ],
       hostP0:
@@ -1431,9 +1434,9 @@ export const en = {
         'With this approach, the application creates and manages the device, pipeline, bind groups, buffers, textures and command encoders. TypeShade generates the shader code.',
       importH: 'Importing the file',
       importP:
-        'Configure the Vite plugin to import `.shade.ts` files. Exported helper functions run on the CPU. Call a `@compute` entry with `await entry(bindings, workgroups)` to run it on supported WebGPU or WebGL2 environments and read back its output. Call a full-screen `@fragment` entry with `entry(canvas, bindings)`. It selects an available backend in WebGPU, WebGL2, CPU order; the runtime creates the required device and pipelines. The setup below uses the source package installed from Git.',
+        'Configure the Vite plugin to import `.shade.ts` files. Exported helper functions run on the CPU. Call a `compute` entry with `await entry(bindings, workgroups)` to run it on supported WebGPU or WebGL2 environments and read back its output. Call a full-screen `fragment` entry with `entry(canvas, bindings)`. It selects an available backend in WebGPU, WebGL2, CPU order; the runtime creates the required device and pipelines. The setup below uses the source package installed from Git.',
       setupP:
-        'After installation, add the Vite plugin and the host `tsconfig.json` settings below. The scripts run Vite and the installed CLI through `tsx`. The `prepare` script writes the host views that `tsc` reads. Add `*.shade.typeshade.ts` to `.gitignore`.',
+        'After installation, add the Vite plugin and the host `tsconfig.json` settings below. The scripts run Vite and the installed CLI through `tsx`. The `prepare` script writes the host views that `tsc` reads. A view spells each type with the shader’s own name, such as `f32` or `vec3`, and `typeshade/runtime` exports those names as types. A view also carries the JSDoc comment written above each export of the module. Add `*.shade.typeshade.ts` to `.gitignore`.',
       viteLabel: 'The Vite plugin, vite.config.ts',
       tsconfigLabel: 'Host configuration, tsconfig.json',
       packageLabel: 'Development scripts, package.json',
@@ -1464,7 +1467,7 @@ export const en = {
     h1: 'Quick Start',
     runLabel: 'Run the compiler, terminal',
     installH: 'Install',
-    p0: 'Create a shader file and add `"use typeshade"` as its first statement. The example below uses classes for return types and decorators to define vertex and fragment entry points.',
+    p0: 'Create a shader file and add `"use typeshade"` as its first statement. The example below uses interfaces for return types and the stage calls `vertex(f)` and `fragment(f)` to define vertex and fragment entry points.',
     p1: `Save the following shader as \`${quickStartFile.shader.name}\`. It defines uniforms and vertex and fragment functions. Next, create the host file shown below to call [\`compile()\`](apiCompile) and print the generated WGSL.`,
     p2: 'Run the command to compile both shader stages. The fragment entry point is shown below:',
     p3: `The [examples page](examples) shows the ${glsl} code for the same function and the uniform layout reported by [\`reflect()\`](apiReflect). The [language guide](guide) explains the syntax and usage.`,
@@ -1868,7 +1871,7 @@ export const en = {
       [
         'Functions',
         'A function has parameters, a return type and a body.',
-        'Stage decorators such as `@vertex` and `@fragment` to identify entry points.',
+        'Stage calls such as `vertex(f)` and `fragment(f)` to identify entry points.',
       ],
       [
         'Modules',
@@ -1899,7 +1902,7 @@ export const en = {
     orderItems: [
       'Learn the TypeScript shape: types, functions and modules.',
       'Add `"use typeshade"` and learn the [GPU types](languageGpuTypes).',
-      'Add entry-point decorators and resource declarations: [Shader stages](languageStages) and [Resources](languageResources).',
+      'Add entry-point stage calls and resource declarations: [Shader stages](languageStages) and [Resources](languageResources).',
       'Use the Playground to see diagnostics and generated WGSL while you edit.',
       'Only then move into compiler and backend details.',
     ],
@@ -1917,7 +1920,7 @@ export const en = {
       invocationP:
         'Each invocation processes a vertex, fragment, or compute work item. Invocations can communicate through shared resources under the language memory and synchronization rules. Their execution order is not implied.',
       invocationRule:
-        'What follows: a stage decorator says which of the three is calling, and a `@builtin(...)` parameter is how an invocation learns its own place in the work. [Shader stages](languageStages) states the decorators and [Functions](languageFunctions) states the parameters.',
+        'What follows: a stage call says which of the three is calling, and a `builtin<N, T>` parameter is how an invocation learns its own place in the work. [Shader stages](languageStages) states the stage calls and [Functions](languageFunctions) states the parameters.',
       memoryH: 'Memory',
       memoryP:
         "A shader uses typed local values and resources bound by the host. WGSL and GLSL ES do not expose JavaScript's general object heap. TypeShade classes describe GPU structs whose bytes the host supplies.",
@@ -1945,7 +1948,7 @@ export const en = {
       tableRows: [
         [
           'Calls an entry point once per vertex, fragment or work item',
-          'A stage decorator on the entry point and a parameter for every builtin input',
+          'A stage call around the entry point and a parameter for every builtin input',
           '[Shader stages](languageStages)',
         ],
         [
@@ -1996,7 +1999,7 @@ export const en = {
         ],
         [
           'Vertex processing',
-          'Your `@vertex` entry',
+          'Your `vertex` entry',
           'Runs once per vertex and returns a clip-space position and the values the fragment stage reads.',
         ],
         [
@@ -2012,7 +2015,7 @@ export const en = {
         ],
         [
           'Fragment processing',
-          'Your `@fragment` entry',
+          'Your `fragment` entry',
           'Runs once per fragment on the vertex outputs weighed for it, and returns a value for each colour attachment.',
         ],
         [
@@ -2043,14 +2046,14 @@ export const en = {
       ],
       entryH: 'Entry points',
       entryP:
-        'The signature of an entry point is that stage interface written out. A `@builtin(...)` parameter is a value the stage hands the invocation, such as the vertex index or the fragment position. A struct parameter is per-vertex input in a vertex stage and a weighed value in a fragment stage. The return type is what the stage gives back to the pipeline, so a vertex entry returns a position and a fragment entry returns colour. [Shader stages](languageStages) has the decorators and the spellings; this page stays with the meaning.',
+        'The signature of an entry point is that stage interface written out. A `builtin<N, T>` parameter is a value the stage hands the invocation, such as the vertex index or the fragment position. A struct parameter is per-vertex input in a vertex stage and a weighed value in a fragment stage. The return type is what the stage gives back to the pipeline, so a vertex entry returns a position and a fragment entry returns colour. [Shader stages](languageStages) has the stage calls and the spellings; this page stays with the meaning.',
       entryNote:
         'Reading a signature therefore tells you which stage the function belongs to, what the pipeline has to supply, and what the pipeline receives.',
       interpolationH: 'Interpolation',
       interpolationP:
         'Between the vertex stage and the fragment stage the rasterizer works out which fragments a primitive covers. For each of them it weighs the values the vertices produced by how near the fragment lies to each vertex, and hands the fragment stage the result. A vertex entry writes a value per vertex and a fragment entry reads a value per fragment, so the two are different values with the same name.',
       interpolationNote:
-        'A float `@location` field is weighed this way unless `@interpolate` asks for another mode. An integer cannot be weighed, so the compiler gives `id` the `flat` qualifier on both targets without being asked, and the fragment reads the value one vertex of the primitive produced. `@interpolate("flat")` asks the same for `tint`. [Types](languageTypes) states the field decorators.',
+        'A float `location<n, T>` field is weighed this way unless its `interpolate` option asks for another mode. An integer cannot be weighed, so the compiler gives `id` the `flat` qualifier on both targets without being asked, and the fragment reads the value one vertex of the primitive produced. `{ interpolate: "flat" }` asks the same for `tint`. [Types](languageTypes) states the attribute types.',
       computeH: 'Compute',
       computeP:
         'A compute stage has no rasterizer in front of it and no attachment behind it. The host dispatches a grid of work items, the entry point reads its own coordinates in that grid from a builtin parameter, and everything it produces goes through a storage resource. [Resources](languageResources) states how a writable resource is declared.',
@@ -2083,8 +2086,8 @@ export const en = {
         ],
         [
           'Compute',
-          'A native `@compute` stage.',
-          `No native compute stage. TypeShade runs supported \`@compute\` entries as generated ${facts.glslTarget} passes, and the manifest names the entries it cannot lower.`,
+          'A native `compute` stage.',
+          `No native compute stage. TypeShade runs supported \`compute\` entries as generated ${facts.glslTarget} passes, and the manifest names the entries it cannot lower.`,
         ],
         [
           'Precision',
@@ -2133,7 +2136,7 @@ export const en = {
       ],
       importH: 'Importing a module',
       importP:
-        "A host can import a `.shade.ts` into its own TypeScript through the `typeshade/vite` plugin instead, and call what the module exports. A helper runs on the CPU. A `@compute` entry is `await entry(bindings, workgroups)`, where `workgroups` may also be `{ indirect, offset }`: the three counts an earlier call wrote at element `offset` of a `Resident<Uint32Array>`, read when the call runs. A full-screen `@fragment` entry is `entry(canvas, bindings)`, drawn on WebGPU, then WebGL2, then the CPU. The application's column of the table above is then the runtime's: it requests the device on the first call and every later call shares it, builds each entry's pipeline, packs each binding from the object the call passes, and reads back what a compute entry wrote.",
+        "A host can import a `.shade.ts` into its own TypeScript through the `typeshade/vite` plugin instead, and call what the module exports. A helper runs on the CPU. A `compute` entry is `await entry(bindings, workgroups)`, where `workgroups` may also be `{ indirect, offset }`: the three counts an earlier call wrote at element `offset` of a `Resident<Uint32Array>`, read when the call runs. A full-screen `fragment` entry is `entry(canvas, bindings)`, drawn on WebGPU, then WebGL2, then the CPU. The application's column of the table above is then the runtime's: it requests the device on the first call and every later call shares it, builds each entry's pipeline, packs each binding from the object the call passes, and reads back what a compute entry wrote.",
       overrideP:
         'A compute entry also accepts `entry(bindings, workgroups, { constants: { WIDTH: width } })`. The names are the module’s declared overrides; omitted values keep their defaults. The selected values determine the workgroup shape, shared-array lengths and CPU invocation builtins. Calculate workgroup counts for that shape: selection does not change the count you pass. The runtime checks names, scalar ranges and device limits before uploads, and captures constants when the call is made.',
       overrideLimitsP:
@@ -2163,7 +2166,7 @@ export const en = {
       webgl2P: 'The same source compiles for WebGL2, and the host side of it looks different.',
       webgl2Items: [
         'There are no bind groups. A uniform block is bound to a binding point on the linked program and a sampler is set through its uniform location, so a host uses the same reflection in a different shape.',
-        `WebGL2 has no native compute stage. TypeShade lowers supported \`@compute\` entries into ${facts.glslTarget} passes using the WebGL2 runtime. The manifest names entries that cannot be lowered.`,
+        `WebGL2 has no native compute stage. TypeShade lowers supported \`compute\` entries into ${facts.glslTarget} passes using the WebGL2 runtime. The manifest names entries that cannot be lowered.`,
         `Precision belongs to the source. Every emitted ${facts.glslTarget} program declares its default precision above its declarations, which WGSL has no need of.`,
         'A GPU feature is turned on by the host, which asks the context for the extension, and where the extension has a directive the emitted source declares it as well. [Compiler internals](internals) describes how the compiler splits those halves.',
       ],
@@ -2200,7 +2203,7 @@ export const en = {
       diffRows: [
         [
           '[Compute stages](languageStages)',
-          'A `@compute` entry emits a compute shader carrying its workgroup size.',
+          'A `compute` entry emits a compute shader carrying its workgroup size.',
           'WebGL2 has no native compute stage. TypeShade runs supported compute entries through generated GLSL ES 3.00 passes.',
         ],
         [
@@ -2242,7 +2245,7 @@ export const en = {
       convertItems: [
         `From GLSL: [Migrating a GLSL shader](internalsGlslShader) covers what a whole shader carries, such as uniform blocks, \`#ifdef\`, \`#include\` and \`#extension\`. [${glsl} in TypeShade](languageFromGlsl) has the types, uniforms, builtin variables and functions.`,
         'From WGSL: [WGSL in TypeShade](languageFromWgsl) gives each WGSL construct its TypeShade spelling.',
-        'Only in WGSL: a file that uses such a construct still compiles. A scalar uniform, a `"read_write"` storage binding in a draw and `@interpolate("linear")` are examples. `compile()` then keeps the WGSL, leaves `glsl` undefined and says why in a `TS8015` warning.',
+        'Only in WGSL: a file that uses such a construct still compiles. A scalar uniform, a `"read_write"` storage binding in a draw and `{ interpolate: "linear" }` are examples. `compile()` then keeps the WGSL, leaves `glsl` undefined and says why in a `TS8015` warning.',
       ],
       furtherH: 'Further reading',
       furtherItems: [
@@ -2277,7 +2280,7 @@ export const en = {
       ],
       [
         'Completions',
-        'The symbols in scope, the keywords, and TypeShade items where the context calls for them: attribute names after `@`, builtin input names inside `@builtin("`, GPU type names in a type position, and snippets for vectors and entry functions.',
+        'The symbols in scope, the keywords, and TypeShade items where the context calls for them: builtin input names inside `builtin<"`, GPU type names in a type position, and snippets for vectors and entry functions.',
       ],
       [
         'Hover',
@@ -2301,7 +2304,7 @@ export const en = {
       ],
       [
         'Semantic tokens',
-        'The tokens in document order, with GPU types, entry functions, resources and the names inside `@builtin(...)` marked as such.',
+        'The tokens in document order, with GPU types, entry functions, resources and the names inside `builtin<...>` marked as such.',
       ],
       [
         'Compiled output',
@@ -2634,12 +2637,12 @@ export const en = {
         ],
       ],
       gpuH: '3. GPU interface',
-      gpuP: 'The source declares the GPU interface. Use `declare` for resources, stage decorators for entry points, and `@builtin(...)` parameters for GPU inputs.',
+      gpuP: 'The source declares the GPU interface. Use `declare` for resources, stage calls for entry points, and `builtin<N, T>` parameters for GPU inputs.',
       gpuNote:
         'The shader does not create `camera` or `pixels`; the host provides them. `gid` is a function parameter, not a global.',
       functionH: '4. Functions and entry points',
       functionP:
-        'Parameters and return types define a function’s inputs and result. Stage decorators and builtin parameters define an entry point’s GPU role.',
+        'Parameters and return types define a function’s inputs and result. Stage calls and builtin parameters define an entry point’s GPU role.',
       functionNote:
         '`addBias` is a reusable helper. `paint` is a compute entry point. They use the same function syntax but have different pipeline roles.',
       resourceH: '5. GPU resources',
@@ -2649,7 +2652,7 @@ export const en = {
         'Declare each resource with `const`. `storage<T>` is read-only; `storage<T, "read_write">` also allows writes.',
       stageH: '6. Shader stages',
       stageP:
-        '`@vertex`, `@fragment` and `@compute` mark an entry point’s stage. Declare GPU builtins as parameters; the compiler does not inject them as globals.',
+        '`vertex(f)`, `fragment(f)` and `compute([64], f)` mark an entry point’s stage. Declare GPU builtins as parameters; the compiler does not inject them as globals.',
       completeH: '7. Complete example',
       completeP:
         'This example combines the directive, a GPU struct, resources, a compute entry point and a builtin parameter.',
@@ -2707,18 +2710,18 @@ export const en = {
           'How TypeScript type and class concepts map to TypeShade GPU values, structs and field layout.',
         h1: 'Types: from TypeScript types to GPU values',
         intro:
-          'TypeShade starts from TypeScript’s type surface, but the final meaning is a GPU value model. Learn the TypeScript idea first: structural typing and type aliases describe value shape. When GPU layout metadata is required, use classes and field decorators.',
+          'TypeShade starts from TypeScript’s type surface, but the final meaning is a GPU value model. Learn the TypeScript idea first: structural typing and type aliases describe value shape. When GPU layout metadata is required, write it in the field’s type: `builtin<N, T>` and `location<n, T>`.',
         ts: 'Start from the TypeScript concept',
         tsP: 'A type alias gives a name to a value shape. TypeShade keeps that surface, while shader semantics determine which types and expressions are valid in a shader.',
         alias: '1. Use type aliases for plain data',
         aliasP:
-          'When fields do not need decorators, a type alias is the smallest representation. It is also useful when the same GPU value shape is shared across helper parameters and return values.',
+          'When fields need no attribute, a type alias is the smallest representation. It is also useful when the same GPU value shape is shared across helper parameters and return values.',
         struct: '2. A class is a struct and its functions',
         structP:
-          'A TypeShade class is a GPU struct and the functions written with it. The fields are the bytes the host writes. A constructor, a method and a static function each lower to a plain function, so `new Ray(o, d)` calls `Ray_new` and `r.at(t)` calls `Ray_at(&r, t)` when `r` is a `let`, so the method reads and writes the object in place, and `Ray_at(r, t)` when it is a `const` (Rule 8.28). Nothing keeps an object alive between them. A class is its struct and its functions (Rule 8.29): every rule for a struct applies to its fields and every rule for a function to its constructor, its methods, its accessors and its static functions, wherever a struct or a function can be. A method that changes its object, called on an element of the array a kernel function takes, is a write to that element, as an `@inout` argument is.',
-        attrs: '3. Field decorators describe layout',
+          'A TypeShade class is a GPU struct and the functions written with it. The fields are the bytes the host writes. A constructor, a method and a static function each lower to a plain function, so `new Ray(o, d)` calls `Ray_new` and `r.at(t)` calls `Ray_at(&r, t)` when `r` is a `let`, so the method reads and writes the object in place, and `Ray_at(r, t)` when it is a `const` (Rule 8.28). Nothing keeps an object alive between them. A class is its struct and its functions (Rule 8.29): every rule for a struct applies to its fields and every rule for a function to its constructor, its methods, its accessors and its static functions, wherever a struct or a function can be. A method that changes its object, called on an element of the array a kernel function takes, is a write to that element, as an `inout<T>` argument is.',
+        attrs: '3. Attribute types describe layout',
         attrsP:
-          'A field takes `@location` and `@builtin`, which bind it to the pipeline, and `@interpolate`, `@invariant` and `@blend_src`, which qualify a varying or an output. `@align` is read and refused, and `@size`, `@offset` and `@ignore` are not attributes the compiler knows. The whole set it accepts is `@vertex`, `@fragment`, `@compute`, `@builtin`, `@location`, `@interpolate`, `@invariant`, `@blend_src`, `@diagnostic`, and `@inout` and `@out` on a parameter of a function.',
+          'A field of an entry input or output says how it binds to the pipeline in its type: `location<n, T>` or `builtin<N, T>`. A third type argument qualifies a varying or an output: `{ interpolate: "flat" }`, `{ invariant: true }` or `{ blend_src: 1 }`. A class field with no initializer takes `!`, as `tsc --strict` asks. The decorated form these types replace, `@location(0)` and the rest, still compiles with a `TS8028` warning, and the next release refuses it.',
         boundary: '4. Where TypeScript classes stop',
         boundaryItems: [
           'An entry point is a top-level function, not a method.',
@@ -2726,7 +2729,7 @@ export const en = {
           'A derived value can be used where its base class is declared when the compiler proves that the base view is read-only and preserves dispatch. Overrides, receiver writes and observable alias mutation require a concrete type or remain unsupported.',
           'A getter and a setter each lower to a function of their own, and a class has one constructor, as in TypeScript.',
           '`new` builds a value inside a function body, and a module constant takes an object literal.',
-          'Prefer a type alias when no field needs a decorator.',
+          'Prefer a type alias or an interface when no field needs an initializer.',
           'A value may be absent as `T | undefined`, `T | null` or `T | null | undefined` in function-scope locals, parameters, results, class fields and fixed-array elements (Rules 7.10 and 8.8). Strict tests distinguish null and undefined; `!= null` excludes both. Bindings, module/static data, entry IO and kernel interfaces refuse these types. Exported helpers using them have no host value (Rule 8.21).',
         ],
         mapping: '5. Concept mapping',
@@ -2737,7 +2740,7 @@ export const en = {
           ['class method', 'A function taking the struct first'],
           ['`new`', 'A call of the generated constructor'],
           ['`extends` with `super`', 'The base fields spliced in and the body lowered again'],
-          ['decorator metadata', 'GPU layout / stage metadata'],
+          ['attribute types and stage calls', 'GPU layout / stage metadata'],
           ['runtime object', 'not applicable'],
           ['structural compatibility', 'applies within shader type checking'],
         ],
@@ -2768,12 +2771,12 @@ export const en = {
           ['`: vec4`', 'The GPU value shape returned to the caller.'],
         ],
         paramsRefP:
-          "A parameter declared `@inout` is the caller's variable itself. The call passes the variable with no mark, and an assignment to the parameter, or to a field, a component or an element of it, writes that variable. A parameter declared `@out` starts with no value: the function writes it before it reads it, and on every path (`TS8075`), so the caller may pass a `let` that has no value yet. One call may not hand one variable to two such parameters when the function writes either (`TS8074`). Only a function declared at the top of the file or in a namespace takes a qualifier; a method, an entry and a local function take values (`TS8073`). A local function inside such a function still reads and writes the parameter, as it does any variable around it. [Parameters that write back](shadeReferenceParameters) shows a struct, an array element and a matrix column passed the same way.",
+          "A parameter typed `inout<T>` is the caller's variable itself. The call passes the variable with no mark, and an assignment to the parameter, or to a field, a component or an element of it, writes that variable. A parameter typed `out<T>` starts with no value: the function writes it before it reads it, and on every path (`TS8075`), so the caller may pass a `let` that has no value yet, declared `let s!: f32`. One call may not hand one variable to two such parameters when the function writes either (`TS8074`). Only a function declared at the top of the file or in a namespace takes a qualifier; a method, an entry and a local function take values (`TS8073`). A local function inside such a function still reads and writes the parameter, as it does any variable around it. [Parameters that write back](shadeReferenceParameters) shows a struct, an array element and a matrix column passed the same way.",
         helper: '3. Helper functions',
         helperP:
-          'A top-level function without a stage decorator is a helper. Helpers let you name repeated calculations and keep shader entries focused on pipeline inputs, resources and outputs.',
+          'A top-level function that no stage call wraps is a helper. Helpers let you name repeated calculations and keep shader entries focused on pipeline inputs, resources and outputs.',
         helperNote:
-          'A helper has no stage decorator because it is not a pipeline entry. This keeps reusable math separate from the pipeline interface.',
+          'A helper has no stage call because it is not a pipeline entry. This keeps reusable math separate from the pipeline interface.',
         call: '4. Calling a function',
         callP:
           'A call looks like an ordinary TypeScript call, but its callee and arguments must stay inside the TypeShade GPU type model. Do not treat the shader as a place to call arbitrary JavaScript APIs.',
@@ -2781,26 +2784,26 @@ export const en = {
           'The call looks like a normal function call, but both the argument and the result of `addBias` must be values supported by the TypeShade GPU model.',
         entry: '5. Shader entry functions',
         entryP:
-          'A pipeline entry is declared as a top-level `export function` with a stage decorator. `@compute`, `@vertex` and `@fragment` attach the function to a GPU execution stage.',
+          'A pipeline entry is a top-level `export const` whose value is a stage call around a function. `compute([64], f)`, `vertex(f)` and `fragment(f)` attach the function to a GPU execution stage.',
         entryNote:
-          '`export` keeps the familiar module surface and exposes the function to the compiler as an entry candidate. The stage decorator adds the GPU-specific stage information.',
+          '`export` keeps the familiar module surface and exposes the function to the compiler as an entry candidate. The stage call adds the GPU-specific stage information.',
         builtin: '6. Builtins are parameters',
         builtinP:
           'GPU-provided stage inputs are explicit function parameters, not hidden global variables. Reading the signature tells you exactly which external inputs the entry expects.',
         builtinTable: [
           ['Form', 'Meaning'],
-          ['`@builtin("global_invocation_id")`', 'Selects the GPU-provided compute input.'],
-          ['`gid: vec3u`', 'The TypeShade type and local name for that input.'],
+          ['`builtin<"global_invocation_id", vec3u>`', 'Selects the GPU-provided compute input.'],
+          ['`gid`', 'The local name for that input, a `vec3u`.'],
           ['`gid.x`', 'Reads the x component for the current invocation.'],
         ],
         compute: '7. Reading a compute entry',
         computeP:
-          '`@compute([64, 1, 1])` declares the workgroup size. `gid` is a parameter receiving the `global_invocation_id` builtin, and `gid.x` reads the current invocation’s x coordinate.',
+          '`compute([64, 1, 1], f)` declares the workgroup size. `gid` is a parameter receiving the `global_invocation_id` builtin, and `gid.x` reads the current invocation’s x coordinate.',
         computeNote:
           'When reading this function, first identify the stage and workgroup size, then inspect the parameters for external GPU inputs, and finally follow the body’s calculation.',
         graphics: '8. Vertex and fragment entries',
         graphicsP:
-          'Graphics stages use the same function model. The decorator selects the stage, while parameters and the return type describe the pipeline interface.',
+          'Graphics stages use the same function model. The stage call selects the stage, while parameters and the return type describe the pipeline interface.',
         graphicsNote:
           'The vertex function has two different inputs: `vid` is a GPU builtin and `vin` is a user-defined struct. The fragment function makes its builtin input, `pid`, explicit as well, so the signature documents the stage interface.',
         scope: '9. Functions and scope',
@@ -2857,9 +2860,9 @@ export const en = {
           'A kernel function holds loops that the compiler may run on the GPU. The sections below state what makes one, which loops run, how the workgroup is sized and what the compiler reports.',
         kernelFunction: 'What a kernel function is',
         kernelFunctionP:
-          "An exported function that is not an entry point and takes an array with no size, `array<T>`, or a 2D storage texture, `texture_storage_2d<F, A>`, is a kernel function (Rule 8.22). A sampled texture alone makes none, so an exported helper that reads one stays a helper. The array or the texture is the caller's, read and written in place. A method that changes its object, called on an element of the array, is a write to that element, as an `@inout` argument is, for the proof of the loops (Rule 8.29).",
+          "An exported function that is not an entry point and takes an array with no size, `array<T>`, or a 2D storage texture, `texture_storage_2d<F, A>`, is a kernel function (Rule 8.22). A sampled texture alone makes none, so an exported helper that reads one stays a helper. The array or the texture is the caller's, read and written in place. A method that changes its object, called on an element of the array, is a write to that element, as an `inout<T>` argument is, for the proof of the loops (Rule 8.29).",
         kernelCallP:
-          'Each `for` at the top of its body is a loop the compiler may run on the GPU, one invocation per iteration, and a host file awaits the function like any import. No `@compute`, binding or `global_invocation_id` is written.',
+          'Each `for` at the top of its body is a loop the compiler may run on the GPU, one invocation per iteration, and a host file awaits the function like any import. No `compute` call, binding or `global_invocation_id` is written.',
         kernelProof: 'Loops that run on the GPU',
         kernelShapeP:
           'The compiler runs a loop on the GPU when it proves that no iteration touches what another one does. The loop is a counted `for`, or a `for...of`, that steps by a constant and that nothing returns from or breaks out of.',
@@ -2869,7 +2872,7 @@ export const en = {
           'The loop reads an array it writes only where it writes it. It never reads a variable it combines, an array it appends to or a `Map` or a `Set` it adds to. It calls no function that writes a module variable or a binding, and has no barrier, no workgroup memory and no `console` call.',
         workgroupSize: 'Workgroup size',
         workgroupSizeP:
-          '`@workgroup_size([128])` before the function sets the workgroup of its loops on WebGPU, which is 64 without it. A loop that reduces always runs in workgroups of 256, so the attribute on a function with such a loop is refused (`TS8077`).',
+          '`export const scale = workgroup_size([128], function scale(…) { … })` sets the workgroup of its loops on WebGPU, which is 64 without it. A loop that reduces always runs in workgroups of 256, so `workgroup_size` around a function with such a loop is refused (`TS8077`).',
         lastWorkgroup: 'The last workgroup',
         lastWorkgroupP:
           "The last workgroup of a dispatch holds the lanes past the loop's last iteration, and none of them returns early. A workgroup wholly past the end returns as one. In the workgroup that holds the last iteration, such a lane runs that iteration again with every write masked. So every lane of a workgroup runs the same control flow, the form that completed on a D3D12 device where an early return hung.",
@@ -2910,10 +2913,10 @@ export const en = {
           'A host can run several kernel calls as one plan. The sections below state how calls fuse, what the report says, how the plan takes its workgroup counts and constants, which resources it uses and which kernels the library supplies.',
         fuseCalls: 'Fusing calls',
         fuseP:
-          'A host can call several kernel functions inside `device.fuse()` without a registration import (Rule 11.13). `fuse()` from `typeshade/fuse` remains supported for the default owner. At this compiler pin, `typeshade({ fuse: true })` still supplies the facts needed to combine eligible calls. On WebGPU, calls that read what the call before them wrote at the same index run as one dispatch, in one submission. A method that changes its object, called on an element of an array, counts as a write to that element in the facts the plan reads, as an `@inout` argument does (Rule 8.29).',
+          'A host can call several kernel functions inside `device.fuse()` without a registration import (Rule 11.13). `fuse()` from `typeshade/fuse` remains supported for the default owner. At this compiler pin, `typeshade({ fuse: true })` still supplies the facts needed to combine eligible calls. On WebGPU, calls that read what the call before them wrote at the same index run as one dispatch, in one submission. A method that changes its object, called on an element of an array, counts as a write to that element in the facts the plan reads, as an `inout<T>` argument does (Rule 8.29).',
         fuseReport: 'The fuse report',
         fuseReportP:
-          'The report the scope returns names each group, and says why two calls run apart. An entry call in the body forms a group of its own, and so does a loop that pushes onto an array. A call taking a `Map` or `Set` also forms its own group, reporting `b takes a Map or a Set` or its CPU fallback reason. `FuseReport` and `mergeReports`, which adds several reports into one, come from `typeshade/runtime` too, so a host that only reads reports ships no planner.',
+          'The report the scope returns names each group, and says why two calls run apart. An entry call in the body forms a group of its own, and so does a loop that pushes onto an array. A call taking a `Map` or `Set` also forms its own group, reporting `b takes a Map or a Set` or its CPU fallback reason. Each group also names the `tier` it ran on, and a group that ran on a later tier than the plan’s says why in `why`, as in `b runs on the CPU, …`. `FuseReport` and `mergeReports`, which adds several reports into one and keeps each group’s `tier`, come from `typeshade/runtime` too, so a host that only reads reports ships no planner.',
         fuseIndirect: 'Indirect workgroup counts',
         fuseIndirectP:
           'An entry call may take its workgroup count from an array an earlier call wrote. `entry(bindings, { indirect, offset })` reads the three counts at element `offset` of a `Resident<Uint32Array>` when the call runs. A chain of calls then needs no read between them, and in a scope the group of such a call reports `indirect: true`.',
@@ -2997,7 +3000,7 @@ export const en = {
           'Resource slots follow declaration order in the file. Keep binding details as part of the compiler/host reflection contract instead of scattering binding numbers through shader code.',
         workgroup: '5. Workgroup memory',
         workgroupP:
-          'A `workgroup<T>` value is shared by invocations in one group. Its outer array length can use the same override as `@compute`. The host chooses that value when it creates the pipeline.',
+          'A `workgroup<T>` value is shared by invocations in one group. Its outer array length can use the same override as `compute`. The host chooses that value when it creates the pipeline.',
         invalid: '6. Common mistakes',
         invalidItems: [
           'Do not declare `declare const x: f32`; a resource needs a space such as `uniform<T>` or `storage<T>`.',
@@ -3013,18 +3016,18 @@ export const en = {
           'Map TypeScript function and module concepts to compute, vertex and fragment entry points with explicit builtins in TypeShade.',
         h1: 'Shader stages: explicit GPU entry points',
         intro:
-          'TypeShade entry points are top-level exported functions. A decorator marks the shader stage and any stage-specific metadata.',
+          'TypeShade entry points are top-level exported functions, each wrapped in a stage call. The call names the shader stage and any stage-specific metadata.',
         mapping: '1. Start from TypeScript functions and modules',
         mappingP:
-          'In TypeScript, `export function` makes a function part of a module’s public surface. In TypeShade, adding a stage decorator gives that function the GPU meaning of a pipeline entry point. An undecorated function remains a reusable helper.',
+          'In TypeScript, `export function` makes a function part of a module’s public surface. In TypeShade, wrapping it in a stage call, `export const fs = fragment(function fs(…) { … })`, gives that function the GPU meaning of a pipeline entry point. A function no stage call wraps remains a reusable helper.',
         compute: '2. Compute',
         computeP:
-          'A compute entry can name an `override<u32>` in its `@compute` dimensions. Numeric dimensions remain valid. Builtins such as `global_invocation_id` are explicit parameters.',
+          'A compute entry can name an `override<u32>` in its `compute` dimensions. Numeric dimensions remain valid. Builtins such as `global_invocation_id` are explicit parameters.',
         computeHostP:
           'Choose a size in ordinary TypeScript, then pass it as a named constant to `program.compute()`. Read `pipeline.workgroupShape` to calculate dispatch counts. An imported entry accepts `entry(bindings, groups, { constants: { WG_SIZE: selected } })`, including inside `device.fuse()`. Calculate `groups` for the selected size and guard the last partial group in the shader. WebGL2 requires the default workgroup shape. The [host-compute example](exampleHostCompute) has the complete host and shader.',
         graphics: '3. Vertex and fragment',
         graphicsP:
-          '`@vertex` and `@fragment` describe graphics-pipeline entry points. Inputs, outputs and builtins are expressed explicitly in the function signature. [The shader pipeline](conceptsPipeline) says what each stage is handed and what it returns.',
+          '`vertex(f)` and `fragment(f)` describe graphics-pipeline entry points. Inputs, outputs and builtins are expressed explicitly in the function signature. [The shader pipeline](conceptsPipeline) says what each stage is handed and what it returns.',
         helper: '4. Helper functions',
         helperP:
           'An undecorated function is a helper, not an entry point. Do not put entry points on classes or treat `this` as a pipeline object.',
@@ -3319,19 +3322,19 @@ export const en = {
           },
           mutableParameter: {
             name: 'Parameter reassignment',
-            p: 'A local copy receives the input value. Reassigning it leaves the caller’s value unchanged; a parameter declared `@inout` changes it.',
+            p: 'A local copy receives the input value. Reassigning it leaves the caller’s value unchanged; a parameter typed `inout<T>` changes it.',
           },
           referenceParameter: {
-            name: '`@inout` parameter',
-            p: `A parameter declared \`@inout\` is the caller's variable, and the call passes the variable with no mark. WGSL takes a pointer and ${glsl} an \`inout\` parameter, the way a method that writes \`this\` does. [reference-parameters](shadeReferenceParameters)`,
+            name: '`inout<T>` parameter',
+            p: `A parameter typed \`inout<T>\` is the caller's variable, and the call passes the variable with no mark. WGSL takes a pointer and ${glsl} an \`inout\` parameter, the way a method that writes \`this\` does. [reference-parameters](shadeReferenceParameters)`,
           },
           outParameter: {
-            name: '`@out` parameter',
-            p: 'The function writes the parameter before it reads it and on every path, so the argument may be a `let` with no value yet. Both targets lower it as they lower `@inout`.',
+            name: '`out<T>` parameter',
+            p: 'The function writes the parameter before it reads it and on every path, so the argument may be a `let` with no value yet. Both targets lower it as they lower `inout<T>`.',
           },
           referenceAlias: {
             name: 'Two references to one variable',
-            p: `One call may not hand one variable to two \`@inout\` or \`@out\` parameters it writes. WGSL refuses the aliased pointers, and ${glsl} would copy the two back in no fixed order.`,
+            p: `One call may not hand one variable to two \`inout<T>\` or \`out<T>\` parameters it writes. WGSL refuses the aliased pointers, and ${glsl} would copy the two back in no fixed order.`,
           },
           lexicalShadow: {
             name: 'Shadowing a module value',
@@ -3615,13 +3618,13 @@ export const en = {
           'There is no `@group` or `@binding` to write. The slot index is the source order of the `declare` in the file, and the WGSL above shows what that came out as. A texture or a sampler takes the next slot the same way.',
         stagesH: 'Entry points and attributes',
         stagesP:
-          'A stage attribute is a decorator on an exported function. A function with none of them is a helper. `@compute` takes dimensions as a list of numbers or named overrides, and numeric dimensions remain valid.',
+          'A stage is a call around an exported function, `vertex(f)`, `fragment(f)` or `compute([…], f)`. A function no stage call wraps is a helper. `compute` takes dimensions as a list of numbers or named overrides, and numeric dimensions remain valid.',
         stagesOverrideP:
           'WGSL declares the value with a module-level `override`, and `@workgroup_size` can use its name. TypeShade can use the same override for the outer length of a workgroup array.',
         returnsP:
-          'A vertex entry has to produce a position. A return typed `vec4` carries the position builtin on its own, and a struct return carries it in a field and adds as many `@location` varyings as the program wants. A struct return with no position field, a `void` return and a bare type that is not a `vec4` are each refused, naming the field or the type to write.',
+          'A vertex entry has to produce a position. A return typed `vec4` carries the position builtin on its own, and a struct return carries it in a field and adds as many `location<n, T>` varyings as the program wants. A struct return with no position field, a `void` return and a bare type that is not a `vec4` are each refused, naming the field or the type to write.',
         builtinValuesH: 'Builtin values',
-        builtinValuesP: `The \`@builtin(...)\` vocabulary is WGSL's, ${facts.wgslBuiltinIds} names passed through as a string, so the WGSL attribute is the same id with no quotes around it. A typo is a \`tsc\` error at the line the author wrote, since the parameter is a closed union of them. WGSL fixes the type of every id but one, so the type column is what the annotation has to say.`,
+        builtinValuesP: `The vocabulary of \`builtin<N, T>\` is WGSL's, ${facts.wgslBuiltinIds} names passed through as a string, so the WGSL attribute is the same id with no quotes around it. A typo is a \`tsc\` error at the line the author wrote, since the type argument is a closed union of them. WGSL fixes the type of every id but one, so the type column is what the annotation has to say.`,
         clipDistancesP: "The one id with no fixed type. The array length is the author's.",
         absentH: 'Names WGSL does not have',
         absentP:
@@ -3640,11 +3643,10 @@ export const en = {
           'vectors.vec3d': 'WGSL has no 64-bit vector either, and the same pass rewrites this one.',
         },
         notes: {
-          'stages.vertex': 'One stage decorator per entry point, on an exported function.',
+          'stages.vertex': 'One stage call per entry point, around an exported function.',
           'stages.fragment':
             'A fragment entry may also return nothing, which is what a program that only writes to a storage binding does.',
-          'stages.compute':
-            'The list is the workgroup size. `@compute` with no list is `[64, 1, 1]`.',
+          'stages.compute': 'The list is the workgroup size, one to three extents.',
           'stages.location':
             'A location sits on an entry parameter, on a class field and on the return.',
           'stages.vertexBare':
@@ -3671,7 +3673,7 @@ export const en = {
           'statements.discard': 'The same word, and the same statement.',
           'statements.struct':
             'A WGSL struct is a class. A type alias of an object shape and an interface both reach the same declaration.',
-          'statements.fn': 'A function with no stage decorator is a helper of the module.',
+          'statements.fn': 'A function no stage call wraps is a helper of the module.',
         },
       },
       fromGlsl: {
@@ -3737,14 +3739,14 @@ export const en = {
           'A uniform binding is a struct, which the writer emits as a std140 block. A storage buffer has no form on this target at all, so a module with one is rewritten to read from a data texture before the capability gate runs.',
         varyingsH: 'Varyings',
         varyingsP:
-          'A value that travels from the vertex stage to the fragment stage is a `@location(n)` field on both sides. This target links them by name and WebGPU by number, so the field name is what has to match in the emitted GLSL.',
+          'A value that travels from the vertex stage to the fragment stage is a `location<n, T>` field on both sides. This target links them by name and WebGPU by number, so the field name is what has to match in the emitted GLSL.',
         capabilitiesH: 'Extensions and capabilities',
         capabilitiesP: `An \`#extension\` line is one half of a GPU feature and the host's \`getExtension\` call is the other. The profile for this target has ${facts.glslCapabilities} rows, and one of them puts a directive in the source; everything with no row at all fails the module closed here before any text is written.`,
         enablesP:
-          'A `"use typeshade"` file has no spelling for these four. `"enable ..."` takes WGSL extension names and none of the four is one, so a host lists the one it needs in the compiled module\'s `enables`: `{ ...compile(source).module, enables: [...] }`. What a module\'s shape implies, such as a storage binding, a compute entry or a `@builtin("clip_distances")`, is derived from the file, and none of those has a row here.',
+          'A `"use typeshade"` file has no spelling for these four. `"enable ..."` takes WGSL extension names and none of the four is one, so a host lists the one it needs in the compiled module\'s `enables`: `{ ...compile(source).module, enables: [...] }`. What a module\'s shape implies, such as a storage binding, a compute entry or a `builtin<"clip_distances", T>`, is derived from the file, and none of those has a row here.',
         variablesH: 'Builtin variables',
         variablesP:
-          'A `gl_*` global is a `@builtin(...)` attribute on a parameter, on a class field or on the return. The attribute says which value it is and the writer decides which global that becomes, which is how one file reaches both targets.',
+          'A `gl_*` global is a `builtin<N, T>` type on a parameter, on a field or on the return. The type says which value it is and the writer decides which global that becomes, which is how one file reaches both targets.',
         absentH: 'Variables neither writer takes',
         absentP:
           'Two of them have no name in this surface. The front end refuses the spelling at the declaration, and the sentence below is what the WGSL backend prints for the same name, which says what to reach for instead.',
@@ -4007,7 +4009,7 @@ export const en = {
           purpose:
             'forward multiplies 784 pixel values by class-specific weights, sums them and adds biases, producing 10 logits per image.',
           explanation:
-            'gid.x identifies the image row. For class c, it computes z = bias[c] + sum pixels[p]×weights[p×10+c]. @compute([64]) specifies the workgroup size, with an explicit guard for short batches.',
+            'gid.x identifies the image row. For class c, it computes z = bias[c] + sum pixels[p]×weights[p×10+c]. compute([64], f) specifies the workgroup size, with an explicit guard for short batches.',
         },
         {
           title: 'Loss and error signal: measure the prediction',

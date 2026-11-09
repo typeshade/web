@@ -1,0 +1,7 @@
+{
+  "slug": "vec4d",
+  "source": "f2b7872bfdb8907e4761b0a12175aa8de52f73363742835fea8ea0796e4aaa3c",
+  "texts": {
+    "summary": "vec4d는 vec4f64의 짧은 표기이며, 같은 타입입니다."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "slug": "vec4u-type",
+  "source": "75e1d190d70a322b36f9dae78347140d6be6a3e54b70422df91d4fd54b509050",
+  "texts": {
+    "summary": "호스트 값으로서의 vec4u입니다. u32 네 개로 된 readonly 튜플입니다."
+  }
+}

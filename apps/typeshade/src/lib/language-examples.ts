@@ -105,8 +105,19 @@ function mentionsOf(file: string, text: string): Mentions {
         if (first && ts.isStringLiteralLike(first)) builtinIds.add(first.text);
       }
     }
-    if (ts.isTypeReferenceNode(node) && ts.isIdentifier(node.typeName))
+    if (ts.isTypeReferenceNode(node) && ts.isIdentifier(node.typeName)) {
       typed.add(node.typeName.text);
+      // The attribute type of change 0111, `builtin<"position", vec4>`, names the id as its
+      // first type argument.
+      const first = node.typeArguments?.[0];
+      if (
+        node.typeName.text === 'builtin' &&
+        first &&
+        ts.isLiteralTypeNode(first) &&
+        ts.isStringLiteral(first.literal)
+      )
+        builtinIds.add(first.literal.text);
+    }
     if (ts.isIdentifier(node) && !declaresName(node)) identifiers.add(node.text);
     ts.forEachChild(node, visit);
   };

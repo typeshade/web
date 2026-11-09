@@ -1,0 +1,7 @@
+{
+  "slug": "vec4-type",
+  "source": "9fc51c4c630bb0657fb48469abaf941b68345a1c963bf1e08a94c639090cc6bb",
+  "texts": {
+    "summary": "f32 네 개로 된 벡터 vec4을 호스트 값으로 나타냅니다. f32 네 개로 된 readonly 튜플입니다."
+  }
+}
