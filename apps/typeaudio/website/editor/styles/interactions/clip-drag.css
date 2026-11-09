@@ -1,0 +1,33 @@
+.audio-clip.dragging {
+  z-index: 4;
+  box-shadow:
+    0 0 0 1px #b9d4ff,
+    0 5px 16px #0007;
+}
+.audio-clip.copying {
+  border-style: dashed;
+}
+.studio-app .clip-drag-readout {
+  position: absolute;
+  right: 5px;
+  top: 3px;
+  padding: 1px 4px;
+  background: #182b45e8;
+  font:
+    9px PlexMono,
+    var(--ui-font-mono);
+  color: white;
+}
+.clip-snap-guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #f4c36a;
+  z-index: 6;
+  pointer-events: none;
+  box-shadow: 0 0 4px #f4c36a77;
+}
+.timeline-scroll {
+  overscroll-behavior: contain;
+}

@@ -7,3 +7,6 @@
 [submodule "sources/typecv"]
 	path = sources/typecv
 	url = https://github.com/typeshade/typecv
+[submodule "sources/typeaudio"]
+	path = sources/typeaudio
+	url = https://github.com/typeshade/typeaudio

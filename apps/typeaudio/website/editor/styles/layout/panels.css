@@ -1,0 +1,77 @@
+.viewer-region {
+  grid-column: 3;
+  grid-row: 1;
+  min-height: 0;
+  min-width: 0;
+}
+.document-view {
+  height: 100%;
+  min-height: 0;
+}
+.document-view > .panel > .panel-body {
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.inspector-region {
+  grid-column: 5;
+  grid-row: 1/-1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+}
+.inspector-region > .panel {
+  height: auto;
+  flex-shrink: 0;
+}
+.inspector-region > .panel:first-child {
+  flex: 1;
+  min-height: 190px;
+}
+.inspector-region .panel-body {
+  overflow: auto;
+}
+.studio-app .utility-panel {
+  flex: 0 0 auto;
+}
+.utility-panel button {
+  width: 100%;
+}
+.splitter {
+  background: #222;
+  min-height: 0;
+  min-width: 0;
+  touch-action: none;
+}
+.splitter:hover,
+.splitter:focus-visible {
+  background: #5675a0;
+}
+.splitter-x {
+  grid-column: 2;
+  grid-row: 1/-1;
+  cursor: col-resize;
+}
+.splitter-y {
+  grid-column: 3;
+  grid-row: 2;
+  cursor: row-resize;
+}
+.picture-workspace .splitter-y {
+  grid-column: 1/4;
+}
+.dock-region {
+  grid-row: 3;
+  grid-column: 3;
+  min-height: 0;
+  min-width: 0;
+}
+.picture-workspace .project-panel {
+  grid-row: 1;
+}
+.picture-workspace .dock-region {
+  grid-column: 1/4;
+}

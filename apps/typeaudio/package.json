@@ -1,0 +1,43 @@
+{
+  "name": "typeaudio-site",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TypeAudio sound studio website",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/typeshade/web",
+    "directory": "apps/typeaudio"
+  },
+  "scripts": {
+    "dev": "node scripts/prepare.mjs && bun --bun vite --config website/vite.config.ts",
+    "build": "node scripts/prepare.mjs && bun --bun vite build --config website/vite.config.ts && bun scripts/site-docs.ts",
+    "check": "node scripts/prepare.mjs && bun --bun tshc sync && bun --bun tshc check website && tsc -p website/tsconfig.json && node scripts/check-editor-architecture.mjs && node --test scripts/compiler-pair.test.mjs",
+    "test": "node scripts/prepare.mjs && bun --bun vitest run",
+    "test:browser": "bun website/check-workspace-browser.ts && bun website/check-state-browser.ts && bun website/check-render-device-loss.ts && bun website/check-interactions-browser.ts && bun website/check-sound-design-browser.ts && bun website/check-timeline-browser.ts && bun website/check-audio-import-browser.ts && bun website/check-graph-browser.ts && bun website/check-node-workspace-browser.ts && bun website/check-code-workspace-browser.ts && bun website/check-code-language-browser.ts && bun website/check-feedback-browser.ts && bun website/check-agent-projects-browser.ts && bun website/check-editor-ux-browser.ts && bun website/check-node-code-browser.ts && bun website/check-function-authoring-browser.ts && bun website/check-composition-browser.ts",
+    "bench:live": "bun website/check-live-performance.ts",
+    "bench:graph": "GRAPH_BENCH=1 bun website/check-live-performance.ts",
+    "bench:render": "bun website/check-render-performance.ts",
+    "feedback": "node scripts/prepare.mjs && bun ../../sources/typeaudio/scripts/feedback.ts",
+    "export:quality": "node scripts/prepare.mjs && bun --tsconfig-override website/tsconfig.json scripts/export-quality-project.ts"
+  },
+  "devDependencies": {
+    "@types/node": "25.6.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "marked": "17.0.1",
+    "playwright-core": "1.64.1",
+    "typescript": "5.6.3",
+    "typeshade": "https://github.com/typeshade/typeshade/archive/87af4eb0d9d15f02b66b8341b72cab0944290472.tar.gz",
+    "vite": "7.3.7",
+    "vitest": "5.0.5",
+    "wrangler": "4.151.0"
+  },
+  "dependencies": {
+    "@typeshade/site-ui": "workspace:*",
+    "monaco-editor": "0.55.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  }
+}

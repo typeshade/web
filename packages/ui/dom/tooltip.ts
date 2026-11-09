@@ -27,8 +27,17 @@ export function enhanceTooltips(root: ParentNode = document) {
     const show = () => {
       clearTimeout(timer);
       if (dismissed) return;
-      tip.hidden = false;
       const rect = trigger.getBoundingClientRect();
+      if (
+        rect.bottom <= 0 ||
+        rect.top >= innerHeight ||
+        rect.right <= 0 ||
+        rect.left >= innerWidth
+      ) {
+        hide();
+        return;
+      }
+      tip.hidden = false;
       const box = tip.getBoundingClientRect();
       tip.style.left = `${Math.max(8, Math.min(innerWidth - box.width - 8, rect.left))}px`;
       tip.style.top = `${rect.bottom + box.height + 8 > innerHeight ? Math.max(8, rect.top - box.height - 8) : rect.bottom + 8}px`;
@@ -59,7 +68,14 @@ export function enhanceTooltips(root: ParentNode = document) {
         hide();
       }
     });
-    window.addEventListener("resize", hide);
-    document.addEventListener("scroll", hide, true);
+    const reposition = () => {
+      if (tip.hidden) return;
+      // Keyboard focus can scroll the trigger into view after its focus event.
+      // Keep that hint attached; pointer-only hints still close on scrolling.
+      if (document.activeElement === trigger) show();
+      else hide();
+    };
+    window.addEventListener("resize", reposition);
+    document.addEventListener("scroll", reposition, true);
   });
 }

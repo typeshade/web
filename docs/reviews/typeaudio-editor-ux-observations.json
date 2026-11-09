@@ -1,0 +1,372 @@
+{
+  "capturedAt": "2026-11-07T00:45:33.472763+00:00",
+  "implementationCommit": "fad1cd07fb516d7eb1b2dc949c617606d4cdad45",
+  "scope": "Web PR47 fad1cd0 local production build",
+  "viewports": {
+    "desktop": [
+      1680,
+      1050
+    ],
+    "mobile": [
+      390,
+      844
+    ]
+  },
+  "draftExport": {
+    "draftMarkerIncluded": false,
+    "status": "Project exported.",
+    "codeStatus": "Unapplied draft \u00b7 Ctrl/\u2318 Enter compiles and applies. Playback uses the last applied code.",
+    "dialogs": 0
+  },
+  "switchVariant": {
+    "name": "One persistent red material",
+    "undoDisabled": true,
+    "dialogs": 0,
+    "storedEdit": []
+  },
+  "naturalScrolling": {
+    "before": [
+      {
+        "sel": ".inspector-region",
+        "clientHeight": 913,
+        "scrollHeight": 913,
+        "scrollTop": 0,
+        "overflowY": "auto"
+      },
+      {
+        "sel": ".clip-properties",
+        "clientHeight": 503,
+        "scrollHeight": 1574,
+        "scrollTop": 0,
+        "overflowY": "hidden"
+      },
+      {
+        "sel": ".clip-properties .panel-body",
+        "clientHeight": 474,
+        "scrollHeight": 1545,
+        "scrollTop": 0,
+        "overflowY": "visible"
+      },
+      {
+        "sel": ".project-panel",
+        "clientHeight": 633,
+        "scrollHeight": 633,
+        "scrollTop": 0,
+        "overflowY": "hidden"
+      },
+      {
+        "sel": ".project-panel .panel-body",
+        "clientHeight": 604,
+        "scrollHeight": 793,
+        "scrollTop": 0,
+        "overflowY": "auto"
+      },
+      {
+        "sel": ".project-examples",
+        "clientHeight": 641,
+        "scrollHeight": 641,
+        "scrollTop": 0,
+        "overflowY": "visible"
+      }
+    ],
+    "afterInspector": [
+      {
+        "sel": ".inspector-region",
+        "clientHeight": 913,
+        "scrollHeight": 913,
+        "scrollTop": 0,
+        "overflowY": "auto"
+      },
+      {
+        "sel": ".clip-properties",
+        "clientHeight": 503,
+        "scrollHeight": 1574,
+        "scrollTop": 0,
+        "overflowY": "hidden"
+      },
+      {
+        "sel": ".clip-properties .panel-body",
+        "clientHeight": 474,
+        "scrollHeight": 1545,
+        "scrollTop": 0,
+        "overflowY": "visible"
+      },
+      {
+        "sel": ".project-panel",
+        "clientHeight": 633,
+        "scrollHeight": 633,
+        "scrollTop": 0,
+        "overflowY": "hidden"
+      },
+      {
+        "sel": ".project-panel .panel-body",
+        "clientHeight": 604,
+        "scrollHeight": 793,
+        "scrollTop": 0,
+        "overflowY": "auto"
+      },
+      {
+        "sel": ".project-examples",
+        "clientHeight": 641,
+        "scrollHeight": 641,
+        "scrollTop": 0,
+        "overflowY": "visible"
+      }
+    ],
+    "afterProject": [
+      {
+        "sel": ".inspector-region",
+        "clientHeight": 913,
+        "scrollHeight": 913,
+        "scrollTop": 0,
+        "overflowY": "auto"
+      },
+      {
+        "sel": ".clip-properties",
+        "clientHeight": 503,
+        "scrollHeight": 1574,
+        "scrollTop": 0,
+        "overflowY": "hidden"
+      },
+      {
+        "sel": ".clip-properties .panel-body",
+        "clientHeight": 474,
+        "scrollHeight": 1545,
+        "scrollTop": 0,
+        "overflowY": "visible"
+      },
+      {
+        "sel": ".project-panel",
+        "clientHeight": 633,
+        "scrollHeight": 633,
+        "scrollTop": 0,
+        "overflowY": "hidden"
+      },
+      {
+        "sel": ".project-panel .panel-body",
+        "clientHeight": 604,
+        "scrollHeight": 793,
+        "scrollTop": 189,
+        "overflowY": "auto"
+      },
+      {
+        "sel": ".project-examples",
+        "clientHeight": 641,
+        "scrollHeight": 641,
+        "scrollTop": 0,
+        "overflowY": "visible"
+      }
+    ]
+  },
+  "layouts": {
+    "desktopEntry": {
+      "workspace": "sound",
+      "scrollY": 0,
+      "height": 1050,
+      "innerHeight": 1050,
+      "relevantControls": [
+        {
+          "text": "Export WAV",
+          "pageY": 72,
+          "w": 98.6875,
+          "h": 26,
+          "font": "11px"
+        },
+        {
+          "text": "Projects",
+          "pageY": 139,
+          "w": 52.125,
+          "h": 31,
+          "font": "10px"
+        }
+      ]
+    },
+    "desktopProject": {
+      "workspace": "picture",
+      "scrollY": 0,
+      "height": 1050,
+      "innerHeight": 1050,
+      "relevantControls": [
+        {
+          "text": "Play composition",
+          "pageY": 72,
+          "w": 29,
+          "h": 26,
+          "font": "11px"
+        },
+        {
+          "text": "Export WAV",
+          "pageY": 72,
+          "w": 98.6875,
+          "h": 26,
+          "font": "11px"
+        },
+        {
+          "text": "Projects",
+          "pageY": 139,
+          "w": 52.125,
+          "h": 31,
+          "font": "10px"
+        },
+        {
+          "text": "Export edited project",
+          "pageY": 773.5625,
+          "w": 118.890625,
+          "h": 25,
+          "font": "11px"
+        },
+        {
+          "text": "Edit sound",
+          "pageY": 777.484375,
+          "w": 272,
+          "h": 26,
+          "font": "10px"
+        }
+      ]
+    },
+    "desktopSource": {
+      "workspace": "sound",
+      "scrollY": 0,
+      "height": 1050,
+      "innerHeight": 1050,
+      "relevantControls": [
+        {
+          "text": "Export WAV",
+          "pageY": 72,
+          "w": 98.6875,
+          "h": 26,
+          "font": "11px"
+        },
+        {
+          "text": "Projects",
+          "pageY": 139,
+          "w": 52.125,
+          "h": 31,
+          "font": "10px"
+        },
+        {
+          "text": "Export edited project",
+          "pageY": 773.5625,
+          "w": 118.890625,
+          "h": 25,
+          "font": "11px"
+        },
+        {
+          "text": "Apply code",
+          "pageY": 660,
+          "w": 72.4375,
+          "h": 25,
+          "font": "11px"
+        }
+      ]
+    },
+    "mobileEntry": {
+      "workspace": "sound",
+      "scrollY": 0,
+      "height": 2063,
+      "innerHeight": 844,
+      "relevantControls": [
+        {
+          "text": "Export WAV",
+          "pageY": 102,
+          "w": 88.015625,
+          "h": 26,
+          "font": "9px"
+        },
+        {
+          "text": "Projects",
+          "pageY": 886,
+          "w": 52.125,
+          "h": 31,
+          "font": "10px"
+        }
+      ]
+    },
+    "mobileProjectAfterOpen": {
+      "workspace": "picture",
+      "scrollY": 453,
+      "height": 3535,
+      "innerHeight": 844,
+      "relevantControls": [
+        {
+          "text": "Play composition",
+          "pageY": 73,
+          "w": 29,
+          "h": 26,
+          "font": "10px"
+        },
+        {
+          "text": "Export WAV",
+          "pageY": 73,
+          "w": 88.015625,
+          "h": 26,
+          "font": "9px"
+        },
+        {
+          "text": "Projects",
+          "pageY": 819,
+          "w": 52.125,
+          "h": 31,
+          "font": "10px"
+        },
+        {
+          "text": "Export edited project",
+          "pageY": 1340.171875,
+          "w": 118.890625,
+          "h": 25,
+          "font": "11px"
+        },
+        {
+          "text": "Edit sound",
+          "pageY": 2171.546875,
+          "w": 327,
+          "h": 26,
+          "font": "10px"
+        }
+      ]
+    },
+    "mobileSourceAfterEdit": {
+      "workspace": "sound",
+      "scrollY": 266,
+      "height": 2764,
+      "innerHeight": 844,
+      "relevantControls": [
+        {
+          "text": "Export WAV",
+          "pageY": 102,
+          "w": 88.015625,
+          "h": 26,
+          "font": "9px"
+        },
+        {
+          "text": "Projects",
+          "pageY": 1399,
+          "w": 52.125,
+          "h": 31,
+          "font": "10px"
+        },
+        {
+          "text": "Export edited project",
+          "pageY": 1920.171875,
+          "w": 118.890625,
+          "h": 25,
+          "font": "11px"
+        },
+        {
+          "text": "Apply code",
+          "pageY": 730.5,
+          "w": 72.4375,
+          "h": 25,
+          "font": "11px"
+        }
+      ]
+    }
+  },
+  "pageErrors": [],
+  "limits": [
+    "Local production build, not the deployed site.",
+    "Headless desktop and mobile viewport emulation, not a physical phone.",
+    "Reviewer walkthrough, not independent user research.",
+    "No application changes made during the audit."
+  ]
+}

@@ -87,3 +87,10 @@ test('retries network errors within the configured bound', async () => {
   assert.equal(sleeps, 2);
   assert.doesNotMatch(result.reason, /network detail/);
 });
+
+test('verifies the TypeAudio production root', async () => {
+  const result = await verifyProductionHttp('https://audio.typeshade.dev/', {
+    fetchImpl: async () => new Response('', {status:200}), maxAttempts:1,
+  });
+  assert.equal(result.result,'passed');
+});

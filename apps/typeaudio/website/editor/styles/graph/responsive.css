@@ -1,0 +1,51 @@
+@media (max-width: 950px) {
+  .graph-surface {
+    min-height: 320px;
+  }
+  .graph-dock {
+    flex-direction: column;
+  }
+  .graph-parameters {
+    width: auto;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .graph-dock-panel {
+    min-height: 340px;
+  }
+}
+@media (max-width: 600px) {
+  .graph-parameters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .graph-toolbar {
+    gap: 4px;
+  }
+  .graph-code-toolbar {
+    flex-wrap: wrap;
+  }
+  .graph-code-toolbar span {
+    width: 100%;
+  }
+}
+@media (max-width: 950px) {
+  .graph-workspace {
+    grid-template-rows: 500px 4px auto auto;
+  }
+  .graph-workspace .viewer-region {
+    height: 500px;
+  }
+  .graph-workspace .dock-region,
+  .graph-dock-panel,
+  .graph-dock {
+    height: auto;
+  }
+  .graph-dock-panel > .panel-body {
+    overflow: visible;
+  }
+  .graph-code-panel textarea {
+    min-height: 160px;
+    flex: none;
+  }
+}

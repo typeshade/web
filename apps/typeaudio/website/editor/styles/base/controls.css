@@ -1,0 +1,196 @@
+@import "@typeshade/site-ui/tokens.css";
+:root {
+  --project-width: 228px;
+  --inspector-width: 300px;
+  --timeline-height: 270px;
+  --code-width: 420px;
+  --code-height: 430px;
+}
+#root {
+  height: 100dvh;
+  min-height: 480px;
+}
+.studio-app {
+  --bg: #242424;
+  --panel: #2c2c2c;
+  --raised: #343434;
+  --line: #171717;
+  --text: #d4d4d4;
+  --muted: #999;
+  --accent: #96b8f1;
+  color-scheme: dark;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 34px 31px 41px minmax(0, 1fr) 25px;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    12px/1.45 Plex,
+    Helvetica,
+    sans-serif;
+  overflow: hidden;
+}
+.studio-app * {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #575757 #292929;
+}
+.studio-app [hidden] {
+  display: none !important;
+}
+.studio-app :is(header, main, footer) {
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  border: 0;
+}
+.studio-app :is(h1, h2, h3, p) {
+  margin: 0;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+.studio-app h2 {
+  font-size: 11px;
+  font-weight: 500;
+}
+.studio-app h3 {
+  font-size: 10px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: #aaa;
+}
+.studio-app a {
+  color: inherit;
+  text-decoration: none;
+}
+.studio-app button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font:
+    11px Arial,
+    Helvetica,
+    sans-serif;
+  background: #3b3b3b;
+  color: #d4d4d4;
+  border: 1px solid #505050;
+  border-radius: 3px;
+  min-height: 25px;
+  padding: 4px 8px;
+  cursor: pointer;
+  box-shadow: none;
+  white-space: nowrap;
+}
+.studio-app button:hover:not(:disabled) {
+  background: #494949;
+  filter: none;
+}
+.studio-app button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.studio-app button.primary {
+  background: #425f87;
+  border-color: #6784b0;
+  color: #edf4ff;
+}
+.studio-app button[aria-pressed="true"] {
+  background: #3d4a5d;
+  color: #bcd3f8;
+  border-color: #6c88b0;
+}
+.studio-app :focus-visible {
+  outline: 2px solid #96b8f1;
+  outline-offset: 1px;
+}
+.studio-app
+  :is(
+    input:not([type="range"]):not([type="checkbox"]):not([type="file"]),
+    select
+  ) {
+  background: #202020;
+  border: 1px solid #484848;
+  border-radius: 2px;
+  color: #ddd;
+  min-height: 25px;
+  padding: 4px 6px;
+  width: 100%;
+  min-width: 0;
+  font:
+    11px Arial,
+    Helvetica,
+    sans-serif;
+  margin: 0;
+}
+.studio-app input[type="range"] {
+  accent-color: #96b8f1;
+  width: 100%;
+  height: 12px;
+  margin: 7px 0 0;
+  display: block;
+  cursor: pointer;
+}
+.studio-app input[type="checkbox"] {
+  accent-color: #96b8f1;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+}
+.studio-app label {
+  font-size: 10px;
+  color: #b2b2b2;
+  display: block;
+}
+.studio-app label:not(.check) > input:not([type="range"]) {
+  margin-top: 6px;
+}
+.studio-app .check {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 10px;
+}
+.studio-app output {
+  float: none;
+  font:
+    10px PlexMono,
+    monospace;
+  color: #a6c7f7;
+}
+.studio-app .mono {
+  font:
+    9px PlexMono,
+    monospace;
+  color: #aaa;
+}
+.studio-app .panel-hint {
+  font-size: 10px;
+  color: #959595;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+.studio-app details {
+  border: 0;
+  padding: 6px 0;
+  color: #aaa;
+  font-size: 10px;
+}
+.studio-app summary {
+  font: 10px Arial;
+  cursor: pointer;
+}
+.studio-app pre {
+  background: #202020;
+  color: #aaa;
+  font:
+    10px/1.5 PlexMono,
+    monospace;
+  padding: 8px;
+  border: 0;
+  border-radius: 0;
+  max-height: 80px;
+  overflow: auto;
+  margin: 7px 0 0;
+}

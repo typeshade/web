@@ -1,0 +1,54 @@
+.studio-app .source-rack .panel-body {
+  padding: 9px;
+}
+.source-list {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+.studio-app .source-list > button {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  gap: 6px;
+  text-align: left;
+  border-color: transparent;
+}
+.source-list > button > span:nth-child(2) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.source-list small {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.layer-settings,
+.wave-sample {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  margin: 8px 0;
+}
+.studio-app :is(.layer-settings, .wave-sample) label {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+}
+.studio-app :is(.layer-settings, .wave-sample) input {
+  width: 100%;
+  min-width: 0;
+}
+.studio-app .layer-settings .check {
+  display: flex;
+}
+.studio-app .layer-settings .check input {
+  width: auto;
+}
+.studio-app .source-rack .button-row {
+  gap: 4px;
+}
+.studio-app .source-rack .button-row button {
+  min-width: 0;
+  flex: 1;
+}

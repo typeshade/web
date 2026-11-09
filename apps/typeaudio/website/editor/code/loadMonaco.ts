@@ -1,0 +1,22 @@
+import * as monaco from "monaco-editor/esm/vs/editor/editor.api.js";
+import "monaco-editor/esm/vs/editor/contrib/find/browser/findController.js";
+import "monaco-editor/esm/vs/editor/contrib/suggest/browser/suggestController.js";
+import "monaco-editor/esm/vs/editor/contrib/hover/browser/hoverContribution.js";
+import "monaco-editor/esm/vs/editor/contrib/comment/browser/comment.js";
+import "monaco-editor/esm/vs/editor/contrib/bracketMatching/browser/bracketMatching.js";
+import "monaco-editor/esm/vs/editor/contrib/contextmenu/browser/contextmenu.js";
+import "monaco-editor/esm/vs/editor/contrib/clipboard/browser/clipboard.js";
+import "monaco-editor/esm/vs/editor/contrib/multicursor/browser/multicursor.js";
+import "monaco-editor/esm/vs/editor/contrib/linesOperations/browser/linesOperations.js";
+import "monaco-editor/esm/vs/editor/contrib/parameterHints/browser/parameterHints.js";
+import "monaco-editor/esm/vs/editor/contrib/gotoSymbol/browser/goToCommands.js";
+import "monaco-editor/esm/vs/editor/contrib/gotoSymbol/browser/link/goToDefinitionAtPosition.js";
+import "monaco-editor/esm/vs/editor/contrib/rename/browser/rename.js";
+import "monaco-editor/esm/vs/editor/contrib/gotoError/browser/gotoError.js";
+import "monaco-editor/esm/vs/editor/contrib/snippet/browser/snippetController2.js";
+import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker.js?worker";
+import { registerTypeShade } from "./registerTypeShade.ts";
+
+globalThis.MonacoEnvironment = { getWorker: () => new EditorWorker() };
+registerTypeShade(monaco);
+export { monaco };

@@ -1,0 +1,67 @@
+.options-bar {
+  background: #323232;
+  border-bottom: 1px solid #171717;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 12px 5px 46px;
+  min-width: 0;
+}
+.transport-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+.studio-app .icon-button {
+  width: 29px;
+  padding: 4px;
+  border-color: transparent;
+  background: transparent;
+}
+.studio-app .icon-button.active {
+  color: #bbd4ff;
+  background: #49566c;
+}
+.studio-app .transport-buttons select {
+  width: 80px;
+  font-size: 10px;
+}
+.export-actions {
+  display: flex;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.studio-app .timecode {
+  font:
+    12px PlexMono,
+    monospace;
+  color: #a9c9fc;
+  min-width: 96px;
+  padding-left: 12px;
+  border-left: 1px solid #484848;
+  margin-left: 3px;
+}
+.segmented {
+  display: flex;
+  gap: 0;
+}
+.studio-app .segmented button {
+  border-radius: 0;
+  font-size: 10px;
+  min-height: 23px;
+  padding: 4px 11px;
+  background: #303030;
+  border-color: #505050;
+}
+.studio-app .segmented button + button {
+  border-left: 0;
+}
+.studio-app .segmented button[aria-pressed="true"] {
+  background: #485364;
+  color: #c5d9fa;
+}
+.studio-app .modes {
+  margin: 0 6px;
+}

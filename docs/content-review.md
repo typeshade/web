@@ -47,6 +47,15 @@ The linked reports record the files/surfaces actually read, changes, retained co
 its rationale, validation and language boundaries. Future updates must provide the same
 evidence; a pattern search alone is not a completed prose review.
 
+The separate [TypeAudio editor UX review](reviews/typeaudio-editor-ux.md), dated 2026-11-07,
+covers the editable-project flow on Web PR #47. It records browser reproductions, interaction
+and label findings, unresolved release blockers and a proposed task flow. It is not a new
+all-site editorial pass, translation review or study with independent users.
+
+The owner subsequently approved the [Frieren editable-study publication](reviews/typeaudio-frieren-publication.md).
+That record covers the six passage projects, their release boundary, a reproduced
+shared-tooltip defect, and the production verification; it is not a full-scene mix approval.
+
 API range evidence: [1–200](reviews/typeshade-api.md),
 [201–359](reviews/typeshade-api-documents-range.md),
 [360–518](reviews/typeshade-api-lessons-range.md).
@@ -101,3 +110,101 @@ TypeShade, TypeNN and TypeCV. Follow-up revision checks are recorded separately.
   passed, as did the benchmark/regression catalogs and final TypeScript check.
 - No vendor source or dependency pin was changed. The shared Shiki dependency was added
   explicitly, and installation passed with pnpm 10.28.2 and the frozen lockfile.
+
+## TypeAudio studio addition
+
+The new TypeAudio application has a bounded English UI review and local audio/browser
+validation recorded in [TypeAudio studio integration](reviews/typeaudio-studio.md).
+The original three-site review and production ownership above are unchanged.
+
+The video scene studio follow-up has a separate bounded English UI review and
+actual local-video/PCM browser checks in the same TypeAudio review record. No
+new translated or full imported-document review is claimed by this addition.
+
+The subsequent [component workspace review](reviews/typeaudio-component-workspace.md)
+records the owner-directed Photoshop/After Effects layout and interaction redesign,
+its component boundaries, reviewed English surfaces and validation scope.
+
+The same record now includes the Live CPU kernel and measured computation changes,
+with the distinction between worker benchmarks and device/game real-time behavior.
+
+Its finite-render follow-up records resident output batching, worker/device reuse,
+timing definitions and explicitly identified software-GPU comparisons.
+
+The component record also covers the editor interaction pass: shared context menus
+and tooltips, direct numeric editing, gesture history, persistent panel sizes and
+timeline manipulation. Its English review is limited to those changed surfaces.
+
+The procedural sound pass adds reviewed English for source layers, FM/noise/custom
+waves, automation, live recording and the CPU render boundary. Its component review
+record identifies implemented behavior, synthesis limits and compute-only evidence.
+
+The timeline editing follow-up records source trim/fade controls, split continuity,
+multiple selection, context actions and shortcuts. Its bounded English review and
+preview/WAV validation are in the same component workspace record.
+
+The audio-file follow-up covers the Audio library, imported clip properties,
+portable project files and recovery messages. Its bounded English review and real
+file/storage/PCM checks are recorded in the component workspace review.
+
+The node-graph follow-up adds reviewed English for procedural graph editing,
+TypeShade Code nodes, exposed parameters, compile/recovery messages and the
+in-editor code reference. The same component record describes the implemented
+limits, actual browser audio checks and measured graph computation.
+
+The Atomic Design refactor has a bounded review in that same record. It covers
+the editor architecture guide and revised README, retained UI wording, component
+and controller boundaries, unchanged compiled CSS and browser regression evidence.
+
+The node workspace follow-up adds a bounded English review for searchable node
+creation, multi-selection, connection editing, framing and keyboard help. Its
+component review records pure edit-operation tests and real browser gesture,
+audio and persistence coverage.
+
+The code workspace follow-up adds a bounded English review for Monaco Code
+node documents, draft/conflict recovery, split layouts and command/quick-open
+search. The component record documents the scalar-language and session-only
+draft limits, resource boundaries and real editor/audio regression coverage.
+
+
+The cross-repository feedback follow-up moves graph execution into TypeAudio and
+adds one English File command, **Export graph reproduction…**, plus its result
+message. The wording names an applied graph snapshot and excludes layer mixing,
+prior edits and playback timing. No translation or broader imported-content review
+is claimed. The TypeAudio README records reproduction and compiler proposal limits.
+
+The TypeAudio language-editor follow-up reviews the English Sample code context,
+input/state descriptions, live Problems panel, analysis retry and Focus code action.
+The wording distinguishes TypeShade language diagnostics from the narrower audio-node
+execution contract and explains when drafts reach playback. Browser coverage checks
+completion, live errors, navigation/rename, stale results and continued AudioWorklet
+progress. This is a bounded studio UI review, not a broader site or translation review.
+
+
+The approved TypeAudio UX follow-up reviews the English project entry, Saved copies,
+variant preview, contextual source breadcrumb, playback scope, browser-save status
+and mobile task labels. Project save includes unapplied drafts; Apply code and WAV
+export remain separate actions. The bounded implementation and its actual browser
+verification are recorded in [the editor UX review](reviews/typeaudio-editor-ux.md).
+No site-wide, translation, physical-device or independent-user acceptance is claimed.
+
+The subsequent [node/code relationship review](reviews/typeaudio-node-code.md) covers
+selection-linked sample documents, built-in settings, actual connection/parameter
+descriptions and read-only generated output. The bounded English review names the
+per-sample execution contract and avoids implying whole-graph TypeScript authoring.
+The default example uses meaningful local names while retaining identical rendered PCM.
+
+The function-authoring continuation reviews the English function/network/source panels,
+New function sound entry, named controls, typed pin settings and compiler-failure messages.
+The wording distinguishes complete modules from the legacy per-sample Code node.
+Apply source compiles all edited modules together; project save preserves incomplete drafts.
+The labels identify the mono CPU profile and independent instance state.
+This is a bounded English studio review. It does not claim site-wide, translation,
+physical-device or independent-user acceptance.
+
+
+The composition continuation reviews the English Network tab, call-location action, input rename form,
+source-conflict recovery and version-mismatch messages. Wording distinguishes static composition calls
+from full processing bodies and explains the effect of keeping a conflicting draft.
+The [bounded review](reviews/typeaudio-composition-editing.md) records actual browser and source-preservation checks.
+This does not extend the earlier site-wide editorial scope or claim translation, listening or physical-device acceptance.

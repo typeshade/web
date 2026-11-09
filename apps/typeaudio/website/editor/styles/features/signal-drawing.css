@@ -1,0 +1,72 @@
+.wave-editor,
+.curve-editor {
+  display: grid;
+  gap: 10px;
+}
+.studio-app :is(.wave-editor, .curve-editor) label {
+  display: grid;
+  gap: 4px;
+}
+.studio-app :is(.wave-editor, .curve-editor) .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.studio-app .expression-field textarea {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+  border: 1px solid #4c4c4c;
+  background: #202124;
+  color: var(--text);
+  padding: 8px;
+  font: 11px/1.6 monospace;
+}
+.wave-drawing,
+.curve-drawing {
+  display: block;
+  width: 100%;
+  height: 140px;
+  border: 1px solid #50555c;
+  background: #22262b;
+  touch-action: none;
+  overflow: visible;
+  cursor: crosshair;
+}
+:is(.wave-drawing, .curve-drawing) polyline {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  fill: none;
+  pointer-events: none;
+}
+:is(.wave-drawing, .curve-drawing) circle {
+  fill: var(--accent);
+  stroke: #242424;
+  stroke-width: 1.5;
+}
+.curve-drawing circle {
+  cursor: grab;
+}
+.curve-drawing circle:focus {
+  outline: none;
+  stroke: white;
+  stroke-width: 2;
+}
+.curve-grid {
+  stroke: #363b42;
+  stroke-width: 1;
+  fill: none;
+  pointer-events: none;
+}
+.curve-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -8px;
+  color: var(--muted);
+  font: 10px monospace;
+}
+.studio-app .field-error {
+  color: #efb0a4;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}

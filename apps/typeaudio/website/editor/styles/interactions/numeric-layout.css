@@ -1,0 +1,10 @@
+.parameter > label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-app input.parameter-number {
+  width: 66px;
+  max-width: 66px;
+}
+/* Procedural sources use the same compact panels and property controls. */

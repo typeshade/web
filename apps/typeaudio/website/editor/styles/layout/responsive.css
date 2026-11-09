@@ -1,0 +1,346 @@
+@media (max-width: 1200px) {
+  :root {
+    --project-width: 195px;
+    --inspector-width: 250px;
+    --timeline-height: 260px;
+  }
+  .workspace {
+    grid-template-columns:
+      min(var(--project-width), 28vw) 4px minmax(180px, 1fr)
+      4px min(var(--inspector-width), 32vw);
+  }
+  .sound-dock-controls {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .sound-summary {
+    display: none;
+  }
+  .studio-app .signal-modules button {
+    font-size: 9px;
+    padding: 5px;
+  }
+  .signal-modules button small,
+  .signal-modules button span {
+    display: none;
+  }
+  .reset-layout {
+    display: none !important;
+  }
+}
+@media (max-width: 950px) {
+  #root {
+    height: auto;
+    min-height: 100dvh;
+  }
+  .studio-app {
+    height: auto;
+    min-height: 100dvh;
+    display: block;
+    overflow: visible;
+  }
+  .app-menubar {
+    min-height: 35px;
+  }
+  .document-bar {
+    height: 31px;
+  }
+  .options-bar {
+    min-height: 43px;
+    flex-wrap: wrap;
+    padding: 6px 10px;
+  }
+  .editor-body {
+    overflow: visible;
+  }
+  .workspace {
+    grid-template-columns: var(--project-width) 4px minmax(0, 1fr);
+    grid-template-rows: 420px 4px 270px auto;
+  }
+  .inspector-region {
+    grid-column: 1/-1;
+    grid-row: 4;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: visible;
+  }
+  .inspector-region > .panel:first-child {
+    min-height: 200px;
+  }
+  .picture-workspace .inspector-region {
+    grid-column: 1/-1;
+  }
+  .project-panel {
+    grid-row: 1/4;
+  }
+  .sound-dock-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+  .sound-dock .panel-body {
+    overflow: auto;
+  }
+  .sound-dock-controls {
+    min-height: 180px;
+    flex-shrink: 0;
+  }
+  .signal-modules {
+    min-height: 50px;
+  }
+  .studio-app .status-bar {
+    position: static;
+    min-height: 26px;
+  }
+  .studio-app .workspace-tabs button {
+    min-width: 65px;
+    padding: 7px 12px;
+  }
+  .studio-app .app-menubar > button {
+    padding: 5px 7px;
+  }
+  .studio-app .help-link {
+    font-size: 9px;
+  }
+}
+@media (max-width: 620px) {
+  .studio-app .app-menubar {
+    gap: 1px;
+    padding: 0 6px;
+  }
+  .app-brand {
+    margin-right: 5px;
+  }
+  .app-brand span {
+    display: none;
+  }
+  .studio-app .app-menubar > button {
+    font-size: 10px;
+    padding: 5px 7px;
+  }
+  .workspace-tabs {
+    margin-left: auto;
+    margin-right: 8px;
+  }
+  .studio-app .workspace-tabs button {
+    min-width: 55px;
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+  .document-status {
+    display: none;
+  }
+  .document-tab {
+    max-width: 100%;
+    border-right: 0;
+  }
+  .options-bar {
+    gap: 7px;
+    padding-left: 8px;
+  }
+  .transport-buttons {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .studio-app .transport-buttons > button {
+    font-size: 10px;
+  }
+  .studio-app .transport-buttons select {
+    width: 65px;
+  }
+  .studio-app .export-actions {
+    margin-left: auto;
+  }
+  .studio-app .export-actions button {
+    font-size: 9px;
+  }
+  .tool-rail {
+    width: 29px;
+    padding-top: 5px;
+  }
+  .studio-app .tool-rail button {
+    width: 25px;
+    height: 26px;
+    padding: 4px;
+  }
+  .workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 0;
+  }
+  .splitter {
+    display: none;
+  }
+  .viewer-region {
+    height: 360px;
+    flex-shrink: 0;
+    order: 0;
+  }
+  .sound-workspace .viewer-region {
+    height: 400px;
+  }
+  .dock-region {
+    height: 310px;
+    flex-shrink: 0;
+    order: 1;
+  }
+  .project-panel {
+    order: 2;
+    height: auto;
+    min-height: 260px;
+    max-height: none;
+  }
+  .asset-list {
+    max-height: 220px;
+  }
+  .project-bottom {
+    margin-top: 15px;
+  }
+  .asset-row {
+    min-height: 36px !important;
+  }
+  .inspector-region {
+    order: 3;
+    display: block;
+    overflow: visible;
+  }
+  .inspector-region > .panel {
+    margin-bottom: 4px;
+  }
+  .signal-modules {
+    overflow: auto;
+    flex-shrink: 0;
+  }
+  .studio-app .signal-modules button {
+    flex: none;
+    font-size: 9px;
+    padding: 6px 9px;
+  }
+  .sound-dock-controls {
+    gap: 12px;
+    padding: 12px;
+    grid-template-columns: 1fr;
+  }
+  .sound-dock-controls > div {
+    min-width: 0;
+  }
+  .tone-pad {
+    height: 120px;
+  }
+  .sound-dock-controls > div:nth-child(2) {
+    padding-top: 10px;
+    border-top: 1px solid #444;
+  }
+  .sound-dock-controls {
+    display: block;
+    min-height: 330px;
+  }
+  .sound-dock-controls > div {
+    margin-bottom: 14px;
+  }
+  .studio-app .sound-dock .panel-body {
+    overflow: auto;
+  }
+  .parameter-grid {
+    gap: 18px;
+  }
+  .sound-view {
+    padding: 10px;
+  }
+  .monitor-footer {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .composition-footer {
+    gap: 8px;
+  }
+  .composition-footer > span {
+    max-width: 95px;
+  }
+  .composition-footer output {
+    font-size: 8px;
+  }
+  .timeline-tools {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px;
+  }
+  .timeline-tools > .mono {
+    margin-left: auto;
+  }
+  .range-inputs {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    gap: 5px;
+  }
+  .ruler-row,
+  .layer-row {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+  .timeline-cursor-space {
+    left: 120px;
+  }
+  .layer-header {
+    font-size: 9px;
+    padding: 7px 6px;
+  }
+  .layer-header small {
+    display: none;
+  }
+  .studio-app .layer-name {
+    padding: 6px;
+    gap: 4px;
+    font-size: 9px;
+  }
+  .layer-name > small {
+    display: none;
+  }
+  .layer-name > svg {
+    width: 10px;
+    flex-shrink: 0;
+  }
+  .layer-name > span > small {
+    font-size: 7px;
+  }
+  .timeline-bottom span:last-child {
+    display: none;
+  }
+  .empty-layers {
+    padding: 25px 10px;
+    font-size: 10px;
+  }
+  .studio-app .status-bar {
+    padding: 5px 8px;
+  }
+  .status-bar > .mono {
+    display: none;
+  }
+  .studio-app #status {
+    font-size: 9px;
+  }
+  .panel-header {
+    padding: 5px 9px;
+  }
+  .panel-header h2 {
+    font-size: 10px;
+  }
+  .panel-actions {
+    gap: 3px;
+  }
+  .panel-actions .check {
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .time-ruler > span:not(:nth-child(5n + 1)) {
+    display: none;
+  }
+}
+
+/* Shared editor interactions: overlays keep their own theme outside the app portal. */
