@@ -569,14 +569,17 @@ cards takes the column. A third measure needs a reason.
   width and height called in `device.fuse()` by `run(canvas)`. That starter processes a generated
   gradient and draws the result, using WebGPU or the CPU tier. Other modules get `run()`
   opening the program runtime and listing the program's entries.
-  For a module a host can call (its host face lists a `@fragment`, `@compute` or kernel export)
-  and for a host example, host.ts's frame is the Result tab (`docs/playground-one-runtime.md`,
-  phase 2). The page runs host.ts when the module compiles and again once an edit to either file
+  For a host example, and for a module whose starter calls an entry (the first three cases
+  above) and that has no vertex entry of its own, host.ts's frame is the Result tab
+  (`docs/playground-one-runtime.md`, phase 2). The page runs host.ts when the module compiles and again once an edit to either file
   settles. It hides the transport, the engine picker and the bindings panel there, since they
   drive the site's runner. A host.ts that a link carries waits for Run until the reader edits
-  it. Any other module shows no picture (Decision 1 of that record): the frame says that a host
-  cannot call a fragment entry that reads vertex output (Rule 8.24) and links
-  `typeshade/typeshade#204`, and the other tabs keep working. For such a module, Run host.ts,
+  it. Any other module is drawn by the site's runner, with the transport, the engine picker and
+  the bindings panel, as before phase 2. A host cannot call a fragment entry that reads vertex
+  output (Rule 8.24), a starter that only lists the entries draws nothing, and a host draws a
+  fragment entry over the whole canvas, not through the file's own vertex entry. The owner
+  reversed Decision 1 of that record on 2026-11-10 until the compiler can draw such a pair from
+  host code. For such a module, Run host.ts,
   the button after the tabs, is the only way host.ts runs. In a file bar under 32rem it is its icon alone, a 24px box like the three
   beside it, so the tabs keep their room. The worker turns it and each module it imports into CommonJS, and the
   page puts an `<iframe sandbox="allow-scripts">` over the canvas that loads the runtime bundle

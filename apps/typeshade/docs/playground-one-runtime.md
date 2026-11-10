@@ -1,7 +1,8 @@
 # Playground on one runtime
 
 Status: accepted (merged in #18); decisions recorded 2026-11-02. Phase 1 is done (#21). Phase 2
-is in progress on branch `claude/playground-phase-2`.
+is done (#23). The owner reversed Decision 1 for now on 2026-11-10: the site runner draws the
+modules that a host cannot call (Decisions, 1).
 
 ## Request and baseline
 
@@ -109,6 +110,9 @@ vertex-driven examples cannot run through host.ts. The Playground says so in pla
 picture, names the rule (Rule 8.24) and the issue, and still shows WGSL, GLSL and Reflection.
 This is a visible reduction until #204 lands, which the owner accepted (Decisions, 1).
 
+The owner reversed this on 2026-11-10 (Decisions, 1). The Playground does not show that line
+now. The site runner draws these examples, as it did before phase 2.
+
 ## Compiler work this depends on
 
 - `typeshade/typeshade#204` (open): a host shape for a fragment entry that reads vertex output,
@@ -139,6 +143,26 @@ approving the recommendations ("승인", confirmed in a follow-up question).
    no picture. The Playground says why in its place, names Rule 8.24 and
    `typeshade/typeshade#204`, and still shows WGSL, GLSL and Reflection. The site runner is not
    kept for them.
+
+   **Reversed for now, 2026-11-10.** Phase 2 (#23) delivered this decision. On 2026-11-10 the
+   owner said in the Claude Code session: "사이트 복구도 해야해요. 지금 예제들 옛날과 같이 실행이
+   안되거든요." (The site must be restored too. The examples do not run as they used to.) From
+   that date the site runner draws the Result tab for every module that a host cannot call, as
+   it did before #23. The line that said why there is no picture is removed. A module that a
+   host can call, and a host example, still run from host.ts (phase 2). The reversal holds until
+   the compiler can draw a vertex and fragment pair from host code. Phase 5 does not remove the
+   site runner before that.
+
+   The same change narrows what phase 2 hands to host.ts. Phase 2 used host.ts's frame for
+   every module whose host face lists a fragment, compute or kernel export. For many of them
+   the starter host.ts cannot write the call (`scripts/playground-host-default.ts`, the last
+   case) and only lists the entries, so the Result tab was an empty frame. Before #23 the site
+   runner dispatched and plotted these modules. A host also draws a fragment entry over the
+   whole canvas, so a file with a vertex entry of its own lost its geometry: `hello` drew a
+   filled red canvas in place of its triangle. Now host.ts's frame is the Result tab only for a
+   host example, and for a module whose starter calls an entry and that has no vertex entry of
+   its own. The site runner draws every other module.
+
 2. **Per-example host files.** Each example's `host.ts` lives in the compiler repository, next
    to the example, as `examples/hosts/` does today.
 3. **Home page and live examples.** They move to the runtime in a separate series after this
