@@ -33,15 +33,15 @@ in [page-templates.md](page-templates.md).
 
 ## Assigned scope
 
-| Area | Owner | Status |
-| --- | --- | --- |
-| TypeNN pages, UI, errors and metadata | Luna: typenn_content | [Reviewed and verified](reviews/typenn-content.md) |
-| TypeCV pages, UI, errors, metadata and imported documentation | Luna: typecv_content | [Reviewed and verified](reviews/typecv-content.md), including source-revision guards |
-| TypeShade main English/Korean dictionaries | Luna: shade_main_copy | [Reviewed](reviews/typeshade-main-copy.md), including generated language and example descriptions |
-| TypeShade concept/function/operation/precision lesson dictionaries | Luna: shade_lessons | [Reviewed](reviews/typeshade-lessons.md) |
-| TypeShade generated API English and Korean translations | Luna: shade_api, shade_documents, shade_lessons | All 518 entries reviewed in three ranges; source corrections integrated |
-| TypeShade guide/reference documents and other published copy | Luna: shade_documents | [Reviewed](reviews/typeshade-documents.md), including 89 diagnostics and 124 design rules |
-| Shared UI, policy, inventory, integration and verification | Main agent | Complete |
+| Area                                                               | Owner                                           | Status                                                                                            |
+| ------------------------------------------------------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| TypeNN pages, UI, errors and metadata                              | Luna: typenn_content                            | [Reviewed and verified](reviews/typenn-content.md)                                                |
+| TypeCV pages, UI, errors, metadata and imported documentation      | Luna: typecv_content                            | [Reviewed and verified](reviews/typecv-content.md), including source-revision guards              |
+| TypeShade main English/Korean dictionaries                         | Luna: shade_main_copy                           | [Reviewed](reviews/typeshade-main-copy.md), including generated language and example descriptions |
+| TypeShade concept/function/operation/precision lesson dictionaries | Luna: shade_lessons                             | [Reviewed](reviews/typeshade-lessons.md)                                                          |
+| TypeShade generated API English and Korean translations            | Luna: shade_api, shade_documents, shade_lessons | All 518 entries reviewed in three ranges; source corrections integrated                           |
+| TypeShade guide/reference documents and other published copy       | Luna: shade_documents                           | [Reviewed](reviews/typeshade-documents.md), including 89 diagnostics and 124 design rules         |
+| Shared UI, policy, inventory, integration and verification         | Main agent                                      | Complete                                                                                          |
 
 The linked reports record the files/surfaces actually read, changes, retained content and
 its rationale, validation and language boundaries. Future updates must provide the same
@@ -166,7 +166,6 @@ node documents, draft/conflict recovery, split layouts and command/quick-open
 search. The component record documents the scalar-language and session-only
 draft limits, resource boundaries and real editor/audio regression coverage.
 
-
 The cross-repository feedback follow-up moves graph execution into TypeAudio and
 adds one English File command, **Export graph reproduction…**, plus its result
 message. The wording names an applied graph snapshot and excludes layer mixing,
@@ -179,7 +178,6 @@ The wording distinguishes TypeShade language diagnostics from the narrower audio
 execution contract and explains when drafts reach playback. Browser coverage checks
 completion, live errors, navigation/rename, stale results and continued AudioWorklet
 progress. This is a bounded studio UI review, not a broader site or translation review.
-
 
 The approved TypeAudio UX follow-up reviews the English project entry, Saved copies,
 variant preview, contextual source breadcrumb, playback scope, browser-save status
@@ -201,7 +199,6 @@ Apply source compiles all edited modules together; project save preserves incomp
 The labels identify the mono CPU profile and independent instance state.
 This is a bounded English studio review. It does not claim site-wide, translation,
 physical-device or independent-user acceptance.
-
 
 The composition continuation reviews the English Network tab, call-location action, input rename form,
 source-conflict recovery and version-mismatch messages. Wording distinguishes static composition calls
@@ -261,7 +258,7 @@ Korean block of each finding again before it changed the Korean.
   the digit in "2의 거듭제곱", so the term stays "이진 거듭제곱"; the added example is removed).
 - Terms made one across the twelve sections and the lessons: tier, 디바이스, 인자, 하향 변환, 하위
   경로, 언어 표면(surface), 변경 NNNN, prelude against 프리앰블, 드로, "…에 있습니다" for "See …".
-- Not read by anyone: the guide sections `diagnostics` and `glsl-float-precision`; the section
+- Not read by anyone: the section
   titles and descriptions in `src/i18n/ko.ts` (lines 22 to 79); `content/guide/ko/rules.json`; 22
   Korean API entries in full; `the-cpu-oracle`, which is shown in English.
 - Open: `src/i18n/ko.ts` and the guide disagree on some terms, and this change leaves `ko.ts` as
@@ -279,6 +276,16 @@ The compiler pin move to `50234ad6` (PR #55, 2026-11-10) changes one English par
 Korean (the CPU math functions of the WebGPU and WebGL2 page) and four Korean guide blocks. No
 Luna subagent and no second reader read the new English or the new Korean. This is the deviation
 the owner chose on 2026-11-10.
+
+In the same pull request the authoring agent read two Korean guide sections in full against the
+pinned English, block by block: `diagnostics` (31 blocks) and `glsl-float-precision` (25 blocks).
+Fixed: the page intro of `diagnostics` (the Korean described the page instead of saying what the
+reader can do after it), five sentences that dropped or weakened a clause ("one problem found in
+one program", "one handler catches every coded failure", the reason a branch on a code keeps
+working, "safe to call on a module you are about to emit", "as the samples above show"), one
+plain ending, and in `glsl-float-precision` an added "반드시", a duty where the English describes
+("측정해야 합니다"), "뿐" that the English does not say, a dropped "only", and "기기" made
+"디바이스". No second reader read these fixes.
 
 The Korean guide section `the-cpu-oracle` is shown in English until it is translated again from
 the pinned `AUTHORING.md`; it was already shown in English at `e30bbe57`.
