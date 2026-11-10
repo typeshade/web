@@ -93,6 +93,21 @@ pin is a step with checks, not a memory:
 The compiler's `AGENTS.md` (section "Docs follow the code") describes the conventions these
 checks come from.
 
+## When the pin moves
+
+The owner's rule, given on 2026-11-10 after the pin had fallen 342 commits behind the compiler:
+the pin moves at each milestone.
+
+- Open a pin pull request when a change that an author can see is merged in the compiler: a
+  change to the syntax, to the host API, or to behaviour that a page of this site states.
+- Open one when a milestone of a compiler proposal is complete.
+- A compiler change that is only an internal refactor or a bug fix opens none. It rides the
+  next pin move.
+- The scheduled `pin-compiler` workflow proposes a pin on the branch `pin/compiler`. That pull
+  request moves the pointer only. The work that the pin owes ("The copy follows the pinned
+  compiler") is still done by hand, in the same pull request or in one that supersedes it.
+- A status report names the pin and how far the compiler's `main` is ahead of it.
+
 ## Before pushing
 
 Run `bun run format:check` and `bun run build`, then the `qa:*` passes over `dist/`: the same
