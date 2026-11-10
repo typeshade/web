@@ -464,7 +464,10 @@ id first, then the pull request that did the work.
 - 0134: a written number takes its type from its uses. The `TS8053` example is removed and the
   code is listed as retired; the `deprecations` option's translations say that no window is open.
   Open: no snippet that writes a cast or a decimal point only to type a literal is rewritten.
-  Handled in #52.
+  Handled in #52. Pin `68b57a03`: Amendment A3 records the owner's decisions only. The bug fix it
+  asked for first (compiler #1217, no proposal: a scalar cast of a written number is a value of
+  its type, so `u32(7) / 2` is 3) changes no snippet, example or still of this site; the Korean
+  guide and the `TS8003` line were read against Rule 5.3's new fingerprint. Handled in #56.
 - 0135: a built-in value takes its type from WGSL, and the compiler gives a user-defined value
   its location. The types page (en and ko) says so, with the options as the second argument of
   `builtin<N, O>`; every sample writes `builtin<"position">`; the `TS8029` example is a
@@ -494,6 +497,9 @@ id first, then the pull request that did the work.
   `log`, `log2`, `ldexp`). The paragraph names them and says what Amendments A1 to A3 and the
   changelog state: the same results on Node and Bun, an error under 1 ULP on every operand
   measured (samples, no proof), `ldexp` correctly rounded, no monotonic promise, and a GPU's
-  functions remain the driver's. Open: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh` and
-  `pow` still use the engine's `Math`; the WebAssembly tier is not implemented, so no page names
-  it. Handled in #55.
+  functions remain the driver's. Handled in #55. Pin `68b57a03`: all nineteen functions are the
+  libm's (`sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh` and `pow` joined; `tan` has a new
+  kernel). The paragraph names the nineteen, drops the sentence on the engine's `Math`, and says
+  what Amendment A4 and the changelog state: `pow` keeps ECMAScript's special values, and on Tint
+  and WebGL2 over SwiftShader eleven special pairs give other values. Open: the WebAssembly tier
+  is not implemented, so no page names it. Handled in #56.
