@@ -16,6 +16,7 @@ import remarkRuleLinks from './src/lib/remark-rule-links.mjs';
 import { verifyArtifacts } from './scripts/artifacts.mjs';
 import { retiredExampleRedirects } from './src/lib/retired-examples.mjs';
 import { retiredGuideRedirects } from './src/lib/retired-guide-sections.mjs';
+import { retiredReferenceRedirects } from './src/lib/retired-reference-pages.mjs';
 import { verifyKoreanFonts } from './scripts/fonts.mjs';
 import { playgroundHostTypes } from './scripts/playground-host-types.mjs';
 
@@ -23,6 +24,7 @@ const root = fileURLToPath(new URL('.', import.meta.url));
 const retiredPaths = new Set([
   ...Object.keys(retiredExampleRedirects()),
   ...Object.keys(retiredGuideRedirects()),
+  ...Object.keys(retiredReferenceRedirects()),
 ]);
 
 // typeshade.dev: a static site built from the compiler vendored at vendor/shader-dsl. Every
@@ -35,7 +37,8 @@ export default defineConfig({
   // pages of the `fn()` registry examples redirect to their source twins, or to the examples
   // page where there is none (src/lib/retired-examples.mjs). A guide section the compiler's
   // AUTHORING.md removed redirects to the page that holds what it said
-  // (src/lib/retired-guide-sections.mjs).
+  // (src/lib/retired-guide-sections.mjs), and so does a reference page a pin removed
+  // (src/lib/retired-reference-pages.mjs).
   redirects: Object.fromEntries(
     Object.entries({
       '/motivation/': '/guide/introduction/',
@@ -44,6 +47,7 @@ export default defineConfig({
       '/guide/': '/guide/introduction/',
       ...retiredExampleRedirects(),
       ...retiredGuideRedirects(),
+      ...retiredReferenceRedirects(),
     }).flatMap(([from, to]) => [
       [from, to],
       [`/ko${from}`, `/ko${to}`],

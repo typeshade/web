@@ -25,11 +25,11 @@ const headings = [
   <h2 id="struct">{content.struct}</h2><p><Rich text={content.structP} locale={locale} /></p>
   <TypeShadeCode code={`class VsIn {\n  position: vec3\n  uv: vec2\n}`} />
   <h2 id="attrs">{content.attrs}</h2><p><Rich text={content.attrsP} locale={locale} /></p>
-  <TypeShadeCode code={`class VsOut {\n  position!: builtin<"position", vec4>\n  uv!: location<0, vec2>\n}`} />
+  <TypeShadeCode code={`class VsOut {\n  position: builtin<"position">\n  uv: location<0, vec2>\n}`} />
   <h2 id="boundary">{content.boundary}</h2><ul>{content.boundaryItems.map((item) => <li><Rich text={item} locale={locale} /></li>)}</ul>
   <h2 id="mapping">{content.mapping}</h2>
   <ConceptDoc locale={locale} rows={content.mappingRows.slice(1)} columns={content.mappingRows[0]} />
   <h2 id="example">{content.example}</h2><p>{content.exampleP}</p>
-  <TypeShadeCode code={`interface VsIn {\n  position: location<0, vec3>\n}\n\nexport const vs = vertex(function vs(vin: VsIn): vec4 {\n  return vec4(vin.position, 1)\n});`} />
+  <TypeShadeCode code={`interface VsIn {\n  position: location<0, vec3>\n}\n\n@vertex\nexport function vs(vin: VsIn): vec4 {\n  return vec4(vin.position, 1)\n}`} />
   <p><a href={localePath(locale, links.languageGpuTypes.href)}>{content.next}</a></p>
 </Docs>

@@ -31,12 +31,12 @@ const headings = [
 
   <h2 id="gpu">{content.gpuH}</h2>
   <p><Rich text={content.gpuP} locale={locale} /></p>
-  <TypeShadeCode code={'declare const camera: uniform<Camera>\ndeclare const pixels: storage<array<f32>, "read_write">\n\nexport const paint = compute([64, 1, 1], function paint(gid: builtin<"global_invocation_id", vec3u>) {\n  const i = gid.x\n  pixels[i] = pixels[i] + camera.pos.x\n});'} lang="ts" title="compute.ts" />
+  <TypeShadeCode code={'declare const camera: uniform<Camera>\ndeclare const pixels: storage<array<f32>, "read_write">\n\n@compute([64, 1, 1])\nexport function paint(gid: builtin<"global_invocation_id">) {\n  const i = gid.x\n  pixels[i] = pixels[i] + camera.pos.x\n}'} lang="ts" title="compute.ts" />
   <p><Rich text={content.gpuNote} locale={locale} /></p>
 
   <h2 id="functions">{content.functionH}</h2>
   <p>{content.functionP}</p>
-  <TypeShadeCode code={'function addBias(value: f32): f32 {\n  return value + 0.5\n}\n\nexport const paint = compute([64, 1, 1], function paint(gid: builtin<"global_invocation_id", vec3u>) {\n  pixels[gid.x] = addBias(camera.pos.x)\n});'} lang="ts" title="helper + entry" />
+  <TypeShadeCode code={'function addBias(value: f32): f32 {\n  return value + 0.5\n}\n\n@compute([64, 1, 1])\nexport function paint(gid: builtin<"global_invocation_id">) {\n  pixels[gid.x] = addBias(camera.pos.x)\n}'} lang="ts" title="helper + entry" />
   <p><Rich text={content.functionNote} locale={locale} /></p>
 
   <h2 id="resources">{content.resourceH}</h2>
@@ -46,11 +46,11 @@ const headings = [
 
   <h2 id="stages">{content.stageH}</h2>
   <p><Rich text={content.stageP} locale={locale} /></p>
-  <TypeShadeCode code={'export const vs = vertex(function vs(vid: builtin<"vertex_index", u32>): vec4 {\n  return positions[vid]\n});\n\nexport const fs = fragment(function fs(): vec4 {\n  return vec4(1, 0, 0, 1)\n});'} lang="ts" title="pipeline stages" />
+  <TypeShadeCode code={'@vertex\nexport function vs(vid: builtin<"vertex_index">): vec4 {\n  return positions[vid]\n}\n\n@fragment\nexport function fs(): vec4 {\n  return vec4(1, 0, 0, 1)\n}'} lang="ts" title="pipeline stages" />
 
   <h2 id="complete">{content.completeH}</h2>
   <p>{content.completeP}</p>
-  <TypeShadeCode code={'"use typeshade";\n\nclass Camera {\n  view!: mat4;\n  pos!: vec3;\n}\n\ndeclare const camera: uniform<Camera>;\ndeclare const pixels: storage<array<f32>, "read_write">;\n\nexport const paint = compute([64, 1, 1], function paint(gid: builtin<"global_invocation_id", vec3u>) {\n  const i = gid.x;\n  pixels[i] = pixels[i] + camera.pos.x;\n});'} lang="ts" title="paint.ts" />
+  <TypeShadeCode code={'"use typeshade";\n\nclass Camera {\n  view: mat4;\n  pos: vec3;\n}\n\ndeclare const camera: uniform<Camera>;\ndeclare const pixels: storage<array<f32>, "read_write">;\n\n@compute([64, 1, 1])\nexport function paint(gid: builtin<"global_invocation_id">) {\n  const i = gid.x;\n  pixels[i] = pixels[i] + camera.pos.x;\n}'} lang="ts" title="paint.ts" />
 
   <h2 id="typescript">{content.tsH}</h2>
   <ConceptDoc locale={locale} rows={content.tsRows} columns={['TypeScript', 'TypeShade']} />

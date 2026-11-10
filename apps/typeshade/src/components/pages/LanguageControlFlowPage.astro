@@ -32,7 +32,7 @@ const warnings = kernelLoopWarnings();
   <h2 id="ts">{content.ts}</h2><p><Rich text={content.tsP} locale={locale} /></p>
   <h2 id="branch">{content.branch}</h2><p><Rich text={content.branchIndexP} locale={locale} /></p>
   <h3 id="if"><Rich text={content.ifStatement} locale={locale} /></h3><p><Rich text={content.branchP} locale={locale} /></p>
-  <TypeShadeCode code={`export const paint = compute([64, 1, 1], function paint(gid: builtin<"global_invocation_id", vec3u>) {\n  if (camera.pos.x > 0) {\n    pixels[gid.x] = 1\n  } else {\n    pixels[gid.x] = 0\n  }\n});`} />
+  <TypeShadeCode code={`@compute([64, 1, 1])\nexport function paint(gid: builtin<"global_invocation_id">) {\n  if (camera.pos.x > 0) {\n    pixels[gid.x] = 1\n  } else {\n    pixels[gid.x] = 0\n  }\n}`} />
   <h3 id="conditional">{content.conditional}</h3><p><Rich text={content.conditionalP} locale={locale} /></p>
   <h3 id="costly-arm">{content.costlyArm}</h3><p><Rich text={content.costlyArmP} locale={locale} /></p>
   <h2 id="loop">{content.loop}</h2><p>{content.loopIndexP}</p>

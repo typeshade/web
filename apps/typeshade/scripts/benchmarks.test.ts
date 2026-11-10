@@ -494,13 +494,23 @@ test('a subgroup case is refused by a build that predates it, and skipped as uns
     'reduction-subgroup-levels',
   ]);
   expect(regressionCatalog.builds.every((b) => b.cases.length === 26)).toBe(true);
-  // Both builds of the comparison (cdb12dc0 and e30bbe57) carry compiler change 0117, so
-  // neither refuses the three programs that use the subgroup built-in functions, and each
-  // compiles all four into its own WGSL. A baseline that predates 0117 refuses exactly those
-  // three; the comparison of 8c088df and cdb12dc0 held that before this pin.
+  // The four subgroup-suite sources write a built-in value in the short form of the pin,
+  // `builtin<"global_invocation_id">` (compiler change 0135; the owner's decision of
+  // 2026-11-10). The baseline of this comparison, e30bbe57, predates that form and refuses all
+  // four with TS8002, the reference `atomics-bins-1-workgroup` among them. The candidate,
+  // 34cea187, compiles all four. A baseline that predates change 0117 refused the three
+  // programs that call the subgroup built-in functions; the comparison of 8c088df and
+  // cdb12dc0 held that.
   const refusedOn = (build: number) =>
     regressionCatalog.builds[build]!.cases.filter((c) => 'refused' in c).map((c) => c.id);
-  expect(refusedOn(0)).toEqual([]);
+  expect(refusedOn(0).sort()).toEqual([
+    'atomics-bins-1-subgroup',
+    'atomics-bins-1-workgroup',
+    'reduction-subgroup',
+    'reduction-subgroup-levels',
+  ]);
+  for (const c of regressionCatalog.builds[0]!.cases)
+    if ('refused' in c) expect(c.refused).toMatch(/^TS8002 .*builtin<\.\.\.>/);
   expect(refusedOn(1)).toEqual([]);
   for (const c of SUBGROUP_CASES) {
     const built = regressionCatalog.builds[1]!.cases.find((x) => x.id === c.id)!;
@@ -570,11 +580,14 @@ test('a subgroup case is refused by a build that predates it, and skipped as uns
   expect(() => parseAnyRecord(without)).toThrow();
   skip(without);
   expect(parseAnyRecord(without).status).toBe('complete');
-  // The reference pairing reads the subgroup cases against their references within a build,
-  // so a refusing baseline pairs only the case it compiled.
+  // The reference pairing reads the subgroup cases against their references within a build.
+  // This baseline refuses the reference `atomics-bins-1-workgroup` too, so it pairs nothing,
+  // and the candidate pairs the case whose rows the skip above left.
   const pairs = summarizeFixed([withFeature]).filter((g) => g.metric === 'wallMs');
   expect(pairs.every((g) => g.fixed === 'atomics-bins-1-workgroup')).toBe(true);
-  expect(pairs.map((g) => g.build).sort()).toEqual(['baseline', 'candidate']);
+  expect(pairs.map((g) => g.build).sort()).toEqual(
+    refusedOn(0).includes('atomics-bins-1-workgroup') ? ['candidate'] : ['baseline', 'candidate'],
+  );
   const full = summarizeFixed([pairedRecord()]).filter((g) => g.metric === 'wallMs');
   expect(full.filter((g) => g.build === 'baseline')).toHaveLength(4 - refusedOn(0).length);
   expect(full.filter((g) => g.build === 'candidate')).toHaveLength(4);
@@ -756,8 +769,9 @@ test('application references cover cold fields, insertion order and output corru
 test('paired ratios require a complete same-adapter run and expose sample spread', () => {
   const r = pairedRecord();
   const pairs = pairedResults(r);
-  // Both builds compile every case, the subgroup ones among them, so each case has a pair.
-  expect(pairs).toHaveLength(34);
+  // The baseline refuses the four subgroup-suite cases (see the subgroup test below), and a
+  // refused case has no pair: 34 cases, 30 pairs.
+  expect(pairs).toHaveLength(30);
   expect(pairs[0]!.wallRatio).toBe(2);
   expect(pairs[0]!.bufferRatio).toBe(2);
   expect(pairs[0]!.baselineWallP90).toBe(4);

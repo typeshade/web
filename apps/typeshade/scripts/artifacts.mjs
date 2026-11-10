@@ -103,7 +103,9 @@ export const SHADE_STILL_EXAMPLES = [
  *                    fullscreen triangle and binds no vertex buffer cannot fill */
 export const NO_STILL_REASONS = {
   'hello-vsin': 'vertex-buffer',
-  'hello-uniform': 'no-glsl',
+  // A bare uniform has a GLSL ES 3.00 form since compiler change 0127. The page still has no
+  // value for `scale`, so the reason is the uniform, not the missing GLSL.
+  'hello-uniform': 'uniform',
   'hello-camera': 'no-glsl',
   'textured-quad': 'texture',
   'compute-reduction-twin': 'no-glsl',

@@ -1,8 +1,8 @@
 ---
 id: layouts-and-resources
-source: a2502327fd48d4fc8505c7db3cb9f719b6e5d657f72d6abc0962541d90f5248f
-sourceLine: 990
-rules: 6.6 2moXxSw3cZPNxiaa9uRTWOFZn7M2pZk2ypG0F6f0ymk=, 12.3 CjhXTenX6H0V0STxt5Bka_Sp7X0GVUeCZR9Mt1IqNvA=
+source: b4e481dfaea9c0be71b0af545523d466201b2ff463d081fa9bfc1d8a14fecc53
+sourceLine: 1011
+rules: 12.3 mZMHlNERUgQ_m2Hydt__O52bQnqaaFcmeU98Dt1rBoc=
 ---
 
 버텍스, 유니폼, 스토리지, 텍스처 레이아웃은 각각 한 번 선언하며, 필드는 이 선언을 통해 읽습니다. 이 페이지는 선언 방법과 타깃별 리소스 표현을 설명합니다.
@@ -11,51 +11,52 @@ rules: 6.6 2moXxSw3cZPNxiaa9uRTWOFZn7M2pZk2ypG0F6f0ymk=, 12.3 CjhXTenX6H0V0STxt5
 
 ### IO 구조체
 
-IO 구조체는 스테이지 경계를 넘는 필드 묶음입니다. 버텍스 스테이지가 이 구조체를 돌려주고,
-프래그먼트 스테이지가 매개변수로 받습니다. IO 구조체는 `interface`, `class`, `type` 가운데
-무엇으로든 쓸 수 있으며, 모든 필드가 타입에 스테이지 속성을 담습니다. 초기화 식이 없는 `class`
-필드에는 일반 `tsc --strict`가 요구하는 대로 `!`를 붙입니다(`pos!: builtin<"position", vec4>`).
-`builtin<"id", T>`는 하드웨어가 주는 값을 선언하며, `"position"`이나 `"vertex_index"` 같은 WGSL
-내장 값 id를 받습니다. WGSL이 정의하지 않은 id는 오류입니다. `location<n, T>`는 번호 붙은 슬롯을
-선언하며, 세 번째 타입 인자로 `{ interpolate: "flat" }`, `{ interpolate: "linear" }`,
-`{ interpolate: "perspective" }`를 받을 수 있습니다. 이전 릴리스의 데코레이터를 붙인 클래스
-필드(`@location(0) uv: vec2`)는 마이그레이션 릴리스 다음 릴리스까지 계속 받아들입니다. 정수 필드는 따로
-적지 않아도 `flat`이 됩니다. 두 타깃 모두 정수 varying에 이를 요구하기 때문입니다. `"flat"`과
-`"perspective"`는 두 타깃이 모두 지원하는 모드입니다. `"linear"`는 GLSL ES 3.00에 대응하는 형태가
-없으므로, 이 모드를 쓰는 모듈에서는 GLSL이 나오지 않습니다.
+IO 구조체는 스테이지 경계를 넘는 필드 묶음입니다. 버텍스 스테이지가 이 구조체를 돌려주고, 프래그먼트 스테이지가
+매개변수로 받습니다. IO 구조체는 `interface`, `class`, `type` 가운데 무엇으로든 쓸 수 있습니다. `class` 필드에는
+초기화 식도 `!`도 필요하지 않습니다(`pos: builtin<"position">`). 그 필드는 필드를 만드는 스테이지가 채우기
+때문입니다. `builtin<"id">`는 하드웨어가 주는 값을 WGSL이 정한 타입으로 선언하며, `"position"`이나
+`"vertex_index"` 같은 WGSL 내장 값 id를 받습니다. WGSL이 정의하지 않은 id는 오류입니다. 그 밖의 필드는 사용자가
+정의한 값이며, 컴파일러가 적힌 순서대로 location을 정합니다. `location<n, T>`는 번호를 직접 적으며, 세 번째 타입
+인자로 `{ interpolate: "flat" }`, `{ interpolate: "linear" }`, `{ interpolate: "perspective" }`를 받을 수
+있습니다. 이전 릴리스의 데코레이터를 붙인 클래스 필드(`@location(0) uv: vec2`)는 마이그레이션 릴리스 다음
+릴리스까지 계속 받아들입니다. 정수 필드는 따로 적지 않아도 `flat`이 됩니다. 두 타깃 모두 정수 varying에 이를
+요구하기 때문입니다. `"flat"`과 `"perspective"`는 두 타깃이 모두 지원하는 모드입니다. `"linear"`는 GLSL ES
+3.00에 대응하는 형태가 없으므로, 이 모드를 쓰는 모듈에서는 GLSL이 나오지 않습니다.
 
 ```ts
 "use typeshade";
 
 interface VsIn {
-  xy: location<0, vec2>;
-  uv: location<1, vec2>;
+  xy: vec2; // @location(0)
+  uv: vec2; // @location(1)
 }
 
 interface VsOut {
-  pos: builtin<"position", vec4>;
-  uv: location<0, vec2>;
-  vis: location<1, f32>;
-  id: location<2, u32>; // an integer varying: flat on both targets
+  pos: builtin<"position">;
+  uv: vec2;
+  vis: f32;
+  id: u32; // an integer varying: flat on both targets
 }
 
 // A vertex entry returns the struct. The object literal takes the declared struct,
 // so a missing or extra field is an error.
-export const vsMain = vertex(function vsMain(v: VsIn, inst: builtin<"instance_index", u32>): VsOut {
+@vertex
+export function vsMain(v: VsIn, inst: builtin<"instance_index">): VsOut {
   const pos = vec4(v.xy, 0., 1.);
   return { pos: pos, uv: v.uv, vis: 1., id: inst };
-});
+}
 
 // Read fields off a parameter declared with the struct.
-export const fsMain = fragment(function fsMain(input: VsOut): vec4 {
+@fragment
+export function fsMain(input: VsOut): vec4 {
   if (input.vis < 0.) {
     discard;
   }
   return vec4(input.uv, f32(input.id), 1.);
-});
+}
 ```
 
-버텍스 진입점의 `location<n, T>` 입력은 버텍스 속성입니다. 따로 쓴 매개변수일 수도 있고, `VsIn` 같은
+버텍스 진입점에서 사용자가 정의한 입력은 버텍스 속성입니다. 따로 쓴 매개변수일 수도 있고, `VsIn` 같은
 구조체 매개변수의 필드일 수도 있습니다. `reflect()`는 이 입력의 버퍼 레이아웃을 알려 줍니다. 여러
 문장에 걸쳐 만드는 구조체 값은 구조체 타입의 `let`으로 선언하고 필드에 하나씩 대입합니다.
 
@@ -74,17 +75,18 @@ interface Uniforms {
 
 declare const u: uniform<Uniforms>;
 
-export const vs = vertex(function vs(pos: location<0, vec3>): vec4 {
+@vertex
+export function vs(pos: vec3): vec4 {
   const opacity = u.rasterParams.x;
   return u.mvp * vec4(pos, opacity);
-});
+}
 ```
 
 슬롯은 파일 안에서 선언이 놓인 자리로 정해집니다. `declare const`마다 그룹 0의 다음 바인딩을
 차지하고, `reflect()`가 이를 호스트에 알려 줍니다. 유니폼 버퍼는 읽기 전용이므로 `uniform<T>`는
 접근 모드를 받지 않습니다.
 
-WGSL에서는 유니폼에 스칼라나 벡터 하나만 담을 수도 있다(`declare const mode: uniform<u32>`).
+WGSL에서는 유니폼에 스칼라나 벡터 하나만 담을 수도 있습니다(`declare const mode: uniform<u32>`).
 GLSL ES 3.00은 유니폼 바인딩을 std140 블록으로 표현합니다. 그래서 WebGL2를 타깃으로 하는 모듈은
 값을 구조체에 넣어야 합니다. 스칼라 유니폼이 있으면 `compile()`은 WGSL을 유지하고 GLSL 쪽은
 `TS8015` 경고로 보고합니다. 모든 형태와 거부되는 경우는 인터페이스 참조 문서
@@ -98,14 +100,14 @@ GLSL ES 3.00은 유니폼 바인딩을 std140 블록으로 표현합니다. 그�
 "use typeshade";
 
 class ShapeSegment {
-  kind!: u32;
-  colorIdx!: u32;
-  flags!: u32;
-  pad!: u32;
-  p0!: vec2;
-  p1!: vec2;
-  p2!: vec2;
-  p3!: vec2;
+  kind: u32;
+  colorIdx: u32;
+  flags: u32;
+  pad: u32;
+  p0: vec2;
+  p1: vec2;
+  p2: vec2;
+  p3: vec2;
 }
 
 declare const segments: storage<array<ShapeSegment>>;
@@ -128,9 +130,10 @@ export function segmentLength(i: u32): f32 {
 declare const src: storage<array<f32>>;
 declare const dst: storage<array<f32>, "read_write">;
 
-export const twice = compute([64, 1, 1], function twice(gid: builtin<"global_invocation_id", vec3u>): void {
+@compute([64, 1, 1])
+export function twice(gid: builtin<"global_invocation_id">): void {
   dst[gid.x] = src[gid.x] * 2.0;
-});
+}
 ```
 
 두 선언은 소스 순서대로 그룹 0의 바인딩 0과 1에 `var<storage, read> src: array<f32>;`와
@@ -156,15 +159,23 @@ GLSL ES 3.00에는 스토리지 버퍼 객체가 없습니다. 읽기 바인딩�
 declare const tex: texture_2d<f32>;
 declare const texSampler: sampler;
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   const c = textureSample(tex, texSampler, uv); // fragment only
   const cv = textureSampleLevel(tex, texSampler, uv, 0.); // any stage
   const size = textureDimensions(tex); // vec2u, the extent in texels
   return c + cv * f32(size.x);
-});
+}
 ```
 
-`textureSample`은 화면 공간 미분값으로 밉 레벨을 정하므로 프래그먼트 전용입니다. 버텍스나 컴퓨트 진입점에서 도달하는 함수에 사용하면 해당 진입점 이름을 포함한 오류가 발생합니다. 모든 스테이지에서 명시적 레벨을 사용하려면 `textureSampleLevel(tex, smp, uv, level)`을 사용합니다. 미분 내장 함수 `fwidth`, `dpdx`, `dpdy`도 프래그먼트 전용이며 버텍스나 컴퓨트에서 사용할 수 없습니다. 필요한 값은 프래그먼트에서 미리 계산해 전달해야 합니다. GLSL ES 3.00에서는 텍스처와 샘플러가 `sampler2D` 하나로 결합되고 호출에서 샘플러 인자가 제거됩니다.
+`textureSample`은 화면 공간 미분값으로 밉 레벨을 정하므로 프래그먼트 전용입니다. 버텍스나 컴퓨트 진입점에서 도달하는 함수에 사용하면 해당 진입점 이름을 포함한 오류가 발생합니다. 모든 스테이지에서 명시적 레벨을 사용하려면 `textureSampleLevel(tex, smp, uv, level)`을 사용합니다. 미분 내장 함수 `fwidth`, `dpdx`, `dpdy`도 프래그먼트 전용이며 버텍스나 컴퓨트에서 사용할 수 없습니다. 필요한 값은 프래그먼트에서 미리 계산해 전달해야 합니다. GLSL ES 3.00에서는 텍스처와 샘플러가 `sampler2D` 하나로 결합되고 호출에서 샘플러 인자가 제거됩니다. 그래서 선택한 스테이지들에서
+텍스처 바인딩 하나는 샘플러 하나만 쓸 수 있습니다. GLSL 생성은 그 바인딩에 서로 다른 샘플러를 쓰면 거부하며, WGSL은
+그대로 쓸 수 있습니다. 이럴 때는 텍스처를 샘플러마다 한 번씩 두 번 선언하고, 두 선언에 같은 호스트 텍스처를
+바인딩합니다.
+
+WebGL2 런타임은 버텍스 진입점과 프래그먼트 진입점을 결합할 때 같은 조건을 검사합니다. 텍스처를 로드만 하는
+스테이지는 샘플러 상태를 요구하지 않으며, 다른 스테이지가 쓰는 샘플러를 그대로 씁니다. 깊이 비교는 선언한 비교
+샘플러를 유지합니다.
 
 ### 배열 텍스처와 정수 텍스처
 
@@ -189,7 +200,8 @@ declare const atlas: texture_2d_array<f32>;
 declare const atlasSampler: sampler;
 declare const ids: texture_2d<u32>;
 
-export const fs = fragment(function fs(p: builtin<"position", vec4>, uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(p: builtin<"position">, uv: location<0, vec2>): vec4 {
   const layer: i32 = 2;
   const a = textureSample(atlas, atlasSampler, uv, layer); // implicit LOD, fragment only
   const b = textureSampleLevel(atlas, atlasSampler, uv, layer, 0.); // explicit LOD, any stage
@@ -198,7 +210,7 @@ export const fs = fragment(function fs(p: builtin<"position", vec4>, uv: locatio
   const id = textureLoad(ids, vec2i(p.xy), 0); // vec4u
   const size = textureDimensions(ids); // vec2u, as for any other texture
   return a + b + c + vec4(f32(n), f32(id.x), f32(size.x), 1.);
-});
+}
 ```
 
 `reflect()`는 텍스처 바인딩마다 차원과 요소를 알려 줍니다. 호스트가 맞는 뷰를 만들고 샘플 타입을

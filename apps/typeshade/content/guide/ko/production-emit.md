@@ -1,7 +1,7 @@
 ---
 id: production-emit
-source: c9f32ca47314cbd272ba285c9dd2de272070848a8d410b73eaf3a643865c313d
-sourceLine: 2847
+source: 0caf3b93afac948342405b8c3a250496accaa8f1148e3f8fff2a26b8826babb6
+sourceLine: 2933
 ---
 
 이 페이지는 배포용 변환을 코드 생성 호출에 조합하고, 변경된 식별자가 포함된 드라이버 로그를 원래 이름으로 해석하는 방법을 설명합니다.
@@ -29,13 +29,15 @@ function terrainShade(uv: vec2): vec4 {
   return vec4(h, h * 0.5, 0.25, 1.) * u.tint;
 }
 
-export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): vec4 {
+@vertex
+export function vs(vi: builtin<"vertex_index">): vec4 {
   return vec4(f32(vi & 1) * 4. - 1., f32(vi >> 1) * 4. - 1., 0., 1.);
-});
+}
 
-export const fs = fragment(function fs(p: builtin<"position", vec4>): vec4 {
+@fragment
+export function fs(p: builtin<"position">): vec4 {
   return terrainShade(p.xy * 0.01);
-});
+}
 ```
 
 ### 플러그인 묶음
@@ -176,7 +178,7 @@ invertRenames(renames).get('b') // { emitted: 'b', authored: ['terrainShade'] }
 가드까지 포함해 호스트가 이름으로 찾습니다. 바인딩 구조체 이름은 그대로 GLSL 유니폼
 블록의 태그가 됩니다. 구조체 필드 이름은 std140 레이아웃 정보를 담고 있고, GLSL에서는
 varying이 이 이름으로 두 스테이지를 연결합니다. IR 빌더가 조립한 모듈에 raw 문(statement)이
-들어 있으면 모듈 전체의 이름을 바꾸지 않는다([`docs/ir-builder.md`](docs/ir-builder.md)).
+들어 있으면 모듈 전체의 이름을 바꾸지 않습니다([`docs/ir-builder.md`](docs/ir-builder.md)).
 
 ```ts
 const renames = new Map<string, string>()

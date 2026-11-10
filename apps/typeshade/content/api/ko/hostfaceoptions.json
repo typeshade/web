@@ -1,9 +1,10 @@
 {
   "slug": "hostfaceoptions",
-  "source": "4e4900aaf79f6dd0b7577222f1dd665c5b130e5a878452c6b53fc1d323a23f6f",
+  "source": "c5b70a38aef036127b90efa4e3adbb74bb94bacc98cf79d171f4641fe95735b9",
   "texts": {
     "summary": "hostFace를 부르는 방법입니다.",
     "members.fileName": "셰이더 모듈의 경로입니다. 진단에 실리고, 생성된 파일 안에도 적힙니다.",
+    "members.origin": "이 모듈의 퓨전 기록이 갖는 정확한 식별자입니다(변경 0122). 기본값은 `fileName`이며, 빈 문자열도 명시적인 식별자입니다. 퓨즈 스코프 하나를 함께 쓸 수 있는 서로 다른 모듈은 식별자가 달라야 합니다. 이 값은 소스 경로, 가져오기, 진단, 뷰를 바꾸지 않으며, `fuse: false`에서는 효과가 없습니다.",
     "members.runtime": "생성 모듈이 런타임을 가져올 지정자입니다. 기본값은 `typeshade/runtime/internal`이고, 테스트는 이를 소스 파일로 돌립니다. 번들러 없이 생성 모듈을 실행하는 도구(change 0062)는 번들러처럼 `typeshade/runtime/internal`을 패키지에 든 복사본에 대응시킵니다. 이 지정자는 생성 모듈이 가져오는 것이지, 호스트가 가져올 API가 아닙니다.",
     "members.console": "`'gpu'`이면 GPU 진입점이 도달하는 `console.*` 호출을 하나하나 `_console` 버퍼에 기록합니다(change 0014). 런타임은 디스패치나 그리기가 끝난 뒤 이 버퍼를 디코딩해 호스트의 콘솔에 냅니다. Vite 플러그인은 `vite dev`에서 이 값을 설정하며, 프로덕션 빌드는 아무것도 기록하지 않습니다.",
     "members.ir": "프로그램의 이식 가능한 IR을 매니페스트, 곧 기본 export에 넣습니다. 그러면 로드 시점의 생성기(`typeshade/emit`)가 이를 다시 생성할 수 있습니다(change 0025).",

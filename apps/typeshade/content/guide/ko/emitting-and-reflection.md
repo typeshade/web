@@ -1,8 +1,8 @@
 ---
 id: emitting-and-reflection
-source: cfdd793c5bd8cf46f17bc581608397f72efa7b09bf00d45ed6a68f0d591d2c9f
-sourceLine: 1231
-rules: 6.6 2moXxSw3cZPNxiaa9uRTWOFZn7M2pZk2ypG0F6f0ymk=, 12.3 CjhXTenX6H0V0STxt5Bka_Sp7X0GVUeCZR9Mt1IqNvA=
+source: 1ed416de644a9ed9eae9f0fda58ef937eced78608cd8143f74caa39ca6ebfeaf
+sourceLine: 1266
+rules: 12.3 mZMHlNERUgQ_m2Hydt__O52bQnqaaFcmeU98Dt1rBoc=
 ---
 
 이 페이지는 모듈을 WGSL, GLSL 스테이지 두 개, 호스트 프로그램에 결합할 모듈 조각(module fragment)으로 생성하는 방법을 설명합니다. 바인딩에 필요한 파이프라인 메타데이터를 읽는 방법도 다룹니다.
@@ -22,17 +22,19 @@ interface Uniforms {
 declare const u: uniform<Uniforms>;
 
 interface VsOut {
-  pos: builtin<"position", vec4>;
-  uv: location<0, vec2>;
+  pos: builtin<"position">;
+  uv: vec2;
 }
 
-export const vs = vertex(function vs(xy: location<0, vec2>): VsOut {
+@vertex
+export function vs(xy: vec2): VsOut {
   return { pos: vec4(xy, 0., 1.), uv: xy * 0.5 + 0.5 };
-});
+}
 
-export const fs = fragment(function fs(vo: VsOut): vec4 {
+@fragment
+export function fs(vo: VsOut): vec4 {
   return u.tint * (0.5 + 0.5 * sin(u.time + vo.uv.x));
-});
+}
 ```
 
 ### WGSL 생성
@@ -143,7 +145,7 @@ r.requires // host-provided globals the module references and does not declare
 
 `packModule(m)`은 같은 정보를 평범한 JSON 매니페스트 하나로 모읍니다. 프로그램의 WGSL, 바이트
 레이아웃이 붙은 바인딩, 진입점, WebGL2 프로그램이 여기에 들어갑니다. 빌드가 이 매니페스트를
-디스크에 쓰고, `typeshade/runtime`이 불러온다(`docs/use-typeshade-surface.md` §69).
+디스크에 쓰고, `typeshade/runtime`이 불러옵니다(`docs/use-typeshade-surface.md` §69).
 
 ### 리플렉션에서 바인딩하기
 

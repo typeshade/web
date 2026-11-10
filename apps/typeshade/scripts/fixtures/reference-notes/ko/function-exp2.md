@@ -1,7 +1,7 @@
 ---
 entry: function/exp2
 sources: what-it-computes 6f7e752f40d0, in-typeshade f4ea5b9147be
-rules: 12.7 Mvr2vY3Krl66Bglu9ejs51aqLb_3vraF1hO4FLdrK48=
+rules: 12.7 -5zmDylMuYrkLS3PqZL8I1PjjR-jIqAPGb3BPmfL-Lo=
 ---
 
 ## exp2가 계산하는 값 {#what-it-computes}

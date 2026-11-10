@@ -1,8 +1,8 @@
 ---
 id: control-flow
-source: df3ae3598c1f07170868aa77755907d2bb387da977f12a3ee99b465348fefc65
-sourceLine: 790
-rules: 7.5 4308LIgSysAnlue51NfkW0VyNcY9-VTAPwyWJ1UyQN4=
+source: 6a78856d24898fd1f7148220155ee461219a50e5137d6e6479d85d284bf00886
+sourceLine: 810
+rules: 7.5 cLEWqoooRxRDgmbSkzSguJp7MuC9UNqYilDmP6Kp_sY=
 ---
 
 제어 흐름은 셰이더 본문의 분기, 반복, 디스패치를 결정합니다. 문(statement)은 실행할 작업을 정하고, 표현식은 사용할 값을 정합니다. 모든 형태는 TypeScript 문법을 따르며, 대응하는 WGSL과 GLSL 문장으로 생성됩니다.
@@ -25,7 +25,7 @@ if (idx == 1) {
 
 ### for와 while
 
-`for`는 정수 카운터로 횟수를 정하는 반복문입니다. 카운터, 일정한 증감 폭, 카운터와 한계값을 비교하는 종료 조건으로 구성됩니다. 반복 본문에서 한계값을 변경해서는 안 됩니다. 한계값은 유니폼, 매개변수, 스토리지 배열의 `.length`처럼 실행 중에 정해지는 값일 수도 있습니다.
+`for`는 횟수를 세는 반복문입니다. 정수 카운터, 상수 증감, 그리고 본문이 쓰지 않는 한계값과 카운터를 비교하는 종료 조건으로 이루어집니다. 한계값은 유니폼, 매개변수, 스토리지 배열의 `.length`처럼 실행 중에 정해지는 값일 수도 있습니다.
 
 ```ts
 let acc = 0.;
@@ -59,7 +59,8 @@ while (n != 1) {
 
 declare const dists: storage<array<f32>>;
 
-export const fs = fragment(function fs(alpha: location<0, f32>, count: location<1, u32, { interpolate: "flat" }>): vec4 {
+@fragment
+export function fs(alpha: location<0, f32>, count: location<1, u32, { interpolate: "flat" }>): vec4 {
   let nearest = 1e10;
   for (let i: u32 = 0; i < count; i++) {
     const d = dists[i];
@@ -75,7 +76,7 @@ export const fs = fragment(function fs(alpha: location<0, f32>, count: location<
     discard;
   }
   return vec4(nearest, 0., 0., alpha);
-});
+}
 ```
 
 `discard`는 프래그먼트 진입점과 그 헬퍼에서 사용할 수 있습니다. 단, 버텍스나 컴퓨트 진입점에서 해당 헬퍼에 도달해서는 안 됩니다. 컴파일러는 호출 그래프 전체를 검사하며, 거부 시 헬퍼와 진입점 이름을 함께 보고합니다.
@@ -136,7 +137,7 @@ export function nearestOf(p: vec2, pts: array<vec2, 8>): f32 {
 
 이 호출은 반복문과 그 반복이 갱신하는 변수를 생성합니다. `let`과 `for`와 대입을 직접 쓴 것과
 같은 코드입니다. `map`, `forEach`, `some`, `every`도 쓸 수 있고, `map`을 뺀 나머지는 런타임
-크기 스토리지 배열에서도 동작한다(`docs/use-typeshade-surface.md` §63).
+크기 스토리지 배열에서도 동작합니다(`docs/use-typeshade-surface.md` §63).
 
 ### enum으로 디스패치하기
 

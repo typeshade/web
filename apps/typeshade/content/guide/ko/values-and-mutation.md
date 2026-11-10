@@ -1,8 +1,8 @@
 ---
 id: values-and-mutation
-source: 63837ea1158192758c9c0b43aef48d2eb506f9136a75e78334305adb6751a9dc
-sourceLine: 343
-rules: 11.12 30yuoBdpwkfDlJLbGKIzbnlOXHnKqWPpqDe7V6UDujU=, 6.2 X1TddP_Ob7b4QaR9Qbuoo1UgPCngNA5JdtbbWwd_lOc=, 6.10 suiaQZS1y-SaWxDmJXHL21Qzp_yYkddUlpCNV8AsLVc=, 8.13 aNXyjNJvi1bR7zPmCgF2WJ0PmaP_Qk6WWqXOOuEbzCg=, 8.14 SP-Fa9DtpBru_e2Zuh3x8ZUFrqweaTrNrJs-c8RHbE0=, 8.17 iy_UhoCMHYdgpfUXu8eRAllyZo67mQ2c6BRfQtMcIYY=, 7.6 GMsX5wNgIEXEAZ7s8jNra2oroSJknOZi_ucTQ2GzOgQ=, 8.25 YA_aCQVarZYOhnVQ93ZZ3Z2VnLmSKkB70xDcX8W9rZM=, 12.7 Mvr2vY3Krl66Bglu9ejs51aqLb_3vraF1hO4FLdrK48=, 2.3 r7XKZw0j-Hb5AH5VaQM8ueWwC512ZArtkVGU0ccfsOE=, 4.8 ZaXqxS6SImuhTEXg74x7e6A4X5QWcoGarvtV45ZRA4I=, 5.3 AlhLu-cJSNgGl-ltXEFlhL7eWs5_USuUdEImJEf0Eb4=, 5.4 RphTFmChXNrzoLVIpKED02ndV41w4BSuuRjq3nTUtVM=, 6.3 HrFOiH7tAJqEuKnDGy0ONc5jMJLadIKmvRR6CZc2FK8=, 7.1 slGgWLh0LvX-AtHwWav2IAGdVekgx7fNu2sYqitl4Kk=, 7.4 Emky1db0T6Mhf0H1_VyxRD8Ub8JLKEB_0DqK59uhD-M=, 7.5 4308LIgSysAnlue51NfkW0VyNcY9-VTAPwyWJ1UyQN4=, 7.10 3lGjzZUWGw-ZKwJftj0FW4dk59DA_93RfSYdpPpXAkA=, 8.18 WSJEXSLWucW9-ovejXz9e-mLa7u8vqZrdwezeNyrr7M=, 8.19 2D92Uur_1PtJq4PAX_vx-kOcr0i4SbSGiaNJkCSbJ_g=, 12.6 kuInDVEKCI_Qu_9zVLzT--W8UeBj0WgdX22sRWA_VNY=, 2.1 nwiyGBq4biNPSwuqSRZQ0n2m5uoSNXdsq3yUaVZj5sQ=, 4.1 nBREyZ8OMiZOapVAwVoV3KZvTGWXeAjHPhZPgZ0B9H8=, 4.6 RwdafG75jJiCMgm6Du1X3zVcPigfJdPEwfy6iWlDksU=, 7.8 fyWaTaGHHUsBo-fTN-eap0uAUPB1U1v3TNqAC_1wgPU=, 12.4 BHZ-Neq9i9zSLzX_EHLkq_rZA6ansI2EDMVOVFuqdZk=
+source: deab88e392d20678b6282ef222b21903a34b083cd5e2f4eb275bad31b9811602
+sourceLine: 347
+rules: 11.12 30yuoBdpwkfDlJLbGKIzbnlOXHnKqWPpqDe7V6UDujU=, 6.2 X1TddP_Ob7b4QaR9Qbuoo1UgPCngNA5JdtbbWwd_lOc=, 6.10 suiaQZS1y-SaWxDmJXHL21Qzp_yYkddUlpCNV8AsLVc=, 8.13 aNXyjNJvi1bR7zPmCgF2WJ0PmaP_Qk6WWqXOOuEbzCg=, 8.14 Qsap1yjcH8voJJw_UuZLvp26Aj4mstB4D7DwGjiZ5b8=, 8.17 iy_UhoCMHYdgpfUXu8eRAllyZo67mQ2c6BRfQtMcIYY=, 7.6 FTjvSTHfC8VfTIRf8NWVqMQuJ4A5FFDQH0GYUlHYblE=, 8.25 rh2UwYiwaHUbPvP_w6lEH6ujxXtDYRpOaPm5GRz_tMU=, 12.7 -5zmDylMuYrkLS3PqZL8I1PjjR-jIqAPGb3BPmfL-Lo=, 2.3 r7XKZw0j-Hb5AH5VaQM8ueWwC512ZArtkVGU0ccfsOE=, 4.8 U-IIp8hfReQAO5uTDreriVZ6GkXNPjAxEfAyOHmWZYQ=, 5.3 AlhLu-cJSNgGl-ltXEFlhL7eWs5_USuUdEImJEf0Eb4=, 5.4 CXAu-Ujhd7W62nl4dCyRPmt9q7s9DNjXq9eQAYUckmU=, 6.3 KVrVRGgR56I6ZJQ18UBF77Om3yEEuFapjQdWG2Feli4=, 7.1 slGgWLh0LvX-AtHwWav2IAGdVekgx7fNu2sYqitl4Kk=, 7.4 Emky1db0T6Mhf0H1_VyxRD8Ub8JLKEB_0DqK59uhD-M=, 7.5 cLEWqoooRxRDgmbSkzSguJp7MuC9UNqYilDmP6Kp_sY=, 7.10 3lGjzZUWGw-ZKwJftj0FW4dk59DA_93RfSYdpPpXAkA=, 8.18 WSJEXSLWucW9-ovejXz9e-mLa7u8vqZrdwezeNyrr7M=, 8.19 pJUFX4A2OPnBtNTJ7r9DlF-4oAMi1uUQ_QD4POumUOM=, 12.6 cxZ3W1P8f61AZD9IU4OoWoeyAczeH2kn2TZslZ5WPus=, 2.1 ofdVxTODabYFXXK-lv0TvbyfVUV1b6DLZLioGpTvVcE=, 4.1 nBREyZ8OMiZOapVAwVoV3KZvTGWXeAjHPhZPgZ0B9H8=, 4.6 RwdafG75jJiCMgm6Du1X3zVcPigfJdPEwfy6iWlDksU=, 7.8 fyWaTaGHHUsBo-fTN-eap0uAUPB1U1v3TNqAC_1wgPU=, 12.4 99AhDPXpsQcYpjcTJ5e1hSIRxOP9RNn_Wv64Gf8rqWI=, 6.6 v9R6bYC4u9FE8PK38m5uVaVvXQHjyaWMpH1XGuB7AWA=
 ---
 
 이 페이지는 중간값의 선언, 타입 표기, 값의 변경, 상수와 변수의 차이를 설명합니다.
@@ -34,7 +34,7 @@ export function scale(v: vec2, k: f32): vec2 {
 오라클도 같은 값을 계산합니다. 부동소수점 원본은 정수 타입으로 갈 때 포화되고, `i32`/`u32`는
 비트열을 바꾸지 않고 부호만 다르게 해석합니다. 모든 타깃에서 그렇습니다. GLSL ES 3.00은 범위를
 벗어난 원본의 결과를 정의하지 않습니다. 그래서 GLSL 생성기는 이 변환을 WGSL처럼 포화시키는
-`_f2i`와 `_f2u`로 적는다(규칙 11.12).
+`_f2i`와 `_f2u`로 적습니다(규칙 11.12).
 
 ### 평범한 const 바인딩
 
@@ -193,3 +193,9 @@ export function tint(i: i32): vec4 {
 이들에 대한 수학 내장 함수(`const K: f32 = sin(1.)`)가 상수입니다. 함수 안에서 읽는 상수는
 편집기가 찾아 주는 이름입니다. 그래서 이름을 바꾸거나 잘못 쓴 상수는 쓰인 자리마다 오류로
 나타납니다.
+
+스칼라 `f64` 상수도 쓸 수 있습니다. `const TAU: f64 = 2 * Math.PI`는 CPU용으로는 double로, GPU용으로는 리터럴
+쌍으로 접힙니다. 허용되는 내장 함수 호출도 컴파일 시점에 접힙니다. 직접 쓴 `f32` 변환과 `f32` 연산은 반올림 경계를
+그대로 유지합니다. 앞서 선언한 `f32` 상수는 컴파일 시점에 기록된 값을 `f32`로 반올림해 제공하며, 이 값은 GPU에
+남는 내장 함수 식의 값과 같지 않을 수 있습니다. 정밀도 규칙과 유한한 쌍의 범위 제한은
+`docs/use-typeshade-surface.md`의 12절에 있습니다.

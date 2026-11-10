@@ -2,7 +2,8 @@
 // module's host face (change 0062), so it type-checks against the module the reader holds.
 //
 //   - A module with a full-screen `@fragment` entry gets `animate(canvas)`, which draws that
-//     entry into the canvas once a frame.
+//     entry into the canvas once a frame. An entry with no binding is called `fs(canvas)`, with
+//     no empty bindings object (compiler change 0125).
 //   - A module with a `@compute` entry gets `run()`, which dispatches it once and logs the
 //     bindings it wrote.
 //   - An image kernel taking a sampled image, an RGBA8 storage texture, width and height gets
@@ -172,7 +173,7 @@ import { ${name} } from '${from}';
 /** Draw \`${name}\` into the canvas once a frame. */
 export function animate(canvas: HTMLCanvasElement): void {
   const frame = (ms: number): void => {
-${/\btime\b/.test(bindings) ? '    const time = ms / 1000;\n' : ''}    void ${name}(canvas, ${bindings});
+${/\btime\b/.test(bindings) ? '    const time = ms / 1000;\n' : ''}    void ${name}(${bindings === '{}' ? 'canvas' : `canvas, ${bindings}`});
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);

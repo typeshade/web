@@ -72,7 +72,7 @@ try {
         );
       }
       // A real mistake must be visible, then disappear after the source is repaired.
-      const bad = `"use typeshade";\nfunction gain(value: f32 | null | undefined): f32 { return value * 2.; }\nexport const main = fragment(function main(uv: location<0, vec2>): vec4 { return vec4(uv, gain(null), 1.); });`;
+      const bad = `"use typeshade";\nfunction gain(value: f32 | null | undefined): f32 { return value * 2.; }\n@fragment\nexport function main(uv: location<0, vec2>): vec4 { return vec4(uv, gain(null), 1.); }`;
       await page.evaluate((text) => window.monaco.editor.getModels()[0].setValue(text), bad);
       await page.waitForFunction(() =>
         /TS8003/.test(document.querySelector('[data-diagnostics]')?.textContent ?? ''),

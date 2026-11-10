@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 
 // A real language-worker round trip verifies the boundary between the reader's
 // fragment file and the compiler's inserted vertex prelude. The sources are written in the
-// entry form of compiler change 0111 (stage calls and attribute types): the decorated form
-// draws a TS8028 warning marker, and the check waits for a file with no marker.
+// entry form of compiler change 0130 (a stage attribute on the function declaration): the
+// stage call of change 0111 draws a TS8028 error marker, and the check waits for a file with
+// no marker. The attribute stays on the declaration's line, so the stripe is line 9.
 export async function checkEditorCoordinates(page) {
   const source = `"use typeshade"
 
@@ -12,10 +13,10 @@ interface Color {
 }
 
 // Eight stripes across the canvas.
-export const fs = fragment(function fs(uv: location<0, vec2>): Color {
+@fragment export function fs(uv: location<0, vec2>): Color {
   const stripe = fract(uv.x * 8.);
   return { color: vec4(stripe, uv.y, 1. - stripe, 1.) };
-});
+}
 `;
   await page.evaluate(
     (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
@@ -218,9 +219,10 @@ export const fs = fragment(function fs(uv: location<0, vec2>): Color {
     (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
     `"use typeshade"
 
-export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
+@fragment
+export function main(p: builtin<"position">): vec4 {
   return vec4(fract(p.x / 32.), 0.5, 0.5, 1.);
-});
+}
 `,
   );
   await page.waitForFunction(
@@ -240,16 +242,18 @@ export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
     (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
     `"use typeshade"
 
-export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): vec4 {
+@vertex
+export function vs(vi: builtin<"vertex_index">): vec4 {
   const xs: array<f32, 3> = [-0.5, 0.5, 0.];
   const ys: array<f32, 3> = [-0.5, -0.5, 0.5];
   const i = i32(vi);
   return vec4(xs[i], ys[i], 0., 1.);
-});
+}
 
-export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
+@fragment
+export function main(p: builtin<"position">): vec4 {
   return vec4(fract(p.x / 32.), 0.5, 0.5, 1.);
-});
+}
 `,
   );
   await page.waitForFunction(

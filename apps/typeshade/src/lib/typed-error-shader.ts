@@ -9,15 +9,16 @@ export const typedErrorFile = 'typed-error.shade.ts';
 export const typedErrorSource = `"use typeshade"
 
 class Uniforms {
-  time!: f32
-  top!: vec4
-  bottom!: vec4
+  time: f32
+  top: vec4
+  bottom: vec4
 }
 
 declare const u: uniform<Uniforms>
 
-export const main = fragment(function main(uv: location<0, vec2>): vec4 {
+@fragment
+export function main(uv: location<0, vec2>): vec4 {
   const t = uv.y + u.time * 0.05
   return vec4(mix(u.bottom.rgb, u.top.rgb, t), 1.0)
-});
+}
 `;

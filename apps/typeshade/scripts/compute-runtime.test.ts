@@ -166,7 +166,7 @@ function manifest(body: string, console = false) {
 
 test('compute runtime binds by name, forwards overrides and preserves storage readback', async () => {
   const pack = manifest(
-    'const scale: override<u32> = 1; declare const values: storage<array<u32>, "read_write">; const main = compute([1], function main(id: builtin<"global_invocation_id", vec3u>): void { values[id.x] = scale; });',
+    'const scale: override<u32> = 1; declare const values: storage<array<u32>, "read_write">; @compute([1])\n function main(id: builtin<"global_invocation_id">): void { values[id.x] = scale; }',
   );
   const result = await runComputeOnGpu({
     manifest: pack,
@@ -193,7 +193,7 @@ test('compute runtime binds by name, forwards overrides and preserves storage re
 });
 
 test('runtime refuses an unknown override before any dispatch', async () => {
-  const pack = manifest('const main = compute([1], function main(): void {});');
+  const pack = manifest('@compute([1])\nfunction main(): void {}');
   const count = workgroups.length;
   await expect(
     runComputeOnGpu({
@@ -208,10 +208,7 @@ test('runtime refuses an unknown override before any dispatch', async () => {
 });
 
 test('submit returns console overflow counts without a manual console resource', async () => {
-  const pack = manifest(
-    'const main = compute([1], function main(): void { console.log("hello"); });',
-    true,
-  );
+  const pack = manifest('@compute([1])\nfunction main(): void { console.log("hello"); }', true);
   dropped = 7;
   try {
     const result = await runComputeOnGpu({
@@ -234,7 +231,7 @@ test('submit returns console overflow counts without a manual console resource',
 
 test('storage texture readback removes padded rows and releases resources', async () => {
   const pack = manifest(
-    'declare const image: texture_storage_2d<"rgba8unorm", "write">; const main = compute([1], function main(): void { textureStore(image, vec2i(0, 0), vec4f(1.0)); });',
+    'declare const image: texture_storage_2d<"rgba8unorm", "write">; @compute([1])\n function main(): void { textureStore(image, vec2i(0, 0), vec4f(1.0)); }',
   );
   const result = await runComputeOnGpu({
     manifest: pack,
@@ -261,7 +258,7 @@ test('storage texture readback removes padded rows and releases resources', asyn
 });
 
 test('pipeline failures propagate before dispatch and leave the shared device alive', async () => {
-  const pack = manifest('const main = compute([1], function main(): void {});');
+  const pack = manifest('@compute([1])\nfunction main(): void {}');
   rejectPipeline = true;
   try {
     await expect(
@@ -274,7 +271,7 @@ test('pipeline failures propagate before dispatch and leave the shared device al
 
 test('readback failure releases both host and runtime allocations', async () => {
   const pack = manifest(
-    'declare const values: storage<array<u32>, "read_write">; const main = compute([1], function main(): void { values[0] = 1; });',
+    'declare const values: storage<array<u32>, "read_write">; @compute([1])\n function main(): void { values[0] = 1; }',
   );
   rejectReadback = true;
   try {

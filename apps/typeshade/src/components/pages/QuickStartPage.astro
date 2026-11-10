@@ -9,6 +9,7 @@ import InstallCommand from '../InstallCommand.astro';
 import Rich from '../Rich.astro';
 import { copyFor, localePath, type Locale } from '../../i18n/index.ts';
 import { hero, quickStartFile } from '../../lib/examples.ts';
+import { compile } from '../../../vendor/shader-dsl/src/index.ts';
 import { useTypeshadeSample } from '../../lib/use-typeshade-sample.ts';
 import { editCopy, links } from '../../lib/links.ts';
 import { slugify } from '../../lib/slug.ts';
@@ -23,7 +24,7 @@ const host = t.quickStart.host;
 const heading = (depth: number) => (h: string) => ({ depth, slug: slugify(h), text: h });
 const headings = [
   ...[q.installH, q.live.h, host.boundaryH, host.hostH].map(heading(2)),
-  ...[host.compileH, host.importH].map(heading(3)),
+  ...[host.compileH, host.importH, host.resourcesH].map(heading(3)),
   ...[q.status.h, host.nextLearnH].map(heading(2)),
 ];
 const p0 = q.p0 ?? host.p0;
@@ -37,19 +38,20 @@ const stripes = `"use typeshade"
 const TAU: f32 = 6.2831853
 
 class Uniforms {
-  time!: f32
-  bands!: f32
-  low!: vec3
-  high!: vec3
+  time: f32
+  bands: f32
+  low: vec3
+  high: vec3
 }
 
 declare const u: uniform<Uniforms>
 
-export const main = fragment(function main(uv: location<0, vec2>): vec4 {
+@fragment
+export function main(uv: location<0, vec2>): vec4 {
   const phase = (uv.x * u.bands + u.time) * TAU
   const wave = sin(phase) * 0.5 + 0.5
   return vec4(mix(u.low, u.high, wave), 1.)
-});
+}
 `;
 
 // The import setup and a host file that draws the sample above. Code, so it stays here too.
@@ -74,7 +76,51 @@ const packageJson = `{
 const appTs = `import { fs } from './hello.shade.ts';
 
 const canvas = document.querySelector('canvas')!;
-fs(canvas, {});`;
+fs(canvas);`;
+
+// Host resources (compiler change 0138, milestone 1). The shader file is compiled here against
+// the pin, so a pin that refuses it stops the build. The host file was run against the module
+// the pinned compiler generates for scene.shade.ts.
+const sceneShade = `"use typeshade";
+
+export class Camera {
+  pos: vec3 = vec3(0.);
+  time: f32 = 0.;
+}
+
+export class Particle {
+  pos: vec3 = vec3(0.);
+  life: f32 = 0.;
+}
+
+export declare const camera: uniform<Camera>;
+export declare const particles: storage<array<Particle>, "read_write">;
+
+@compute([64])
+export function age(id: builtin<"global_invocation_id">) {
+  if (id.x < particles.length) {
+    particles[id.x].life = particles[id.x].life + camera.time;
+  }
+}
+`;
+const sceneErrors = compile(sceneShade, { fileName: 'scene.shade.ts' }).diagnostics.filter((d) => d.category === 'error');
+if (sceneErrors.length > 0) throw new Error(`[quick-start] scene.shade.ts no longer compiles at the pin: ${sceneErrors.map((d) => `${d.code} ${d.message}`).join('; ')}`);
+const sceneHost = `import { uniform, zeros, array } from 'typeshade/runtime';
+import { Camera, Particle, camera, particles } from './scene.shade.ts';
+
+// An exported binding is a resource the module makes once.
+camera.pos.set(0, 2, 5);
+camera.set({ time: 0.5 });
+particles.resize(4); // scene.shade.ts states no size, so the host sets the length
+particles.at(0).life.set(1);
+
+// Resources of the host's own, typed by the exported classes.
+const eye = uniform(Camera, { time: 1 });
+const ps = zeros(Particle, 2);
+ps.at(1).pos.set(0, 1, 0);
+const seeded = array(Particle, [{ life: 1 }, { life: 2 }]);
+
+console.log(camera.pos.get(), camera.time.get(), particles.length);`;
 ---
 
 <Docs locale={locale} path={links.quickStart.href} title={q.title} description={q.description} headings={headings} editHref={editCopy(locale, 'quickStart')}>
@@ -167,6 +213,15 @@ const pipeline = device.createComputePipeline({
     <CodeFrame label={host.devLabel}>
       <Code code="npm run dev" lang="bash" locale={locale} />
     </CodeFrame>
+    <h3 id={slugify(host.resourcesH)}>{host.resourcesH}</h3>
+    <p><Rich text={host.resourcesP} locale={locale} /></p>
+    <CodeFrame label={host.resourcesShaderLabel}>
+      <Code code={sceneShade} lang="ts" title="scene.shade.ts" locale={locale} />
+    </CodeFrame>
+    <CodeFrame label={host.resourcesHostLabel}>
+      <Code code={sceneHost} lang="ts" title="scene.ts" locale={locale} />
+    </CodeFrame>
+    <p><Rich text={host.resourcesNoteP} locale={locale} /></p>
     <p><Rich text={host.untilP} locale={locale} /></p>
   </section>
   <section>

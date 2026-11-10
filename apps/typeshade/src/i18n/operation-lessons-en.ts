@@ -351,46 +351,6 @@ export const operationLessons = {
       'Every invocation of the workgroup must reach the barrier in uniform control flow. It is not a device-wide barrier. These compiler calls are compute-only and WebGPU-only.',
   },
   // The stage calls of compiler change 0111, and the numerical contract of change 0107.
-  vertex: {
-    meaning:
-      'vertex(f) makes f the entry point of the vertex stage. The GPU calls it once per vertex of a draw.',
-    use: 'Use it for the function that places each vertex in clip space and passes values on to the fragment stage.',
-    try: 'Compare the three vertices of one triangle. Each call reads its own vertex index and returns its own position.',
-    caution:
-      'Write it as a top-level export const whose name the function expression repeats. A vertex entry must produce a position: a vec4 return, or a struct field typed builtin<"position", vec4>.',
-  },
-  fragment: {
-    meaning:
-      'fragment(f) makes f the entry point of the fragment stage. The GPU calls it once per covered pixel sample.',
-    use: 'Use it for the function that computes the colour of each pixel from the values the vertex stage interpolated.',
-    try: 'Compare three pixels of one triangle. Each call reads the interpolated uv of its own pixel and returns its own colour.',
-    caution:
-      'Write it as a top-level export const. A bare return goes to location 0, the first colour attachment; a struct return takes one location<n, T> field per attachment.',
-  },
-  compute: {
-    meaning:
-      'compute([x, y?, z?], f) makes f a compute entry point and gives its workgroup size, one to three extents.',
-    use: 'Use it for general GPU work over buffers and textures, outside any draw.',
-    try: 'Compare three invocations of one dispatch. Each reads its own global_invocation_id and writes its own element.',
-    caution:
-      'The size comes first and the function second. The host chooses how many workgroups a dispatch runs; the size says how many invocations each one holds.',
-  },
-  workgroup_size: {
-    meaning:
-      'workgroup_size([n], f) sets the workgroup size the loops of the kernel function f run in on WebGPU.',
-    use: 'Use it when the loops of a kernel function should run in workgroups of another size than the default of 64.',
-    try: 'Compare a loop under the default, under 128 and a loop that reduces. The reducing loop runs at 256 whatever is written.',
-    caution:
-      'It takes one extent, and only a kernel function takes it. A kernel function with a loop that reduces refuses it (TS8077).',
-  },
-  numerics: {
-    meaning:
-      'numerics(classes, f) opts the function f into floating-point rewrites that the default optimizer refuses.',
-    use: 'Use it for a function whose operands you know are finite, so x * 0 may fold to 0 and the arithmetic may be reordered.',
-    try: 'Compare the same expression with no contract, under finite-math and under reassociate. The CPU oracle keeps the exact meaning in every case.',
-    caution:
-      'A rewrite applies only inside the function that opted in. An unknown class, or the call written anywhere but around a function of the file, is TS8078.',
-  },
   storageBarrier: {
     meaning:
       'A barrier waits for the invocations of one workgroup and orders their accesses to storage memory.',
@@ -834,6 +794,44 @@ export const operationLessons = {
       'Read-write access must be explicit. The declaration allocates nothing; the host supplies the buffer. Shared writes need ownership, atomics, or suitable synchronization.',
   },
 } satisfies Record<string, FunctionLesson>;
+
+/** The lessons of the stage attributes and of the kernel workgroup size, shown on their
+ *  attribute pages. They taught the stage calls of compiler change 0111 until change 0130 made
+ *  the stage an attribute on the function declaration. */
+export const attributeLessons: Readonly<Record<string, FunctionLesson>> = {
+  vertex: {
+    meaning:
+      '@vertex makes the function it marks the entry point of the vertex stage. The GPU calls it once per vertex of a draw.',
+    use: 'Use it for the function that places each vertex in clip space and passes values on to the fragment stage.',
+    try: 'Compare the three vertices of one triangle. Each call reads its own vertex index and returns its own position.',
+    caution:
+      'Write it before a top-level function declaration; the entry takes the name of the declaration. A vertex entry must produce a position: a vec4 return, or a struct field typed builtin<"position">.',
+  },
+  fragment: {
+    meaning:
+      '@fragment makes the function it marks the entry point of the fragment stage. The GPU calls it once per covered pixel sample.',
+    use: 'Use it for the function that computes the colour of each pixel from the values the vertex stage interpolated.',
+    try: 'Compare three pixels of one triangle. Each call reads the interpolated uv of its own pixel and returns its own colour.',
+    caution:
+      'Write it before a top-level function declaration. A bare return goes to location 0, the first colour attachment; a struct return takes one field per attachment, numbered in the order written.',
+  },
+  compute: {
+    meaning:
+      '@compute([x, y?, z?]) makes the function it marks a compute entry point and gives its workgroup size, one to three extents.',
+    use: 'Use it for general GPU work over buffers and textures, outside any draw.',
+    try: 'Compare three invocations of one dispatch. Each reads its own global_invocation_id and writes its own element.',
+    caution:
+      'The size is the argument of the attribute, and a bare @compute takes 64. The host chooses how many workgroups a dispatch runs; the size says how many invocations each one holds.',
+  },
+  workgroup_size: {
+    meaning:
+      '@workgroup_size([n]) states the workgroup size the loops of the kernel function it marks run in on WebGPU.',
+    use: 'Use it when the loops of a kernel function should run in workgroups of another size than the default of 64.',
+    try: 'Compare a loop under the default, under 128 and a loop that reduces. The reducing loop runs at 256 whatever is written.',
+    caution:
+      'It takes one extent, and only a kernel function takes it. A kernel function with a loop that reduces refuses it (TS8077).',
+  },
+};
 
 export function constructorLesson(name: string): FunctionLesson | undefined {
   const matrix = /^mat([234])(?:x([234]))?f?$/.exec(name);

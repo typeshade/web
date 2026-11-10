@@ -21,6 +21,11 @@ class Args { n!: u32; }
 declare const args: uniform<Args>;
 declare const src: storage<array<u32>>;
 `;
+// The sources write the stage as an attribute (compiler change 0130) and a built-in value in
+// its short form, `builtin<"global_invocation_id">` (change 0135), which the pin reads with no
+// warning. The regression catalog compiles every case at two builds, the pin and the pin before
+// it. At this pin the baseline is e30bbe57, which refuses the short form (TS8002), so the catalog
+// records the four cases as refused on the baseline (the owner's decision, 2026-11-10).
 const subgroupCase = (
   id: string,
   suite: Experiment['suite'],
@@ -48,13 +53,14 @@ const subgroupCase = (
 const reductionSubgroup = `${HEAD}declare const out: storage<array<u32>, "read_write">;
 
 let tile: workgroup<array<u32, 64>>;
-export const main = compute([64], function main(
-  gid: builtin<"global_invocation_id", vec3u>,
-  lid: builtin<"local_invocation_id", vec3u>,
-  wid: builtin<"workgroup_id", vec3u>,
-  sgi: builtin<"subgroup_invocation_id", u32>,
-  sgid: builtin<"subgroup_id", u32>,
-  nsg: builtin<"num_subgroups", u32>,
+@compute([64])
+export function main(
+  gid: builtin<"global_invocation_id">,
+  lid: builtin<"local_invocation_id">,
+  wid: builtin<"workgroup_id">,
+  sgi: builtin<"subgroup_invocation_id">,
+  sgid: builtin<"subgroup_id">,
+  nsg: builtin<"num_subgroups">,
 ): void {
   const v = subgroupAdd(src[gid.x]);
   if (sgi === 0) { tile[sgid] = v; }
@@ -64,7 +70,7 @@ export const main = compute([64], function main(
     for (let j: u32 = 0; j < nsg; j++) { s += tile[j]; }
     out[wid.x] = s;
   }
-});
+}
 `;
 /** A second `subgroupAdd` level over the partials. It is right only where a subgroup's lanes
  *  are consecutive `local_invocation_index` values, which the device probe reports; a device
@@ -72,14 +78,15 @@ export const main = compute([64], function main(
 const reductionSubgroupLevels = `${HEAD}declare const out: storage<array<u32>, "read_write">;
 
 let tile: workgroup<array<u32, 64>>;
-export const main = compute([64], function main(
-  gid: builtin<"global_invocation_id", vec3u>,
-  lid: builtin<"local_invocation_id", vec3u>,
-  wid: builtin<"workgroup_id", vec3u>,
-  sgi: builtin<"subgroup_invocation_id", u32>,
-  sgs: builtin<"subgroup_size", u32>,
-  sgid: builtin<"subgroup_id", u32>,
-  nsg: builtin<"num_subgroups", u32>,
+@compute([64])
+export function main(
+  gid: builtin<"global_invocation_id">,
+  lid: builtin<"local_invocation_id">,
+  wid: builtin<"workgroup_id">,
+  sgi: builtin<"subgroup_invocation_id">,
+  sgs: builtin<"subgroup_size">,
+  sgid: builtin<"subgroup_id">,
+  nsg: builtin<"num_subgroups">,
 ): void {
   const v = subgroupAdd(src[gid.x]);
   if (sgi === 0) { tile[sgid] = v; }
@@ -96,28 +103,30 @@ export const main = compute([64], function main(
     for (let j: u32 = 0; j < m; j++) { s += tile[j]; }
     out[wid.x] = s;
   }
-});
+}
 `;
 /** A subgroup fold, then one `atomicAdd` per subgroup into the one bin: the pre-reduction the
  *  compiler could emit before an atomic accumulation. */
 const atomicsSubgroup = `${HEAD}declare const out: storage<array<atomic<u32>>, "read_write">;
 
-export const main = compute([64], function main(gid: builtin<"global_invocation_id", vec3u>): void {
+@compute([64])
+export function main(gid: builtin<"global_invocation_id">): void {
   const i = gid.x;
   let x: u32 = 0;
   if (i < args.n) { x = src[i]; }
   const v = subgroupAdd(x);
   if (subgroupElect()) { atomicAdd(out[0], v); }
-});
+}
 `;
 /** The workgroup tree, then one `atomicAdd` per workgroup: the same pre-reduction with no
  *  extension, which any device runs. */
 const atomicsWorkgroup = `${HEAD}declare const out: storage<array<atomic<u32>>, "read_write">;
 
 let tile: workgroup<array<u32, 64>>;
-export const main = compute([64], function main(
-  gid: builtin<"global_invocation_id", vec3u>,
-  lid: builtin<"local_invocation_id", vec3u>,
+@compute([64])
+export function main(
+  gid: builtin<"global_invocation_id">,
+  lid: builtin<"local_invocation_id">,
 ): void {
   const i = gid.x;
   let x: u32 = 0;
@@ -129,7 +138,7 @@ export const main = compute([64], function main(
     workgroupBarrier();
   }
   if (lid.x === 0) { atomicAdd(out[0], tile[0]); }
-});
+}
 `;
 export const SUBGROUP_CASES: SubgroupCase[] = [
   subgroupCase('reduction-subgroup', 'reduction', 'reduce', 'subgroup', reductionSubgroup, [

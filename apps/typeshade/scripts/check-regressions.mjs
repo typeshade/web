@@ -47,12 +47,18 @@ export async function checkRegressions(page, url) {
   writeFileSync('shots/benchmarks/unified-quick.json', JSON.stringify(quick, null, 2));
   assert.equal(quick.status, 'complete', JSON.stringify(quick.results.at(-1)));
   assert.equal(quick.results.length, 68);
-  // The baseline build refuses the three cases that call the subgroup built-in functions:
-  // their rows say so and measure nothing.
+  // The baseline build e30bbe57 refuses the four subgroup-suite cases, whose sources write
+  // `builtin<N>` in the short form of compiler change 0135: their rows say so and measure
+  // nothing.
   const refusedRow = (r) =>
     r.build === 'baseline' &&
-    ['reduction-subgroup', 'reduction-subgroup-levels', 'atomics-bins-1-subgroup'].includes(r.id);
-  assert.equal(quick.results.filter(refusedRow).length, 3);
+    [
+      'reduction-subgroup',
+      'reduction-subgroup-levels',
+      'atomics-bins-1-subgroup',
+      'atomics-bins-1-workgroup',
+    ].includes(r.id);
+  assert.equal(quick.results.filter(refusedRow).length, 4);
   assert(
     quick.results.every((r) =>
       refusedRow(r)
