@@ -488,7 +488,12 @@ id first, then the pull request that did the work.
   under 0042), and the site's own renderer stays. Handled in #52.
 - 0140: the stage calls are refused at once. The `TS8028` example is a refused stage call with
   the attribute as its fix. The work is the work of 0130. Handled in #52.
-- 0042: the compiler's libm, first slice: `sin` and `cos` on the CPU. The WebGPU and WebGL2 page
-  says (en and ko) that the CPU tier and the CPU oracle compute the two with the compiler's own
-  routines, under 1 ULP and not correctly rounded, and that every other function still uses the
-  engine's `Math`. The WebAssembly tier is not implemented, so no page names it. Handled in #52.
+- 0042: the compiler's libm. Pin `34cea187`: `sin` and `cos` on the CPU; the WebGPU and WebGL2
+  page gained its paragraph (en and ko). Handled in #52. Pin `50234ad6`: twelve of the nineteen
+  functions are the libm's (`sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `atan2`, `exp`, `exp2`,
+  `log`, `log2`, `ldexp`). The paragraph names them and says what Amendments A1 to A3 and the
+  changelog state: the same results on Node and Bun, an error under 1 ULP on every operand
+  measured (samples, no proof), `ldexp` correctly rounded, no monotonic promise, and a GPU's
+  functions remain the driver's. Open: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh` and
+  `pow` still use the engine's `Math`; the WebAssembly tier is not implemented, so no page names
+  it. Handled in #55.

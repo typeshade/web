@@ -47,18 +47,12 @@ export async function checkRegressions(page, url) {
   writeFileSync('shots/benchmarks/unified-quick.json', JSON.stringify(quick, null, 2));
   assert.equal(quick.status, 'complete', JSON.stringify(quick.results.at(-1)));
   assert.equal(quick.results.length, 68);
-  // The baseline build e30bbe57 refuses the four subgroup-suite cases, whose sources write
-  // `builtin<N>` in the short form of compiler change 0135: their rows say so and measure
-  // nothing.
-  const refusedRow = (r) =>
-    r.build === 'baseline' &&
-    [
-      'reduction-subgroup',
-      'reduction-subgroup-levels',
-      'atomics-bins-1-subgroup',
-      'atomics-bins-1-workgroup',
-    ].includes(r.id);
-  assert.equal(quick.results.filter(refusedRow).length, 4);
+  // A row of a case that a build's compiler refused says so and measures nothing. At this pin
+  // both builds (34cea187 and 50234ad6) compile every case, so no row is refused. Name the
+  // cases here when a baseline refuses some again.
+  const refusedIds = [];
+  const refusedRow = (r) => r.build === 'baseline' && refusedIds.includes(r.id);
+  assert.equal(quick.results.filter(refusedRow).length, refusedIds.length);
   assert(
     quick.results.every((r) =>
       refusedRow(r)

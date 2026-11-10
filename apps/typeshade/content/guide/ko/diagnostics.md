@@ -5,9 +5,9 @@ sourceLine: 1969
 rules: 12.2 i81jajIqKPFQCmZ8J1MOkejuMSPX2dkEGKTlWS3-yBQ=, 12.4 99AhDPXpsQcYpjcTJ5e1hSIRxOP9RNn_Wv64Gf8rqWI=, 6.2 X1TddP_Ob7b4QaR9Qbuoo1UgPCngNA5JdtbbWwd_lOc=, 6.10 suiaQZS1y-SaWxDmJXHL21Qzp_yYkddUlpCNV8AsLVc=, 8.13 aNXyjNJvi1bR7zPmCgF2WJ0PmaP_Qk6WWqXOOuEbzCg=, 8.14 Qsap1yjcH8voJJw_UuZLvp26Aj4mstB4D7DwGjiZ5b8=, 8.17 iy_UhoCMHYdgpfUXu8eRAllyZo67mQ2c6BRfQtMcIYY=, 12.3 mZMHlNERUgQ_m2Hydt__O52bQnqaaFcmeU98Dt1rBoc=
 ---
 
-진단은 컴파일 오류와 경고, 모듈 검사 결과를 전달합니다. 이 페이지는 진단 코드에 따른 분기, 전체 진단 보고서, 소스 위치 추적을 설명합니다.
+이 페이지를 읽으면 진단을 읽고, 진단에 담긴 코드로 자신의 코드를 분기하고, 모듈의 모든 실패를 보고서 하나로 받고, 오류가 나온 줄을 찾을 수 있습니다.
 
-진단은 프로그램에서 발견한 문제를 나타냅니다. 고정된 코드, 오류와 경고를 구별하는 심각도, 메시지, 소스 위치를 포함합니다. 호스트에 전달하는 방식은 두 종류입니다. `compile()`은 소스 문제를 `TS8` 코드의 진단 목록으로 보고하며 오류를 던지지 않습니다. 코드 생성 함수, `reflect`, 오라클 등 모듈을 읽는 함수는 요청한 작업을 수행할 수 없으면 `SD` 코드의 `TypeShadeError`를 던집니다.
+진단은 프로그램 하나에서 찾은 문제 하나입니다. 고정된 코드, 오류와 경고를 구별하는 심각도, 메시지, 소스 위치를 포함합니다. 호스트에 닿는 진단은 두 종류입니다. `compile()`은 소스 문제를 `TS8` 코드의 진단 목록으로 보고하며 오류를 던지지 않습니다. 코드 생성 함수, `reflect`, 오라클 등 모듈을 읽는 함수는 요청한 작업을 수행할 수 없으면 `SD` 코드의 `TypeShadeError`를 던집니다.
 
 ### 코드가 붙은 오류
 
@@ -32,7 +32,7 @@ for (const d of diagnostics) {
 rim.shade.ts:5:3 TS8005 Cannot assign to "edge" — it is declared with const.
 ```
 
-호스트 호출의 코드가 붙은 오류는 모두 `TypeShadeError`입니다. 고정된 카탈로그의 `code`와 세부 내용을 조합한 `message`를 포함합니다. 카탈로그에 해결 방법이 있으면 `hint`도 포함합니다. `ValidationError`와 `UnsupportedFeatureError`는 하위 클래스이므로, `instanceof TypeShadeError`로 이 오류들을 함께 처리할 수 있습니다.
+호스트 호출의 코드가 붙은 오류는 모두 `TypeShadeError`입니다. 고정된 카탈로그의 `code`와 세부 내용을 조합한 `message`를 포함합니다. 카탈로그에 해결 방법이 있으면 `hint`도 포함합니다. `ValidationError`와 `UnsupportedFeatureError`는 하위 클래스이므로, `instanceof TypeShadeError` 핸들러 하나가 코드가 붙은 실패를 모두 잡습니다.
 
 ```ts
 import { TypeShadeError, emitGlslModule } from 'typeshade'
@@ -56,7 +56,7 @@ glsl-es300: @interpolate("linear") has no GLSL ES 3.00 form — that spec has sm
 
 ### 코드로 분기하기
 
-진단에 따른 분기에는 메시지 대신 코드를 사용합니다. `TS8` 번호는 바뀌지 않으며(규칙 12.2), `SD` 카탈로그에는 코드가 추가되기만 합니다. 이 안정성을 기준으로 분기를 구성하고, 사용자에게는 메시지를 표시합니다.
+진단의 두 부분 가운데 직접 작성하는 코드가 기준으로 삼을 부분은 진단 코드입니다. `TS8` 코드는 번호가 바뀌지 않으며(규칙 12.2), `SD` 코드는 추가만 되는 카탈로그에서 오므로, 코드로 쓴 분기는 계속 동작합니다. 분기는 코드로 하고, 메시지는 작성자에게 보여 줍니다.
 
 ```ts
 const errors = compile(source).diagnostics.filter((d) => d.category === 'error')
@@ -67,11 +67,11 @@ if (errors.some((d) => d.code === 'TS8005')) {
 
 ### 모든 실패를 한 번에
 
-`compile()`은 한 번의 호출로 소스의 모든 진단을 수집합니다. 실수가 세 개이면 진단도 세 개이며, 실수 하나는 진단 하나로 보고한다(규칙 12.4). 거부된 선언을 참조하는 곳마다 같은 오류를 반복하지 않습니다. `category`는 셰이더 텍스트 생성을 막는 `error`와 개선 방법이나 지원하지 않는 타깃을 알리는 `warning`을 구별합니다.
+`compile()`은 한 번의 호출로 소스의 모든 진단을 수집합니다. 실수가 세 개이면 진단도 세 개이며, 실수 하나는 진단 하나로 나타납니다(규칙 12.4). 거부된 선언을 참조하는 곳마다 같은 오류를 반복하지 않습니다. `category`는 셰이더 텍스트 생성을 막는 `error`와 개선 방법이나 지원하지 않는 타깃을 알리는 `warning`을 구별합니다.
 
 `compile()` 뒤에 바꾼 모듈이나 엔진이 조립한 모듈은 `validate(m)`이 검사합니다. 이 함수는 생성
 시점의 규칙을 모듈에 적용합니다. 함수나 구조체 이름이 겹치지 않아야 하고, 바인딩이 충돌하지 않아야
-하며, 값을 돌려주는 함수는 모든 경로에서 반환해야 하고, 호출 지점은 부르는 선언과 맞아야 합니다.
+하며, 값을 반환하는 함수는 모든 경로에서 반환해야 하고, 호출 지점은 부르는 선언과 맞아야 합니다.
 `emitModule`과 GLSL 생성기가 먼저 실행하는 것도 이 검사입니다. 그래서 규칙을 어긴 모듈은
 `createShaderModule`에서 드라이버 메시지로 실패하지 않고, 생성을 호출하는 자리에서 코드 붙은
 오류로 실패합니다. `validate`는 오류를 모두 모은 다음에 던지며, `ValidationError`의
@@ -98,7 +98,7 @@ typeshade [SD0020]: module validation failed (1 error):
 
 ### diagnose 보고서
 
-`typeshade/dev` 하위 경로의 `diagnose(m)`은 모듈의 문제를 보고서로 반환합니다. 린트 규칙을 실행하고, 백엔드를 지정하면 기능 검사도 수행합니다. 보고서는 전체 진단과 개수 요약을 포함합니다. 오류를 던지거나 모듈을 변경하지 않으므로 코드 생성 전에 호출할 수 있습니다. `formatReport`는 보고서를 텍스트로 변환합니다. `lintModule(m)`은 같은 린트 규칙을 실행하지만 요약과 기능 검사 없이 진단 배열만 반환합니다.
+`typeshade/dev` 하위 경로의 `diagnose(m)`은 모듈의 문제를 보고서로 반환합니다. 린트 규칙을 실행하고, 백엔드를 지정하면 기능 검사도 수행합니다. 보고서는 전체 진단과 개수 요약을 포함합니다. 오류를 던지지도 모듈을 변경하지도 않으므로, 곧 생성할 모듈에 호출해도 문제가 없습니다. `formatReport`는 보고서를 텍스트로 변환합니다. `lintModule(m)`은 같은 린트 규칙을 실행하지만 요약과 기능 검사 없이 진단 배열만 반환합니다.
 
 ```ts
 import { compile, wgslBackend } from 'typeshade'
@@ -126,7 +126,7 @@ error[SD0030] unsupported-capability
 
 ### 소스 위치
 
-`compile()`의 모든 진단에는 소스 위치가 포함됩니다. 가져온 파일에서 발생한 진단에는 해당 파일 이름이 표시됩니다. 별도 설정은 필요하지 않습니다.
+위 예제에서 보듯, `compile()`의 모든 진단에는 소스 위치가 포함됩니다. 가져온 파일에서 발생한 진단에는 해당 파일 이름이 표시됩니다. 별도 설정은 필요하지 않습니다.
 
 모듈도 위치를 간직합니다. 컴파일러가 만드는 문장마다 원래 소스의 구간이 붙어 있으며,
 `sourceSpanOf(stmt)`로 읽습니다. 파일, 오프셋, 시작과 끝의 줄과 문자 위치가 들어 있습니다.
