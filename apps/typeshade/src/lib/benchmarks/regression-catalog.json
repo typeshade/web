@@ -1,9 +1,9 @@
 {
   "bundler": "bun@1.4.3",
-  "measurement": "dd827ae9624ac60121ce40bb7ed25015d229b28bb2bdc75dc620c325d5b9a5d5",
+  "measurement": "aa99004ced51e9029cf05cf67628415a600c8c04d16a27b2601912faeba475b1",
   "workloadRevision": "applications-5",
   "instrument": "unified-4",
-  "workload": "b31b148bd674b6985167b9bd77e5fbb498909b58da4c5c9dd4a23d1374da6cef",
+  "workload": "2e08c5caf7102eaedf6c3167b3ea4290409581741de37f19650eff2c2cd413c3",
   "applications": [
     "image",
     "particles",
@@ -466,15 +466,9 @@
           "factor": 1,
           "dispatches": 1,
           "separate": false,
-          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\", vec3u>,\n  lid: builtin<\"local_invocation_id\", vec3u>,\n  wid: builtin<\"workgroup_id\", vec3u>,\n  sgi: builtin<\"subgroup_invocation_id\", u32>,\n  sgid: builtin<\"subgroup_id\", u32>,\n  nsg: builtin<\"num_subgroups\", u32>,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    for (let j: u32 = 0; j < nsg; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n}\n",
+          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\">,\n  lid: builtin<\"local_invocation_id\">,\n  wid: builtin<\"workgroup_id\">,\n  sgi: builtin<\"subgroup_invocation_id\">,\n  sgid: builtin<\"subgroup_id\">,\n  nsg: builtin<\"num_subgroups\">,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    for (let j: u32 = 0; j < nsg; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n}\n",
           "features": ["subgroups"],
-          "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>, @builtin(workgroup_id) wid: vec3<u32>, @builtin(subgroup_invocation_id) sgi: u32, @builtin(subgroup_id) sgid: u32, @builtin(num_subgroups) nsg: u32) {\n  let v = subgroupAdd(src[gid.x]);\n  if ((sgi == 0u)) {\n    tile[sgid] = v;\n  }\n  workgroupBarrier();\n  if ((lid.x == 0u)) {\n    var s: u32 = 0u;\n    for (var j: u32 = 0u; (j < nsg); j = j + 1u) {\n      s += tile[j];\n    }\n    out[wid.x] = s;\n  }\n}\n",
-          "shader": "afbb8ce9ed83146f4f9f9ec4d4b962526e1819a3bc006d09b9cf6f57681907ad",
-          "bindings": [
-            { "name": "args", "binding": 0, "group": 0 },
-            { "name": "src", "binding": 1, "group": 0 },
-            { "name": "out", "binding": 2, "group": 0 }
-          ]
+          "refused": "TS8002 Type arguments are not supported yet (got \"builtin<...>\")."
         },
         {
           "id": "reduction-subgroup-levels",
@@ -487,15 +481,9 @@
           "factor": 1,
           "dispatches": 1,
           "separate": false,
-          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\", vec3u>,\n  lid: builtin<\"local_invocation_id\", vec3u>,\n  wid: builtin<\"workgroup_id\", vec3u>,\n  sgi: builtin<\"subgroup_invocation_id\", u32>,\n  sgs: builtin<\"subgroup_size\", u32>,\n  sgid: builtin<\"subgroup_id\", u32>,\n  nsg: builtin<\"num_subgroups\", u32>,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  let y: u32 = 0;\n  if (lid.x < nsg) { y = tile[lid.x]; }\n  const w = subgroupAdd(y);\n  workgroupBarrier();\n  if (sgi === 0) { tile[sgid] = w; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    const m = (nsg + sgs - 1) / sgs;\n    for (let j: u32 = 0; j < m; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n}\n",
+          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\">,\n  lid: builtin<\"local_invocation_id\">,\n  wid: builtin<\"workgroup_id\">,\n  sgi: builtin<\"subgroup_invocation_id\">,\n  sgs: builtin<\"subgroup_size\">,\n  sgid: builtin<\"subgroup_id\">,\n  nsg: builtin<\"num_subgroups\">,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  let y: u32 = 0;\n  if (lid.x < nsg) { y = tile[lid.x]; }\n  const w = subgroupAdd(y);\n  workgroupBarrier();\n  if (sgi === 0) { tile[sgid] = w; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    const m = (nsg + sgs - 1) / sgs;\n    for (let j: u32 = 0; j < m; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n}\n",
           "features": ["subgroups"],
-          "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>, @builtin(workgroup_id) wid: vec3<u32>, @builtin(subgroup_invocation_id) sgi: u32, @builtin(subgroup_size) sgs: u32, @builtin(subgroup_id) sgid: u32, @builtin(num_subgroups) nsg: u32) {\n  let v = subgroupAdd(src[gid.x]);\n  if ((sgi == 0u)) {\n    tile[sgid] = v;\n  }\n  workgroupBarrier();\n  var y: u32 = 0u;\n  if ((lid.x < nsg)) {\n    y = tile[lid.x];\n  }\n  let w = subgroupAdd(y);\n  workgroupBarrier();\n  if ((sgi == 0u)) {\n    tile[sgid] = w;\n  }\n  workgroupBarrier();\n  if ((lid.x == 0u)) {\n    var s: u32 = 0u;\n    let m = (nsg + sgs - 1u) / sgs;\n    for (var j: u32 = 0u; (j < m); j = j + 1u) {\n      s += tile[j];\n    }\n    out[wid.x] = s;\n  }\n}\n",
-          "shader": "2bf49f5a7cef580522ead9f5d930f174c12f8c670625389966d6308ae2b408ec",
-          "bindings": [
-            { "name": "args", "binding": 0, "group": 0 },
-            { "name": "src", "binding": 1, "group": 0 },
-            { "name": "out", "binding": 2, "group": 0 }
-          ]
+          "refused": "TS8002 Type arguments are not supported yet (got \"builtin<...>\")."
         },
         {
           "id": "atomics-bins-1-subgroup",
@@ -508,15 +496,9 @@
           "factor": 1,
           "dispatches": 1,
           "separate": false,
-          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\n@compute([64])\nexport function main(gid: builtin<\"global_invocation_id\", vec3u>): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  const v = subgroupAdd(x);\n  if (subgroupElect()) { atomicAdd(out[0], v); }\n}\n",
+          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\n@compute([64])\nexport function main(gid: builtin<\"global_invocation_id\">): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  const v = subgroupAdd(x);\n  if (subgroupElect()) { atomicAdd(out[0], v); }\n}\n",
           "features": ["subgroups"],
-          "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<atomic<u32>>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  var x: u32 = 0u;\n  if ((i < args.n)) {\n    x = src[i];\n  }\n  let v = subgroupAdd(x);\n  if (subgroupElect()) {\n    _ = atomicAdd(&out[0], v);\n  }\n}\n",
-          "shader": "e1a481e22af7864a2ee94b49523324dabf3d471dfc688744574a963c63a315b3",
-          "bindings": [
-            { "name": "args", "binding": 0, "group": 0 },
-            { "name": "src", "binding": 1, "group": 0 },
-            { "name": "out", "binding": 2, "group": 0 }
-          ]
+          "refused": "TS8002 Type arguments are not supported yet (got \"builtin<...>\")."
         },
         {
           "id": "atomics-bins-1-workgroup",
@@ -529,15 +511,9 @@
           "factor": 1,
           "dispatches": 1,
           "separate": false,
-          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\", vec3u>,\n  lid: builtin<\"local_invocation_id\", vec3u>,\n): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  tile[lid.x] = x;\n  workgroupBarrier();\n  for (let stride: u32 = 32; stride > 0; stride /= 2) {\n    if (lid.x < stride) { tile[lid.x] += tile[lid.x + stride]; }\n    workgroupBarrier();\n  }\n  if (lid.x === 0) { atomicAdd(out[0], tile[0]); }\n}\n",
+          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\">,\n  lid: builtin<\"local_invocation_id\">,\n): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  tile[lid.x] = x;\n  workgroupBarrier();\n  for (let stride: u32 = 32; stride > 0; stride /= 2) {\n    if (lid.x < stride) { tile[lid.x] += tile[lid.x + stride]; }\n    workgroupBarrier();\n  }\n  if (lid.x === 0) { atomicAdd(out[0], tile[0]); }\n}\n",
           "features": [],
-          "wgsl": "struct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<atomic<u32>>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>) {\n  let i = gid.x;\n  var x: u32 = 0u;\n  if ((i < args.n)) {\n    x = src[i];\n  }\n  tile[lid.x] = x;\n  workgroupBarrier();\n  for (var stride: u32 = 32u; (stride > 0u); stride /= 2u) {\n    if ((lid.x < stride)) {\n      tile[lid.x] += tile[lid.x + stride];\n    }\n    workgroupBarrier();\n  }\n  if ((lid.x == 0u)) {\n    _ = atomicAdd(&out[0], tile[0]);\n  }\n}\n",
-          "shader": "53a05db8ddf6de351eee4c00a824d33ab4a98e04cbfd5297706d627e27f318ff",
-          "bindings": [
-            { "name": "args", "binding": 0, "group": 0 },
-            { "name": "src", "binding": 1, "group": 0 },
-            { "name": "out", "binding": 2, "group": 0 }
-          ]
+          "refused": "TS8002 Type arguments are not supported yet (got \"builtin<...>\")."
         }
       ]
     },
@@ -992,7 +968,7 @@
           "factor": 1,
           "dispatches": 1,
           "separate": false,
-          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\", vec3u>,\n  lid: builtin<\"local_invocation_id\", vec3u>,\n  wid: builtin<\"workgroup_id\", vec3u>,\n  sgi: builtin<\"subgroup_invocation_id\", u32>,\n  sgid: builtin<\"subgroup_id\", u32>,\n  nsg: builtin<\"num_subgroups\", u32>,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    for (let j: u32 = 0; j < nsg; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n}\n",
+          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\">,\n  lid: builtin<\"local_invocation_id\">,\n  wid: builtin<\"workgroup_id\">,\n  sgi: builtin<\"subgroup_invocation_id\">,\n  sgid: builtin<\"subgroup_id\">,\n  nsg: builtin<\"num_subgroups\">,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    for (let j: u32 = 0; j < nsg; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n}\n",
           "features": ["subgroups"],
           "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>, @builtin(workgroup_id) wid: vec3<u32>, @builtin(subgroup_invocation_id) sgi: u32, @builtin(subgroup_id) sgid: u32, @builtin(num_subgroups) nsg: u32) {\n  let v = subgroupAdd(src[gid.x]);\n  if ((sgi == 0u)) {\n    tile[sgid] = v;\n  }\n  workgroupBarrier();\n  if ((lid.x == 0u)) {\n    var s: u32 = 0u;\n    for (var j: u32 = 0u; (j < nsg); j = j + 1u) {\n      s += tile[j];\n    }\n    out[wid.x] = s;\n  }\n}\n",
           "shader": "afbb8ce9ed83146f4f9f9ec4d4b962526e1819a3bc006d09b9cf6f57681907ad",
@@ -1013,7 +989,7 @@
           "factor": 1,
           "dispatches": 1,
           "separate": false,
-          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\", vec3u>,\n  lid: builtin<\"local_invocation_id\", vec3u>,\n  wid: builtin<\"workgroup_id\", vec3u>,\n  sgi: builtin<\"subgroup_invocation_id\", u32>,\n  sgs: builtin<\"subgroup_size\", u32>,\n  sgid: builtin<\"subgroup_id\", u32>,\n  nsg: builtin<\"num_subgroups\", u32>,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  let y: u32 = 0;\n  if (lid.x < nsg) { y = tile[lid.x]; }\n  const w = subgroupAdd(y);\n  workgroupBarrier();\n  if (sgi === 0) { tile[sgid] = w; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    const m = (nsg + sgs - 1) / sgs;\n    for (let j: u32 = 0; j < m; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n}\n",
+          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<u32>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\">,\n  lid: builtin<\"local_invocation_id\">,\n  wid: builtin<\"workgroup_id\">,\n  sgi: builtin<\"subgroup_invocation_id\">,\n  sgs: builtin<\"subgroup_size\">,\n  sgid: builtin<\"subgroup_id\">,\n  nsg: builtin<\"num_subgroups\">,\n): void {\n  const v = subgroupAdd(src[gid.x]);\n  if (sgi === 0) { tile[sgid] = v; }\n  workgroupBarrier();\n  let y: u32 = 0;\n  if (lid.x < nsg) { y = tile[lid.x]; }\n  const w = subgroupAdd(y);\n  workgroupBarrier();\n  if (sgi === 0) { tile[sgid] = w; }\n  workgroupBarrier();\n  if (lid.x === 0) {\n    let s: u32 = 0;\n    const m = (nsg + sgs - 1) / sgs;\n    for (let j: u32 = 0; j < m; j++) { s += tile[j]; }\n    out[wid.x] = s;\n  }\n}\n",
           "features": ["subgroups"],
           "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<u32>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>, @builtin(workgroup_id) wid: vec3<u32>, @builtin(subgroup_invocation_id) sgi: u32, @builtin(subgroup_size) sgs: u32, @builtin(subgroup_id) sgid: u32, @builtin(num_subgroups) nsg: u32) {\n  let v = subgroupAdd(src[gid.x]);\n  if ((sgi == 0u)) {\n    tile[sgid] = v;\n  }\n  workgroupBarrier();\n  var y: u32 = 0u;\n  if ((lid.x < nsg)) {\n    y = tile[lid.x];\n  }\n  let w = subgroupAdd(y);\n  workgroupBarrier();\n  if ((sgi == 0u)) {\n    tile[sgid] = w;\n  }\n  workgroupBarrier();\n  if ((lid.x == 0u)) {\n    var s: u32 = 0u;\n    let m = (nsg + sgs - 1u) / sgs;\n    for (var j: u32 = 0u; (j < m); j = j + 1u) {\n      s += tile[j];\n    }\n    out[wid.x] = s;\n  }\n}\n",
           "shader": "2bf49f5a7cef580522ead9f5d930f174c12f8c670625389966d6308ae2b408ec",
@@ -1034,7 +1010,7 @@
           "factor": 1,
           "dispatches": 1,
           "separate": false,
-          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\n@compute([64])\nexport function main(gid: builtin<\"global_invocation_id\", vec3u>): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  const v = subgroupAdd(x);\n  if (subgroupElect()) { atomicAdd(out[0], v); }\n}\n",
+          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\n@compute([64])\nexport function main(gid: builtin<\"global_invocation_id\">): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  const v = subgroupAdd(x);\n  if (subgroupElect()) { atomicAdd(out[0], v); }\n}\n",
           "features": ["subgroups"],
           "wgsl": "enable subgroups;\n\nstruct Args {\n  n: u32,\n}\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<atomic<u32>>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>) {\n  let i = gid.x;\n  var x: u32 = 0u;\n  if ((i < args.n)) {\n    x = src[i];\n  }\n  let v = subgroupAdd(x);\n  if (subgroupElect()) {\n    _ = atomicAdd(&out[0], v);\n  }\n}\n",
           "shader": "e1a481e22af7864a2ee94b49523324dabf3d471dfc688744574a963c63a315b3",
@@ -1055,7 +1031,7 @@
           "factor": 1,
           "dispatches": 1,
           "separate": false,
-          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\", vec3u>,\n  lid: builtin<\"local_invocation_id\", vec3u>,\n): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  tile[lid.x] = x;\n  workgroupBarrier();\n  for (let stride: u32 = 32; stride > 0; stride /= 2) {\n    if (lid.x < stride) { tile[lid.x] += tile[lid.x + stride]; }\n    workgroupBarrier();\n  }\n  if (lid.x === 0) { atomicAdd(out[0], tile[0]); }\n}\n",
+          "source": "\"use typeshade\";\nclass Args { n!: u32; }\n\ndeclare const args: uniform<Args>;\ndeclare const src: storage<array<u32>>;\ndeclare const out: storage<array<atomic<u32>>, \"read_write\">;\n\nlet tile: workgroup<array<u32, 64>>;\n@compute([64])\nexport function main(\n  gid: builtin<\"global_invocation_id\">,\n  lid: builtin<\"local_invocation_id\">,\n): void {\n  const i = gid.x;\n  let x: u32 = 0;\n  if (i < args.n) { x = src[i]; }\n  tile[lid.x] = x;\n  workgroupBarrier();\n  for (let stride: u32 = 32; stride > 0; stride /= 2) {\n    if (lid.x < stride) { tile[lid.x] += tile[lid.x + stride]; }\n    workgroupBarrier();\n  }\n  if (lid.x === 0) { atomicAdd(out[0], tile[0]); }\n}\n",
           "features": [],
           "wgsl": "struct Args {\n  n: u32,\n}\n\nvar<workgroup> tile: array<u32, 64>;\n\n@group(0) @binding(0) var<uniform> args: Args;\n@group(0) @binding(1) var<storage, read> src: array<u32>;\n@group(0) @binding(2) var<storage, read_write> out: array<atomic<u32>>;\n\n@compute @workgroup_size(64)\nfn main(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(local_invocation_id) lid: vec3<u32>) {\n  let i = gid.x;\n  var x: u32 = 0u;\n  if ((i < args.n)) {\n    x = src[i];\n  }\n  tile[lid.x] = x;\n  workgroupBarrier();\n  for (var stride: u32 = 32u; (stride > 0u); stride /= 2u) {\n    if ((lid.x < stride)) {\n      tile[lid.x] += tile[lid.x + stride];\n    }\n    workgroupBarrier();\n  }\n  if ((lid.x == 0u)) {\n    _ = atomicAdd(&out[0], tile[0]);\n  }\n}\n",
           "shader": "53a05db8ddf6de351eee4c00a824d33ab4a98e04cbfd5297706d627e27f318ff",
@@ -1068,5 +1044,5 @@
       ]
     }
   ],
-  "digest": "d4ac1b20b63492489c4f6fe9b333dd50ba93033dee79af4afc1d5da53e0e77ee"
+  "digest": "fa99f31fa7640f8712989a69dbb719c3d46d44f170b2323797d25480e0e2d0eb"
 }

@@ -25,8 +25,7 @@ export function distToSegment(p: vec2, a: vec2, b: vec2): f32 {
 ```
 
 매개변수 이름으로 `sample`, `filter`, `texture`처럼 GLSL이 예약한 이름을 써도 됩니다. IR은 그
-이름을 그대로 두고, GLSL 백엔드가 생성할 때 이름을 바꿉니다. 지역 함수, 다른 함수 안에서 선언한
-함수, 함수를 인자로 받는 함수도 TypeScript의 형태 그대로 쓸 수 있다
+이름을 그대로 두고, GLSL 백엔드가 생성할 때 이름을 바꿉니다. 지역 함수(다른 함수 안에서 선언한 함수)와 함수를 인자로 받는 함수도 TypeScript의 형태 그대로 쓸 수 있습니다
 (`docs/use-typeshade-surface.md` §14).
 
 ### 반환 타입
@@ -66,7 +65,7 @@ const d = distToSegment(uv, p0, p1);
 ```
 
 매개변수의 기본값은 호출 지점에서 채워집니다. 함수는 다른 함수를 매개변수로 받을 수도 있으며,
-호출할 때마다 그 자리의 스코프에 있는 함수 이름을 넘긴다(`docs/use-typeshade-surface.md` §14).
+호출할 때마다 그 자리의 스코프에 있는 함수 이름을 넘깁니다(`docs/use-typeshade-surface.md` §14).
 WGSL에는 호출 스택이 없으므로 재귀는 거부됩니다.
 
 ### 진입점
@@ -196,7 +195,7 @@ export function fs(uv: location<0, vec2>): vec4 {
 ```
 
 이런 프로그램을 컴파일하는 호스트 호출은
-[다른 셰이더 모듈을 가져오는 셰이더 모듈](#a-shader-module-that-imports-another)에 있습니다.
+[다른 셰이더 모듈을 가져오는 모듈](#a-shader-module-that-imports-another)에 있습니다.
 
 ### 모듈 안 함수의 이름
 

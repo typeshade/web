@@ -14,6 +14,7 @@
 //                 signature or a statement gets its target text.
 //   the registry  src/core/intrinsics.ts, read through src/lib/builtin-table.ts, for the
 //                 function-name rows on the GLSL page.
+import { migrateSource } from '../../vendor/shader-dsl/src/cli/migrate.ts';
 import { compile } from '../../vendor/shader-dsl/src/index.ts';
 import { compileTsSource } from '../../vendor/shader-dsl/src/compiler/ts/source-file.ts';
 import { wgslBackend } from '../../vendor/shader-dsl/src/index.ts';
@@ -36,17 +37,32 @@ export interface MappingRowData {
   readonly message: string;
 }
 
+/** Stops the build when a source cell writes a spelling the pinned compiler refuses or warns
+ *  on. A cell is a fragment (`@vertex`, `pos: builtin<"position">`), which `compile()` cannot
+ *  read, so the compiler's own `migrateSource` reads it instead, as written and as a parameter
+ *  and a field: a cell it would rewrite is an old spelling. A stage call written as `vertex(f)`
+ *  is no declaration, so it is matched by name (compiler changes 0130, 0135, 0137). */
+function assertCurrentSpelling(id: string, source: string): void {
+  const old =
+    /^\s*(?:vertex|fragment|compute|workgroup_size)\s*\(/.test(source) ||
+    [source, `function _(${source}) {}`, `interface _ { ${source} }`].some(
+      (text) => migrateSource(text).text !== text,
+    );
+  if (old)
+    throw new Error(
+      `[target-mapping] the source cell of '${id}' writes a spelling the pinned compiler rewrites: ${source}`,
+    );
+}
+
 export const row = (
   id: string,
   target: string | null,
   source: string | null,
   message = '',
-): MappingRowData => ({
-  id,
-  target,
-  source,
-  message,
-});
+): MappingRowData => {
+  if (source !== null) assertCurrentSpelling(id, source);
+  return { id, target, source, message };
+};
 
 // ── the compiler, asked one question at a time ──
 
@@ -546,9 +562,9 @@ function buildWgsl(): WgslMapping {
       ),
     ],
     stages: [
-      row('vertex', pick(entries, '@vertex', 'entry snippet'), 'vertex(f)'),
-      row('fragment', pick(entries, '@fragment', 'entry snippet'), 'fragment(f)'),
-      row('compute', pick(computeEntry, '@compute', 'compute snippet'), 'compute([64, 1, 1], f)'),
+      row('vertex', pick(entries, '@vertex', 'entry snippet'), '@vertex'),
+      row('fragment', pick(entries, '@fragment', 'entry snippet'), '@fragment'),
+      row('compute', pick(computeEntry, '@compute', 'compute snippet'), '@compute([64, 1, 1])'),
       row(
         'location',
         pick(entries, '@location(0) uv: vec2<f32>,', 'entry snippet').replace(/,$/, ''),
@@ -558,7 +574,7 @@ function buildWgsl(): WgslMapping {
       row(
         'vertexStruct',
         pick(entries, '@builtin(position) pos:', 'entry snippet').replace(/,$/, ''),
-        'pos: builtin<"position", vec4>',
+        'pos: builtin<"position">',
       ),
       row('fragmentReturn', returnOf(pick(entries, 'fn fs(', 'entry snippet')), ': vec4'),
     ],

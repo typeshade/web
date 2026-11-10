@@ -145,7 +145,7 @@ r.requires // host-provided globals the module references and does not declare
 
 `packModule(m)`은 같은 정보를 평범한 JSON 매니페스트 하나로 모읍니다. 프로그램의 WGSL, 바이트
 레이아웃이 붙은 바인딩, 진입점, WebGL2 프로그램이 여기에 들어갑니다. 빌드가 이 매니페스트를
-디스크에 쓰고, `typeshade/runtime`이 불러온다(`docs/use-typeshade-surface.md` §69).
+디스크에 쓰고, `typeshade/runtime`이 불러옵니다(`docs/use-typeshade-surface.md` §69).
 
 ### 리플렉션에서 바인딩하기
 

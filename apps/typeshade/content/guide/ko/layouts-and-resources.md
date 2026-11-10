@@ -86,7 +86,7 @@ export function vs(pos: vec3): vec4 {
 차지하고, `reflect()`가 이를 호스트에 알려 줍니다. 유니폼 버퍼는 읽기 전용이므로 `uniform<T>`는
 접근 모드를 받지 않습니다.
 
-WGSL에서는 유니폼에 스칼라나 벡터 하나만 담을 수도 있다(`declare const mode: uniform<u32>`).
+WGSL에서는 유니폼에 스칼라나 벡터 하나만 담을 수도 있습니다(`declare const mode: uniform<u32>`).
 GLSL ES 3.00은 유니폼 바인딩을 std140 블록으로 표현합니다. 그래서 WebGL2를 타깃으로 하는 모듈은
 값을 구조체에 넣어야 합니다. 스칼라 유니폼이 있으면 `compile()`은 WGSL을 유지하고 GLSL 쪽은
 `TS8015` 경고로 보고합니다. 모든 형태와 거부되는 경우는 인터페이스 참조 문서

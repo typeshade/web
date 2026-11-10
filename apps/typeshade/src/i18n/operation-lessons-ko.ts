@@ -757,6 +757,42 @@ export const operationLessons = {
   },
 } satisfies Record<keyof typeof english, FunctionLesson>;
 
+/** 스테이지 속성과 커널 워크그룹 크기의 레슨이며, 각 속성 페이지에 표시됩니다. */
+export const attributeLessons: Readonly<Record<string, FunctionLesson>> = {
+  vertex: {
+    meaning:
+      '@vertex는 표시한 함수를 버텍스 스테이지의 진입점으로 만듭니다. GPU는 그리기의 버텍스마다 이 함수를 한 번 호출합니다.',
+    use: '각 버텍스를 클립 공간에 배치하고 프래그먼트 스테이지로 값을 넘기는 함수에 사용하세요.',
+    try: '삼각형 하나의 버텍스 세 개를 비교해 보세요. 호출마다 자신의 버텍스 인덱스를 읽고 자신의 위치를 돌려줍니다.',
+    caution:
+      '최상위 함수 선언 앞에 쓰며, 진입점의 이름은 선언의 이름입니다. 버텍스 진입점은 위치를 만들어야 합니다. vec4를 반환하거나, 타입이 builtin<"position">인 구조체 필드를 둡니다.',
+  },
+  fragment: {
+    meaning:
+      '@fragment는 표시한 함수를 프래그먼트 스테이지의 진입점으로 만듭니다. GPU는 덮인 픽셀 샘플마다 이 함수를 한 번 호출합니다.',
+    use: '버텍스 스테이지가 보간한 값으로 각 픽셀의 색을 계산하는 함수에 사용하세요.',
+    try: '삼각형 하나의 픽셀 세 개를 비교해 보세요. 호출마다 자신의 픽셀에서 보간된 uv를 읽고 자신의 색을 돌려줍니다.',
+    caution:
+      '최상위 함수 선언 앞에 씁니다. 구조체 없이 반환한 값은 첫 번째 색상 어태치먼트인 location 0으로 갑니다. 구조체를 반환하면 어태치먼트마다 필드를 하나씩 두며, 번호는 적힌 순서대로 매겨집니다.',
+  },
+  compute: {
+    meaning:
+      '@compute([x, y?, z?])는 표시한 함수를 컴퓨트 진입점으로 만들고, 한 개에서 세 개의 크기로 워크그룹 크기를 정합니다.',
+    use: '그리기와 무관하게 버퍼와 텍스처를 다루는 일반 GPU 작업에 사용하세요.',
+    try: '디스패치 하나의 인보케이션 세 개를 비교해 보세요. 저마다 자신의 global_invocation_id를 읽고 자신의 원소에 씁니다.',
+    caution:
+      '크기는 속성의 인자이며, 인자 없이 쓴 @compute는 64를 씁니다. 디스패치가 워크그룹을 몇 개 실행할지는 호스트가 정하고, 크기는 워크그룹 하나에 인보케이션이 몇 개 있는지를 정합니다.',
+  },
+  workgroup_size: {
+    meaning:
+      '@workgroup_size([n])은 표시한 커널 함수의 루프가 WebGPU에서 실행될 워크그룹 크기를 정합니다.',
+    use: '커널 함수의 루프를 기본값 64가 아닌 크기의 워크그룹으로 실행해야 할 때 사용하세요.',
+    try: '기본값으로 도는 루프, 128로 도는 루프, 리덕션을 하는 루프를 비교해 보세요. 리덕션을 하는 루프는 무엇을 적든 256으로 실행됩니다.',
+    caution:
+      '크기는 하나만 받으며, 커널 함수에만 쓸 수 있습니다. 리덕션을 하는 루프가 있는 커널 함수는 이 속성을 거부합니다(TS8077).',
+  },
+};
+
 export function constructorLesson(name: string): FunctionLesson | undefined {
   const matrix = /^mat([234])(?:x([234]))?f?$/.exec(name);
   if (matrix) {

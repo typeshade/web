@@ -9,7 +9,7 @@ import { facts, hero, quickStartFile } from '../lib/examples.ts';
 import { ISSUE_IMAGE_BYTES, ISSUE_IMAGES_MAX } from '../lib/issue-data.ts';
 import { typedError } from '../lib/typed-error.ts';
 import { mnistEpochs, mnistTestSamples } from '../lib/mnist-settings.ts';
-import { operationLessons, constructorLesson } from './operation-lessons-ko.ts';
+import { operationLessons, constructorLesson, attributeLessons } from './operation-lessons-ko.ts';
 import { functionLessons } from './function-lessons-ko.ts';
 
 const glsl = facts.glslTarget;
@@ -443,6 +443,8 @@ export const ko: Copy = {
       worked: {
         lessons: operationLessons,
         constructor: constructorLesson,
+        attributeLessons,
+        relatedAttributes: '관련 속성',
         heading: '예제 비교',
         modelNote:
           '예제는 설명용 계산 모델이며 GPU를 실행하지 않습니다. 정확한 호출 형식은 아래 컴파일러 참고 자료에서 설명합니다.',
@@ -778,7 +780,7 @@ export const ko: Copy = {
           '파일이 선언하지도 가져오지도 않은 함수를 부르거나, ECMAScript 표기가 있어서 언어에서 뺀 내장 함수를 부릅니다. `arrayLength(xs)`가 그 예이며, 메시지가 대신 쓸 `xs.length`를 알려 줍니다(규칙 9.9).',
         CONST_ASSIGN: '`const`나 읽기 전용 리소스처럼 바뀔 수 없는 이름에 값을 대입합니다.',
         LOOP_BOUND:
-          '컴파일러가 조건을 받아들이지 않는 루프입니다. 시작값, 경계, 증분이 모두 상수인 `for`에서 조건이 거짓이 되기 전에 카운터가 타입의 범위를 벗어나거나, 루프 조건 안에서 값을 쓰는 함수를 호출합니다.',
+          '컴파일러가 조건을 받아들이지 않는 루프입니다. 시작값, 경계, 증분이 모두 상수인 `for`에서 조건이 거짓이 되기 전에 카운터가 타입의 범위를 벗어나거나, 루프 조건 안에서 값을 쓰는 함수를 호출합니다. 이름이 아닌 배열을 도는 `for...of`도 이 코드로 거부됩니다.',
         LOOP_INFINITE:
           '끝나지 않는 것이 확실한 루프입니다. `break`나 `return`이 없는 `while (true)`나 조건 없는 `for`가 그렇고, 경계가 상수인 `for`에서 카운터를 경계 쪽으로 움직이지 않는 증분도 그렇습니다. 조건은 그대로 썼든 상수만으로 계산했든 같습니다.',
         LOOP_INDUCTION:
@@ -1374,7 +1376,7 @@ export const ko: Copy = {
         '이 방식에서는 애플리케이션이 device, pipeline, bind group, buffer, texture, command encoder를 생성하고 관리합니다. TypeShade는 셰이더 코드를 생성합니다.',
       importH: '파일 가져오기',
       importP:
-        'Vite 플러그인을 설정하면 `.shade.ts` 파일을 import할 수 있습니다. export한 헬퍼 함수는 CPU에서 실행됩니다. `@compute` 진입점은 `await entry(bindings, workgroups)`로 호출하며, 지원되는 WebGPU 또는 WebGL2 환경에서 실행한 결과를 읽어 옵니다. 전체 화면 `@fragment` 진입점은 `entry(canvas, bindings)`로 호출하고, 바인딩을 읽지 않으면 `entry(canvas)`로 호출합니다. WebGPU, WebGL2, CPU 순서로 사용 가능한 실행 방식을 선택하며, 필요한 디바이스와 파이프라인은 런타임이 생성합니다. 아래 설정은 Git에서 설치한 소스 패키지용입니다.',
+        'Vite 플러그인을 설정하면 `.shade.ts` 파일을 import할 수 있습니다. export한 헬퍼 함수는 CPU에서 실행됩니다. `@compute` 진입점은 `await entry(bindings, workgroups)`로 호출하며, 지원되는 WebGPU 또는 WebGL2 환경에서 실행한 결과를 읽어 옵니다. 전체 화면 `@fragment` 진입점은 `entry(canvas, bindings)`로 호출하고, 바인딩을 읽지 않으면 `entry(canvas)`로 호출합니다. WebGPU, WebGL2, CPU 순서로 사용 가능한 tier를 선택하며, 필요한 디바이스와 파이프라인은 런타임이 생성합니다. 아래 설정은 Git에서 설치한 소스 패키지용입니다.',
       setupP:
         '설치 후에는 아래의 Vite 플러그인과 호스트 `tsconfig.json` 설정을 추가합니다. 스크립트는 Vite와 설치한 CLI를 `tsx`로 실행합니다. `prepare`는 `tsc`가 읽는 호스트 뷰를 만듭니다. 뷰는 각 타입을 `f32`나 `vec3`처럼 셰이더에서 쓰는 이름으로 적고, `typeshade/runtime`이 그 이름들을 타입으로 내보냅니다. 뷰에는 모듈의 각 export 위에 쓴 JSDoc 주석도 함께 들어갑니다. `.gitignore`에 `*.shade.typeshade.ts`를 추가합니다.',
       viteLabel: 'Vite 플러그인, vite.config.ts',
@@ -1391,7 +1393,7 @@ export const ko: Copy = {
       resourcesShaderLabel: 'class와 바인딩을 내보내는 셰이더 파일, scene.shade.ts',
       resourcesHostLabel: '호스트 파일에서 리소스를 설정하고 읽기, scene.ts',
       resourcesNoteP:
-        '마지막 줄은 카메라 위치 `[0, 2, 5]`, 시간 `0.5`, 길이 `4`를 출력합니다. 이 컴파일러 버전에서 리소스는 데이터를 보관하고 무엇이 바뀌었는지 추적합니다. 호출은 아직 리소스를 받지 않으므로, 진입점이나 커널 함수에는 일반 데이터나 `array()`로 만든 `Resident`를 넘기세요. `resident()`와 `configure()`는 계속 동작하지만 지원 중단 예정이니 `array()`와 `createDevice()`를 쓰세요.',
+        '마지막 줄은 카메라 위치인 `[0, 2, 5]`의 `Float32Array`, 그리고 시간 `0.5`와 길이 `4`를 출력합니다. 이 컴파일러 버전에서 리소스는 데이터를 보관하고 무엇이 바뀌었는지 추적합니다. 호출은 아직 리소스를 받지 않으므로, 진입점이나 커널 함수에는 일반 데이터나 `array()`로 만든 `Resident`를 넘기세요. `resident()`와 `configure()`는 계속 동작하지만 더 이상 권장하지 않으니, 대신 `array()`와 `createDevice()`를 쓰세요.',
       untilP:
         '각 방식에서 애플리케이션과 런타임이 담당하는 작업은 [WebGPU와 WebGL2](conceptsWebgpu)를 참고하세요.',
       nextLearnP: '언어 가이드에서 타입, 함수, 제어 흐름, GPU 리소스를 이어서 배워보세요.',
@@ -2088,11 +2090,11 @@ export const ko: Copy = {
       reflectionNote:
         '셰이더에서 필드 이름을 바꾸면 다음 빌드에서 리플렉션이 따라 바뀌고, 리플렉션을 읽는 호스트 코드도 함께 따라옵니다.',
       runtimeH: '런타임',
-      runtimeP: `호스트가 모듈을 컴파일해 셰이더 코드를 전달하는 방식에서는 브라우저에 TypeShade 코드가 필요하지 않습니다. 컴파일러는 빌드, 테스트 또는 [언어 서비스](languageService)를 사용하는 편집기처럼 셰이더 텍스트를 만드는 곳에서 실행됩니다. 브라우저에는 생성된 셰이더 소스와 애플리케이션의 호스트 코드만 전달됩니다. Vite 플러그인으로 가져온 모듈은 호출을 실행할 \`typeshade/runtime\`을 번들에 포함하지만 컴파일러는 포함하지 않습니다. 플러그인이 번들을 만들 때 모듈을 컴파일하기 때문입니다. 호출은 브라우저에서 사용할 수 있는 첫 실행 경로(WebGPU, WebGL2, CPU 순서)에서 실행됩니다. \`createDevice({ prefer })\`는 나열한 tier 가운데 처음 열리는 곳에 디바이스를 열고, 그 뒤의 tier는 호출이 대신 실행될 곳으로 남습니다. \`array()\`나 \`device.array()\`가 만드는 \`Resident\`는 호출 사이에 배열을 GPU에 둡니다. 프로그램 런타임에 프로그램을 불러오는 경우에도 번들에는 \`typeshade/runtime\`과 매니페스트만 포함하고 컴파일러는 포함하지 않습니다. TypeShade는 런타임 의존성으로 TypeScript ${facts.runtimeDeps}개를 설치합니다. \`compile()\`과 언어 서비스가 소스를 읽을 때 사용합니다.`,
+      runtimeP: `호스트가 모듈을 컴파일해 셰이더 코드를 전달하는 방식에서는 브라우저에 TypeShade 코드가 필요하지 않습니다. 컴파일러는 빌드, 테스트 또는 [언어 서비스](languageService)를 사용하는 편집기처럼 셰이더 텍스트를 만드는 곳에서 실행됩니다. 브라우저에는 생성된 셰이더 소스와 애플리케이션의 호스트 코드만 전달됩니다. Vite 플러그인으로 가져온 모듈은 호출을 실행할 \`typeshade/runtime\`을 번들에 포함하지만 컴파일러는 포함하지 않습니다. 플러그인이 번들을 만들 때 모듈을 컴파일하기 때문입니다. 호출은 브라우저에서 사용할 수 있는 첫 tier(WebGPU, WebGL2, CPU 순서)에서 실행됩니다. \`createDevice({ prefer })\`는 나열한 tier 가운데 처음 열리는 곳에 디바이스를 열고, 그 뒤의 tier는 호출이 대신 실행될 곳으로 남습니다. \`array()\`나 \`device.array()\`가 만드는 \`Resident\`는 호출 사이에 배열을 GPU에 둡니다. 프로그램 런타임에 프로그램을 불러오는 경우에도 번들에는 \`typeshade/runtime\`과 매니페스트만 포함하고 컴파일러는 포함하지 않습니다. TypeShade는 런타임 의존성으로 TypeScript ${facts.runtimeDeps}개를 설치합니다. \`compile()\`과 언어 서비스가 소스를 읽을 때 사용합니다.`,
       runtimeOwnerP:
-        '호스트는 `typeshade/runtime`의 `createDevice()`로 호출의 소유자를 따로 열 수도 있다(규칙 11.8). 소유자는 `prefer`에서 처음 열리는 tier나 호스트가 이미 가진 `GPUDevice`, 또는 프로그램 런타임의 디바이스(`createDevice({ runtime })`) 위에 열립니다. `device.array()`는 그 호출이 받는 `Resident` 배열을 만들고, `device.fuse()`는 호출 체인을 그 디바이스에서 계획 하나로 실행합니다. 일반 호출은 배열과 텍스처의 유일한 소유자를 선택합니다. 소유자가 있는 리소스가 없으면 기본 소유자를 씁니다. 여러 소유자가 섞이면 실행 전에 거부하며, 소유권과 수명 검사는 유지됩니다. 디바이스를 정하는 `prefer`, `device`, `runtime` 옵션은 함께 지정할 수 없습니다. 소유자는 에뮬레이션 배정밀도의 플레이버(`createDevice({ fp64Flavor })`)와, 긴 커널의 청크 하나가 쓸 수 있는 시간(`createDevice({ timeBudgetMs })`)도 정합니다. `fp64Flavor`를 생략하면 실제 디바이스나 컨텍스트에서 자동으로 선택하며, 명시적인 재정의도 지원합니다. `fuse()`는 이전처럼 기본 소유자를 다룹니다. `configure()`와 `resident()`는 계속 동작하지만 지원 중단 예정입니다. 둘 다 처음 호출할 때 경고를 한 번 출력합니다. 디바이스는 `createDevice()`로 여세요. `Resident`는 `typeshade/runtime`의 `array()`로 만드세요. `using _ = device.use()`는 블록 안에서 그 디바이스를 기본 디바이스로 만듭니다. 이때 `texture()`는 그 디바이스에 텍스처를 만듭니다. 이 컴파일러 버전에서 커널 함수나 진입점 호출은 아직 `device.use()`를 따르지 않습니다.',
+        '호스트는 `typeshade/runtime`의 `createDevice()`로 호출의 소유자를 따로 열 수도 있습니다(규칙 11.8). 소유자는 `prefer`에서 처음 열리는 tier나 호스트가 이미 가진 `GPUDevice`, 또는 프로그램 런타임의 디바이스(`createDevice({ runtime })`) 위에 열립니다. `device.array()`는 그 호출이 받는 `Resident` 배열을 만들고, `device.fuse()`는 호출 체인을 그 디바이스에서 계획 하나로 실행합니다. 일반 호출은 배열과 텍스처의 유일한 소유자를 선택합니다. 소유자가 있는 리소스가 없으면 기본 소유자를 씁니다. 여러 소유자가 섞이면 실행 전에 거부하며, 소유권과 수명 검사는 유지됩니다. 디바이스를 정하는 `prefer`, `device`, `runtime` 옵션은 함께 지정할 수 없습니다. 소유자는 에뮬레이션 배정밀도의 플레이버(`createDevice({ fp64Flavor })`)와, 긴 커널의 청크 하나가 쓸 수 있는 시간(`createDevice({ timeBudgetMs })`)도 정합니다. `fp64Flavor`를 생략하면 실제 디바이스나 컨텍스트에서 자동으로 선택하며, 명시적인 재정의도 지원합니다. `fuse()`는 이전처럼 기본 소유자를 다룹니다. `configure()`와 `resident()`는 계속 동작하지만 더 이상 권장하지 않습니다. 둘 다 처음 호출할 때 경고를 한 번 출력합니다. 디바이스는 `createDevice()`로 여세요. `Resident`는 `typeshade/runtime`의 `array()`로 만드세요. `using _ = device.use()`는 블록 안에서 그 디바이스를 기본 디바이스로 만듭니다. 이때 `texture()`는 그 디바이스에 텍스처를 만듭니다. 이 컴파일러 버전에서 커널 함수나 진입점 호출은 아직 `device.use()`를 따르지 않습니다.',
       runtimeResourcesP:
-        '셰이더 모듈이 내보낸 class는 호스트가 GPU용으로 보관하는 데이터의 타입이기도 합니다. `uniform(Camera, { time: 0 })`는 `Uniform<Camera>`를 만들고, `zeros(Particle, n)`과 `array(Particle, data)`는 `Buffer<Particle>`을 만듭니다. 필드는 `camera.pos.set(0, 2, 5)`처럼 `set`으로 쓰고 `get`으로 읽습니다. `set`은 숫자를 하나씩 검사하고, 바뀐 값만 쓰며, 리소스의 변경된 바이트 범위를 넓힙니다. 모듈이 내보낸 바인딩 `export declare const camera: uniform<Camera>`도 호스트에서 같은 종류의 리소스입니다. 크기를 적지 않은 스토리지 배열을 내보냈다면 호스트가 `resize(n)`이나 `set(data)`로 길이를 정합니다. 이 컴파일러 버전에서는 아직 어떤 호출도 리소스를 받지 않습니다. 진입점, 커널 함수, 그리기 호출은 일반 데이터와 `Resident`를 받고, 진입점 호출은 바인딩의 값을 bindings 객체로 받습니다. 예제는 [빠른 시작](quickStart)에 있습니다.',
+        '셰이더 모듈이 내보낸 class는 호스트가 GPU용으로 보관하는 데이터의 타입이기도 합니다. `uniform(Camera, { time: 0 })`는 `Uniform<Camera>`를 만들고, `zeros(Particle, n)`과 `array(Particle, data)`는 `Buffer<Particle>`을 만듭니다. 필드는 `camera.pos.set(0, 2, 5)`처럼 `set`으로 쓰고 `get`으로 읽습니다. `set`은 숫자를 하나씩 검사하고, 바뀐 값만 쓰며, 바뀐 바이트 범위를 기록합니다. 모듈이 내보낸 바인딩 `export declare const camera: uniform<Camera>`도 호스트에서 같은 종류의 리소스입니다. 크기를 적지 않은 스토리지 배열을 내보냈다면 호스트가 `resize(n)`이나 `set(data)`로 길이를 정합니다. 이 컴파일러 버전에서는 아직 어떤 호출도 리소스를 받지 않습니다. 진입점, 커널 함수, 그리기 호출은 일반 데이터와 `Resident`를 받고, 진입점 호출은 바인딩의 값을 bindings 객체로 받습니다. 예제는 [빠른 시작](quickStart)에 있습니다.',
       runtimeFailureP:
         '생성된 커널, 컴퓨트 진입점, 프래그먼트 진입점 호출이 앞선 호출에서 쓰기에 실패한 `Resident`의 내용을 읽으면, 실행이나 업로드나 제출을 하기 전에 같은 오류로 거부됩니다. 거부된 호출은 자신이 썼을 모든 `Resident`에 그 오류를 남기고, 거부된 그리기는 캔버스 이미지를 그대로 둡니다. 컴파일러가 대상에 쓰기만 한다고 증명한 호출은 그 대상을 복구할 수 있고, 쓰기에 성공하면 오류가 지워집니다. `Resident.write(value)`는 오류를 지우지 않습니다. 실패한 배열을 읽지 않는 호출은 평소대로 실행됩니다. 직접 인코딩한 프로그램 런타임 호출과 `Frame` 제출은 각자의 계약을 그대로 따릅니다.',
       runtimeLibmP:
@@ -2672,7 +2674,7 @@ export const ko: Copy = {
         'host-draw':
           '전체 화면 `@fragment` 진입점과 이를 그리는 호스트입니다. 호스트는 `fs`를 가져와 프레임마다 `fs(canvas, { frame })`를 한 번 부르고 유니폼에 시간을 넣습니다. 셰이더는 전체 화면 삼각형 하나를 그립니다. WebGPU를 먼저 시도하고, 사용할 수 없으면 WebGL2, 그다음 CPU tier를 사용합니다. 호스트 코드에는 파이프라인, 버퍼, 바인드 그룹이 없습니다.',
         'host-compute':
-          '`@compute(…)` 진입점과 이를 실행하는 호스트입니다. `run()`은 선언한 기본값을 쓰고, `runSpecialized()`는 직접 호출과 `device.fuse()` 안의 호출에 `{ constants }`를 넘깁니다. `WIDTH`는 워크그룹 크기를, `GAIN`은 출력 배율을 정합니다. 호스트는 선택한 폭으로 그룹 개수를 계산하고, 계획의 배열을 Resident로 유지한 뒤 결과와 디스패치 리포트를 돌려준다. 상수를 선택한 디바이스 계획에서는 WebGPU와 CPU tier가 워크그룹당 32개 인보케이션을 사용하며, WebGL2는 기본값 64를 유지하면서 `GAIN`을 선택합니다.',
+          '`@compute(…)` 진입점과 이를 실행하는 호스트입니다. `run()`은 선언한 기본값을 쓰고, `runSpecialized()`는 직접 호출과 `device.fuse()` 안의 호출에 `{ constants }`를 넘깁니다. `WIDTH`는 워크그룹 크기를, `GAIN`은 출력 배율을 정합니다. 호스트는 선택한 폭으로 그룹 개수를 계산하고, 계획의 배열을 Resident로 유지한 뒤 결과와 디스패치 리포트를 돌려줍니다. 상수를 선택한 디바이스 계획에서는 WebGPU와 CPU tier가 워크그룹당 32개 인보케이션을 사용하며, WebGL2는 기본값 64를 유지하면서 `GAIN`을 선택합니다.',
         'host-kernel':
           '커널 함수 두 개와 이를 부르는 호스트입니다. `exposure`는 `array<f32>`를 돌고, `peak`는 그 배열을 하나의 값으로 줄입니다. 호스트는 `Float32Array`를 넘겨 `await exposure(1.5, pixels)`를 부르고, 숫자 하나를 얻으려고 `await peak(pixels)`를 부릅니다. 컴파일러가 반복이 서로 독립이라고 증명한 루프는 GPU에서 반복마다 인보케이션 하나로 실행되고, 배열은 제자리에서 바뀌어 돌아온다.',
         'host-resident':
@@ -2950,7 +2952,7 @@ export const ko: Copy = {
           ['`: vec4`', '호출자에게 반환할 GPU 값의 구조입니다.'],
         ],
         paramsRefP:
-          '`@inout a: T`로 쓴 매개변수는 호출자의 변수 자체입니다. 호출은 그 변수를 아무 표시 없이 넘기고, 매개변수나 그 필드, 성분, 요소에 대입하면 호출자의 변수에 값이 들어갑니다. `@out c: T`로 쓴 매개변수는 값 없이 시작합니다. 함수는 이 매개변수를 읽기 전에 쓰고, 모든 경로에서 씁니다(`TS8075`). 그래서 호출자는 `let s: f32`처럼 아직 값이 없는 `let`을 넘길 수 있습니다. 함수가 둘 중 하나라도 쓴다면, 호출 하나가 같은 변수를 이런 매개변수 둘에 넘길 수는 없다(`TS8074`). 한정자는 파일 최상위나 네임스페이스에 선언한 함수에만 붙고, 메서드와 진입점과 지역 함수는 값을 받는다(`TS8073`). 다만 한정자가 붙은 함수 안의 지역 함수는 바깥의 다른 변수처럼 그 매개변수를 읽고 씁니다. 구조체, 배열 요소, 행렬의 열을 같은 방식으로 넘기는 모습은 [되돌려 쓰는 매개변수](shadeReferenceParameters) 예제에 있습니다.',
+          '`@inout a: T`로 쓴 매개변수는 호출자의 변수 자체입니다. 호출은 그 변수를 아무 표시 없이 넘기고, 매개변수나 그 필드, 성분, 요소에 대입하면 호출자의 변수에 값이 들어갑니다. `@out c: T`로 쓴 매개변수는 값 없이 시작합니다. 함수는 이 매개변수를 읽기 전에 쓰고, 모든 경로에서 씁니다(`TS8075`). 그래서 호출자는 `let s: f32`처럼 아직 값이 없는 `let`을 넘길 수 있습니다. 함수가 둘 중 하나라도 쓴다면, 호출 하나가 같은 변수를 이런 매개변수 둘에 넘길 수는 없습니다(`TS8074`). 한정자는 파일 최상위나 네임스페이스에 선언한 함수에만 붙고, 메서드와 진입점과 지역 함수는 값을 받습니다(`TS8073`). 다만 한정자가 붙은 함수 안의 지역 함수는 바깥의 다른 변수처럼 그 매개변수를 읽고 씁니다. 구조체, 배열 요소, 행렬의 열을 같은 방식으로 넘기는 모습은 [되돌려 쓰는 매개변수](shadeReferenceParameters) 예제에 있습니다.',
         helper: '3. Helper function',
         helperP:
           '스테이지 속성이 없는 최상위 함수는 다른 셰이더 함수에서 호출할 수 있는 헬퍼입니다. 반복되는 계산을 이름 있는 함수로 분리하면 셰이더를 읽고 검증하기 쉬워집니다.',
@@ -3087,10 +3089,10 @@ export const ko: Copy = {
           '호스트는 커널 호출 여러 개를 계획 하나로 실행할 수 있습니다. 아래에서 호출을 합치는 방법, 리포트의 내용, 워크그룹 개수와 상수를 정하는 방법, 계획이 쓰는 리소스, 라이브러리가 제공하는 커널을 차례로 설명합니다.',
         fuseCalls: '호출 합치기',
         fuseP:
-          '호스트는 등록용 import 없이 `device.fuse()` 안에서 커널 함수 여러 개를 부를 수 있습니다(규칙 11.13). 기본 소유자를 사용하는 `typeshade/fuse`의 `fuse()`도 계속 지원합니다. 이 컴파일러 버전에서는 합칠 수 있는 호출을 분석하는 정보를 얻으려면 여전히 `typeshade({ fuse: true })`로 빌드해야 합니다. WebGPU에서는 바로 앞 호출이 같은 인덱스에 쓴 값을 읽는 호출들이 제출 하나 안의 디스패치 하나로 실행됩니다. 객체를 바꾸는 메서드를 배열의 원소에서 부르면, 계획이 읽는 사실에서는 `@inout` 매개변수의 인자처럼 그 원소에 쓰는 것으로 칩니다(규칙 8.29).',
+          '호스트는 등록용 import 없이 `device.fuse()` 안에서 커널 함수 여러 개를 부를 수 있습니다(규칙 11.13). 기본 소유자를 사용하는 `typeshade/fuse`의 `fuse()`도 계속 지원합니다. Vite 플러그인은 합칠 수 있는 호출을 판단하는 데 필요한 정보를 기본으로 포함합니다. `typeshade({ fuse: false })`는 이 정보를 빼서 생성 코드의 크기를 줄입니다. WebGPU에서는 바로 앞 호출이 같은 인덱스에 쓴 값을 읽는 호출들이 제출 하나 안의 디스패치 하나로 실행됩니다. 객체를 바꾸는 메서드를 배열의 원소에서 부르면, 계획이 읽는 사실에서는 `@inout` 매개변수의 인자처럼 그 원소에 쓰는 것으로 칩니다(규칙 8.29).',
         fuseReport: 'fuse 리포트',
         fuseReportP:
-          '스코프가 돌려주는 리포트는 그룹마다 이름을 대고, 두 호출이 따로 실행되는 이유를 알려 줍니다. 본문 안의 진입점 호출은 혼자 그룹을 이루며, 배열에 값을 덧붙이는 루프도 그렇습니다. `Map`이나 `Set`을 받는 호출도 별도 그룹이며, 리포트는 `b takes a Map or a Set`이나 CPU에서 실행하는 이유를 표시합니다. 각 그룹은 자신이 실행된 `tier`도 표시하며, 계획보다 뒤의 tier에서 실행된 그룹은 그 이유를 `b runs on the CPU, …`처럼 `why`에 적습니다. 각 그룹의 `dispatches`는 그 그룹이 WebGPU에서 만든 디스패치 명령이나 WebGL2에서 만든 그리기 호출의 개수입니다. CPU tier에서는 0입니다. 이 값은 명령의 개수이지 워크그룹의 모양이 아닙니다. 런타임이 만든 리포트에는 `webgpuScratch`도 있습니다. 계획의 스크래치 배열이 가져간 WebGPU 버퍼를 세는 카운터 네 개로, 새 버퍼는 `allocations`와 `allocatedBytes`에, 소유자의 풀에서 빌린 버퍼는 `reuses`와 `reusedBytes`에 셉니다. `webgpuScratch`가 없는 리포트는 그 값이 0이 아니라 알 수 없다는 뜻입니다. `FuseReport`와 `mergeReports`는 `typeshade/runtime`에서도 가져올 수 있습니다. 이 함수는 여러 리포트를 하나로 합치면서 그룹마다 `tier`와 `dispatches`를 유지합니다. 스크래치 카운터는 모든 리포트가 기록했을 때만 더합니다. 그래서 리포트를 읽기만 하는 호스트는 플래너를 싣지 않습니다.',
+          '스코프가 돌려주는 리포트는 그룹마다 이름을 대고, 두 호출이 따로 실행되는 이유를 알려 줍니다. 본문 안의 진입점 호출은 혼자 그룹을 이루며, 배열에 값을 덧붙이는 루프도 그렇습니다. `Map`이나 `Set`을 받는 호출도 별도 그룹이며, 리포트는 `b takes a Map or a Set`이나 CPU에서 실행하는 이유를 표시합니다. 각 그룹은 자신이 실행된 `tier`도 표시하며, 계획보다 뒤의 tier에서 실행된 그룹은 그 이유를 `b runs on the CPU, …`처럼 `why`에 적습니다. 각 그룹의 `dispatches`는 그 그룹이 WebGPU에서 만든 디스패치 명령이나 WebGL2에서 만든 그리기 호출의 개수입니다. CPU tier에서는 0입니다. 이 값은 명령의 개수이지 워크그룹의 모양이 아닙니다. 런타임이 만든 리포트에는 `webgpuScratch`도 있습니다. 계획의 스크래치 배열이 가져간 WebGPU 버퍼를 세는 카운터 네 개로, 새 버퍼는 `allocations`와 `allocatedBytes`에, 소유자의 풀에서 빌린 버퍼는 `reuses`와 `reusedBytes`에 셉니다. `webgpuScratch`가 없는 리포트는 그 값이 0이 아니라 알 수 없다는 뜻입니다. `mergeReports`는 여러 리포트를 하나로 합칩니다. 그룹마다 `tier`와 `dispatches`를 유지하고, 스크래치 카운터는 모든 리포트가 기록했을 때만 더합니다. `FuseReport`와 `mergeReports`는 `typeshade/runtime`에서도 가져올 수 있으므로, 리포트를 읽기만 하는 호스트는 플래너를 싣지 않습니다.',
         fuseIndirect: '간접 워크그룹 개수',
         fuseIndirectP:
           '진입점 호출은 앞선 호출이 쓴 배열에서 워크그룹 개수를 읽을 수 있습니다. `entry(bindings, { indirect, offset })`는 호출이 실행될 때 `Resident<Uint32Array>`의 `offset` 원소에서 개수 세 개를 읽습니다. 그러면 호출 체인 사이에 읽기가 필요 없습니다. 스코프 안에서는 이런 호출의 그룹이 리포트에 `indirect: true`로 적힙니다.',
@@ -3490,7 +3492,7 @@ export const ko: Copy = {
           },
           referenceParameter: {
             name: '`@inout` 매개변수',
-            p: `\`@inout a: T\`로 쓴 매개변수는 호출자의 변수 자체이고, 호출은 그 변수를 아무 표시 없이 넘긴다. \`this\`에 값을 넣는 메서드처럼 WGSL은 포인터를, ${glsl}은 \`inout\` 매개변수를 쓴다. [reference-parameters](shadeReferenceParameters)`,
+            p: `\`@inout a: T\`로 쓴 매개변수는 호출자의 변수 자체이고, 호출은 그 변수를 아무 표시 없이 넘깁니다. \`this\`에 값을 넣는 메서드처럼 WGSL은 포인터를, ${glsl}은 \`inout\` 매개변수를 씁니다. [reference-parameters](shadeReferenceParameters)`,
           },
           outParameter: {
             name: '`@out` 매개변수',
@@ -3498,7 +3500,7 @@ export const ko: Copy = {
           },
           referenceAlias: {
             name: '한 변수를 가리키는 참조 둘',
-            p: `호출 하나가 값을 쓰는 \`@inout\`이나 \`@out\` 매개변수 둘에 같은 변수를 넘길 수 없다. WGSL은 이런 포인터 별칭을 거부하고, ${glsl}은 두 값을 정해지지 않은 순서로 되돌려 씁니다.`,
+            p: `호출 하나가 값을 쓰는 \`@inout\`이나 \`@out\` 매개변수 둘에 같은 변수를 넘길 수 없습니다. WGSL은 이런 포인터 별칭을 거부하고, ${glsl}은 두 값을 정해지지 않은 순서로 되돌려 씁니다.`,
           },
           lexicalShadow: {
             name: '모듈 값과 같은 이름',
@@ -3783,7 +3785,7 @@ export const ko: Copy = {
         returnsP:
           '버텍스 진입점은 반드시 위치를 만들어 내야 합니다. 반환 타입이 `vec4`이면 그 자체가 position builtin을 답니다. 구조체를 반환하면 위치는 필드 하나가 나르고, 프로그램이 원하는 만큼 `location<n, T>` varying을 덧붙입니다. position 필드가 없는 구조체 반환, `void` 반환, `vec4`가 아닌 단일 타입은 각각 거부되며 어떤 필드나 타입을 적어야 하는지 함께 알려 줍니다.',
         builtinValuesH: 'builtin 값',
-        builtinValuesP: `\`builtin<N>\`의 이름 ${facts.wgslBuiltinIds}개는 WGSL에서 온 것으로, 문자열 그대로 전달됩니다. 따라서 WGSL 속성에는 같은 이름을 따옴표 없이 씁니다. 타입 인자는 이 이름만 허용하는 유니온이므로 오타가 있으면 작성한 줄에서 오류가 납니다. WGSL은 한 id를 제외한 모든 타입을 정하므로 타입 열에는 그 값의 타입이 표시되며, \`clip_distances\`만 타입을 직접 적습니다.`,
+        builtinValuesP: `\`builtin<N>\`의 이름 ${facts.wgslBuiltinIds}개는 WGSL에서 온 것으로, 문자열 그대로 전달됩니다. 따라서 WGSL 속성에는 같은 이름을 따옴표 없이 씁니다. 타입 인자는 이 이름만 허용하는 유니온이므로 오타가 있으면 작성한 줄에서 오류가 납니다. WGSL은 id 하나를 뺀 모든 id의 타입을 정하므로 타입 열에는 그 값의 타입이 표시되며, \`clip_distances\`만 타입을 직접 적습니다.`,
         clipDistancesP: '타입이 고정되지 않은 유일한 id입니다. 배열 길이는 작성자가 정합니다.',
         absentH: 'WGSL에 없는 이름',
         absentP:

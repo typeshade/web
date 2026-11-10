@@ -310,35 +310,31 @@ function build(): GlslMapping {
     ],
     capabilities,
     variables: [
-      row(
-        'glPosition',
-        nameIn(vertexId, 'gl_Position', 'vertex snippet'),
-        'builtin<"position", vec4>',
-      ),
+      row('glPosition', nameIn(vertexId, 'gl_Position', 'vertex snippet'), 'builtin<"position">'),
       row(
         'glFragCoord',
         nameIn(fragCoord, 'gl_FragCoord', 'fragment snippet'),
-        'builtin<"position", vec4>',
+        'builtin<"position">',
       ),
       row(
         'glVertexID',
         nameIn(vertexId, 'uint(gl_VertexID)', 'vertex snippet'),
-        'builtin<"vertex_index", u32>',
+        'builtin<"vertex_index">',
       ),
       row(
         'glInstanceID',
         nameIn(vertexId, 'uint(gl_InstanceID)', 'vertex snippet'),
-        'builtin<"instance_index", u32>',
+        'builtin<"instance_index">',
       ),
       row(
         'glFrontFacing',
         nameIn(frontFacing, 'gl_FrontFacing', 'front facing snippet'),
-        'builtin<"front_facing", bool>',
+        'builtin<"front_facing">',
       ),
       row(
         'glFragDepth',
         nameIn(frontFacing, 'gl_FragDepth', 'front facing snippet'),
-        'builtin<"frag_depth", f32>',
+        'builtin<"frag_depth">',
       ),
     ],
     absentVariables: [

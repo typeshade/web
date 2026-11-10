@@ -174,7 +174,7 @@ const m = ok ? fancy : plain // two modules, one decision, made once
 `"use typeshade"` 컴퓨트 진입점은 두 백엔드 모두에서 실행됩니다. WebGPU에서는 컴퓨트
 진입점입니다. 컴퓨트 스테이지가 없는 WebGL2에서는 패스 프로그램으로 실행됩니다. 패스 프로그램은
 패스마다 텍스처에 전체 화면을 그리는 드로이며, 컴파일러가 이를 작성하고 매니페스트가 담아
-전달한다(변경 제안 0054). 어느 단계로 실행할지는 프로그램 런타임이 고르므로, 호스트 코드는 두
+전달합니다(변경 제안 0054). 어느 단계로 실행할지는 프로그램 런타임이 고르므로, 호스트 코드는 두
 백엔드에서 같습니다.
 
 ```ts
@@ -202,8 +202,8 @@ program.gl?.computes // { evalField: … }, the pass program WebGL2 runs
 
 `program.gl.computes`에는 컴퓨트 진입점마다 패스 프로그램이 들어 있고, 패스 프로그램이 없으면 그
 이유가 들어 있습니다. `typeshade/runtime`은 디바이스가 어느 단계이든
-`rt.load(program).compute('evalField')`로 이를 실행한다(`docs/use-typeshade-surface.md` §69).
-배리어, 워크그룹 메모리, 원자 연산도 WebGL2 단계의 패스에서 WGSL이 허용하는 순서대로 실행된다
+`rt.load(program).compute('evalField')`로 이를 실행합니다(`docs/use-typeshade-surface.md` §69).
+배리어, 워크그룹 메모리, 원자 연산도 WebGL2 단계의 패스에서 WGSL이 허용하는 순서대로 실행됩니다
 (`changes/0054-webgl2-compute.md`). 1D, 큐브 배열, 멀티샘플 텍스처를 읽는 진입점처럼 패스
 프로그램이 없는 진입점은 런타임이 그 이유와 함께 거부합니다. IR 빌더에는 이보다 좁은 `portable`
 tier(커널이 속하는 지원 단계)도 있습니다. GLSL 생성기가 프래그먼트 셰이더 하나로 하향 변환하는

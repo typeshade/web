@@ -5,8 +5,10 @@ import LinkColumns from './LinkColumns.astro';
 import { copyFor, localePath, type Locale } from '../i18n/index.ts';
 import type { FunctionLesson } from '../i18n/function-lessons-en.ts';
 import { modelBits, type OperationModel } from '../lib/operation-models.ts';
-interface Props { locale: Locale; name: string; lesson: FunctionLesson; model: OperationModel }
-const { locale, name, lesson, model } = Astro.props;
+// `relatedKind` is the reference kind the related names link to: functions, or attributes on
+// an attribute page.
+interface Props { locale: Locale; name: string; lesson: FunctionLesson; model: OperationModel; relatedKind?: 'functions' | 'attributes' }
+const { locale, name, lesson, model, relatedKind = 'functions' } = Astro.props;
 const r = copyFor(locale).docs.reference;
 const t = r.worked;
 const caption = name.startsWith('texture') ? t.textureDiagram : name.startsWith('mat') || name === 'transpose' || name === 'determinant' ? t.matrixDiagram : /^(dpd|fwidth)/.test(name) ? t.derivativeDiagram : t.diagram;
@@ -46,8 +48,8 @@ const value = (v: number | boolean) => typeof v === 'number' ? Number(v.toPrecis
   <h2 id="input-limits">{r.demo.cautionHeading}</h2>
   <p><Rich text={lesson.caution} locale={locale} /></p>
   <p class="guide-note"><Rich text={r.demo.sources} locale={locale} /></p>
-  <h2 id="related-functions">{r.demo.related}</h2>
-  <LinkColumns>{model.related.map(other => <li><a href={localePath(locale, `/reference/functions/${other}/`)}><code>{other}</code></a></li>)}</LinkColumns>
+  <h2 id="related-functions">{relatedKind === 'attributes' ? t.relatedAttributes : r.demo.related}</h2>
+  <LinkColumns>{model.related.map(other => <li><a href={localePath(locale, `/reference/${relatedKind}/${other}/`)}><code>{relatedKind === 'attributes' ? `@${other}` : other}</code></a></li>)}</LinkColumns>
 </section>
 <style>
   section > h2:first-child { margin-block-start: 28px }

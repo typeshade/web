@@ -20,7 +20,8 @@ import LinkColumns from '../LinkColumns.astro';
 import ReferenceNotes from '../ReferenceNotes.astro';
 import FunctionDemo from '../FunctionDemo.astro';
 import OperationLesson from '../OperationLesson.astro';
-import { operationModel } from '../../lib/operation-models.ts';
+import { attributeModel, operationModel } from '../../lib/operation-models.ts';
+import { compile } from '../../../vendor/shader-dsl/src/index.ts';
 import Rich from '../Rich.astro';
 import { copyFor, localePath, localeSettings, type Locale } from '../../i18n/index.ts';
 import MappingTable from '../MappingTable.astro';
@@ -61,6 +62,17 @@ const model = workedLesson ? operationModel(name) : undefined;
 if (kind === 'function' && !lesson) throw new Error(`[function-lesson] missing lesson for ${name}`);
 if (workedLesson && !model) throw new Error(`[function-lesson] missing worked model for ${name}`);
 const demo = kind === 'function' ? functionDemo(name) : undefined;
+// A stage attribute and the kernel workgroup size carry a lesson too (compiler change 0130 moved
+// the stage from a call to an attribute). The page keeps its attribute title and description;
+// the lesson is a section under the summary. Each model's setup is compiled here, so a pin that
+// refuses one stops the build.
+const attributeLesson = kind === 'attribute' ? (r.worked.attributeLessons as Record<string, FunctionLesson>)[name] : undefined;
+const attributeLessonModel = attributeLesson ? attributeModel(name) : undefined;
+if (attributeLesson && !attributeLessonModel) throw new Error(`[attribute-lesson] missing worked model for ${name}`);
+if (attributeLessonModel?.setup) {
+  const refused = compile(`"use typeshade";\n${attributeLessonModel.setup}`, { fileName: `${name}.shade.ts` }).diagnostics.filter((d) => d.category === 'error');
+  if (refused.length > 0) throw new Error(`[attribute-lesson] the setup of @${name} no longer compiles at the pin: ${refused.map((d) => `${d.code} ${d.message}`).join('; ')}`);
+}
 const section = languageSection(kind);
 const named = r.kinds[kind];
 const kindWord = e.kindWords[kind];
@@ -167,6 +179,12 @@ const sections = [
     { id: 'input-limits', label: r.demo.cautionHeading, show: true },
     { id: 'related-functions', label: r.demo.related, show: true },
   ] : []),
+  ...(attributeLessonModel ? [
+    { id: 'worked-examples', label: r.worked.heading, show: true },
+    { id: 'practical-use', label: r.demo.useHeading, show: true },
+    { id: 'input-limits', label: r.demo.cautionHeading, show: true },
+    { id: 'related-functions', label: r.worked.relatedAttributes, show: true },
+  ] : []),
   ...(notes?.sections ?? []).map((n) => ({ id: n.id, label: n.heading.replace(/`/g, ''), show: true })),
   { id: 'syntax', label: e.syntax, show: true },
   // A decorator written on its own has no row to show and still has something to say, so
@@ -239,6 +257,8 @@ const meta = `title:${searchNames} (${kindWord})`;
   </details>}
   {demo && lesson && <FunctionDemo locale={locale} name={name} lesson={lesson} />}
   {model && workedLesson && <OperationLesson locale={locale} name={name} lesson={workedLesson} model={model} />}
+  {attributeLesson && attributeLessonModel && <p lang={locale} data-attribute-lesson={name}><Rich text={attributeLesson.meaning} locale={locale} /></p>}
+  {attributeLesson && attributeLessonModel && <OperationLesson locale={locale} name={name} lesson={attributeLesson} model={attributeLessonModel} relatedKind="attributes" />}
   <ReferenceNotes locale={locale} view={notes} />
   {(spelled || entry.kind === 'builtin') && (
     <dl class="ref-facts" lang={locale}>

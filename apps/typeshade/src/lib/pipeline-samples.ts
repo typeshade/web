@@ -8,8 +8,8 @@ import { compileTsSource } from '../../vendor/shader-dsl/src/compiler/ts/source-
 const CAMERA = `"use typeshade";
 
 class Camera {
-  view!: mat4
-  pos!: vec3
+  view: mat4
+  pos: vec3
 }
 
 declare const camera: uniform<Camera>

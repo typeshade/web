@@ -178,7 +178,7 @@ invertRenames(renames).get('b') // { emitted: 'b', authored: ['terrainShade'] }
 가드까지 포함해 호스트가 이름으로 찾습니다. 바인딩 구조체 이름은 그대로 GLSL 유니폼
 블록의 태그가 됩니다. 구조체 필드 이름은 std140 레이아웃 정보를 담고 있고, GLSL에서는
 varying이 이 이름으로 두 스테이지를 연결합니다. IR 빌더가 조립한 모듈에 raw 문(statement)이
-들어 있으면 모듈 전체의 이름을 바꾸지 않는다([`docs/ir-builder.md`](docs/ir-builder.md)).
+들어 있으면 모듈 전체의 이름을 바꾸지 않습니다([`docs/ir-builder.md`](docs/ir-builder.md)).
 
 ```ts
 const renames = new Map<string, string>()

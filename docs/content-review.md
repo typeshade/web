@@ -213,12 +213,39 @@ The compiler pin move to `34cea187` (PR #52, 2026-11-10) changes TypeShade copy 
 Korean: the stage attribute wording that replaces "stage call", the entry attribute types, the
 parameter qualifiers, the loop diagnostics, the fuse report, the host resources section of the
 quick start, three paragraphs of the WebGPU and WebGL2 page (host resources, failed `Resident`
-contents, the CPU `sin` and `cos`), 27 Korean API reference entries, 12 Korean guide sections and
-the record
-`apps/typeshade/compiler-changes.md`. The agent that made the change wrote the English first and
-translated it, and verified each technical statement against the pinned compiler. **The editorial
-review of this new and changed prose has not run.** No Luna subagent read it, and no person read
-the Korean for idiom. The Korean guide section `the-cpu-oracle` is shown in English until it is
-translated again from the pinned `AUTHORING.md`; it was already shown in English at `e30bbe57`. Next action: assign the changed keys of
-`apps/typeshade/src/i18n/en.ts` and `ko.ts`, `content/api/ko/` and the quick start to a reviewer,
-then record the review here.
+contents, the CPU `sin` and `cos`), four attribute lessons, 27 Korean API reference entries, 12
+Korean guide sections and the record `apps/typeshade/compiler-changes.md`. The agent that made the
+change wrote the English first and translated it, and verified each technical statement against
+the pinned compiler.
+
+Editorial review of PR #52. An independent agent of the same session reviewed commit `8fc5577`.
+This is a deviation from the Luna review this file names; the owner chose it on 2026-11-10. It
+reported 2 blocking findings, 11 should-fix findings and 7 notes. Applied: B1, B2, S1 to S11, N1,
+N2, N3 and N7. N4 and N6 are older than this change and stay. The mapping tables now refuse a
+source cell that the pinned compiler's `migrateSource` would rewrite
+(`apps/typeshade/src/lib/target-mapping.ts`).
+
+- Covered by the reviewer: the changed keys of `en.ts` and `ko.ts`, the quick start, the mapping
+  tables, `compiler-changes.md`, the Korean guide sections `control-flow` and
+  `functions-and-entry-points` in full, seven other sections in their changed blocks.
+- Not covered by the reviewer: `emitting-and-reflection`, `conditional-programs` and
+  `production-emit` beyond their code, `content/guide/ko/rules.json`, 22 Korean API entries in
+  full, the programs of `src/lib/error-codes.ts`, anchors and layout.
+- Covered by the authoring agent after the review: the other ten Korean guide sections, by a
+  register pass (plain endings made polite) and a comparison of each Korean sentence that states
+  a requirement or an absolute against its English block. This is not a full reading. Three
+  Korean sentences state a duty where the English describes or conditions
+  (`capabilities-extensions` "두 제한을 고려해야 합니다" and "구별해야 합니다", `fp64` "정해야 합니다"). They
+  are older than this change, state nothing false at the pin, and stay for a reviewer.
+- Not reviewed by anyone: the four attribute lessons and the text changed after `8fc5577`.
+- No person read the Korean for idiom.
+
+Open source problems, in the compiler repository (`typeshade/typeshade`), not edited here:
+
+- `AUTHORING.md`, "for and while": "`for` is the counted loop" holds only for a counted header
+  since change 0136; a `for` whose body writes its bound now compiles as an open loop.
+- The pinned JSDoc of `Device` and `FuseReport` still describes its behaviour with `resident()`
+  and `configure({ prefer })`, which change 0138 deprecates, so the Korean API entries do too.
+
+The Korean guide section `the-cpu-oracle` is shown in English until it is translated again from
+the pinned `AUTHORING.md`; it was already shown in English at `e30bbe57`.

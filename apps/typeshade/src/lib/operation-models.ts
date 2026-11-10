@@ -64,6 +64,49 @@ const bitNames = [
 const bits = (x: number) => (x >>> 0).toString(2).padStart(32, '0');
 export { bits as modelBits };
 
+/** The worked models of the four attribute lessons (src/i18n/operation-lessons-*.ts,
+ *  `attributeLessons`). Each setup is a whole program body that compiles at the pin; the
+ *  build compiles it in ReferenceEntryPage. `related` names other attributes. */
+const ATTRIBUTE_MODELS: Readonly<Record<string, OperationModel>> = {
+  vertex: {
+    setup:
+      '@vertex\nexport function vs(i: builtin<"vertex_index">): vec4 {\n  return vec4(f32(i) - 1., 0., 0., 1.);\n}',
+    cases: cases(
+      ['i = 0', 'i = 1', 'i = 2'],
+      ['vec4(-1, 0, 0, 1)', 'vec4(0, 0, 0, 1)', 'vec4(1, 0, 0, 1)'],
+    ),
+    related: ['fragment', 'compute'],
+  },
+  fragment: {
+    setup:
+      '@fragment\nexport function fs(uv: location<0, vec2>): vec4 {\n  return vec4(uv, 0., 1.);\n}',
+    cases: cases(
+      ['uv = (0, 0)', 'uv = (0.5, 0.5)', 'uv = (1, 0)'],
+      ['vec4(0, 0, 0, 1)', 'vec4(0.5, 0.5, 0, 1)', 'vec4(1, 0, 0, 1)'],
+    ),
+    related: ['vertex', 'compute'],
+  },
+  compute: {
+    setup:
+      'declare const out: storage<array<u32>, "read_write">;\n\n@compute([64])\nexport function main(gid: builtin<"global_invocation_id">): void {\n  out[gid.x] = gid.x;\n}',
+    cases: cases(
+      ['gid.x = 0', 'gid.x = 63', 'gid.x = 64'],
+      ['workgroup 0, lane 0', 'workgroup 0, lane 63', 'workgroup 1, lane 0'],
+    ),
+    related: ['workgroup_size', 'vertex', 'fragment'],
+  },
+  workgroup_size: {
+    setup:
+      '@workgroup_size([128])\nexport function scale(xs: array<f32>): void {\n  for (let i = 0; i < xs.length; i++) {\n    xs[i] = xs[i] * 2.;\n  }\n}',
+    cases: cases(
+      ['no @workgroup_size', '@workgroup_size([128])', 'a loop that reduces'],
+      ['64', '128', '256'],
+    ),
+    related: ['compute'],
+  },
+};
+export const attributeModel = (name: string): OperationModel | undefined => ATTRIBUTE_MODELS[name];
+
 export function operationModel(name: string): OperationModel | undefined {
   if (atomicNames.includes(name)) {
     const state = [5, 0, 0xffffffff];
@@ -712,7 +755,7 @@ export function operationModel(name: string): OperationModel | undefined {
     },
     // The stage calls of compiler change 0111 and the numerical contract of change 0107.
     uniform: {
-      setup: 'class Params { scale!: f32; }\ndeclare const u: uniform<Params>;',
+      setup: 'class Params { scale: f32; }\ndeclare const u: uniform<Params>;',
       cases: cases(
         [
           'host: u.scale = 1; shader: u.scale',

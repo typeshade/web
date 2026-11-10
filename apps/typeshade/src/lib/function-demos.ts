@@ -154,7 +154,7 @@ export function demoSource(demo: FunctionDemo): string {
 
 import { PlotUniforms, plot2D, plot3D } from "./function-plot.shade.ts";
 
-${demo.k ? 'class Uniforms extends PlotUniforms { k!: f32; }' : 'class Uniforms extends PlotUniforms {}'}
+${demo.k ? 'class Uniforms extends PlotUniforms { k: f32; }' : 'class Uniforms extends PlotUniforms {}'}
 declare const u: uniform<Uniforms>;
 
 // Inputs outside the mathematical domain are omitted, including after pan or zoom.

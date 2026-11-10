@@ -442,11 +442,16 @@ id first, then the pull request that did the work.
   starters and checks, the live-shader prelude) is rewritten with the pinned compiler's
   `migrateSource`; both dictionaries say "stage attribute" for "stage call"; the language
   reference drops the Stage calls family and lists `@vertex`, `@fragment`, `@compute` and
-  `@workgroup_size` with the attributes; the five stage-call lessons and models go with their
-  reference pages. The benchmark sources keep the written type of a built-in value, since the
-  baseline build `e30bbe57` refuses the short form (`src/lib/benchmarks/subgroups.ts`). Twelve of
-  the 13 Korean guide sections the pinned `AUTHORING.md` changed are translated again. Open:
-  `the-cpu-oracle` is shown in English, as it was at `e30bbe57`. Handled in #52.
+  `@workgroup_size` with the attributes. The lessons of `vertex`, `fragment`, `compute` and
+  `workgroup_size` (en and ko) are written again in the attribute form and shown on the four
+  attribute pages, each with a model whose program the build compiles; the `numerics` lesson
+  left with change 0131. The benchmark sources write `builtin<N>` in the short form, and the
+  regression catalog records the four subgroup-suite cases as refused on the baseline build
+  `e30bbe57`, which predates that form (`src/lib/benchmarks/subgroups.ts`). Twelve of the 13
+  Korean guide sections the pinned `AUTHORING.md` changed are translated again. Open:
+  `the-cpu-oracle` is shown in English, as it was at `e30bbe57`; the pages
+  `/reference/functions/vertex/`, `fragment`, `compute`, `workgroup_size` and `numerics` are
+  gone and have no redirect. Handled in #52.
 - 0131: `numerics` is removed. The `TS8078` example, the `numerics` lesson (en and ko) and its
   model, `content/api/ko/numericsclass.json`, the `numerics` member of `FuncDecl` and the
   `contract` sentence of `DeterminismKind` are removed; `TS8078` is listed as retired. Handled in
@@ -478,8 +483,8 @@ id first, then the pull request that did the work.
   `array`, an exported binding, `resize`, `createDevice` and `device.use()` do, that `resident()`
   and `configure()` are deprecated, and that no call takes a resource at this pin; `uniform`,
   `zeros`, `array`, `texture`, `Buffer`, `Uniform` and `Device.use` are API reference pages with
-  Korean translations. Open: milestones 3 to 9 are not implemented in the compiler, and the site's
-  own renderer stays. Handled in #52.
+  Korean translations. Open: milestones 2 to 9 are not implemented in the compiler (milestone 2 is carried out
+  under 0042), and the site's own renderer stays. Handled in #52.
 - 0140: the stage calls are refused at once. The `TS8028` example is a refused stage call with
   the attribute as its fix. The work is the work of 0130. Handled in #52.
 - 0042: the compiler's libm, first slice: `sin` and `cos` on the CPU. The WebGPU and WebGL2 page
