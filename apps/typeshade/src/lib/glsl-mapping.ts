@@ -94,76 +94,88 @@ const GLSL_NO_FORM: readonly TypeProbe[] = [
   probe('atomic', 'atomic<u32>', 'storage'),
 ];
 
-const UBO_SNIPPET = `class Block { scale!: f32; tint!: vec3 }
+const UBO_SNIPPET = `class Block { scale: f32; tint: vec3 }
 declare const u: uniform<Block>
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv * u.scale, u.tint.x, 1.)
-});
+}
 `;
 
 const LOOSE_UNIFORM_SNIPPET = `declare const scale: uniform<f32>
 
-export const fs = fragment(function fs(): vec4 {
+@fragment
+export function fs(): vec4 {
   return vec4(scale, 0., 0., 1.)
-});
+}
 `;
 
 const STORAGE_READ_SNIPPET = `declare const src: storage<array<f32>>
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   return vec4(src[i32(uv.x)], 0., 0., 1.)
-});
+}
 `;
 
 const OVERRIDE_SNIPPET = `const tint: override<f32> = 0.85
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv * tint, 0., 1.)
-});
+}
 `;
 
-const VARYING_SNIPPET = `interface VsOut { pos: builtin<"position", vec4>; uv: location<0, vec2> }
+const VARYING_SNIPPET = `interface VsOut { pos: builtin<"position">; uv: location<0, vec2> }
 
-export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): VsOut {
+@vertex
+export function vs(vi: builtin<"vertex_index">): VsOut {
   return { pos: vec4(f32(vi), 0., 0., 1.), uv: vec2(f32(vi), 0.) }
-});
+}
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   return vec4(uv, 0., 1.)
-});
+}
 `;
 
 const SHADOW_SNIPPET = `declare const shadowMap: texture_depth_2d
 declare const shadowSmp: sampler_comparison
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   return vec4(textureSampleCompare(shadowMap, shadowSmp, uv, 0.5), 0., 0., 1.)
-});
+}
 `;
 
-export const FRAGCOORD_SNIPPET = `export const fs = fragment(function fs(p: builtin<"position", vec4>): vec4 {
+export const FRAGCOORD_SNIPPET = `@fragment
+export function fs(p: builtin<"position">): vec4 {
   return p
-});
+}
 `;
 
-export const VERTEX_ID_SNIPPET = `export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>, ii: builtin<"instance_index", u32>): vec4 {
+export const VERTEX_ID_SNIPPET = `@vertex
+export function vs(vi: builtin<"vertex_index">, ii: builtin<"instance_index">): vec4 {
   return vec4(f32(vi), f32(ii), 0., 1.)
-});
+}
 
-export const fs = fragment(function fs(): vec4 {
+@fragment
+export function fs(): vec4 {
   return vec4(1., 0., 0., 1.)
-});
+}
 `;
 
-export const FRONT_FACING_SNIPPET = `interface Out { depth: builtin<"frag_depth", f32>; color: location<0, vec4> }
+export const FRONT_FACING_SNIPPET = `interface Out { depth: builtin<"frag_depth">; color: location<0, vec4> }
 
-export const fs = fragment(function fs(facing: builtin<"front_facing", bool>): Out {
+@fragment
+export function fs(facing: builtin<"front_facing">): Out {
   return { depth: 0.5, color: vec4(f32(facing), 0., 0., 1.) }
-});
+}
 `;
 
-const OPERATOR_SNIPPET = `export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+const OPERATOR_SNIPPET = `@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   const floorMod = mod(uv.x, 0.5)
   const truncMod = uv.x % 0.5
   const below: vec2b = uv < vec2(0.5, 0.25)
@@ -171,7 +183,7 @@ const OPERATOR_SNIPPET = `export const fs = fragment(function fs(uv: location<0,
   const picked = select(uv.x, uv.y, below.x)
   const blended = select(vec2(0., 0.), vec2(1., 1.), below)
   return vec4(floorMod + blended.x, truncMod + blended.y, picked, f32(below.y) + f32(same.x))
-});
+}
 `;
 
 /** The GLSL text the registry writes for one builtin, with placeholder arguments. */
@@ -226,15 +238,14 @@ function build(): GlslMapping {
   const frontFacing = emitted(FRONT_FACING_SNIPPET).glslFragment;
   const operators = emitted(OPERATOR_SNIPPET).glslFragment;
 
-  // A bare scalar uniform reaches the GLSL writer as a refusal, and the refusal is the row.
-  const looseMessage = loose.warnings
-    .map((text) => text.replace(/^Backend emit failed:\s*glsl-es300:\s*/, ''))
-    .find((text) => text.includes('std140'));
-  if (!looseMessage) {
-    throw new Error(
-      '[glsl-mapping] a bare scalar uniform no longer names the std140 block it wants',
-    );
-  }
+  // A bare scalar uniform is a private std140 block of one member in GLSL ES 3.00 (compiler
+  // change 0127), and that block is the row. The writer refused it before that change.
+  const looseBlock = pickBlock(
+    loose.glslFragment,
+    'layout(std140) uniform scale_block_ {',
+    '} scale;',
+    'bare uniform snippet',
+  );
 
   const profile = glslEs300Backend.capProfile;
   const capabilities = Object.entries(profile).map(([id, support]) =>
@@ -270,7 +281,7 @@ function build(): GlslMapping {
         pickBlock(ubo, 'layout(std140) uniform Block {', '} u;', 'uniform snippet'),
         'declare const u: uniform<Block>',
       ),
-      row('loose', null, 'declare const scale: uniform<f32>', looseMessage),
+      row('loose', looseBlock, 'declare const scale: uniform<f32>'),
       row(
         'storage',
         pick(storage, 'uniform sampler2D src;', 'storage snippet'),

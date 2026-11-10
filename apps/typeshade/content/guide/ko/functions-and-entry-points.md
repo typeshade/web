@@ -85,7 +85,8 @@ declare const params: uniform<vec4u>;
 declare const input: storage<array<f32>>;
 declare const output: storage<array<f32>, "read_write">;
 
-export const reduceWindows = compute([64], function reduceWindows(gid: builtin<"global_invocation_id", vec3u>): void {
+@compute([64])
+export function reduceWindows(gid: builtin<"global_invocation_id">): void {
   const idx = gid.x;
   if (idx >= params.x) {
     return;
@@ -96,7 +97,7 @@ export const reduceWindows = compute([64], function reduceWindows(gid: builtin<"
     acc += input[base + k];
   }
   output[idx] = acc;
-});
+}
 ```
 
 가드는 평범한 `return`으로 마지막 문장 전에 함수를 빠져나갑니다. 조기 반환은
@@ -121,7 +122,7 @@ export const reduceWindows = compute([64], function reduceWindows(gid: builtin<"
 "use typeshade";
 
 interface VsOut {
-  pos: builtin<"position", vec4>;
+  pos: builtin<"position">;
   uv: location<0, vec2>;
 }
 
@@ -133,7 +134,8 @@ interface Gradient {
 
 declare const u: uniform<Gradient>;
 
-export const vsFull = vertex(function vsFull(idx: builtin<"vertex_index", u32>): VsOut {
+@vertex
+export function vsFull(idx: builtin<"vertex_index">): VsOut {
   let pos = vec2(-1., -1.);
   if (idx == 1) {
     pos = vec2(3., -1.);
@@ -141,13 +143,14 @@ export const vsFull = vertex(function vsFull(idx: builtin<"vertex_index", u32>):
     pos = vec2(-1., 3.);
   }
   return { pos: vec4(pos, 0., 1.), uv: vec2((pos.x + 1.) * 0.5, (pos.y + 1.) * 0.5) };
-});
+}
 
-export const fsGradient = fragment(function fsGradient(vo: VsOut): vec4 {
+@fragment
+export function fsGradient(vo: VsOut): vec4 {
   const t = vo.uv.y + u.mixBias;
   const rgb = mix(u.bottom.rgb, u.top.rgb, t);
   return vec4(rgb, 1.);
-});
+}
 ```
 
 구조체 없이 값만 돌려주는 프래그먼트 진입점은 따로 적지 않아도 첫 번째 색상 어태치먼트인
@@ -176,9 +179,10 @@ export function hash(p: vec2): f32 {
 
 import { hash } from "./noise.shade.ts";
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   return vec4(hash(uv), hash(uv * 2.), 0., 1.);
-});
+}
 ```
 
 이런 프로그램을 컴파일하는 호스트 호출은

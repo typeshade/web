@@ -494,7 +494,7 @@ test('a subgroup case is refused by a build that predates it, and skipped as uns
     'reduction-subgroup-levels',
   ]);
   expect(regressionCatalog.builds.every((b) => b.cases.length === 26)).toBe(true);
-  // Both builds of the comparison (cdb12dc0 and e30bbe57) carry compiler change 0117, so
+  // Both builds of the comparison (e30bbe57 and 34cea187) carry compiler change 0117, so
   // neither refuses the three programs that use the subgroup built-in functions, and each
   // compiles all four into its own WGSL. A baseline that predates 0117 refuses exactly those
   // three; the comparison of 8c088df and cdb12dc0 held that before this pin.

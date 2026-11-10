@@ -21,27 +21,30 @@ interface VsIn {
   uv: location<1, vec2>
 }
 
-export const vs = vertex(function vs(vid: builtin<"vertex_index", u32>, vin: VsIn): vec4 {
+@vertex
+export function vs(vid: builtin<"vertex_index">, vin: VsIn): vec4 {
   return camera.view * vec4(vin.position, 1)
-});
+}
 
-export const fs = fragment(function fs(pid: builtin<"position", vec4>): vec4 {
+@fragment
+export function fs(pid: builtin<"position">): vec4 {
   return vec4(pid.x, 0, 0, 1)
-});`;
+}`;
 
 export const interpolationSample = `class VsOut {
-  pos!: builtin<"position", vec4>
-  uv!: location<0, vec2>
-  id!: location<1, u32>
-  tint!: location<2, vec3, { interpolate: "flat" }>
+  pos: builtin<"position">
+  uv: location<0, vec2>
+  id: location<1, u32>
+  tint: location<2, vec3, { interpolate: "flat" }>
 }`;
 
 export const computeSample = `${CAMERA}
 declare const pixels: storage<array<f32>, "read_write">
 
-export const paint = compute([64, 1, 1], function paint(gid: builtin<"global_invocation_id", vec3u>) {
+@compute([64, 1, 1])
+export function paint(gid: builtin<"global_invocation_id">) {
   pixels[gid.x] = camera.pos.x
-});`;
+}`;
 
 for (const [name, source] of [
   ['entry', entrySample],

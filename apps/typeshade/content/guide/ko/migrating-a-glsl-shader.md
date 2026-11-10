@@ -39,9 +39,10 @@ interface Camera {
 // uniform Camera { mat4 u_matrix; vec2 u_viewport_px; } u_camera;
 declare const u_camera: uniform<Camera>;
 
-export const vs = vertex(function vs(pos: location<0, vec2>): vec4 {
+@vertex
+export function vs(pos: location<0, vec2>): vec4 {
   return u_camera.u_matrix * vec4(pos / u_camera.u_viewport_px, 0., 1.);
-});
+}
 ```
 
 ### 내장 값
@@ -66,12 +67,13 @@ export const vs = vertex(function vs(pos: location<0, vec2>): vec4 {
 
 interface FragOut {
   color: location<0, vec4>;
-  depth: builtin<"frag_depth", f32>;
+  depth: builtin<"frag_depth">;
 }
 
-export const fsCoord = fragment(function fsCoord(pos: builtin<"position", vec4>): FragOut {
+@fragment
+export function fsCoord(pos: builtin<"position">): FragOut {
   return { color: vec4(pos.x * 0.001, pos.y * 0.001, 0., 1.), depth: 0.5 };
-});
+}
 ```
 
 ### WebGL2만 타깃으로 삼기

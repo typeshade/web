@@ -1,8 +1,9 @@
 {
   "slug": "array",
-  "source": "06c0ec421e8a0fa954d3fc391b3007d38f6c16852cdf03c220369342e624460c",
+  "source": "7de088231533cd12c4b42fff189e20a76c338744c0dfec752b7ea01777c001a6",
   "texts": {
-    "summary": "크기가 없는 array<T>를 호스트 값으로 나타내며, 커널 함수의 배열이 받는 타입입니다(규칙 8.21). T의 스칼라에 맞는 타입 배열이고, 벡터 T도 성분을 차례로 이어 담아 같은 타입 배열이 됩니다. 구조체나 행렬 같은 다른 T는 readonly T[]입니다. 어느 경우든 그 값의 Resident도 받습니다.",
-    "description": "크기가 있는 배열 `array<T, N>`은 값 `N`개를 담은 `readonly T[]`입니다(결정 D4).\n\nresident 배열을 담는 변수는 `Resident` 표기를 그대로 씁니다: `Resident<Float32Array>`."
+    "summary": "data가 담은 cls의 구조체들로 스토리지 배열을 만듭니다. 값 하나를 주면 호출 사이에 그 값을 디바이스에 두는 Resident를 만들며, 이는 resident()가 만들던 것과 같습니다(수정안 A1: array(xs)가 resident(xs)를 대신합니다). 길이와 원소를 주면 0으로 채운 Resident를 만듭니다.",
+    "returns": "class에는 `Buffer<T>`를, 그 밖에는 `Resident`를 돌려줍니다.",
+    "exceptions.TypeError": "[`zeros`](/api/zeros/)와 같은 경우, 배열이 아닌 `data`, 그리고 `resident()`가 각 형태에서 던지는 경우에 `TypeError`가 발생합니다."
   }
 }

@@ -22,7 +22,7 @@ sourceLine: 157
 
 ```ts
 interface VsOut {
-  pos: builtin<"position", vec4>;
+  pos: builtin<"position">;
   uv: location<0, vec2>;
 }
 ```
@@ -34,11 +34,12 @@ id와 대조합니다. `T`가 `vec4`가 아닌 `builtin<"position", T>`는 오�
 인덱스만으로 계산합니다. 스테이지 입력은 같은 속성을 붙인 평범한 매개변수입니다.
 
 ```ts
-export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): VsOut {
+@vertex
+export function vs(vi: builtin<"vertex_index">): VsOut {
   const x = f32(vi & 1) * 4. - 1.;
   const y = f32(vi >> 1) * 4. - 1.;
   return { pos: vec4(x, y, 0., 1.), uv: vec2(x * 0.5 + 0.5, y * 0.5 + 0.5) };
-});
+}
 ```
 
 `vi`는 `u32`이고, `f32(vi & 1)`이 이 값을 변환합니다. 소수점 없이 쓴 숫자는 옆 피연산자의 정수
@@ -53,10 +54,11 @@ export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): VsOut {
 `vec2`입니다.
 
 ```ts
-export const fs = fragment(function fs(vo: VsOut): vec4 {
+@fragment
+export function fs(vo: VsOut): vec4 {
   const shade = 1. - vo.uv.y;
   return vec4(vo.uv.x, shade, 0.5, 1.);
-});
+}
 ```
 
 프래그먼트가 구조체 없이 값만 돌려주면 그 값은 첫 번째 색상 어태치먼트인 location 0으로
@@ -71,20 +73,22 @@ export const fs = fragment(function fs(vo: VsOut): vec4 {
 "use typeshade";
 
 interface VsOut {
-  pos: builtin<"position", vec4>;
+  pos: builtin<"position">;
   uv: location<0, vec2>;
 }
 
-export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): VsOut {
+@vertex
+export function vs(vi: builtin<"vertex_index">): VsOut {
   const x = f32(vi & 1) * 4. - 1.;
   const y = f32(vi >> 1) * 4. - 1.;
   return { pos: vec4(x, y, 0., 1.), uv: vec2(x * 0.5 + 0.5, y * 0.5 + 0.5) };
-});
+}
 
-export const fs = fragment(function fs(vo: VsOut): vec4 {
+@fragment
+export function fs(vo: VsOut): vec4 {
   const shade = 1. - vo.uv.y;
   return vec4(vo.uv.x, shade, 0.5, 1.);
-});
+}
 ```
 
 다른 셰이더 파일을 가져오는 파일은 그 파일과 함께 모듈 하나가 됩니다. 쓰는 법은

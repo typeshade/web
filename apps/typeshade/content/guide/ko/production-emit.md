@@ -29,13 +29,15 @@ function terrainShade(uv: vec2): vec4 {
   return vec4(h, h * 0.5, 0.25, 1.) * u.tint;
 }
 
-export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): vec4 {
+@vertex
+export function vs(vi: builtin<"vertex_index">): vec4 {
   return vec4(f32(vi & 1) * 4. - 1., f32(vi >> 1) * 4. - 1., 0., 1.);
-});
+}
 
-export const fs = fragment(function fs(p: builtin<"position", vec4>): vec4 {
+@fragment
+export function fs(p: builtin<"position">): vec4 {
   return terrainShade(p.xy * 0.01);
-});
+}
 ```
 
 ### 플러그인 묶음

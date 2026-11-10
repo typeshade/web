@@ -22,21 +22,22 @@ const headings = [
 const disc = `"use typeshade"
 
 class Uniforms {
-  resolution!: vec2
-  center!: vec2
-  radius!: f32
-  tint!: vec3
+  resolution: vec2
+  center: vec2
+  radius: f32
+  tint: vec3
 }
 
 declare const u: uniform<Uniforms>
 
-export const main = fragment(function main(uv: location<0, vec2>): vec4 {
+@fragment
+export function main(uv: location<0, vec2>): vec4 {
   const ratio: f32 = u.resolution.x / u.resolution.y
   const p: vec2 = (uv - u.center) * vec2(ratio, 1.)
   const d: f32 = length(p) - u.radius
   const edge: f32 = 1. - smoothstep(0., 0.008, d)
   return vec4(mix(vec3(0.15, 0.14, 0.91), u.tint, edge), 1.)
-});
+}
 `;
 ---
 

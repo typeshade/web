@@ -22,17 +22,19 @@ interface Uniforms {
 declare const u: uniform<Uniforms>;
 
 interface VsOut {
-  pos: builtin<"position", vec4>;
+  pos: builtin<"position">;
   uv: location<0, vec2>;
 }
 
-export const vs = vertex(function vs(xy: location<0, vec2>): VsOut {
+@vertex
+export function vs(xy: location<0, vec2>): VsOut {
   return { pos: vec4(xy, 0., 1.), uv: xy * 0.5 + 0.5 };
-});
+}
 
-export const fs = fragment(function fs(vo: VsOut): vec4 {
+@fragment
+export function fs(vo: VsOut): vec4 {
   return u.tint * (0.5 + 0.5 * sin(u.time + vo.uv.x));
-});
+}
 ```
 
 ### WGSL 생성

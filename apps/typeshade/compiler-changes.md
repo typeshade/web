@@ -370,7 +370,8 @@ id first, then the pull request that did the work.
   option. The language reference lists `numerics` with the stage calls (en and ko), read from
   the compiler's `STAGE_CALL_DOCS`; `TS8078` has an error-code page with a trigger (an unknown
   class) and a fix; the pages generated from Rules 6.7 and 11.22 were read against the rules at
-  the pin; `NumericsClass` and the `numerics` member of `FuncDecl` are translated. Handled in
+  the pin; the export that typed the class list and the `numerics` member of `FuncDecl` are
+  translated (change 0131 removes both). Handled in
   #25.
 - 0108: a host view carries the author's JSDoc. No page of this site copies the host-view
   listing of surface §64; the quick start's host setup (en and ko) says that a view carries the
@@ -397,3 +398,87 @@ id first, then the pull request that did the work.
 - 0118: each fuse group names its tier. The control-flow page's fuse report paragraph (en and
   ko) says each group names its `tier` and why it ran on a later tier than the plan's, and the
   `FuseReport` reference and its Korean translation read the new field. Handled in #25.
+- 0119: pin `34cea187`: a kernel function's integer reduction folds inside a subgroup as a variant
+  the runtime selects. The regression catalog compiles its 26 cases at `e30bbe57` and at
+  `34cea187`; `DeviceInfo.subgroups` and `DeviceStatistics.variants` are translated. Open: the
+  benchmark record does not name the variant each row ran, and the method copy does not explain
+  the comparison. Handled in #52.
+- 0120: pin `34cea187`: accepted, and its Amendment A2 moves every obligation to 0138. Nothing is
+  done under this id. Recorded in #52.
+- 0121: each fuse group counts its dispatches. The control-flow page's fuse report paragraph (en
+  and ko) says what `dispatches` counts and that it is not a workgroup shape; `FuseReport` and
+  `mergeReports` are translated again. Handled in #52.
+- 0122: a portable fusion origin. `HostFaceOptions.origin` is an API reference member with its
+  Korean translation; `src/scripts/playground-host-service.ts` passes a URI `fileName` and keeps
+  the default. No page explains the Vite `originNamespace` option. Handled in #52.
+- 0123: scalar `f64` module constants. The English guide reads the pinned `AUTHORING.md`. Open:
+  the Korean sections `fp64` and `values-and-mutation` are shown in English until they are
+  translated again, and the from-TypeScript rows have no module-level `f64` row. Recorded in #52.
+- 0124: `maxSteps` in a debug launch configuration. The English overview reads the pinned
+  `AUTHORING.md`. Open: the Korean `overview` section is shown in English until it is translated
+  again. Recorded in #52.
+- 0125: the empty bindings object is optional. The quick start writes `fs(canvas)`; the
+  Playground's starter (`src/scripts/playground-host-default.ts`) omits `{}` for a fragment entry
+  with no binding; the host-call copy of the quick start and of the WebGPU and WebGL2 page says so
+  (en and ko). Open: the Korean `the-cpu-oracle` section is shown in English. Handled in #52.
+- 0126: a pure alias root. The English guide reads the pinned `AUTHORING.md`. Open: the Korean
+  `the-cpu-oracle` section is shown in English, and `scripts/playground-diagnostics.test.ts` and
+  `scripts/check-playground.mjs` have no alias chain. Recorded in #52.
+- 0127: a bare uniform runs on WebGL2. `hello-uniform` counts as renderable (77 of the examples);
+  its Korean description follows the pinned English; the TS8015 example and the Playground
+  diagnostics test use a module with two fragment entries, since a bare uniform no longer warns.
+  Handled in #52.
+- 0128: WebGPU scratch metrics in a fuse report. The fuse report paragraph (en and ko) names the
+  four counters, says that a report without `webgpuScratch` is unknown and how `mergeReports`
+  sums them; the `FuseReport` and `mergeReports` translations follow. Handled in #52.
+- 0129: failed `Resident` contents propagate. The WebGPU and WebGL2 page gains a paragraph (en and
+  ko) on the rejected call, the recovery by a write-only call and the calls that continue; the
+  `Resident`, `fuse` and `Device.fuse` translations follow. Handled in #52.
+- 0130: a stage is an attribute on the function declaration. Every `"use typeshade"` program the
+  site holds (page samples, error-code triggers and fixes, mapping and lowering rows, Playground
+  starters and checks, the live-shader prelude) is rewritten with the pinned compiler's
+  `migrateSource`; both dictionaries say "stage attribute" for "stage call"; the language
+  reference drops the Stage calls family and lists `@vertex`, `@fragment`, `@compute` and
+  `@workgroup_size` with the attributes; the five stage-call lessons and models go with their
+  reference pages. The benchmark sources keep the written type of a built-in value, since the
+  baseline build `e30bbe57` refuses the short form (`src/lib/benchmarks/subgroups.ts`). Open: the
+  13 Korean guide sections the pinned `AUTHORING.md` changed are shown in English. Handled in #52.
+- 0131: `numerics` is removed. The `TS8078` example, the `numerics` lesson (en and ko) and its
+  model, `content/api/ko/numericsclass.json`, the `numerics` member of `FuncDecl` and the
+  `contract` sentence of `DeterminismKind` are removed; `TS8078` is listed as retired. Handled in
+  #52.
+- 0132: the diagnostic filter is removed. The Korean title of `sample-branch` follows the pinned
+  English; the `directives` member of `CompileTsSourceResult` is removed; the `TS8052` example is
+  a sample the compiler cannot rewrite, in a loop left by a `break`; the lowering table passes no
+  `diagnostics`. Handled in #52.
+- 0134: a written number takes its type from its uses. The `TS8053` example is removed and the
+  code is listed as retired; the `deprecations` option's translations say that no window is open.
+  Open: no snippet that writes a cast or a decimal point only to type a literal is rewritten.
+  Handled in #52.
+- 0135: a built-in value takes its type from WGSL, and the compiler gives a user-defined value
+  its location. The types page (en and ko) says so, with the options as the second argument of
+  `builtin<N, O>`; every sample writes `builtin<"position">`; the `TS8029` example is a
+  user-defined input of a compute entry; `EntryIoField.location` and `VertexAttr.location` are
+  translated again. Handled in #52.
+- 0136: every `for` header compiles, and an entry's result is inferred. The lines of `TS8006`,
+  `TS8007` and `TS8008` (en and ko) state the refusals that remain, with examples that produce
+  them at the pin; the from-WGSL `for` note and the CPU and GPU page's loop sentence say that a
+  `for` means what it means in TypeScript. Open: the Korean `control-flow` section is shown in
+  English. Handled in #52.
+- 0137: a parameter qualifier is written before the parameter. `@inout a: T` and `@out c: T`
+  replace `inout<T>` and `out<T>` in both dictionaries, the lowering rows, the functions page and
+  the fenced code of the Korean guide; `let s: f32` replaces `let s!: f32`. Handled in #52.
+- 0138: host resources, milestone 1 with Amendments A1 to A3. The quick start gains "Keeping data
+  for the GPU" (en and ko) with a shader file the build compiles and a host file run against the
+  module the pinned compiler generates; the WebGPU and WebGL2 page says what `uniform`, `zeros`,
+  `array`, an exported binding, `resize`, `createDevice` and `device.use()` do, that `resident()`
+  and `configure()` are deprecated, and that no call takes a resource at this pin; `uniform`,
+  `zeros`, `array`, `texture`, `Buffer`, `Uniform` and `Device.use` are API reference pages with
+  Korean translations. Open: milestones 3 to 9 are not implemented in the compiler, and the site's
+  own renderer stays. Handled in #52.
+- 0140: the stage calls are refused at once. The `TS8028` example is a refused stage call with
+  the attribute as its fix. The work is the work of 0130. Handled in #52.
+- 0042: the compiler's libm, first slice: `sin` and `cos` on the CPU. The WebGPU and WebGL2 page
+  says (en and ko) that the CPU tier and the CPU oracle compute the two with the compiler's own
+  routines, under 1 ULP and not correctly rounded, and that every other function still uses the
+  engine's `Math`. The WebAssembly tier is not implemented, so no page names it. Handled in #52.

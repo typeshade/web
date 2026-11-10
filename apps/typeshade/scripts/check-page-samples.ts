@@ -83,7 +83,7 @@ for (const page of PAGES) {
       continue;
     }
     const wrapped = STATEMENTS[page]?.includes(index)
-      ? `export const main = compute([64, 1, 1], function main(gid: builtin<"global_invocation_id", vec3u>) {\n${code.replace(/^/gm, '  ')}\n});`
+      ? `@compute([64, 1, 1])\nexport function main(gid: builtin<"global_invocation_id">) {\n${code.replace(/^/gm, '  ')}\n}`
       : code;
     const body = wrapped.startsWith(DIRECTIVE.trim())
       ? wrapped.slice(wrapped.indexOf('\n') + 1)

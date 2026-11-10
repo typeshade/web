@@ -125,14 +125,14 @@ export function plotFontResource(binding: {
 //
 // The fragment half then reads the way a GLSL or WGSL author expects:
 //
-//   uniform vec2 u_resolution;      class Uniforms { resolution!: vec2 }
+//   uniform vec2 u_resolution;      class Uniforms { resolution: vec2 }
 //                                   declare const u: uniform<Uniforms>
-//   void main() {                   export const main = fragment(
-//                                     function main(uv: location<0, vec2>): vec4 {
-//     vec2 st = gl_FragCoord.xy         // uv is already 0 to 1
+//   void main() {                   @fragment
+//                                   export function main(uv: location<0, vec2>): vec4 {
+//     vec2 st = gl_FragCoord.xy       // uv is already 0 to 1
 //               / u_resolution;
-//     gl_FragColor = vec4(c, 1.);       return vec4(c, 1.)
-//   }                                 });
+//     gl_FragColor = vec4(c, 1.);     return vec4(c, 1.)
+//   }                               }
 //
 // `uv` arrives as a `location<0, vec2>` parameter instead of the fragment position, because the
 // two backends disagree about the position builtin: WGSL counts y down from the top and
@@ -143,7 +143,7 @@ export function plotFontResource(binding: {
 export type SampleShape = 'fragment' | 'module';
 
 /** The source with comments and string bodies blanked, for a test that reads code alone. A
- *  sample that says `// the vertex(f) half is written for you` is still a fragment sample.
+ *  sample that says `// the @vertex half is written for you` is still a fragment sample.
  *  Exported for the Playground, which reads the source for the same kind of test. */
 export const codeOnly = (source: string): string =>
   source
@@ -151,9 +151,10 @@ export const codeOnly = (source: string): string =>
     .replace(/\/\/.*$/gm, ' ')
     .replace(/(['"`])(?:[^\\]|\\.)*?\1/g, '""');
 
-/** Which shape a sample is. The test is a vertex entry: the stage call `vertex(f)` of
- *  compiler change 0111, or the `@vertex` decorator it replaces, which is how the compiler
- *  finds the entry point too. */
+/** Which shape a sample is. The test is a vertex entry: the `@vertex` attribute, which is how
+ *  the compiler finds the entry point too (compiler change 0130). The stage call `vertex(f)` of
+ *  change 0111 still counts, so a pasted file in that form is compiled as written and gets the
+ *  compiler's own TS8028. */
 export const sampleShape = (source: string): SampleShape =>
   /=\s*vertex\s*\(|@vertex\b/.test(codeOnly(source)) ? 'module' : 'fragment';
 
@@ -165,15 +166,16 @@ export const sampleShape = (source: string): SampleShape =>
  *  A fragment sample names none of this. It declares its own uniform block, takes `uv` as a
  *  `location<0, vec2>` parameter and returns a `vec4`. */
 export const FRAGMENT_PRELUDE = `interface VsOut {
-  pos: builtin<"position", vec4>
+  pos: builtin<"position">
   uv: location<0, vec2>
 }
 
-export const fullscreen = vertex(function fullscreen(i: builtin<"vertex_index", u32>): VsOut {
+@vertex
+export function fullscreen(i: builtin<"vertex_index">): VsOut {
   const x = i === 1 ? 3. : -1.
   const y = i === 2 ? 3. : -1.
   return { pos: vec4(x, y, 0., 1.), uv: vec2(x * 0.5 + 0.5, y * 0.5 + 0.5) }
-});
+}
 `;
 
 const DIRECTIVE = '"use typeshade"';

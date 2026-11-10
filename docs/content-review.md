@@ -208,3 +208,16 @@ source-conflict recovery and version-mismatch messages. Wording distinguishes st
 from full processing bodies and explains the effect of keeping a conflicting draft.
 The [bounded review](reviews/typeaudio-composition-editing.md) records actual browser and source-preservation checks.
 This does not extend the earlier site-wide editorial scope or claim translation, listening or physical-device acceptance.
+
+The compiler pin move to `34cea187` (PR #52, 2026-11-10) changes TypeShade copy in English and
+Korean: the stage attribute wording that replaces "stage call", the entry attribute types, the
+parameter qualifiers, the loop diagnostics, the fuse report, the host resources section of the
+quick start, three paragraphs of the WebGPU and WebGL2 page (host resources, failed `Resident`
+contents, the CPU `sin` and `cos`), 27 Korean API reference entries and the record
+`apps/typeshade/compiler-changes.md`. The agent that made the change wrote the English first and
+translated it, and verified each technical statement against the pinned compiler. **The editorial
+review of this new and changed prose has not run.** No Luna subagent read it, and no person read
+the Korean for idiom. Thirteen Korean guide sections are shown in English until they are
+translated again from the pinned `AUTHORING.md`. Next action: assign the changed keys of
+`apps/typeshade/src/i18n/en.ts` and `ko.ts`, `content/api/ko/` and the quick start to a reviewer,
+then record the review here.

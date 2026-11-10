@@ -200,6 +200,10 @@ const CATEGORY_BY_FILE: Readonly<Record<string, string>> = {
   'src/runtime/host-types.ts': 'runtime-api',
   'src/runtime/program.ts': 'runtime-api',
   'src/runtime/resources.ts': 'runtime-api',
+  // The host resources of change 0138, milestone 1: `uniform`, `zeros`, `array`, `texture` and
+  // the `Uniform`, `Buffer` and accessor types they return.
+  'src/runtime/resource.ts': 'runtime-api',
+  'src/runtime/default-device.ts': 'runtime-api',
   // typeshade/fuse, the fuse scope of a host (compiler change 0058).
   'src/fuse.ts': 'runtime-api',
   'src/core/fuse-plan.ts': 'runtime-api',

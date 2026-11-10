@@ -76,22 +76,24 @@ export function createPlaygroundModel(locale: Locale, seed?: string, runtime = f
   const sample = `"use typeshade";
 
 interface Clip {
-  pos: builtin<"position", vec4>;
+  pos: builtin<"position">;
 }
 
 interface Color {
   color: location<0, vec4>;
 }
 
-export const vs = vertex(function vs(i: builtin<"vertex_index", u32>): Clip {
+@vertex
+export function vs(i: builtin<"vertex_index">): Clip {
   const x = i === 1 ? 0.8 : i === 2 ? 0. : -0.8;
   const y = i === 2 ? 0.8 : -0.8;
   return { pos: vec4(x, y, 0., 1.) };
-});
+}
 
-export const fs = fragment(function fs(): Color {
+@fragment
+export function fs(): Color {
   return { color: vec4(1., 0., 0., 1.) };
-});
+}
 `;
   // The gallery the page opens on when its link names nothing: every example the picker holds,
   // in the gallery's groups, each tile its still where the build captured one. A page that names
@@ -124,20 +126,21 @@ export const fs = fragment(function fs(): Color {
   const blank = `"use typeshade"
 
 class Uniforms {
-  time!: f32
-  resolution!: vec2
-  mouse!: vec2
+  time: f32
+  resolution: vec2
+  mouse: vec2
 }
 
 declare const u: uniform<Uniforms>
 
-export const main = fragment(function main(uv: location<0, vec2>): vec4 {
+@fragment
+export function main(uv: location<0, vec2>): vec4 {
   const aspect = u.resolution.x / max(u.resolution.y, 1.0)
   const p = (uv - u.mouse) * vec2(aspect, 1.0)
   const ring = 0.5 + 0.5 * sin(length(p) * 24.0 - u.time * 3.0)
   const tint = vec3(0.35, 0.55, 0.95) + vec3(0.4, 0.2, -0.3) * uv.x
   return vec4(mix(vec3(0.05, 0.06, 0.1), tint, ring * ring), 1.0)
-});
+}
 `;
 
   // The words the browser half needs once it is running. It reads them off the element, since

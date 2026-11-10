@@ -38,14 +38,12 @@ import {
   TYPE_DOCS,
   WGSL_BUILTIN_NAMES,
 } from '../../vendor/shader-dsl/src/language-service/index.ts';
-// The two tables of change 0111, the plain-TypeScript spelling of an entry: the stage calls
-// (`fragment(f)`, `compute([64], f)`, `workgroup_size([128], f)`, `numerics([...], f)`) and the
-// attribute types (`builtin<N, T>`, `location<I, T>`, `inout<T>`, `out<T>`). The language
-// service's index does not re-export them, so they are read from the module that defines them.
-import {
-  ATTRIBUTE_TYPE_DOCS,
-  STAGE_CALL_DOCS,
-} from '../../vendor/shader-dsl/src/language-service/docs.ts';
+// The attribute types of an entry's inputs and outputs (`builtin<N>`, `location<I, T>`), with
+// the refused type form of a parameter qualifier (`inout<T>`, `out<T>`, change 0137). The
+// language service's index does not re-export the table, so it is read from the module that
+// defines it. A stage is an attribute on the function declaration (change 0130), so the stage
+// calls of change 0111 have no table at this pin.
+import { ATTRIBUTE_TYPE_DOCS } from '../../vendor/shader-dsl/src/language-service/docs.ts';
 import { typeKey } from '../../vendor/shader-dsl/src/index.ts';
 // The declare-once tables are `typeshade/core/ir` only since Rule 11.19 (change 0060).
 import { WGSL_BUILTIN_TYPES } from '../../vendor/shader-dsl/src/core/ir/index.ts';
@@ -78,9 +76,8 @@ export const LANGUAGE_SLUGS: Readonly<Record<LanguageKind, string>> = {
 /** The sections the functions page is cut into. The first eleven are the families the builtin
  *  table already groups the spelling registry by (src/lib/builtin-table.ts); the last two
  *  hold the names the registry has no id for, which the front end lowers itself. */
-export type LanguageFamily = BuiltinFamily | 'constructors' | 'resources' | 'stages';
+export type LanguageFamily = BuiltinFamily | 'constructors' | 'resources';
 export const LANGUAGE_FAMILIES: readonly LanguageFamily[] = [
-  'stages',
   'maths',
   'geometry',
   'derivatives',
@@ -101,9 +98,6 @@ export const LANGUAGE_FAMILIES: readonly LanguageFamily[] = [
 // names the CPU oracle and the front end lower without an intrinsic. A documented function
 // in neither the registry nor this table stops the build in build().
 const FAMILY_OF: Readonly<Record<string, LanguageFamily>> = {
-  // The stage calls of change 0111 (STAGE_CALL_DOCS): an entry point, a kernel function's
-  // workgroup size and the numerical contract of change 0107 each wrap the function.
-  ...Object.fromEntries(Object.keys(STAGE_CALL_DOCS).map((name) => [name, 'stages' as const])),
   bool: 'casts',
   bitcast: 'casts',
   log10: 'maths',
@@ -625,11 +619,7 @@ function build(): readonly LanguageSection[] {
   // Every `declare function` in the ambient file belongs to one of the two tables that
   // document a call: the attributes and the functions. A name in neither is an undocumented
   // call the editor would still offer, so it stops the build here.
-  const documentedCalls = new Set([
-    ...Object.keys(FUNCTION_DOCS),
-    ...Object.keys(STAGE_CALL_DOCS),
-    ...Object.keys(ATTRIBUTE_DOCS),
-  ]);
+  const documentedCalls = new Set([...Object.keys(FUNCTION_DOCS), ...Object.keys(ATTRIBUTE_DOCS)]);
   const undocumented = [...decl.functions.keys()].filter((n) => !documentedCalls.has(n));
   if (undocumented.length > 0) {
     throw new Error(
@@ -674,7 +664,6 @@ function build(): readonly LanguageSection[] {
       ATTRIBUTE_DOCS,
       BUILTIN_DOCS,
       FUNCTION_DOCS,
-      STAGE_CALL_DOCS,
       CONSTANT_DOCS,
       MATH_MEMBER_DOCS,
     ].flatMap((t) => Object.keys(t)),
@@ -765,13 +754,9 @@ function build(): readonly LanguageSection[] {
           // `@workgroup_size` on a kernel function (compiler change 0067) is read by the front end
           // off the decorator itself, and the ambient file declares no function for it: its page
           // shows the attribute as written, with no overload to list.
-          // The ambient file declares a stage call under the same name as its decorator
-          // (change 0111). A stage call is generic over the function it wraps, and the
-          // functions page lists it; the decorator's own overloads are the ones without.
-          const nodes = (
+          const nodes =
             decl.functions.get(name) ??
-            (DECORATOR_ONLY.has(name) ? [] : missing(kind, name, 'declaration in SHADE_DTS'))
-          ).filter((n) => !n.typeParameters?.length);
+            (DECORATOR_ONLY.has(name) ? [] : missing(kind, name, 'declaration in SHADE_DTS'));
           signature =
             nodes.length > 0 ? nodes.map((n) => n.getText(source)).join('\n') : `${title}([n])`;
           // A decorator's declaration comes in two shapes and only one of them lists what an
@@ -812,14 +797,7 @@ function build(): readonly LanguageSection[] {
           break;
         }
         case 'function': {
-          const declared =
-            decl.functions.get(name) ?? missing(kind, name, 'declaration in SHADE_DTS');
-          // A stage call shares its name with the decorator of the old form, which the
-          // attributes page lists; the call is the overload generic over the function it wraps.
-          const nodes = Object.prototype.hasOwnProperty.call(STAGE_CALL_DOCS, name)
-            ? declared.filter((n) => (n.typeParameters?.length ?? 0) > 0)
-            : declared;
-          if (nodes.length === 0) missing(kind, name, 'stage-call declaration in SHADE_DTS');
+          const nodes = decl.functions.get(name) ?? missing(kind, name, 'declaration in SHADE_DTS');
           signature = nodes.map((n) => n.getText(source)).join('\n');
           overloads = nodes.map((n) => overloadOf(n, source));
           const known = spellings.get(name);
@@ -896,11 +874,10 @@ function build(): readonly LanguageSection[] {
         positional: parameters.some((p) => GENERATED.test(p.name)),
         bareForm,
         protocol,
-        // A stage call's `number` is a workgroup extent and an attribute type's is a location
-        // index, ordinary JavaScript numbers like a decorator's argument, so neither is the slot.
+        // An attribute type's `number` is a location index, an ordinary JavaScript number like
+        // a decorator's argument, so it is not the slot.
         showsNumber:
           SCALAR_SLOT_KINDS.has(kind) &&
-          !Object.prototype.hasOwnProperty.call(STAGE_CALL_DOCS, name) &&
           !(kind === 'type' && Object.prototype.hasOwnProperty.call(ATTRIBUTE_TYPE_DOCS, name)) &&
           /\bnumber\b/.test(slots ?? signature),
         helpers: helpersIn(signature),
@@ -938,7 +915,7 @@ function build(): readonly LanguageSection[] {
     type: { ...TYPE_DOCS, ...ATTRIBUTE_TYPE_DOCS },
     attribute: ATTRIBUTE_DOCS,
     builtin: BUILTIN_DOCS,
-    function: { ...FUNCTION_DOCS, ...STAGE_CALL_DOCS },
+    function: FUNCTION_DOCS,
     constant: CONSTANT_DOCS,
     math: MATH_MEMBER_DOCS,
   };

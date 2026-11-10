@@ -59,7 +59,8 @@ while (n != 1) {
 
 declare const dists: storage<array<f32>>;
 
-export const fs = fragment(function fs(alpha: location<0, f32>, count: location<1, u32, { interpolate: "flat" }>): vec4 {
+@fragment
+export function fs(alpha: location<0, f32>, count: location<1, u32, { interpolate: "flat" }>): vec4 {
   let nearest = 1e10;
   for (let i: u32 = 0; i < count; i++) {
     const d = dists[i];
@@ -75,7 +76,7 @@ export const fs = fragment(function fs(alpha: location<0, f32>, count: location<
     discard;
   }
   return vec4(nearest, 0., 0., alpha);
-});
+}
 ```
 
 `discard`는 프래그먼트 진입점과 그 헬퍼에서 사용할 수 있습니다. 단, 버텍스나 컴퓨트 진입점에서 해당 헬퍼에 도달해서는 안 됩니다. 컴파일러는 호출 그래프 전체를 검사하며, 거부 시 헬퍼와 진입점 이름을 함께 보고합니다.

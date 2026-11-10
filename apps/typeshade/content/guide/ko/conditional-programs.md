@@ -28,9 +28,10 @@ export function shadeHeight(h: f32): vec4 {
 
 import { shadeHeight } from "./terrain.shade.ts";
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   return shadeHeight(0.);
-});
+}
 
 // terrain-dem.shade.ts
 "use typeshade";
@@ -40,9 +41,10 @@ import { shadeHeight } from "./terrain.shade.ts";
 declare const dem: texture_2d<f32>;
 declare const demSampler: sampler;
 
-export const fs = fragment(function fs(uv: location<0, vec2>): vec4 {
+@fragment
+export function fs(uv: location<0, vec2>): vec4 {
   return shadeHeight(textureSample(dem, demSampler, uv).x);
-});
+}
 ```
 
 파일은 호스트가 고릅니다.
@@ -79,9 +81,10 @@ export function shade(base: f32): f32 {
   return acc;
 }
 
-export const fs = fragment(function fs(v: location<0, f32>): vec4 {
+@fragment
+export function fs(v: location<0, f32>): vec4 {
   return vec4(shade(v), 0., 0., 1.);
-});
+}
 ```
 
 WGSL은 `override quality: f32 = 1.0;`을 생성하고, 호스트는 파이프라인의 `constants`로 값을

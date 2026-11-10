@@ -167,12 +167,13 @@ function trajectory(t: f32): vec3 {
   return vec3(t, sample(t), 0.);
 }
 
-export const main = fragment(function main(uv: location<0, vec2>): vec4 {
+@fragment
+export function main(uv: location<0, vec2>): vec4 {
   const flat = plot2D(sample, uv, u, ${jumps});
   if (u.plotBlend <= 0.) { return flat; }
   const space = plot3D(trajectory, uv, u, ${jumps});
   return mix(flat, space, clamp(u.plotBlend, 0., 1.));
-});
+}
 `;
 }
 

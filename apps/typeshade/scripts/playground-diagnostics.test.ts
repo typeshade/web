@@ -60,7 +60,9 @@ test('unlocated backend errors and warnings are retained', () => {
 
 test('a real backend warning survives alongside usable WGSL', () => {
   const result = compile(
-    '"use typeshade";\ndeclare const u: uniform<f32>;\nconst main = fragment(function main(): vec4 { return vec4(u, u, u, 1.0); });',
+    // Two fragment entries: GLSL ES 3.00 has one main() a stage, so the GLSL writer refuses the
+    // module and WGSL stays. A bare uniform no longer warns here (compiler change 0127).
+    '"use typeshade";\n@fragment\nfunction main(): vec4 { return vec4(1.0); }\n@fragment\nfunction other(): vec4 { return vec4(0.5); }',
     { fileName: entry },
   );
   expect(result.wgsl).toBeDefined();

@@ -1,0 +1,10 @@
+{
+  "slug": "zeros",
+  "source": "1bc9acd9e319cac736ce33fe7f1b276cc87942e0d1702805fead8bd0883c2467",
+  "texts": {
+    "summary": "셰이더 모듈이 내보낸 class인 cls의 구조체 length개를 0으로 채운 스토리지 배열입니다. 리전의 범위 하나를 차지합니다.",
+    "parameters.length": "원소의 개수이며, 정수입니다.",
+    "returns": "배열입니다. 원소 `i`는 `ps.at(i).pos.set(…)`처럼 설정합니다.",
+    "exceptions.TypeError": "셰이더 모듈의 class가 아닌 값, 추상 class, 스토리지 레이아웃이 없는 구조체, 정수가 아닌 길이에는 `TypeError`가 발생합니다."
+  }
+}

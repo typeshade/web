@@ -134,9 +134,10 @@ CPU tier의 메모리에 있는 텍스처는 예외입니다. `device.texture()`
 declare const tex: texture_2d<f32>;
 declare const smp: sampler;
 
-export const shade = fragment(function shade(uv: location<0, vec2>): vec4 {
+@fragment
+export function shade(uv: location<0, vec2>): vec4 {
   return textureSample(tex, smp, uv);
-});
+}
 ```
 
 ```ts
@@ -421,21 +422,21 @@ const { wgsl, diagnostics } = compile(read('src/clouds.shade.ts')!, {
 "use typeshade";
 
 class Ray {
-  origin!: vec3;
-  dir!: vec3;
+  origin: vec3;
+  dir: vec3;
 }
 
-function swap(a: inout<f32>, b: inout<f32>): void {
+function swap(@inout a: f32, @inout b: f32): void {
   const t = a;
   a = b;
   b = t;
 }
 
-function add(a: f32, b: f32, c: out<f32>): void {
+function add(a: f32, b: f32, @out c: f32): void {
   c = a + b;
 }
 
-function advance(r: inout<Ray>, t: f32): void {
+function advance(@inout r: Ray, t: f32): void {
   r.origin = r.origin + r.dir * t;
 }
 
@@ -443,7 +444,7 @@ export function demo(): f32 {
   let x: f32 = 1.;
   let y: f32 = 2.;
   swap(x, y); // x is 2. and y is 1.
-  let s!: f32;
+  let s: f32;
   add(x, y, s); // s is 3.
   let r = new Ray();
   r.dir = vec3(1., 0., 0.);
