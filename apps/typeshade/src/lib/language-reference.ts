@@ -48,6 +48,7 @@ import { typeKey } from '../../vendor/shader-dsl/src/index.ts';
 // The declare-once tables are `typeshade/core/ir` only since Rule 11.19 (change 0060).
 import { WGSL_BUILTIN_TYPES } from '../../vendor/shader-dsl/src/core/ir/index.ts';
 import { builtinGroups, type BuiltinFamily, type BuiltinRow } from './builtin-table.ts';
+import { RETIRED_REFERENCE_FUNCTIONS } from './retired-reference-pages.mjs';
 
 const ROOT = 'vendor/shader-dsl';
 
@@ -621,6 +622,16 @@ function build(): readonly LanguageSection[] {
   // call the editor would still offer, so it stops the build here.
   const documentedCalls = new Set([...Object.keys(FUNCTION_DOCS), ...Object.keys(ATTRIBUTE_DOCS)]);
   const undocumented = [...decl.functions.keys()].filter((n) => !documentedCalls.has(n));
+  // A retired function page redirects (src/lib/retired-reference-pages.mjs). A function of that
+  // name that the pin documents again would have a page and a redirect on one route.
+  const returned = Object.keys(RETIRED_REFERENCE_FUNCTIONS).filter((n) =>
+    Object.prototype.hasOwnProperty.call(FUNCTION_DOCS, n),
+  );
+  if (returned.length > 0) {
+    throw new Error(
+      `[language-reference] the pin documents the function ${returned.join(', ')} again; remove its line from src/lib/retired-reference-pages.mjs`,
+    );
+  }
   if (undocumented.length > 0) {
     throw new Error(
       `[language-reference] SHADE_DTS declares ${undocumented.join(', ')}, which no *_DOCS table documents`,

@@ -448,10 +448,11 @@ id first, then the pull request that did the work.
   left with change 0131. The benchmark sources write `builtin<N>` in the short form, and the
   regression catalog records the four subgroup-suite cases as refused on the baseline build
   `e30bbe57`, which predates that form (`src/lib/benchmarks/subgroups.ts`). Twelve of the 13
-  Korean guide sections the pinned `AUTHORING.md` changed are translated again. Open:
-  `the-cpu-oracle` is shown in English, as it was at `e30bbe57`; the pages
-  `/reference/functions/vertex/`, `fragment`, `compute`, `workgroup_size` and `numerics` are
-  gone and have no redirect. Handled in #52.
+  Korean guide sections the pinned `AUTHORING.md` changed are translated again. The pages
+  `/reference/functions/vertex/`, `fragment/`, `compute/` and `workgroup_size/` redirect to their
+  attribute pages, and `numerics/` to Rule 6.7, which says that change 0131 removed it
+  (`src/lib/retired-reference-pages.mjs`). Open: `the-cpu-oracle` is shown in English, as it
+  was at `e30bbe57`. Handled in #52.
 - 0131: `numerics` is removed. The `TS8078` example, the `numerics` lesson (en and ko) and its
   model, `content/api/ko/numericsclass.json`, the `numerics` member of `FuncDecl` and the
   `contract` sentence of `DeterminismKind` are removed; `TS8078` is listed as retired. Handled in
