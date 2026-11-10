@@ -302,5 +302,10 @@ The authoring agent wrote the English against the pinned `CHANGELOG.md`, Amendme
 `src/core/cpu-runtime.ts`, then translated it into Korean with the same meaning. Rule 5.3's
 fingerprint moved by a test reference only; its text is the same. The authoring agent read the
 Korean `values-and-mutation` section and the `TS8003` lines in both locales against it and
-recorded the new fingerprint. No Luna subagent and no independent agent read these changes. No
-guide block of the English changed, so no Korean block was translated again.
+recorded the new fingerprint. No Luna subagent read these changes. An independent agent of the
+same session reviewed commit `d6fcc75`, as for PR #52, PR #54 and PR #55: this is the deviation
+the owner chose on 2026-11-10. It reported no blocking finding, 3 should-fix findings and 5
+notes. Applied: S1 (this record and the `TS8003` wording of `compiler-changes.md`), S2 (the
+SwiftShader sentence names WebGPU and WebGL2 in Chromium and says the values differ from the
+CPU's) and S3 (the first sentence in the active voice). No guide block of the English changed, so
+no Korean block was translated again.

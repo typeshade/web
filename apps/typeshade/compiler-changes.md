@@ -467,7 +467,7 @@ id first, then the pull request that did the work.
   Handled in #52. Pin `68b57a03`: Amendment A3 records the owner's decisions only. The bug fix it
   asked for first (compiler #1217, no proposal: a scalar cast of a written number is a value of
   its type, so `u32(7) / 2` is 3) changes no snippet, example or still of this site; the Korean
-  guide and the `TS8003` line were read against Rule 5.3's new fingerprint. Handled in #56.
+  guide and the `TS8003` lines (en and ko) were read against Rule 5.3's new fingerprint. Handled in #56.
 - 0135: a built-in value takes its type from WGSL, and the compiler gives a user-defined value
   its location. The types page (en and ko) says so, with the options as the second argument of
   `builtin<N, O>`; every sample writes `builtin<"position">`; the `TS8029` example is a
