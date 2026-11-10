@@ -294,3 +294,18 @@ English imperative as a plain statement, "뿐" that the English does not say, a 
 
 The Korean guide section `the-cpu-oracle` is shown in English until it is translated again from
 the pinned `AUTHORING.md`; it was already shown in English at `e30bbe57`.
+
+The compiler pin move to `68b57a03` (PR #56, 2026-11-10) changes the same English paragraph and
+its Korean (the CPU math functions of the WebGPU and WebGL2 page): all 19 functions are the
+compiler's routines, and `pow` keeps ECMAScript's special values (Amendment A4 of change 0042).
+The authoring agent wrote the English against the pinned `CHANGELOG.md`, Amendment A4 and
+`src/core/cpu-runtime.ts`, then translated it into Korean with the same meaning. Rule 5.3's
+fingerprint moved by a test reference only; its text is the same. The authoring agent read the
+Korean `values-and-mutation` section and the `TS8003` lines in both locales against it and
+recorded the new fingerprint. No Luna subagent read these changes. An independent agent of the
+same session reviewed commit `d6fcc75`, as for PR #52, PR #54 and PR #55: this is the deviation
+the owner chose on 2026-11-10. It reported no blocking finding, 3 should-fix findings and 5
+notes. Applied: S1 (this record and the `TS8003` wording of `compiler-changes.md`), S2 (the
+SwiftShader sentence names WebGPU and WebGL2 in Chromium and says the values differ from the
+CPU's) and S3 (the first sentence in the active voice). No guide block of the English changed, so
+no Korean block was translated again.

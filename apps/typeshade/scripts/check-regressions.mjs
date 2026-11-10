@@ -48,7 +48,7 @@ export async function checkRegressions(page, url) {
   assert.equal(quick.status, 'complete', JSON.stringify(quick.results.at(-1)));
   assert.equal(quick.results.length, 68);
   // A row of a case that a build's compiler refused says so and measures nothing. At this pin
-  // both builds (34cea187 and 50234ad6) compile every case, so no row is refused. Name the
+  // both builds (50234ad6 and 68b57a03) compile every case, so no row is refused. Name the
   // cases here when a baseline refuses some again.
   const refusedIds = [];
   const refusedRow = (r) => r.build === 'baseline' && refusedIds.includes(r.id);
