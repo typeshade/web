@@ -240,10 +240,8 @@ source cell that the pinned compiler's `migrateSource` would rewrite
 - Not reviewed by anyone: the four attribute lessons and the text changed after `8fc5577`.
 - No person read the Korean for idiom.
 
-Open source problems, in the compiler repository (`typeshade/typeshade`), not edited here:
+Open source problem, in the compiler repository (`typeshade/typeshade`), not edited here:
 
-- `AUTHORING.md`, "for and while": "`for` is the counted loop" holds only for a counted header
-  since change 0136; a `for` whose body writes its bound now compiles as an open loop.
 - The pinned JSDoc of `Device` and `FuseReport` still describes its behaviour with `resident()`
   and `configure({ prefer })`, which change 0138 deprecates, so the Korean API entries do too.
 
@@ -272,16 +270,15 @@ Korean block of each finding again before it changed the Korean.
   "영" and "power of two" stays "이진 거듭제곱" where the English writes the word, because the
   numeral check compares digits.
 
-Two more open source problems in the compiler repository (`AUTHORING.md` at `34cea187`), not
-edited here:
+Source problems that the compiler fixed. Compiler pull request #1209 corrected three of the
+problems this file recorded: "`for` is the counted loop", "the stage functions" and "the shaders
+… import the package". They are removed from this file with the pin move to `50234ad6` (PR #55),
+and the Korean sections `overview` and `control-flow` follow the corrected English.
 
-- Lines 80 to 81: "the types, the builtins and the stage functions are the language's own."
-  A stage is an attribute at the pin (change 0130). Proposed: "the types, the builtins and the
-  stage attributes are the language's own."
-- Lines 114 to 115: "The shaders themselves live in your repository and import the package like
-  any other dependency." contradicts line 80, "A shader file imports nothing from the package".
-  Proposed: "The shaders themselves live in your repository, and your host code imports the
-  package like any other dependency."
+The compiler pin move to `50234ad6` (PR #55, 2026-11-10) changes one English paragraph and its
+Korean (the CPU math functions of the WebGPU and WebGL2 page) and four Korean guide blocks. No
+Luna subagent and no second reader read the new English or the new Korean. This is the deviation
+the owner chose on 2026-11-10.
 
 The Korean guide section `the-cpu-oracle` is shown in English until it is translated again from
 the pinned `AUTHORING.md`; it was already shown in English at `e30bbe57`.

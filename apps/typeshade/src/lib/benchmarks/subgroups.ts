@@ -22,10 +22,10 @@ declare const args: uniform<Args>;
 declare const src: storage<array<u32>>;
 `;
 // The sources write the stage as an attribute (compiler change 0130) and a built-in value in
-// its short form, `builtin<"global_invocation_id">` (change 0135), which the pin reads with no
-// warning. The regression catalog compiles every case at two builds, the pin and the pin before
-// it. At this pin the baseline is e30bbe57, which refuses the short form (TS8002), so the catalog
-// records the four cases as refused on the baseline (the owner's decision, 2026-11-10).
+// its short form, `builtin<"global_invocation_id">` (change 0135). The regression catalog
+// compiles every case at two builds, the pin and the pin before it. A baseline that predates the
+// short form refuses these cases, and the catalog records the refusal: the comparison of
+// e30bbe57 and 34cea187 did. At the pin 50234ad6 both builds compile them.
 const subgroupCase = (
   id: string,
   suite: Experiment['suite'],

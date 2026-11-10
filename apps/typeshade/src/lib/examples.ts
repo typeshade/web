@@ -453,7 +453,7 @@ export const facts = {
 // asks for a copy decision. Comparing them only at the commit the copy was written at left
 // the check inert from the next pin on, which is when it has something to catch.
 const pinned = {
-  commit: '34cea187',
+  commit: '50234ad6',
   shadeExamples: 102,
   shadeRenderable: 77,
   fp64Examples: 12,
@@ -481,10 +481,10 @@ const pinned = {
   rulesPending: 0,
   rulesReview: 7,
   rulesSurfaceSections: 52,
-  // The rule history counts the rules added and changed since e30bbe57, the pin before this one.
-  rulesAdded: 2,
+  // The rule history counts the rules added and changed since 34cea187, the pin before this one.
+  rulesAdded: 0,
   rulesRemoved: 0,
-  rulesChanged: 45,
+  rulesChanged: 2,
 };
 const drift: string[] = [];
 if (facts.shadeExamples !== pinned.shadeExamples)

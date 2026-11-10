@@ -1,6 +1,6 @@
 ---
 id: overview
-source: bf1faeadeaae628303a03eff11c28b6b764155d720b2f0050b1154e7074bb648
+source: 422267ac1646c6a0f6dbfa102026b52b32ecb5e5e54a1a7bf6484a26e01b6e53
 sourceLine: 1
 ---
 
@@ -65,7 +65,7 @@ fn ringMask(uv: vec2<f32>, radius: f32) -> f32 {
 
 ### 가져오기
 
-셰이더 파일은 패키지에서 아무것도 가져오지 않습니다. 타입, 내장 함수, 스테이지 함수는 언어에 포함되어 있습니다. 호스트 코드는 컴파일러와 컴파일 결과를 읽는 함수를 패키지 루트에서 가져옵니다.
+셰이더 파일은 패키지에서 아무것도 가져오지 않습니다. 타입, 내장 함수, 스테이지 속성은 언어에 포함되어 있습니다. 호스트 코드는 컴파일러와 컴파일 결과를 읽는 함수를 패키지 루트에서 가져옵니다.
 
 ```ts
 import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typeshade'
@@ -95,7 +95,7 @@ import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typ
   도구가 씁니다. 1.0 전까지는 안정성을 약속하지 않으며, 이 가이드는 IR 빌더를 쓰지 않습니다.
   사용법은 [`docs/ir-builder.md`](docs/ir-builder.md)에 있습니다.
 
-이 패키지에는 컴파일러와, 호스트의 가져오기가 실행될 때 쓰는 작은 런타임이 들어 있습니다. 셰이더 소스는 사용하는 프로젝트의 저장소에 두고, 패키지는 다른 의존성과 같은 방식으로 가져옵니다.
+이 패키지에는 컴파일러와, 호스트의 가져오기가 실행될 때 쓰는 작은 런타임이 들어 있습니다. 셰이더 자체는 사용하는 프로젝트의 저장소에 있고, 호스트 코드가 다른 의존성과 같은 방식으로 패키지를 가져옵니다.
 
 ### 이 가이드의 순서
 
