@@ -1355,6 +1355,16 @@ test('a multi-video run with ?dense=1 runs the dense MVS on each component', asy
       record.result.components.reduce((n, c) => n + c.dense.points, 0),
       detail,
     );
+    // The viewer writes `data-dense-points` in its next animation frame, after the page has
+    // published the record. Wait for that frame; a viewer that never shows a point still fails.
+    await page
+      .waitForFunction(
+        () =>
+          Number(document.querySelector('.sfm-map .viewer')?.getAttribute('data-dense-points')) > 0,
+        undefined,
+        { timeout: 30000 },
+      )
+      .catch(() => {});
     assert.ok(
       Number(await page.locator('.sfm-map .viewer').getAttribute('data-dense-points')) > 0,
       detail,
