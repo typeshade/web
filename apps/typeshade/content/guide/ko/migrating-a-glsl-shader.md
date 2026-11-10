@@ -1,8 +1,8 @@
 ---
 id: migrating-a-glsl-shader
-source: 23c2a448d9126c187177ee2844442362f3286558d602228631e0fc71943a8e0a
-sourceLine: 3086
-rules: 6.6 2moXxSw3cZPNxiaa9uRTWOFZn7M2pZk2ypG0F6f0ymk=, 12.3 CjhXTenX6H0V0STxt5Bka_Sp7X0GVUeCZR9Mt1IqNvA=
+source: d09702c934d526fc905aeb090907808e9af42fb468608b3c5d04761ccf0a71af
+sourceLine: 3174
+rules: 12.3 mZMHlNERUgQ_m2Hydt__O52bQnqaaFcmeU98Dt1rBoc=
 ---
 
 이 페이지는 기존 GLSL ES 3.00 셰이더를 옮기는 경우를 위한 구문 대응표입니다. GLSL 구문을 `"use typeshade"` 파일에서 표현하는 방법과 타깃별 생성 결과를 설명합니다. 가이드의 다른 페이지는 새 셰이더를 작성하는 순서로 구성되어 있습니다.
@@ -16,7 +16,7 @@ rules: 6.6 2moXxSw3cZPNxiaa9uRTWOFZn7M2pZk2ypG0F6f0ymk=, 12.3 CjhXTenX6H0V0STxt5
 | `uniform Block { … } name;`            | [`declare const name: uniform<Block>`](/guide/authoring/layouts-and-resources/)       | `@group`/`@binding` `var<uniform>`      | std140 레이아웃은 `reflect()`에서 얻으므로 오프셋을 손으로 셀 일이 없다                                                                                                                     |
 | 따로 선언한 `uniform float u_x;`       | 유니폼 구조체의 필드                                                                  | `var<uniform>` 구조체의 필드            | `declare const u_x: uniform<f32>`는 WGSL 전용입니다. GLSL ES 3.00은 유니폼 바인딩을 std140 블록으로 표현하기 때문이다                                                                       |
 | 호스트 프리앰블이 선언한 심볼이나 블록 | 없음. IR 빌더의 `externVar`, `hostUniform`, `hostBlock`                               | 같은 참조를 타깃별 표기로               | [`docs/ir-builder.md`](docs/ir-builder.md)에 있다                                                                                                                                           |
-| 함수 매개변수의 `in` / `out` / `inout` | 없음 / [`out<T>`, `inout<T>`](#a-function-that-changes-its-callers-variable)          | 포인터 매개변수                         | 한정자가 없는 매개변수가 곧 GLSL의 `in`이다                                                                                                                                                 |
+| 함수 매개변수의 `in` / `out` / `inout` | 없음 / [`@out`, `@inout`](#a-function-that-changes-its-callers-variable)              | 포인터 매개변수                         | 한정자가 없는 매개변수가 곧 GLSL의 `in`이다                                                                                                                                                 |
 | 이 모듈이 결정하는 `#ifdef FEATURE`    | [변형마다 파일 하나](/guide/authoring/conditional-programs/)                          | 전처리기 없음                           | 바인딩을 선언하지 않는 변형에는 그 바인딩이 아예 없다                                                                                                                                       |
 | 호스트가 결정하는 `#ifdef FEATURE`     | [`variantFamily`](/guide/authoring/conditional-programs/)                             | 행렬의 점마다 모듈 하나                 | `emitGuarded`는 define을 소유한 GLSL 호스트를 위해 `#if` ladder를 생성하며, 각 분기는 따로 만든 변형과 바이트 단위로 같다                                                                   |
 | 값 하나만 달라지는 변형                | [`override<T>`와 `overrideValues`](/guide/authoring/conditional-programs/)            | `override`와 파이프라인 상수            | 이런 경우 별도 변형을 만들면 파이프라인만 쓸데없이 늘어난다                                                                                                                                 |
@@ -40,25 +40,25 @@ interface Camera {
 declare const u_camera: uniform<Camera>;
 
 @vertex
-export function vs(pos: location<0, vec2>): vec4 {
+export function vs(pos: vec2): vec4 {
   return u_camera.u_matrix * vec4(pos / u_camera.u_viewport_px, 0., 1.);
 }
 ```
 
 ### 내장 값
 
-내장 값은 하드웨어가 스테이지에 제공하는 값입니다. WGSL 이름을 사용하며 매개변수나 구조체 필드에 타입 `builtin<"id", T>`로 지정합니다. `gl_*` 이름이나 오타를 사용하면 올바른 TypeShade 표기를 안내하는 오류가 발생합니다. 이후 각 백엔드는 id를 타깃의 표기로 변환합니다.
+내장 값은 하드웨어가 스테이지에 제공하는 값입니다. WGSL 이름을 사용하며 매개변수나 구조체 필드에 타입 `builtin<"id">`로 지정합니다. `gl_*` 이름이나 오타를 사용하면 올바른 TypeShade 표기를 안내하는 오류가 발생합니다. 이후 각 백엔드는 id를 타깃의 표기로 변환합니다.
 
-| GLSL 전역 변수                     | `"use typeshade"` 표기                          | 설명                                                                                                                                                                                                                |
-| ---------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `gl_Position`                      | 버텍스 출력의 `builtin<"position", vec4>`       | GLSL에서는 `gl_Position`에 씁니다. 구조체 없이 `vec4`만 돌려주는 버텍스 진입점은 위치를 반환한다                                                                                                                    |
-| `gl_FragCoord`                     | 프래그먼트 입력의 `builtin<"position", vec4>`   | GLSL에서는 `gl_FragCoord`를 읽습니다. y축 원점에 주의해야 합니다. GL 윈도우 좌표는 왼쪽 아래가, WGSL 프레임버퍼 좌표는 왼쪽 위가 원점입니다. 그러니 `.y`를 쓰기 전에 타깃마다 뒤집거나, 위아래 대칭인 값을 계산한다 |
-| `gl_VertexID`                      | `vi: builtin<"vertex_index", u32>`              | GLSL에서는 읽을 때 `uint(gl_VertexID)`로 감쌉니다. 인터페이스는 이 값을 u32로 두지만 GLSL에서는 int이기 때문이다                                                                                                    |
-| `gl_InstanceID`                    | `ii: builtin<"instance_index", u32>`            | 마찬가지로 `uint()`로 감싼다                                                                                                                                                                                        |
-| `gl_FrontFacing`                   | `front: builtin<"front_facing", bool>`          |                                                                                                                                                                                                                     |
-| `gl_FragDepth`                     | 반환 구조체 필드의 `builtin<"frag_depth", f32>` |                                                                                                                                                                                                                     |
-| `gl_PointSize` and `gl_PointCoord` | 두 생성기 모두 지원하지 않음                    | 포인트 크기 상한은 벤더마다 다르며, WebGPU의 점 프리미티브는 항상 한 픽셀입니다. 버텍스 스테이지에서 인스턴싱한 쿼드를 펼치고, 모서리 uv는 `location<n, vec2>`로 넘겨 보간한다                                      |
-| float `mod(x, y)`                  | 내장 함수 `mod()`                               | 이쪽은 floor-mod입니다. `%`는 trunc-mod이며, WGSL의 의미이고 GLSL에서도 같은 뜻으로 생성됩니다. 음수 피연산자에서 원하는 의미에 따라 고른다                                                                         |
+| GLSL 전역 변수                     | `"use typeshade"` 표기                     | 설명                                                                                                                                                                                                                |
+| ---------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gl_Position`                      | 버텍스 출력의 `builtin<"position">`        | GLSL에서는 `gl_Position`에 씁니다. 구조체 없이 `vec4`만 돌려주는 버텍스 진입점은 위치를 반환한다                                                                                                                    |
+| `gl_FragCoord`                     | 프래그먼트 입력의 `builtin<"position">`    | GLSL에서는 `gl_FragCoord`를 읽습니다. y축 원점에 주의해야 합니다. GL 윈도우 좌표는 왼쪽 아래가, WGSL 프레임버퍼 좌표는 왼쪽 위가 원점입니다. 그러니 `.y`를 쓰기 전에 타깃마다 뒤집거나, 위아래 대칭인 값을 계산한다 |
+| `gl_VertexID`                      | `vi: builtin<"vertex_index">`              | GLSL에서는 읽을 때 `uint(gl_VertexID)`로 감쌉니다. 인터페이스는 이 값을 u32로 두지만 GLSL에서는 int이기 때문이다                                                                                                    |
+| `gl_InstanceID`                    | `ii: builtin<"instance_index">`            | 마찬가지로 `uint()`로 감싼다                                                                                                                                                                                        |
+| `gl_FrontFacing`                   | `front: builtin<"front_facing">`           |                                                                                                                                                                                                                     |
+| `gl_FragDepth`                     | 반환 구조체 필드의 `builtin<"frag_depth">` |                                                                                                                                                                                                                     |
+| `gl_PointSize` and `gl_PointCoord` | 두 생성기 모두 지원하지 않음               | 포인트 크기 상한은 벤더마다 다르며, WebGPU의 점 프리미티브는 항상 한 픽셀입니다. 버텍스 스테이지에서 인스턴싱한 쿼드를 펼치고, 모서리 uv는 `vec2`로 넘겨 보간한다                                                   |
+| float `mod(x, y)`                  | 내장 함수 `mod()`                          | 이쪽은 floor-mod입니다. `%`는 trunc-mod이며, WGSL의 의미이고 GLSL에서도 같은 뜻으로 생성됩니다. 음수 피연산자에서 원하는 의미에 따라 고른다                                                                         |
 
 프래그먼트 스테이지는 버텍스 스테이지와 같은 `position` 내장 값 이름으로 프레임버퍼 좌표를 읽습니다. 깊이는 반환 구조체의 필드로 출력합니다.
 
@@ -66,7 +66,7 @@ export function vs(pos: location<0, vec2>): vec4 {
 "use typeshade";
 
 interface FragOut {
-  color: location<0, vec4>;
+  color: vec4;
   depth: builtin<"frag_depth">;
 }
 

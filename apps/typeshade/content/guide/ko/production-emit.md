@@ -1,7 +1,7 @@
 ---
 id: production-emit
-source: c9f32ca47314cbd272ba285c9dd2de272070848a8d410b73eaf3a643865c313d
-sourceLine: 2847
+source: 0caf3b93afac948342405b8c3a250496accaa8f1148e3f8fff2a26b8826babb6
+sourceLine: 2933
 ---
 
 이 페이지는 배포용 변환을 코드 생성 호출에 조합하고, 변경된 식별자가 포함된 드라이버 로그를 원래 이름으로 해석하는 방법을 설명합니다.

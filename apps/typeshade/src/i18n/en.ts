@@ -584,7 +584,7 @@ export const en = {
           name: 'Attributes',
           summary:
             'The attributes written with `@`: an entry’s stage, a kernel function’s workgroup size and the parameter qualifiers.',
-          description: `The ${facts.languageAttributes} attributes written with \`@\`: an entry’s stage, a kernel function’s workgroup size, the parameter qualifiers, and the decorated form of the attribute types.`,
+          description: `The ${facts.languageAttributes} attributes written with \`@\`: an entry’s stage, a kernel function’s workgroup size, parameter qualifiers and the decorated form of the attribute types.`,
         },
         builtin: {
           name: 'Builtin values',

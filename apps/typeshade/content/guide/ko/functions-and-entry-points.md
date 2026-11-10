@@ -1,7 +1,8 @@
 ---
 id: functions-and-entry-points
-source: baf1a21ca41afe66ace7943d2c2c2f6f5f665d974e52bb4a06d764532eeba6b8
-sourceLine: 574
+source: 3924bfe58f2d21905d5ad3ab67c32a12e18ac0fe8f00c0b9de701d6975791780
+sourceLine: 585
+rules: 1.4 AyrFRt9RzpqisjmBeAhKhYBPY_8uzSPYr2SvQfsZH8k=, 1.8 43bZ1DaVTE9M73oyG3SDoNOYOFJaT_vhpaVV8tUF4K0=, 6.6 v9R6bYC4u9FE8PK38m5uVaVvXQHjyaWMpH1XGuB7AWA=, 6.7 RHgMFWhF7JfCvwF5_NDsVqKVq6eCr6gGI4sXIByH9Q8=, 6.8 jWjZUCCE0mQuMIaUlYZya37HzqjWIaNgI9LICjNRoRk=, 8.1 ugDum55qOp8zOu08iFeRXe7bAbNGFjTioL6j88ZGoe4=, 8.5 Kq2hCdlup1NA0l4vhuwirKDHJRnVjrkr0ZK9UUZFYbQ=, 8.22 wnazXzoQOoPisUu8hL-Q08toqLE3nWvxFji7BZ7x4dc=
 ---
 
 헬퍼 함수는 다른 함수에서 호출하며, 진입점은 버텍스·프래그먼트·컴퓨트 스테이지에서 실행합니다. 이 페이지는 함수 선언, 호출, 진입점, 모듈 구성을 설명합니다.
@@ -70,11 +71,11 @@ WGSL에는 호출 스택이 없으므로 재귀는 거부됩니다.
 
 ### 진입점
 
-진입점은 함수를 감싸는 스테이지 호출 `vertex(f)`, `fragment(f)`, `compute([…], f)` 가운데
-하나로 초기화한 최상위 `export const`입니다. 감싸는 함수는 상수와 이름이 같은 함수 표현식이거나
-화살표 함수입니다. 컴퓨트 진입점은 워크그룹 크기를 첫 번째 인자로 `compute([64], f)`나
-`compute([8, 8], f)`처럼 적습니다. 이전 릴리스의 데코레이터 형태(`@compute([64]) export function main(…)`)는
-마이그레이션 릴리스 다음 릴리스까지 계속 받아들입니다.
+진입점은 스테이지 속성 `@vertex`, `@fragment`, `@compute([…])` 가운데 정확히 하나를 앞에 쓴 최상위 함수
+선언입니다. 진입점의 이름은 선언의 이름입니다. 컴퓨트 진입점은 워크그룹 크기를 속성의 인자로 `@compute([64])`나
+`@compute([8, 8])`처럼 적습니다. 인자 없이 쓴 `@compute`는 기본값 64를 씁니다. 변경 0111의 스테이지
+호출(`export const main = compute([64], function main(…) { … })`)은 `TS8028`로 거부되며, 진입점에 붙인
+`export default`도 마찬가지입니다(변경 0130, 0140). `tshc migrate`는 둘 다 속성 형태로 바꿔 씁니다.
 
 ```ts
 "use typeshade";
@@ -109,14 +110,20 @@ export function reduceWindows(gid: builtin<"global_invocation_id">): void {
 `entry(bindings, groups, { constants })`로 전달합니다. 프로그램 파이프라인은 확정된
 `pipeline.workgroupShape`를 반환합니다. `device.fuse()` 안을 포함한 진입점 호출은 선택한
 모양을 사용하며, 전달한 워크그룹 개수는 변경하지 않습니다. 소스 형태, 제한, 호스트 호출은
-[`docs/use-typeshade-surface.md` §3](docs/use-typeshade-surface.md#3-entries--stage-calls-and-explicit-builtins),
+[`docs/use-typeshade-surface.md` §3](docs/use-typeshade-surface.md#3-entries--stage-attributes-and-explicit-builtins),
 [`§15`](docs/use-typeshade-surface.md#15-textures-samplers-and-overrides),
 [`§24`](docs/use-typeshade-surface.md#24-module-variables),
 [`§69`](docs/use-typeshade-surface.md#69-running-a-compiled-program)에 설명되어 있습니다.
 
 ### 스테이지 매개변수
 
-스테이지는 타입에 속성을 담은 매개변수로 입력을 받습니다. `builtin<"id", T>`는 하드웨어가 제공하는 `"vertex_index"`, `"position"`, `"global_invocation_id"` 같은 값을 선언합니다. `location<n, T>`는 스테이지 사이에서 데이터를 전달하는 번호가 붙은 슬롯을 선언합니다. 두 타입 모두 값은 `T`입니다. 같은 두 타입을 두 스테이지가 공유하는 IO 구조체, 곧 인터페이스나 클래스의 필드에도 사용합니다. 보간 모드는 [레이아웃과 리소스](/guide/authoring/layouts-and-resources/)에서 설명합니다.
+스테이지는 매개변수로 입력을 받습니다. `builtin<"id">`는 하드웨어가 제공하는 `"vertex_index"`, `"position"`,
+`"global_invocation_id"` 같은 값을 선언하며, 그 타입은 WGSL이 그 값에 정한 타입입니다. `builtin<…>`이 없는
+매개변수는 사용자가 정의한 입력입니다. 버텍스 진입점에서는 버텍스 속성이고, 프래그먼트 진입점에서는 스테이지 사이를
+오가는 값이며 버텍스 결과에서 이름이 같은 필드의 location을 받습니다. location은 컴파일러가 정합니다.
+`location<n, T>`는 번호를 직접 적으며, 버텍스 진입점이 없는 파일의 프래그먼트 진입점은 이 번호를 적습니다. 같은
+형태를 두 스테이지가 공유하는 IO 구조체, 곧 인터페이스나 클래스의 필드에도 사용합니다. 보간 모드는
+[레이아웃과 리소스](/guide/authoring/layouts-and-resources/)에서 설명합니다.
 
 ```ts
 "use typeshade";
@@ -164,7 +171,10 @@ location 0을 받습니다. 구조체 없이 `vec4`만 돌려주는 버텍스 �
 불러도 되기 때문입니다. GLSL 스테이지에는 그 스테이지의 진입점이 닿는 함수만 들어가며, GLSL ES
 3.00의 요구대로 불리는 함수가 부르는 함수보다 앞에 놓입니다.
 
-파일은 다른 TypeScript 모듈처럼 다른 셰이더 파일의 내보내기를 가져옵니다. 컴파일 대상 파일과 직접 또는 간접적으로 가져오는 셰이더 파일이 하나의 프로그램과 모듈을 구성합니다. 가져온 파일에서 컴파일 대상 파일이 사용하는 헬퍼, 구조체, 상수, 바인딩은 모듈에 포함됩니다. 가져온 파일의 진입점은 포함되지 않습니다.
+파일은 다른 TypeScript 모듈처럼 다른 셰이더 파일의 내보내기를 가져옵니다. 컴파일 대상 파일과 직접 또는 간접적으로
+가져오는 셰이더 파일이 하나의 프로그램과 모듈을 구성합니다. 일반 import는 컴파일 대상 파일이 사용하는 선언을
+가져오며, 헬퍼, 구조체, 상수, 바인딩이 여기에 포함됩니다. 관련 없는 진입점은 포함되지 않습니다. 반면 순수 루트 별칭은
+최종 대상을 그대로 보존합니다([다른 셰이더 모듈을 가져오는 모듈](#a-shader-module-that-imports-another) 참고).
 
 ```ts
 // noise.shade.ts

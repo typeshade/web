@@ -411,22 +411,25 @@ id first, then the pull request that did the work.
 - 0122: a portable fusion origin. `HostFaceOptions.origin` is an API reference member with its
   Korean translation; `src/scripts/playground-host-service.ts` passes a URI `fileName` and keeps
   the default. No page explains the Vite `originNamespace` option. Handled in #52.
-- 0123: scalar `f64` module constants. The English guide reads the pinned `AUTHORING.md`. Open:
-  the Korean sections `fp64` and `values-and-mutation` are shown in English until they are
-  translated again, and the from-TypeScript rows have no module-level `f64` row. Recorded in #52.
+- 0123: scalar `f64` module constants. The English guide reads the pinned `AUTHORING.md`, and
+  the Korean sections `fp64` and `values-and-mutation` are translated again. Open: the
+  from-TypeScript rows have no module-level `f64` row. Handled in #52.
 - 0124: `maxSteps` in a debug launch configuration. The English overview reads the pinned
-  `AUTHORING.md`. Open: the Korean `overview` section is shown in English until it is translated
-  again. Recorded in #52.
+  `AUTHORING.md`, and the Korean `overview` section is translated again. Handled in #52.
 - 0125: the empty bindings object is optional. The quick start writes `fs(canvas)`; the
   Playground's starter (`src/scripts/playground-host-default.ts`) omits `{}` for a fragment entry
   with no binding; the host-call copy of the quick start and of the WebGPU and WebGL2 page says so
-  (en and ko). Open: the Korean `the-cpu-oracle` section is shown in English. Handled in #52.
+  (en and ko). Open: the Korean `the-cpu-oracle` section is shown in English, as it was at
+  `e30bbe57`. Handled in #52.
 - 0126: a pure alias root. The English guide reads the pinned `AUTHORING.md`. Open: the Korean
   `the-cpu-oracle` section is shown in English, and `scripts/playground-diagnostics.test.ts` and
   `scripts/check-playground.mjs` have no alias chain. Recorded in #52.
 - 0127: a bare uniform runs on WebGL2. `hello-uniform` counts as renderable (77 of the examples);
-  its Korean description follows the pinned English; the TS8015 example and the Playground
+  its Korean description follows the pinned English; the from-GLSL uniform row shows the std140
+  block the pin emits for a bare scalar; the TS8015 example and the Playground
   diagnostics test use a module with two fragment entries, since a bare uniform no longer warns.
+  Open: the example page shows no still, since the page supplies no value for the bare `scale`
+  (`scripts/artifacts.mjs`, reason `uniform`); a still and a WebGL2 playback check are owed.
   Handled in #52.
 - 0128: WebGPU scratch metrics in a fuse report. The fuse report paragraph (en and ko) names the
   four counters, says that a report without `webgpuScratch` is unknown and how `mergeReports`
@@ -441,8 +444,9 @@ id first, then the pull request that did the work.
   reference drops the Stage calls family and lists `@vertex`, `@fragment`, `@compute` and
   `@workgroup_size` with the attributes; the five stage-call lessons and models go with their
   reference pages. The benchmark sources keep the written type of a built-in value, since the
-  baseline build `e30bbe57` refuses the short form (`src/lib/benchmarks/subgroups.ts`). Open: the
-  13 Korean guide sections the pinned `AUTHORING.md` changed are shown in English. Handled in #52.
+  baseline build `e30bbe57` refuses the short form (`src/lib/benchmarks/subgroups.ts`). Twelve of
+  the 13 Korean guide sections the pinned `AUTHORING.md` changed are translated again. Open:
+  `the-cpu-oracle` is shown in English, as it was at `e30bbe57`. Handled in #52.
 - 0131: `numerics` is removed. The `TS8078` example, the `numerics` lesson (en and ko) and its
   model, `content/api/ko/numericsclass.json`, the `numerics` member of `FuncDecl` and the
   `contract` sentence of `DeterminismKind` are removed; `TS8078` is listed as retired. Handled in
@@ -463,8 +467,8 @@ id first, then the pull request that did the work.
 - 0136: every `for` header compiles, and an entry's result is inferred. The lines of `TS8006`,
   `TS8007` and `TS8008` (en and ko) state the refusals that remain, with examples that produce
   them at the pin; the from-WGSL `for` note and the CPU and GPU page's loop sentence say that a
-  `for` means what it means in TypeScript. Open: the Korean `control-flow` section is shown in
-  English. Handled in #52.
+  `for` means what it means in TypeScript. The Korean `control-flow` section takes the pinned
+  code. Handled in #52.
 - 0137: a parameter qualifier is written before the parameter. `@inout a: T` and `@out c: T`
   replace `inout<T>` and `out<T>` in both dictionaries, the lowering rows, the functions page and
   the fenced code of the Korean guide; `let s: f32` replaces `let s!: f32`. Handled in #52.

@@ -1,6 +1,6 @@
 ---
 id: overview
-source: 00a269e14c7a8cd8109417858a7e790d33df075b84bc44651d68aa981a1e3a33
+source: bf1faeadeaae628303a03eff11c28b6b764155d720b2f0050b1154e7074bb648
 sourceLine: 1
 ---
 
@@ -10,9 +10,9 @@ sourceLine: 1
 
 ### 작성하는 코드와 그 결과
 
-셰이더는 일반 TypeScript 파일로 작성하며, 첫 문장은 지시문 `"use typeshade"`입니다. 문법은 TypeScript와 같으며 `function`, `const`와 `let`, `if`, `for`, `class`, 연산자와 리터럴을 사용합니다. 타입은 GPU 타입인 `f32`, `u32`, `vec3`, `mat4`, `array<f32, 16>`을 사용합니다. `fragment(f)` 같은 스테이지 호출은 GPU가 호출하는 함수를 표시합니다. 타입이나 필드 이름이 틀리면 편집기가 해당 줄에 오류를 표시합니다.
+셰이더는 일반 TypeScript 파일로 작성하며, 첫 문장은 지시문 `"use typeshade"`입니다. 문법은 TypeScript와 같으며 `function`, `const`와 `let`, `if`, `for`, `class`, 연산자와 리터럴을 사용합니다. 타입은 GPU 타입인 `f32`, `u32`, `vec3`, `mat4`, `array<f32, 16>`을 사용합니다. `@fragment` 같은 스테이지 속성은 GPU가 호출하는 함수를 표시합니다. 타입이나 필드 이름이 틀리면 편집기가 해당 줄에 오류를 표시합니다.
 
-프로그램의 구조는 진입점, 리소스, 구조체 선언으로 정해집니다. 스테이지 호출(`vertex(f)`, `fragment(f)`, `compute([64], f)`)로 초기화한 최상위 `export const`는 진입점입니다. GPU는 버텍스, 프래그먼트, 컴퓨트 인보케이션마다 진입점을 실행하며, 나머지 함수는 진입점이 호출하는 헬퍼입니다. `uniform<T>`나 `storage<T>` 타입의 `declare const`는 호스트가 바인딩하는 리소스입니다. `class`, `interface`, `type` 별칭은 구조체가 됩니다.
+프로그램의 구조는 진입점, 리소스, 구조체 선언으로 정해집니다. 스테이지 속성(`@vertex`, `@fragment`, `@compute([64])`)을 앞에 쓴 최상위 함수 선언은 진입점입니다. GPU는 버텍스, 프래그먼트, 컴퓨트 인보케이션마다 진입점을 실행하며, 나머지 함수는 진입점이 호출하는 헬퍼입니다. `uniform<T>`나 `storage<T>` 타입의 `declare const`는 호스트가 바인딩하는 리소스입니다. `class`, `interface`, `type` 별칭은 구조체가 됩니다.
 
 ```ts
 "use typeshade";
@@ -89,7 +89,8 @@ import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typ
   단계씩 실행합니다. 작성자가 쓴 문장마다 멈춰 소스 구간과 프레임의 지역 변수를 보고하고,
   중단점을 줄 번호로 찾습니다. 실행 하나를 데이터로 적은 실행 구성도 함께 들어 있습니다. 이
   구성은 인수 위치가 아니라 진입점이 선언한 이름을 키로 씁니다. `launch.json`용으로 미리 만든
-  JSON Schema와, 값을 작성자가 쓴 셰이더 타입으로 보여 주는 포매터도 있습니다. 편집기의 디버그
+  JSON Schema와, 값을 작성자가 쓴 셰이더 타입으로 보여 주는 포매터도 있습니다. 선택 항목인 양의 정수 `maxSteps`는
+  세션의 문장 이벤트 수를 제한하며, 생략하면 실행에 제한이 없습니다. 편집기의 디버그
   어댑터와 Playground의 단계 실행 패널이 모두 이 경로를 바탕으로 만들어졌습니다.
   `docs/debugging.md`를 참고합니다.
 - `typeshade/core/ir`은 IR 빌더입니다. 소스를 컴파일하지 않고 코드로 모듈을 조립하는 엔진이나

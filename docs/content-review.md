@@ -213,11 +213,12 @@ The compiler pin move to `34cea187` (PR #52, 2026-11-10) changes TypeShade copy 
 Korean: the stage attribute wording that replaces "stage call", the entry attribute types, the
 parameter qualifiers, the loop diagnostics, the fuse report, the host resources section of the
 quick start, three paragraphs of the WebGPU and WebGL2 page (host resources, failed `Resident`
-contents, the CPU `sin` and `cos`), 27 Korean API reference entries and the record
+contents, the CPU `sin` and `cos`), 27 Korean API reference entries, 12 Korean guide sections and
+the record
 `apps/typeshade/compiler-changes.md`. The agent that made the change wrote the English first and
 translated it, and verified each technical statement against the pinned compiler. **The editorial
 review of this new and changed prose has not run.** No Luna subagent read it, and no person read
-the Korean for idiom. Thirteen Korean guide sections are shown in English until they are
-translated again from the pinned `AUTHORING.md`. Next action: assign the changed keys of
+the Korean for idiom. The Korean guide section `the-cpu-oracle` is shown in English until it is
+translated again from the pinned `AUTHORING.md`; it was already shown in English at `e30bbe57`. Next action: assign the changed keys of
 `apps/typeshade/src/i18n/en.ts` and `ko.ts`, `content/api/ko/` and the quick start to a reviewer,
 then record the review here.

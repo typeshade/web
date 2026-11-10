@@ -1,7 +1,7 @@
 ---
 id: capabilities-extensions
-source: 780c2ec4698fb1dba99abe6939568fe391522911bd4dd46ac8010a9fa46a76b2
-sourceLine: 2293
+source: 8993bcf5a1490cc68354b557f736dae191cf4a3e492a25a63967f4493752cbd7
+sourceLine: 2375
 rules: 11.21 NGIrnrXEAXjbu_CT68JK1XC6NGSjxGH7XAQK99t8d5Q=
 ---
 
@@ -11,7 +11,7 @@ rules: 11.21 NGIrnrXEAXjbu_CT68JK1XC6NGSjxGH7XAQK99t8d5Q=
 
 ### 기능 선언
 
-대부분의 기능은 스스로 선언됩니다. `builtin<"clip_distances", T>`, `builtin<"primitive_index", u32>`,
+대부분의 기능은 스스로 선언됩니다. `builtin<"clip_distances", T>`, `builtin<"primitive_index">`,
 서브그룹 내장 값, `blend_src` 옵션을 쓰면 그 쓰임에 필요한 기능이 파생됩니다. 스토리지 바인딩,
 컴퓨트 진입점, 한 타깃에 없는 종류의 텍스처도 마찬가지입니다. 어떤 쓰임으로도 파생되지 않는 확장은
 `"use typeshade"` 옆에 문자열 지시문으로 활성화합니다. 지시문은 한 줄에 하나씩, WGSL의 이름 그대로
@@ -61,7 +61,7 @@ id별 요구 사항은 _호스트 기능_(host feature)과 _소스 지시문_(so
 | `packed4x8Dot`       | 미지원, fail closed로 실패                                       | 코어 사양, 파생. 언어 기능 하나를 확인해야 함                      |
 
 아래쪽 여섯 행은 아무도 직접 선언하지 않는 기능입니다. `builtin<"clip_distances", T>`,
-`builtin<"primitive_index", u32>`, `builtin<"subgroup_id", u32>`, `blend_src` 옵션을 적으면 해당
+`builtin<"primitive_index">`, `builtin<"subgroup_id">`, `blend_src` 옵션을 적으면 해당
 기능이 파생됩니다. WGSL은 이들을 저마다 짝이 맞는 `enable` 없이는 거부하기 때문입니다.
 `"bgra8unorm"` 스토리지 텍스처, packed 4x8 계열 함수 호출, 서브그룹 내장 함수 호출
 (`subgroupAdd(x)`, 변경 0117)도 각각 바인딩과 호출에서 기능을 끌어냅니다. 어떤 사용으로도
@@ -100,8 +100,8 @@ capabilityMatrix([wgslBackend, glslEs300Backend])
   `multiview`를 선언한 모듈은 지시문만 생성하고 여전히 단일 뷰로 렌더링합니다. 나머지 네 기능은
   쓸 수 있습니다. `clipDistances`, `primitiveIndex`, `dualSourceBlending`은 각 속성에
   필요한 기능입니다. `subgroups`는 컴퓨트나 프래그먼트 진입점에
-  `builtin<"subgroup_invocation_id", u32>`나 `builtin<"subgroup_size", u32>`를 적거나, 컴퓨트
-  진입점에 `builtin<"subgroup_id", u32>`나 `builtin<"num_subgroups", u32>`를 적거나, 서브그룹 내장
+  `builtin<"subgroup_invocation_id">`나 `builtin<"subgroup_size">`를 적거나, 컴퓨트
+  진입점에 `builtin<"subgroup_id">`나 `builtin<"num_subgroups">`를 적거나, 서브그룹 내장
   함수 21개 가운데 하나(`subgroupAdd` 등, 변경 0117)를 부르면 쓰게 됩니다. GLSL ES 3.00에서는
   비용이 없습니다. 거기서는 서브그룹이 인보케이션 하나이므로(규칙 11.21) 접은 값은 레인
   자신의 값이고 `subgroup_size`는 `1u`입니다. 어떤 어댑터가 이 네 기능 가운데 하나를 실제로 갖추었는지 알려면

@@ -1,8 +1,8 @@
 ---
 id: control-flow
-source: df3ae3598c1f07170868aa77755907d2bb387da977f12a3ee99b465348fefc65
-sourceLine: 790
-rules: 7.5 4308LIgSysAnlue51NfkW0VyNcY9-VTAPwyWJ1UyQN4=
+source: 6a78856d24898fd1f7148220155ee461219a50e5137d6e6479d85d284bf00886
+sourceLine: 810
+rules: 7.5 cLEWqoooRxRDgmbSkzSguJp7MuC9UNqYilDmP6Kp_sY=
 ---
 
 제어 흐름은 셰이더 본문의 분기, 반복, 디스패치를 결정합니다. 문(statement)은 실행할 작업을 정하고, 표현식은 사용할 값을 정합니다. 모든 형태는 TypeScript 문법을 따르며, 대응하는 WGSL과 GLSL 문장으로 생성됩니다.
