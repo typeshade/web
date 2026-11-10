@@ -109,44 +109,26 @@ const HEADER = (file: string): string =>
     `host.ts: the TypeScript an application writes around ${file}. It runs in a sandboxed frame with a canvas of its own, which the Result tab shows when ${file} has an entry a host can call; otherwise it runs when you click Run. Its console lines go to the Console tab. The import is the shader module: hover a name to read what a host sees.`,
   );
 
-/** The starter host.ts for the module at `file` (a name at the workspace's root), from the
- *  exports its host face lists. */
-export function defaultHost(file: string, exports: readonly HostExport[]): string {
-  const from = `./${file}`;
+type Named<K extends HostExport['kind']> = Extract<HostExport, { kind: K }>;
+
+/** The entry a starter calls, and how: the first full-screen `@fragment` entry whose bindings
+ *  can be written, else the first such `@compute` entry, else the first image kernel. Undefined
+ *  for a module the starter can only list the entries of. */
+type StarterCall =
+  | { readonly use: 'draw'; readonly exported: Named<'fragment'>; readonly bindings: string }
+  | { readonly use: 'dispatch'; readonly exported: Named<'compute'>; readonly bindings: string }
+  | { readonly use: 'image'; readonly exported: Named<'kernel'> };
+
+function starterCall(exports: readonly HostExport[]): StarterCall | undefined {
   for (const exported of exports) {
     if (exported.kind !== 'fragment') continue;
     const bindings = bindingsValue(exported.bindingsType, 'draw');
-    if (bindings === undefined) continue;
-    const name = exported.name;
-    return `${HEADER(file)}
-import { ${name} } from '${from}';
-
-/** Draw \`${name}\` into the canvas once a frame. */
-export function animate(canvas: HTMLCanvasElement): void {
-  const frame = (ms: number): void => {
-${/\btime\b/.test(bindings) ? '    const time = ms / 1000;\n' : ''}    void ${name}(canvas, ${bindings});
-    requestAnimationFrame(frame);
-  };
-  requestAnimationFrame(frame);
-}
-`;
+    if (bindings !== undefined) return { use: 'draw', exported, bindings };
   }
   for (const exported of exports) {
     if (exported.kind !== 'compute') continue;
     const bindings = bindingsValue(exported.bindingsType, 'dispatch');
-    if (bindings === undefined) continue;
-    const name = exported.name;
-    const size = exported.entry.wg[0];
-    return `${HEADER(file)}
-import { ${name} } from '${from}';
-
-/** Dispatch \`${name}\` once, and log the bindings it wrote. */
-export async function run(): Promise<void> {
-  const bindings = ${bindings};
-  await ${name}(bindings, ${size > 1 ? `Math.ceil(${ELEMENTS} / ${size})` : ELEMENTS});
-  console.log(bindings);
-}
-`;
+    if (bindings !== undefined) return { use: 'dispatch', exported, bindings };
   }
   for (const exported of exports) {
     if (exported.kind !== 'kernel') continue;
@@ -164,7 +146,56 @@ export async function run(): Promise<void> {
       height.type.k !== 'num'
     )
       continue;
+    return { use: 'image', exported };
+  }
+  return undefined;
+}
+
+/** Whether the starter host.ts for these exports calls an entry of the module: it draws a
+ *  fragment entry, dispatches a compute entry or runs an image kernel. False where the starter
+ *  only lists the program's entries, which draws and returns nothing. */
+export function starterCallsEntry(exports: readonly HostExport[]): boolean {
+  return starterCall(exports) !== undefined;
+}
+
+/** The starter host.ts for the module at `file` (a name at the workspace's root), from the
+ *  exports its host face lists. */
+export function defaultHost(file: string, exports: readonly HostExport[]): string {
+  const from = `./${file}`;
+  const call = starterCall(exports);
+  if (call?.use === 'draw') {
+    const { exported, bindings } = call;
     const name = exported.name;
+    return `${HEADER(file)}
+import { ${name} } from '${from}';
+
+/** Draw \`${name}\` into the canvas once a frame. */
+export function animate(canvas: HTMLCanvasElement): void {
+  const frame = (ms: number): void => {
+${/\btime\b/.test(bindings) ? '    const time = ms / 1000;\n' : ''}    void ${name}(canvas, ${bindings});
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+`;
+  }
+  if (call?.use === 'dispatch') {
+    const { exported, bindings } = call;
+    const name = exported.name;
+    const size = exported.entry.wg[0];
+    return `${HEADER(file)}
+import { ${name} } from '${from}';
+
+/** Dispatch \`${name}\` once, and log the bindings it wrote. */
+export async function run(): Promise<void> {
+  const bindings = ${bindings};
+  await ${name}(bindings, ${size > 1 ? `Math.ceil(${ELEMENTS} / ${size})` : ELEMENTS});
+  console.log(bindings);
+}
+`;
+  }
+  if (call?.use === 'image') {
+    const name = call.exported.name;
     return `${HEADER(file)}
 import { createDevice } from 'typeshade/runtime';
 import 'typeshade/fuse';

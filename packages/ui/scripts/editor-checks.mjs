@@ -134,15 +134,33 @@ export const fs = fragment(function fs(uv: location<0, vec2>): Color {
     document.querySelector('[data-file-tab="lib/colors.shade.ts"]').click();
   });
 
-  // The fragment entry reads the vertex prelude's `uv`, which no host can call yet (Rule 8.24),
-  // so the Result tab draws nothing and says why (apps/typeshade/docs/playground-one-runtime.md,
-  // Decision 1).
+  // The fragment entry reads the vertex prelude's `uv`, which no host can call (Rule 8.24), so
+  // the site's runner draws the Result tab (apps/typeshade/docs/playground-one-runtime.md,
+  // Decision 1, reversed on 2026-11-10). A real worker-pool draw verifies that the moved worker
+  // URL is bundled by Vite.
   await page.locator('[data-target="result"]').click();
+  await page.waitForFunction(
+    () =>
+      document.querySelector("[data-playground]")?.dataset.result === "site",
+    undefined,
+    { timeout: 60000 },
+  );
+  assert.ok(await page.locator("[data-transport]").isVisible());
+  await page.locator("[data-engine]").selectOption("cpu");
+  await page.locator("[data-resolution]").selectOption("64");
+  await page.waitForFunction(
+    () => {
+      const note = document.querySelector("[data-canvas-note]");
+      return Number(note?.dataset.px) > 0 && Number(note?.dataset.workers) > 0;
+    },
+    undefined,
+    { timeout: 60000 },
+  );
   await page.waitForFunction(
     () => {
       const root = document.querySelector("[data-playground]");
       return (
-        root?.dataset.result === "none" &&
+        root?.dataset.result === "site" &&
         root.dataset.version ===
           document.querySelector("[data-gpu-frame]")?.dataset.settled &&
         !root.classList.contains("has-errors")
@@ -151,8 +169,17 @@ export const fs = fragment(function fs(uv: location<0, vec2>): Color {
     undefined,
     { timeout: 60000 },
   );
-  assert.ok(await page.locator("[data-result-none]").isVisible());
-  assert.ok(await page.locator("[data-transport]").isHidden());
+  assert.equal(
+    await page.locator("[data-canvas]").evaluate((canvas) => canvas.width),
+    64,
+  );
+  await page.locator("[data-play]").click();
+  assert.equal(
+    await page.locator("[data-play]").getAttribute("aria-pressed"),
+    "true",
+  );
+  await page.locator("[data-restart]").click();
+  await page.locator("[data-play]").click();
 
   // For a module no host can call, host.ts runs only on the explicit Run action, and Stop
   // removes its sandbox.
@@ -211,13 +238,23 @@ export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
     (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
     source,
   );
+  // Back on a module no host can call, the frame goes and the site's runner draws again, on
+  // the CPU canvas the engine picker still names.
   await page.waitForFunction(
-    () =>
-      document.querySelector("[data-playground]")?.dataset.result === "none" &&
-      document.querySelectorAll("[data-host-frame]").length === 0,
+    () => {
+      const root = document.querySelector("[data-playground]");
+      return (
+        root?.dataset.result === "site" &&
+        document.querySelectorAll("[data-host-frame]").length === 0 &&
+        root.dataset.version ===
+          document.querySelector("[data-gpu-frame]")?.dataset.settled
+      );
+    },
     undefined,
     { timeout: 60000 },
   );
+  assert.ok(await page.locator("[data-transport]").isVisible());
+  assert.ok(await page.locator("[data-canvas]").isVisible());
   page.once("dialog", (dialog) => dialog.accept());
   await page
     .locator(".file-pair")

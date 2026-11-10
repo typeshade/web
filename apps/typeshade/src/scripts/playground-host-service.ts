@@ -22,7 +22,7 @@ import {
   type TypeshadeHover,
   type TypeshadePosition,
 } from '../../vendor/shader-dsl/src/language-service/index.ts';
-import { defaultHost } from './playground-host-default.ts';
+import { defaultHost, starterCallsEntry } from './playground-host-default.ts';
 import { HOST_URI } from './playground-language.ts';
 const HOST_PATH = '/host.ts';
 const LIB_DIR = '/lib/';
@@ -372,14 +372,13 @@ export function hostModuleOf(
   return faceOf(uri, read)?.code;
 }
 
-/** Whether a host can call an entry of the module at `uri` (Rule 8.24): its host face lists a
- *  `@fragment` entry that reads no vertex output, a `@compute` entry or a kernel function. The
- *  Result tab runs such a module through host.ts (docs/playground-one-runtime.md, phase 2). */
+/** Whether the starter host.ts calls an entry of the module at `uri`: its host face lists a
+ *  `@fragment` entry that reads no vertex output (Rule 8.24), a `@compute` entry or an image
+ *  kernel, with bindings the starter can write (playground-host-default.ts). The Result tab runs
+ *  such a module through host.ts (docs/playground-one-runtime.md, phase 2). A module whose
+ *  starter only lists the program's entries is not one: the site's runner draws it. */
 export function hostCallable(uri: string, read: (uri: string) => string | undefined): boolean {
-  return (faceOf(uri, read)?.exports ?? []).some(
-    (exported) =>
-      exported.kind === 'fragment' || exported.kind === 'compute' || exported.kind === 'kernel',
-  );
+  return starterCallsEntry(faceOf(uri, read)?.exports ?? []);
 }
 
 /** host.ts and the modules it imports, as the frame runs them. */

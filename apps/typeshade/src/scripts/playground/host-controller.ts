@@ -57,8 +57,8 @@ export function createHostController({
   // other file gets a starter written from its host face (playground-host-default.ts) the first
   // time host.ts is shown, run or downloaded.
   //
-  // For a module a host can call, the frame is the Result tab (docs/playground-one-runtime.md,
-  // phase 2): the page runs host.ts itself once the module compiles and again after an edit
+  // For a module whose starter calls an entry, and for a host example, the frame is the Result
+  // tab (docs/playground-one-runtime.md, phase 2): the page runs host.ts itself once the module compiles and again after an edit
   // settles. It does so for the host.ts the example or the starter brings and for one the reader
   // has edited. A host.ts that a link carries waits for Run until the reader edits it.
 

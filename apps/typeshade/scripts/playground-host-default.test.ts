@@ -1,7 +1,12 @@
 import { expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { hostTypes } from './playground-host-types.mjs';
-import { hostBuild, hostDiagnostics, hostStarter } from '../src/scripts/playground-host-service.ts';
+import {
+  hostBuild,
+  hostCallable,
+  hostDiagnostics,
+  hostStarter,
+} from '../src/scripts/playground-host-service.ts';
 
 const uri = 'file:///kernel-image-invert.shade.ts';
 const source = readFileSync('vendor/shader-dsl/examples/kernel-image-invert.shade.ts', 'utf8');
@@ -30,4 +35,26 @@ test('a different storage format keeps the fallback instead of displaying bytes 
   const host = hostStarter(uri, (file) => (file === uri ? changed : undefined));
   expect(host).toContain('program.entries');
   expect(host).not.toContain('putImageData');
+});
+
+// The Result tab is host.ts's frame only where the starter calls an entry. A starter that lists
+// the entries draws nothing, so the site's runner keeps such a module
+// (docs/playground-one-runtime.md, Decisions, 1).
+test('only a module whose starter calls an entry hands the Result tab to host.ts', () => {
+  const example = (id: string): boolean => {
+    const file = `file:///${id}.shade.ts`;
+    const text = readFileSync(`vendor/shader-dsl/examples/${id}.shade.ts`, 'utf8');
+    const reads = (asked: string) => (asked === file ? text : undefined);
+    const calls = hostCallable(file, reads);
+    expect(hostStarter(file, reads).includes('program.entries')).toBe(!calls);
+    return calls;
+  };
+  // An image kernel, and a fragment entry that reads only its position.
+  expect(example('kernel-image-invert')).toBe(true);
+  expect(example('bare-position')).toBe(true);
+  // A fragment entry that reads its vertex entry's output (Rule 8.24).
+  expect(example('null-values')).toBe(false);
+  // A compute entry and a kernel loop whose bindings the starter cannot write.
+  expect(example('array-length')).toBe(false);
+  expect(example('loop-kernel')).toBe(false);
 });

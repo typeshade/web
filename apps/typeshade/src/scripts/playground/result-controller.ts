@@ -47,8 +47,7 @@ interface ResultOptions {
   engineIsCpu(): boolean;
   isComputeModule(): boolean;
   /** Whether the site's runner draws the Result tab for the module that compiled last. It does
-   *  not for a module host.ts runs, or one no host can call yet (docs/playground-one-runtime.md,
-   *  phase 2 and Decision 1). */
+   *  not for a module host.ts runs (docs/playground-one-runtime.md, phase 2). */
   siteDraws(): boolean;
   currentChoice(): EmitChoice;
   waitFor(step: 'compiling' | 'drawing' | null): void;
@@ -530,8 +529,7 @@ export function createResultController({
     const mine = ++lastResult;
     if (frame instanceof HTMLElement) delete frame.dataset.settled;
     if (!siteDraws()) {
-      // The runner stops and its canvas and the still go: host.ts draws the frame, or the tab
-      // says why nothing does.
+      // The runner stops and its canvas and the still go: host.ts draws the frame.
       resultRun += 1;
       stopMount();
       const node = gpuCanvasNow();

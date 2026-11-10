@@ -248,10 +248,10 @@ function mount(root: HTMLElement): void {
   /** Whether the compiled module has the vertex and fragment pair a triangle needs. */
   let moduleDrawable = false;
   /** What the Result tab shows for the module that compiled last (docs/playground-one-runtime.md,
-   *  phase 2): `host`, host.ts's frame, for a module a host can call and for a host example;
-   *  `none`, a line saying why there is no picture, for any other module (Decision 1); `site`,
-   *  the site's runner, until a module has compiled. A file with errors keeps the last one. */
-  let resultBy: 'site' | 'host' | 'none' = 'site';
+   *  phase 2): `host`, host.ts's frame, for a module whose starter host.ts calls an entry and
+   *  for a host example; `site`, the site's runner, for any other module and until a module has
+   *  compiled (Decision 1, reversed on 2026-11-10). A file with errors keeps the last one. */
+  let resultBy: 'site' | 'host' = 'site';
   /** The version host.ts last ran for, so a repaint of the same analysis does not run it again. */
   let hostRanFor = -1;
   /** Whether the browser actually backed the canvas at the size it was asked for. */
@@ -922,10 +922,10 @@ function mount(root: HTMLElement): void {
     transport.syncDropHint();
     if (compiled) {
       const hostExample = examples.find((e) => e.id === openedExample)?.host !== undefined;
-      const next = analysis.hostCallable || hostExample ? 'host' : 'none';
-      if (next !== 'host' && resultBy === 'host') host.stopHost();
-      // Neither draws on the CPU canvas, so a draw still in flight is retired.
-      raster.stopDrawing();
+      const next = analysis.hostCallable || hostExample ? 'host' : 'site';
+      if (next === 'site' && resultBy === 'host') host.stopHost();
+      // host.ts's frame does not draw on the CPU canvas, so a draw still in flight is retired.
+      if (next === 'host') raster.stopDrawing();
       resultBy = next;
       root.dataset.result = next;
     }
