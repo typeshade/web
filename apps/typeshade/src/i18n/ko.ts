@@ -9,7 +9,12 @@ import { facts, hero, quickStartFile } from '../lib/examples.ts';
 import { ISSUE_IMAGE_BYTES, ISSUE_IMAGES_MAX } from '../lib/issue-data.ts';
 import { typedError } from '../lib/typed-error.ts';
 import { mnistEpochs, mnistTestSamples } from '../lib/mnist-settings.ts';
-import { operationLessons, constructorLesson, attributeLessons } from './operation-lessons-ko.ts';
+import {
+  operationLessons,
+  constructorLesson,
+  attributeLessons,
+  attributeModelLabels,
+} from './operation-lessons-ko.ts';
 import { functionLessons } from './function-lessons-ko.ts';
 
 const glsl = facts.glslTarget;
@@ -444,7 +449,11 @@ export const ko: Copy = {
         lessons: operationLessons,
         constructor: constructorLesson,
         attributeLessons,
+        attributeModelLabels,
         relatedAttributes: '관련 속성',
+        attributeSetup: '예제 프로그램',
+        attributeModelNote:
+          '예제는 설명용 계산 모델이며 GPU를 실행하지 않습니다. 속성의 문법은 아래 컴파일러 참고 자료에서 설명합니다.',
         heading: '예제 비교',
         modelNote:
           '예제는 설명용 계산 모델이며 GPU를 실행하지 않습니다. 정확한 호출 형식은 아래 컴파일러 참고 자료에서 설명합니다.',
@@ -2098,7 +2107,7 @@ export const ko: Copy = {
       runtimeFailureP:
         '생성된 커널, 컴퓨트 진입점, 프래그먼트 진입점 호출이 앞선 호출에서 쓰기에 실패한 `Resident`의 내용을 읽으면, 실행이나 업로드나 제출을 하기 전에 같은 오류로 거부됩니다. 거부된 호출은 자신이 썼을 모든 `Resident`에 그 오류를 남기고, 거부된 그리기는 캔버스 이미지를 그대로 둡니다. 컴파일러가 대상에 쓰기만 한다고 증명한 호출은 그 대상을 복구할 수 있고, 쓰기에 성공하면 오류가 지워집니다. `Resident.write(value)`는 오류를 지우지 않습니다. 실패한 배열을 읽지 않는 호출은 평소대로 실행됩니다. 직접 인코딩한 프로그램 런타임 호출과 `Frame` 제출은 각자의 계약을 그대로 따릅니다.',
       runtimeLibmP:
-        'CPU tier와 CPU 오라클에서 `sin`과 `cos`는 JavaScript 엔진의 `Math.sin`과 `Math.cos`가 아니라 컴파일러가 직접 가진 루틴입니다. `f32` 피연산자의 결과는 `f64` 루틴의 결과를 `f32`로 한 번 반올림한 값입니다. 각 루틴의 오차는 1 ULP 미만이며, 어느 루틴도 올바르게 반올림된 결과를 보장하지 않습니다. 컴파일러의 테스트는 Node와 Bun에서 같은 결과를 재현합니다. `"use typeshade"` 함수 안의 `Math.sin(t)`는 호스트 코드의 `Math.sin(t)`와 마지막 비트가 다를 수 있습니다. 이 컴파일러 버전에서는 `sin`과 `cos`만 이렇게 동작합니다. CPU가 엔진의 `Math`로 계산하는 다른 함수는 지금도 그대로이며, GPU의 `sin`과 `cos`는 여전히 드라이버의 것입니다.',
+        'CPU tier와 CPU 오라클에서 `sin`과 `cos`는 JavaScript 엔진의 `Math.sin`과 `Math.cos`가 아니라 컴파일러가 직접 가진 루틴입니다. `f32` 피연산자의 결과는 `f64` 루틴의 결과를 `f32`로 한 번 반올림한 값입니다. 각 루틴의 오차는 1 ULP 미만이며, 어느 루틴도 올바르게 반올림된 결과를 보장하지 않습니다. 컴파일러의 테스트는 Node와 Bun에서 같은 결과를 재현합니다. `"use typeshade"` 함수 안의 `Math.sin(t)`는 호스트 코드의 `Math.sin(t)`와 마지막 비트가 다를 수 있습니다. 이 컴파일러 버전에서는 `sin`과 `cos`만 이렇게 동작합니다. 다른 함수는 모두 CPU에서 여전히 엔진의 `Math`를 쓰며, GPU의 `sin`과 `cos`는 여전히 드라이버의 것입니다.',
       runtimeInfoP:
         '`buildInfo`는 패키지 버전과, 확인할 수 있을 때만 정확한 소스 리비전을 제공합니다. 수정되었거나 빌드 결과가 오래되었거나 리비전이 기록되지 않은 빌드는 `revision: null`입니다. `device.info`와 `runtime.info`는 실제로 열린 디바이스나 컨텍스트의 고정된 기록입니다. 직렬화할 수 있으며, 디바이스를 잃거나 해제한 뒤에도 읽을 수 있습니다. WebGPU 식별 정보에는 출처가 표시되고, 기능과 한도는 활성화된 디바이스의 값입니다. 알 수 없는 식별 정보는 그대로 남깁니다. WebGL 문자열은 실제 컨텍스트에서 읽습니다. 이 정보는 개별 호출의 실행 tier를 나타내거나 보고서를 전송하지 않습니다. 런타임 빌드, 프로그램을 만든 컴파일러, 벤치마크 워크로드의 출처는 각각 기록합니다.',
       webgl2H: 'WebGL2에서 달라지는 것',
@@ -2597,7 +2606,7 @@ export const ko: Copy = {
         'gpu-console':
           '컴퓨트 커널 안에서 `console.log("i =", gid.x, p)`를 부릅니다. 문자열 리터럴은 라벨이 되고, 크기가 정해진 값은 무엇이든 인자로 넘길 수 있습니다.',
         'compute-reduction-twin':
-          'workgroup_size로 감싼 컴퓨트 커널입니다. 입력 스토리지 버퍼의 한 구간을 reduce()로 접어 출력 원소 하나로 만듭니다.',
+          '@workgroup_size를 지정한 컴퓨트 커널입니다. 입력 스토리지 버퍼의 한 구간을 reduce()로 접어 출력 원소 하나로 만듭니다.',
         'workgroup-override':
           '`override<u32>` 하나가 컴퓨트 진입점의 워크그룹 크기와 공유 스크래치 배열의 바깥쪽 길이를 정합니다.',
         'hillshade-twin': '음영 기복.',
@@ -2789,8 +2798,8 @@ export const ko: Copy = {
     sectionTitle: (title: string) => `${title}, TypeShade 작성 가이드`,
     sections,
     referenceTableHeading: '참조 표',
-    note: `커밋 ${facts.pinnedCommit}의 [AUTHORING.md](guideSource)를 한국어로 옮긴 것입니다. 패키지는 ${facts.nextVersion}에서 쓸 \`typeshade\`라는 이름으로 가져온다.`,
-    noteUntranslated: `커밋 ${facts.pinnedCommit}의 [AUTHORING.md](guideSource)를 그대로 옮긴 것으로, 이 절의 본문은 아직 영어입니다. 패키지는 ${facts.nextVersion}에서 쓸 \`typeshade\`라는 이름으로 가져온다.`,
+    note: `커밋 ${facts.pinnedCommit}의 [AUTHORING.md](guideSource)를 한국어로 옮긴 것입니다. 패키지는 ${facts.nextVersion}에서 쓸 \`typeshade\`라는 이름으로 가져옵니다.`,
+    noteUntranslated: `커밋 ${facts.pinnedCommit}의 [AUTHORING.md](guideSource)를 그대로 옮긴 것으로, 이 절의 본문은 아직 영어입니다. 패키지는 ${facts.nextVersion}에서 쓸 \`typeshade\`라는 이름으로 가져옵니다.`,
   },
 
   // The language guide: src/components/pages/LanguagePage.astro and the Language*Page.astro topic pages.
