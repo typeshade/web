@@ -274,8 +274,13 @@ and the Korean sections `overview` and `control-flow` follow the corrected Engli
 
 The compiler pin move to `50234ad6` (PR #55, 2026-11-10) changes one English paragraph and its
 Korean (the CPU math functions of the WebGPU and WebGL2 page) and four Korean guide blocks. No
-Luna subagent and no second reader read the new English or the new Korean. This is the deviation
-the owner chose on 2026-11-10.
+Luna subagent read them. An independent agent of the same session reviewed commit `eaf3db5`, as for
+PR #52 and PR #54: this is the deviation the owner chose on 2026-11-10. It reported no blocking
+finding, 6 should-fix findings and 8 notes. Applied: S1 to S6 (the libm paragraph split into
+sentences with one topic each, "단조로운 결과" made "결과의 단조성", two `diagnostics` sentences, and
+this record). Not applied: N1 (the page states the measurements and not the 1 ULP promise of
+0042 decision N9; that stays the owner's choice). Open: the Korean guide mixes "반환" and
+"돌려주다", and about ten Korean section intros still describe the page.
 
 In the same pull request the authoring agent read two Korean guide sections in full against the
 pinned English, block by block: `diagnostics` (31 blocks) and `glsl-float-precision` (25 blocks).
@@ -283,9 +288,9 @@ Fixed: the page intro of `diagnostics` (the Korean described the page instead of
 reader can do after it), five sentences that dropped or weakened a clause ("one problem found in
 one program", "one handler catches every coded failure", the reason a branch on a code keeps
 working, "safe to call on a module you are about to emit", "as the samples above show"), one
-plain ending, and in `glsl-float-precision` an added "반드시", a duty where the English describes
-("측정해야 합니다"), "뿐" that the English does not say, a dropped "only", and "기기" made
-"디바이스". No second reader read these fixes.
+plain ending, "돌려주는" made "반환하는" where the same sentence says "반환해야", and in `glsl-float-precision` an added "반드시", a duty ("측정해야 합니다") where the guide renders an
+English imperative as a plain statement, "뿐" that the English does not say, a dropped "only", and "기기" made
+"디바이스". The independent review above read these fixes.
 
 The Korean guide section `the-cpu-oracle` is shown in English until it is translated again from
 the pinned `AUTHORING.md`; it was already shown in English at `e30bbe57`.
