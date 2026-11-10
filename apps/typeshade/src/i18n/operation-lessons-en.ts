@@ -833,6 +833,17 @@ export const attributeLessons: Readonly<Record<string, FunctionLesson>> = {
   },
 };
 
+/** The phrases an attribute lesson's examples use, by the phrase the model writes
+ *  (src/lib/operation-models.ts). A phrase is prose, so each language has its own; a model
+ *  phrase with no entry here stops the build in OperationLesson. */
+export const attributeModelLabels: Readonly<Record<string, string>> = {
+  'workgroup 0, lane 0': 'workgroup 0, lane 0',
+  'workgroup 0, lane 63': 'workgroup 0, lane 63',
+  'workgroup 1, lane 0': 'workgroup 1, lane 0',
+  'no @workgroup_size': 'no @workgroup_size',
+  'a loop that reduces': 'a loop that reduces',
+};
+
 export function constructorLesson(name: string): FunctionLesson | undefined {
   const matrix = /^mat([234])(?:x([234]))?f?$/.exec(name);
   if (matrix) {

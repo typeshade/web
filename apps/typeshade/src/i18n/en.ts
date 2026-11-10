@@ -12,7 +12,12 @@ import { ISSUE_IMAGE_BYTES, ISSUE_IMAGES_MAX } from '../lib/issue-data.ts';
 import type { LinkKey } from '../lib/links.ts';
 import { typedError } from '../lib/typed-error.ts';
 import { mnistEpochs, mnistTestSamples } from '../lib/mnist-settings.ts';
-import { operationLessons, constructorLesson, attributeLessons } from './operation-lessons-en.ts';
+import {
+  operationLessons,
+  constructorLesson,
+  attributeLessons,
+  attributeModelLabels,
+} from './operation-lessons-en.ts';
 import { functionLessons } from './function-lessons-en.ts';
 
 const glsl = facts.glslTarget;
@@ -371,7 +376,11 @@ export const en = {
         lessons: operationLessons,
         constructor: constructorLesson,
         attributeLessons,
+        attributeModelLabels,
         relatedAttributes: 'Related attributes',
+        attributeSetup: 'Example program',
+        attributeModelNote:
+          'The examples are calculation models and do not run GPU work. The reference below gives the syntax of the attribute.',
         heading: 'Compare examples',
         modelNote:
           'The examples are calculation models and do not run GPU work. The reference below gives the complete call signatures.',

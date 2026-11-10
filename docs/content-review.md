@@ -247,5 +247,41 @@ Open source problems, in the compiler repository (`typeshade/typeshade`), not ed
 - The pinned JSDoc of `Device` and `FuseReport` still describes its behaviour with `resident()`
   and `configure({ prefer })`, which change 0138 deprecates, so the Korean API entries do too.
 
+Bilingual reading of the Korean guide (PR #54, 2026-11-10). An independent agent of the session
+read the Korean against the English at pin `34cea187`. It is not the model this file names; the
+owner chose that deviation on 2026-11-10. The authoring agent read the English block and the
+Korean block of each finding again before it changed the Korean.
+
+- Covered, in full: ten guide sections, 364 blocks (`overview`, `your-first-shader`,
+  `values-and-mutation`, `layouts-and-resources`, `emitting-and-reflection`,
+  `conditional-programs`, `capabilities-extensions`, `fp64`, `production-emit`,
+  `migrating-a-glsl-shader`); the four attribute lessons; the quick start's host section; the
+  libm paragraph of the WebGPU and WebGL2 page.
+- Findings: 3 blocking and 30 should-fix, with notes and a terminology table. Applied: the 3
+  blocking findings and every should-fix finding but two. Applied in part: M-1 (the checker holds
+  three code-only table cells to the English, "and" included) and F-3 (the numeral check counts
+  the digit in "2의 거듭제곱", so the term stays "이진 거듭제곱"; the added example is removed).
+- Terms made one across the twelve sections and the lessons: tier, 디바이스, 인자, 하향 변환, 하위
+  경로, 언어 표면(surface), 변경 NNNN, prelude against 프리앰블, 드로, "…에 있습니다" for "See …".
+- Not read by anyone: the guide sections `diagnostics` and `glsl-float-precision`; the section
+  titles and descriptions in `src/i18n/ko.ts` (lines 22 to 79); `content/guide/ko/rules.json`; 22
+  Korean API entries in full; `the-cpu-oracle`, which is shown in English.
+- Open: `src/i18n/ko.ts` and the guide disagree on some terms, and this change leaves `ko.ts` as
+  it is: draw is "그리기" 14 times in `ko.ts` and "드로" in the guide; return is "돌려주다" 44 times
+  and "반환하다" 65 times in `ko.ts`; "deprecated" is the label "지원 중단" in `ko.ts`. "zero" stays
+  "영" and "power of two" stays "이진 거듭제곱" where the English writes the word, because the
+  numeral check compares digits.
+
+Two more open source problems in the compiler repository (`AUTHORING.md` at `34cea187`), not
+edited here:
+
+- Lines 80 to 81: "the types, the builtins and the stage functions are the language's own."
+  A stage is an attribute at the pin (change 0130). Proposed: "the types, the builtins and the
+  stage attributes are the language's own."
+- Lines 114 to 115: "The shaders themselves live in your repository and import the package like
+  any other dependency." contradicts line 80, "A shader file imports nothing from the package".
+  Proposed: "The shaders themselves live in your repository, and your host code imports the
+  package like any other dependency."
+
 The Korean guide section `the-cpu-oracle` is shown in English until it is translated again from
 the pinned `AUTHORING.md`; it was already shown in English at `e30bbe57`.

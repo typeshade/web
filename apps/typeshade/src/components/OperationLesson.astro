@@ -12,16 +12,26 @@ const { locale, name, lesson, model, relatedKind = 'functions' } = Astro.props;
 const r = copyFor(locale).docs.reference;
 const t = r.worked;
 const caption = name.startsWith('texture') ? t.textureDiagram : name.startsWith('mat') || name === 'transpose' || name === 'determinant' ? t.matrixDiagram : /^(dpd|fwidth)/.test(name) ? t.derivativeDiagram : t.diagram;
+const attribute = relatedKind === 'attributes';
+// An attribute lesson's example phrases are prose, so the dictionary carries them. A phrase is
+// one with a letter run of two or more words; code and numbers stay as the model writes them.
+const label = (text: string): string => {
+  if (!attribute) return text;
+  const known = (t.attributeModelLabels as Record<string, string>)[text];
+  if (known !== undefined) return known;
+  if (/^[a-z][a-z @_0-9,]* [a-z]/i.test(text) && !/[=()]/.test(text)) throw new Error(`[attribute-lesson] @${name}: the example phrase '${text}' has no entry in attributeModelLabels (src/i18n/operation-lessons-*.ts)`);
+  return text;
+};
 const value = (v: number | boolean) => typeof v === 'number' ? Number(v.toPrecision(7)).toString() : String(v);
 ---
 <section data-operation-lesson={name} lang={locale}>
   <h2 id="worked-examples">{t.heading}</h2>
   <p><Rich text={lesson.try} locale={locale} /></p>
-  {model.setup && <p class="model-setup text-(length:--text-ui) text-text-2"><strong>{t.setup}</strong><code>{model.setup}</code></p>}
+  {model.setup && <p class="model-setup text-(length:--text-ui) text-text-2"><strong>{attribute ? t.attributeSetup : t.setup}</strong><code>{model.setup}</code></p>}
   <div class="model-examples mbs-5 grid gap-3">
     {model.cases.map((sample, i) => (
       <details class="model-case rounded-md border border-line-2" name={`model-${name}`} open={i === 0} data-model-case={i}>
-        <summary class="cursor-pointer px-4 py-3 text-(length:--text-ui) font-semibold text-text-1">{t.example(i + 1)}<code class="model-preview font-normal text-text-2">{sample.input}</code></summary>
+        <summary class="cursor-pointer px-4 py-3 text-(length:--text-ui) font-semibold text-text-1">{t.example(i + 1)}<code class="model-preview font-normal text-text-2">{label(sample.input)}</code></summary>
         <div class="model-result px-4 pbe-4">
           {sample.grid && <figure class="model-figure">
             <div class="model-grid" style={`--model-columns: ${sample.grid[0].length}`}>
@@ -31,7 +41,7 @@ const value = (v: number | boolean) => typeof v === 'number' ? Number(v.toPrecis
           </figure>}
           <dl class:list={['model-values text-(length:--text-ui)', { 'model-atomic': sample.after !== undefined }]}>
             {sample.before !== undefined && <div><dt>{t.before}</dt><dd><code>{sample.before}</code></dd></div>}
-            <div><dt>{sample.after !== undefined ? t.returned : t.output}</dt><dd data-model-output><code>{sample.output}</code></dd></div>
+            <div><dt>{sample.after !== undefined ? t.returned : t.output}</dt><dd data-model-output><code>{label(sample.output)}</code></dd></div>
             {sample.after !== undefined && <div><dt>{t.after}</dt><dd data-model-after><code>{sample.after}</code></dd></div>}
           </dl>
           {sample.word !== undefined && <figure class="model-figure">
@@ -42,7 +52,7 @@ const value = (v: number | boolean) => typeof v === 'number' ? Number(v.toPrecis
       </details>
     ))}
   </div>
-  <p class="guide-note">{t.modelNote} {t.calculationNote}</p>
+  <p class="guide-note">{attribute ? t.attributeModelNote : t.modelNote} {t.calculationNote}</p>
   <h2 id="practical-use">{r.demo.useHeading}</h2>
   <p><Rich text={lesson.use} locale={locale} /></p>
   <h2 id="input-limits">{r.demo.cautionHeading}</h2>

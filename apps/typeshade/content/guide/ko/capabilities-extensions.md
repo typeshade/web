@@ -26,7 +26,7 @@ export function k(gid: builtin<"global_invocation_id">) {
 }
 ```
 
-기능 이름은 고정되어 있고 타깃과 독립적이므로, 소스에 `EXT_*`나 `OVR_*` 같은 확장 문자열을 직접 적지 않습니다. 기능 게이트(capability gate)는 생성기가 모듈을 처리하기 전에 각 id를 검사합니다. 기능을 표현할 수 없는 백엔드는 해당 기능 이름을 포함한 `UnsupportedFeatureError`(`SD0030`)를 던집니다. 이 실패 방식은 드라이버가 거부할 소스를 생성하는 대신 컴파일 단계에서 실패하는 fail closed 방식입니다.
+기능 이름은 고정되어 있고 타깃과 독립적이므로, 소스에 `EXT_*`나 `OVR_*` 같은 확장 문자열을 직접 적지 않습니다. 기능 게이트(capability gate)는 생성기가 모듈을 처리하기 전에 각 id를 검사합니다. 기능을 표현할 수 없는 백엔드는 해당 기능 이름을 포함한 `UnsupportedFeatureError`(`SD0030`)를 던집니다. 드라이버가 거부할 소스는 만들어지지 않습니다.
 
 소스에서 쓸 표기가 없는 기능이 넷 있습니다. `floatRenderTarget`, `float32Blend`,
 `float32Filterable`, `multiview`입니다. 앞의 셋은 호스트가 켜며 셰이더에는 토큰 하나도 더하지
@@ -116,13 +116,13 @@ capabilityMatrix([wgslBackend, glslEs300Backend])
 
 ### 파생 기능과 암시적 기능
 
-일부 기능은 모듈의 구조에서 자동으로 파생됩니다. 스토리지 바인딩은 `storageBuffer`, 컴퓨트 진입점은 `compute`, 멀티샘플 텍스처 로드는 `msaaTextureLoad`, 스토리지 텍스처 바인딩은 `storageTexture`, 1D 텍스처는 `texture1d`, 큐브 배열 텍스처는 `textureCubeArray`, `textureGather` 호출은 `textureGather`를 암시합니다. packed 4x8 정수 내장 함수 여덟 개 중 하나를 호출하면 `packed4x8Dot`이 파생됩니다. `bgra8unormStorage`는 바인딩 종류가 아니라 포맷에서 파생됩니다. `bgra8unorm`은 코어 사양에 포함되지 않는 유일한 스토리지 포맷이므로, 디바이스에서 `bgra8unorm-storage`를 요청하지 않으면 바인드 그룹 레이아웃이 거부됩니다. 이 요구 사항은 측정 결과이며, Tint는 기능 요청 여부와 무관하게 모듈을 컴파일합니다. 따라서 호스트에는 이 기능으로 요구 사항을 전달합니다. 모듈의 `enables` 타입은 파생 기능 id를 제외하므로 직접 지정하면 타입 오류가 발생합니다.
+일부 기능은 모듈의 구조에서 자동으로 파생됩니다. 스토리지 바인딩은 `storageBuffer`, 컴퓨트 진입점은 `compute`, 멀티샘플 텍스처 로드는 `msaaTextureLoad`, 스토리지 텍스처 바인딩은 `storageTexture`, 1D 텍스처는 `texture1d`, 큐브 배열 텍스처는 `textureCubeArray`, `textureGather` 호출은 `textureGather`를 암시합니다. packed 4x8 정수 내장 함수 여덟 개 중 하나를 호출하면 `packed4x8Dot`이 파생됩니다. `bgra8unormStorage`는 바인딩 종류가 아니라 포맷에서 파생됩니다. `bgra8unorm`은 코어 사양에 포함되지 않는 유일한 스토리지 포맷이므로, 디바이스에서 `bgra8unorm-storage`를 요청하지 않으면 바인드 그룹 레이아웃이 거부됩니다. 이 요구 사항은 측정 결과이며, Tint는 기능 요청 여부와 무관하게 모듈을 컴파일합니다. 따라서 이 요구 사항을 호스트에 전하는 것은 이 기능뿐입니다. 모듈의 `enables` 타입은 파생 기능 id를 제외하므로 직접 지정하면 타입 오류가 발생합니다.
 
 WGSL _언어_ 기능(language feature)은 디바이스 기능과 구별해야 합니다. 언어 기능은 브라우저의 셰이딩 언어 구현이 지원하는 기능이며 `requestDevice`의 요청 대상이 아닙니다. `reflect().requiredLanguageFeatures`는 소스가 사용하는 언어 기능을 나열하고, `navigator.gpu.wgslLanguageFeatures`는 지원 여부를 제공합니다. WGSL 생성기는 `read`나 `read_write` 스토리지 텍스처 바인딩에 `requires readonly_and_readwrite_storage_textures;`를 생성합니다. packed 4x8 계열은 지시문 없이 컴파일할 수 있으므로 지시문을 생성하지 않습니다.
 
 한 기능이 다른 기능을 암시할 수도 있습니다. `float32Blend`는 `floatRenderTarget`을 함께
 끌어옵니다. float 타깃에 블렌딩하려면 먼저 그 타깃이 색상 어태치먼트로 렌더링 가능한
-상태여야 하는데, `EXT_float_blend`만 켜져 있으면 프레임버퍼가 INCOMPLETE 상태로 돌아오기
+상태여야 하는데, `EXT_float_blend`만 켜져 있으면 프레임버퍼가 incomplete 상태로 돌아오기
 때문입니다. `reflect().requiredFeatures`는 이렇게 딸려 오는 기능까지 모두 모은 목록을
 돌려주므로, 모듈이 하나만 선언해도 둘 다 들어 있습니다.
 
@@ -137,7 +137,7 @@ reflect(m).requiredFeatures // ['float32Blend', 'floatRenderTarget']
 
 모듈의 기능 선언은 디바이스 기능을 활성화하지 않습니다. 디바이스가 지원하는 기능은 모듈 생성보다 앞선 디바이스 생성 시점에 정해집니다. WebGPU의 `requiredFeatures`는 `requestDevice` 호출 시 확정되며, 요청하지 않은 기능은 나중에 추가할 수 없습니다. WebGL2 컨텍스트도 가져온 확장만 사용할 수 있으므로 파이프라인 생성 시점보다 먼저 확인해야 합니다.
 
-호스트는 생성된 디바이스가 모듈에 필요한 기능을 지원하는지 확인하고, 지원하지 않으면 명시적으로 실패해야 합니다. `reflect().requiredFeatures`는 모듈만 읽고 타깃은 받지 않으므로 중립 id를 반환합니다. `hostFeaturesFor`는 이를 특정 백엔드의 호스트 기능 문자열로 변환합니다. 호스트 기능이 필요 없는 항목은 건너뛰므로 드라이버에 전달할 목록에 빈 항목이 생기지 않습니다.
+따라서 작성자가 할 일은 부팅된 디바이스가 모듈에 필요한 기능을 갖추었는지 확인하고, 갖추지 못했으면 분명하게 실패시키는 것입니다. `reflect().requiredFeatures`는 모듈만 읽고 타깃은 받지 않으므로 중립 id를 반환합니다. `hostFeaturesFor`는 이를 특정 백엔드의 호스트 기능 문자열로 변환합니다. 호스트 기능이 필요 없는 항목은 건너뛰므로 드라이버에 전달할 목록에 빈 항목이 생기지 않습니다.
 
 ```ts
 import { hostFeaturesFor, reflect, glslEs300Backend, wgslBackend } from 'typeshade'
@@ -154,7 +154,7 @@ const device = await adapter.requestDevice({
 ```
 
 `typeshade/runtime`은 WebGPU 쪽 확인을 대신 해 줍니다. 디바이스를 직접 요청하는 런타임은 자기
-프로그램에 필요한 기능을 함께 요청합니다. 커널 호출의 소유자에는 인스턴스별 요구 사항을 `createDevice({ limits, features })`에 넘깁니다. 직접 넘겨준 디바이스는 그 요구 사항을 이미 켜 둔 상태여야 합니다. 생성자 옵션을 쓰면 서로 독립된 라이브러리가 기본 소유자의 어느 호출이 먼저 실행되는지에 의존하지 않습니다.
+프로그램에 필요한 기능을 함께 요청합니다. 커널 호출의 소유자를 쓸 때는 인스턴스의 요구 사항을 `createDevice({ limits, features })`에 넘깁니다. 직접 넘겨준 디바이스는 그 요구 사항을 이미 켜 둔 상태여야 합니다. 생성자 옵션을 쓰면 서로 독립된 라이브러리가 기본 소유자의 어느 호출이 먼저 실행되는지에 의존하지 않습니다.
 
 ### 두 모듈 중 고르기
 
@@ -174,7 +174,7 @@ const m = ok ? fancy : plain // two modules, one decision, made once
 `"use typeshade"` 컴퓨트 진입점은 두 백엔드 모두에서 실행됩니다. WebGPU에서는 컴퓨트
 진입점입니다. 컴퓨트 스테이지가 없는 WebGL2에서는 패스 프로그램으로 실행됩니다. 패스 프로그램은
 패스마다 텍스처에 전체 화면을 그리는 드로이며, 컴파일러가 이를 작성하고 매니페스트가 담아
-전달합니다(변경 제안 0054). 어느 단계로 실행할지는 프로그램 런타임이 고르므로, 호스트 코드는 두
+전달합니다(변경 0054). 어느 tier(호출이 실행되는 백엔드)로 실행할지는 프로그램 런타임이 고르므로, 호스트 코드는 두
 백엔드에서 같습니다.
 
 ```ts
@@ -201,10 +201,9 @@ program.gl?.computes // { evalField: … }, the pass program WebGL2 runs
 ```
 
 `program.gl.computes`에는 컴퓨트 진입점마다 패스 프로그램이 들어 있고, 패스 프로그램이 없으면 그
-이유가 들어 있습니다. `typeshade/runtime`은 디바이스가 어느 단계이든
+이유가 들어 있습니다. `typeshade/runtime`은 디바이스가 어느 tier이든
 `rt.load(program).compute('evalField')`로 이를 실행합니다(`docs/use-typeshade-surface.md` §69).
-배리어, 워크그룹 메모리, 원자 연산도 WebGL2 단계의 패스에서 WGSL이 허용하는 순서대로 실행됩니다
+배리어, 워크그룹 메모리, 원자 연산도 WebGL2 tier의 패스에서 WGSL이 허용하는 순서대로 실행됩니다
 (`changes/0054-webgl2-compute.md`). 1D, 큐브 배열, 멀티샘플 텍스처를 읽는 진입점처럼 패스
-프로그램이 없는 진입점은 런타임이 그 이유와 함께 거부합니다. IR 빌더에는 이보다 좁은 `portable`
-tier(커널이 속하는 지원 단계)도 있습니다. GLSL 생성기가 프래그먼트 셰이더 하나로 하향 변환하는
+프로그램이 없는 진입점은 런타임이 그 이유와 함께 거부합니다. IR 빌더에는 이보다 좁은 `portable` tier도 있습니다. GLSL 생성기가 프래그먼트 셰이더 하나로 하향 변환하는
 gather(읽기만 하는 접근) 전용 커널이며, [`docs/ir-builder.md`](docs/ir-builder.md)가 설명합니다.

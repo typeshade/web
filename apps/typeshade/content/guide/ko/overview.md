@@ -12,7 +12,7 @@ sourceLine: 1
 
 셰이더는 일반 TypeScript 파일로 작성하며, 첫 문장은 지시문 `"use typeshade"`입니다. 문법은 TypeScript와 같으며 `function`, `const`와 `let`, `if`, `for`, `class`, 연산자와 리터럴을 사용합니다. 타입은 GPU 타입인 `f32`, `u32`, `vec3`, `mat4`, `array<f32, 16>`을 사용합니다. `@fragment` 같은 스테이지 속성은 GPU가 호출하는 함수를 표시합니다. 타입이나 필드 이름이 틀리면 편집기가 해당 줄에 오류를 표시합니다.
 
-프로그램의 구조는 진입점, 리소스, 구조체 선언으로 정해집니다. 스테이지 속성(`@vertex`, `@fragment`, `@compute([64])`)을 앞에 쓴 최상위 함수 선언은 진입점입니다. GPU는 버텍스, 프래그먼트, 컴퓨트 인보케이션마다 진입점을 실행하며, 나머지 함수는 진입점이 호출하는 헬퍼입니다. `uniform<T>`나 `storage<T>` 타입의 `declare const`는 호스트가 바인딩하는 리소스입니다. `class`, `interface`, `type` 별칭은 구조체가 됩니다.
+구조는 세 곳에 담깁니다. 스테이지 속성(`@vertex`, `@fragment`, `@compute([64])`)을 앞에 쓴 최상위 함수 선언은 진입점입니다. GPU는 버텍스, 프래그먼트, 컴퓨트 인보케이션마다 진입점을 실행하며, 나머지 함수는 진입점이 호출하는 헬퍼입니다. `uniform<T>`나 `storage<T>` 타입의 `declare const`는 호스트가 바인딩하는 리소스입니다. `class`, `interface`, `type` 별칭은 구조체가 됩니다.
 
 ```ts
 "use typeshade";
@@ -65,7 +65,7 @@ fn ringMask(uv: vec2<f32>, radius: f32) -> f32 {
 
 ### 가져오기
 
-셰이더 파일은 패키지에서 타입이나 함수를 가져오지 않습니다. 타입, 내장 함수, 스테이지 함수는 언어에 포함되어 있습니다. 호스트 코드는 컴파일러와 컴파일 결과를 읽는 함수를 패키지 루트에서 가져옵니다.
+셰이더 파일은 패키지에서 아무것도 가져오지 않습니다. 타입, 내장 함수, 스테이지 함수는 언어에 포함되어 있습니다. 호스트 코드는 컴파일러와 컴파일 결과를 읽는 함수를 패키지 루트에서 가져옵니다.
 
 ```ts
 import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typeshade'
@@ -76,9 +76,7 @@ import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typ
 - `typeshade/runtime`은 컴파일된 프로그램을 불러와 WebGPU나 WebGL2에서 실행합니다. 번들에
   컴파일러는 들어가지 않습니다. 자세한 내용은 `docs/use-typeshade-surface.md` §69에 있습니다.
 - `typeshade/vite`에는 Vite 플러그인이 있습니다. 이 플러그인으로 평범한 호스트 파일이
-  `.shade.ts`를 가져와 그 헬퍼 함수를 부르며, 이 함수는 CPU에서 실행됩니다.
-  [모듈의 헬퍼를 호스트 코드에서 부르기](#calling-a-modules-helpers-from-host-code)를
-  참고합니다.
+  `.shade.ts`를 가져와 그 헬퍼 함수를 부르며, 이 함수는 CPU에서 실행됩니다. 자세한 내용은 [모듈의 헬퍼를 호스트 코드에서 부르기](#calling-a-modules-helpers-from-host-code)에 있습니다.
 - `typeshade/dev`에는 개발 도구가 있습니다. 린트 보고서, 최적화 측정, 오류의 소스 위치를
   제공합니다.
 - `typeshade/emit-prod`에는 배포 시점에 생성된 소스를 맹글링하고 압축하고 난독화하는 텍스트
@@ -88,20 +86,20 @@ import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typ
 - `typeshade/debug`는 `"use typeshade"` 셰이더의 인보케이션 하나를 CPU 오라클 위에서 한
   단계씩 실행합니다. 작성자가 쓴 문장마다 멈춰 소스 구간과 프레임의 지역 변수를 보고하고,
   중단점을 줄 번호로 찾습니다. 실행 하나를 데이터로 적은 실행 구성도 함께 들어 있습니다. 이
-  구성은 인수 위치가 아니라 진입점이 선언한 이름을 키로 씁니다. `launch.json`용으로 미리 만든
+  구성은 인자 위치가 아니라 진입점이 선언한 이름을 키로 씁니다. `launch.json`용으로 미리 만든
   JSON Schema와, 값을 작성자가 쓴 셰이더 타입으로 보여 주는 포매터도 있습니다. 선택 항목인 양의 정수 `maxSteps`는
   세션의 문장 이벤트 수를 제한하며, 생략하면 실행에 제한이 없습니다. 편집기의 디버그
   어댑터와 Playground의 단계 실행 패널이 모두 이 경로를 바탕으로 만들어졌습니다.
-  `docs/debugging.md`를 참고합니다.
+  자세한 내용은 `docs/debugging.md`에 있습니다.
 - `typeshade/core/ir`은 IR 빌더입니다. 소스를 컴파일하지 않고 코드로 모듈을 조립하는 엔진이나
   도구가 씁니다. 1.0 전까지는 안정성을 약속하지 않으며, 이 가이드는 IR 빌더를 쓰지 않습니다.
   사용법은 [`docs/ir-builder.md`](docs/ir-builder.md)에 있습니다.
 
-패키지에는 컴파일러와 컴파일된 모듈을 실행하는 작은 런타임이 포함되어 있습니다. 셰이더 소스는 사용하는 프로젝트의 저장소에 두고, 패키지는 다른 의존성과 같은 방식으로 가져옵니다.
+이 패키지에는 컴파일러와, 호스트의 가져오기가 실행될 때 쓰는 작은 런타임이 들어 있습니다. 셰이더 소스는 사용하는 프로젝트의 저장소에 두고, 패키지는 다른 의존성과 같은 방식으로 가져옵니다.
 
 ### 이 가이드의 순서
 
-가이드의 각 페이지는 한 주제를 다루며 학습 순서대로 배치되어 있습니다. 개별 주제는 따로 읽을 수 있습니다. 함수별 세부 사항은 참조 페이지에 있으며, 언어의 전체 규칙과 거부 조건은 `docs/use-typeshade-surface.md`에 있습니다.
+페이지는 한 주제씩 학습 순서대로 놓여 있으며, 처음에는 순서대로 읽는 것이 가장 빠릅니다. 그 뒤에는 각 페이지를 따로 읽을 수 있습니다. 함수별 세부 사항은 참조 페이지에 있으며, 언어의 전체 규칙과 거부 조건은 `docs/use-typeshade-surface.md`에 있습니다.
 
 주제별 페이지는 다음과 같습니다.
 
@@ -123,8 +121,7 @@ import { compile, emitModule, emitGlslStages, reflect, compileModule } from 'typ
   하나로 모읍니다.
 - [조건부 프로그램](/guide/authoring/conditional-programs/): 기능 조합마다 특수화된 프로그램을
   하나씩 만듭니다.
-- [기능과 확장](/guide/authoring/capabilities-extensions/): 모듈 생성이 의존하는 GPU 기능을
-  선언하고, 부팅된 디바이스를 그 선언과 대조합니다.
+- [기능과 확장](/guide/authoring/capabilities-extensions/): 모듈의 코드 생성(emit)이 의존하는 GPU 기능을 선언하고, 부팅된 디바이스를 그 선언과 대조합니다.
 - [fp64](/guide/authoring/fp64/): float만 있는 하드웨어에서 배정밀도를 얻습니다.
 - [GLSL 부동소수점 정밀도](/guide/authoring/glsl-float-precision/): GLSL 스테이지를 mediump로
   생성하고, 그것이 소스에서 무엇을 바꾸는지 봅니다.
