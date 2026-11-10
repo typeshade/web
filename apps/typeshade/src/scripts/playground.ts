@@ -248,10 +248,14 @@ function mount(root: HTMLElement): void {
   /** Whether the compiled module has the vertex and fragment pair a triangle needs. */
   let moduleDrawable = false;
   /** What the Result tab shows for the module that compiled last (docs/playground-one-runtime.md,
-   *  phase 2): `host`, host.ts's frame, for a module whose starter host.ts calls an entry and
-   *  for a host example; `site`, the site's runner, for any other module and until a module has
-   *  compiled (Decision 1, reversed on 2026-11-10). A file with errors keeps the last one. */
+   *  phase 2): `host`, host.ts's frame, for a host example and for a module whose starter
+   *  host.ts calls an entry, unless the file has a vertex entry of its own; `site`, the site's
+   *  runner, for any other module and until a module has compiled (Decision 1, reversed on
+   *  2026-11-10). A file with errors keeps the last one. */
   let resultBy: 'site' | 'host' = 'site';
+  /** How many lines of vertex prelude the page put before the reader's file: none when the file
+   *  has no fragment entry, or brings the vertex half itself. */
+  let preludeLines = 0;
   /** The version host.ts last ran for, so a repaint of the same analysis does not run it again. */
   let hostRanFor = -1;
   /** Whether the browser actually backed the canvas at the size it was asked for. */
@@ -922,7 +926,11 @@ function mount(root: HTMLElement): void {
     transport.syncDropHint();
     if (compiled) {
       const hostExample = examples.find((e) => e.id === openedExample)?.host !== undefined;
-      const next = analysis.hostCallable || hostExample ? 'host' : 'site';
+      // A host draws a fragment entry over the whole canvas. A file with a vertex entry of its
+      // own is drawn with that entry, which only the site's runner runs: `hello` is a triangle
+      // there and a filled canvas from host.ts.
+      const ownVertex = preludeLines === 0 && entries.some((entry) => entry.stage === 'vertex');
+      const next = hostExample || (analysis.hostCallable && !ownVertex) ? 'host' : 'site';
       if (next === 'site' && resultBy === 'host') host.stopHost();
       // host.ts's frame does not draw on the CPU canvas, so a draw still in flight is retired.
       if (next === 'host') raster.stopDrawing();
@@ -950,6 +958,7 @@ function mount(root: HTMLElement): void {
     root.dataset.version = String(version);
     const composed = compose(model.getValue());
     coordinates.setPrelude(composed);
+    preludeLines = composed.lines;
     if (preludeNote instanceof HTMLElement) preludeNote.hidden = composed.lines === 0;
     client.update(documentUri, composed.text, version);
   };

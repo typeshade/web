@@ -157,9 +157,11 @@ approving the recommendations ("승인", confirmed in a follow-up question).
    every module whose host face lists a fragment, compute or kernel export. For many of them
    the starter host.ts cannot write the call (`scripts/playground-host-default.ts`, the last
    case) and only lists the entries, so the Result tab was an empty frame. Before #23 the site
-   runner dispatched and plotted these modules. Now host.ts's frame is the Result tab only for
-   a host example and for a module whose starter calls an entry. The site runner draws every
-   other module.
+   runner dispatched and plotted these modules. A host also draws a fragment entry over the
+   whole canvas, so a file with a vertex entry of its own lost its geometry: `hello` drew a
+   filled red canvas in place of its triangle. Now host.ts's frame is the Result tab only for a
+   host example, and for a module whose starter calls an entry and that has no vertex entry of
+   its own. The site runner draws every other module.
 
 2. **Per-example host files.** Each example's `host.ts` lives in the compiler repository, next
    to the example, as `examples/hosts/` does today.

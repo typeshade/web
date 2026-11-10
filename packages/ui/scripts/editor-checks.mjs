@@ -234,6 +234,38 @@ export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
     await page.locator("[data-host-frame]").getAttribute("sandbox"),
     "allow-scripts",
   );
+  // The same fragment entry beside a vertex entry of the file's own: a host would draw the
+  // fragment over the whole canvas, so the site's runner draws the pair and the frame goes.
+  await page.evaluate(
+    (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
+    `"use typeshade"
+
+export const vs = vertex(function vs(vi: builtin<"vertex_index", u32>): vec4 {
+  const xs: array<f32, 3> = [-0.5, 0.5, 0.];
+  const ys: array<f32, 3> = [-0.5, -0.5, 0.5];
+  const i = i32(vi);
+  return vec4(xs[i], ys[i], 0., 1.);
+});
+
+export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
+  return vec4(fract(p.x / 32.), 0.5, 0.5, 1.);
+});
+`,
+  );
+  await page.waitForFunction(
+    () => {
+      const root = document.querySelector("[data-playground]");
+      return (
+        root?.dataset.result === "site" &&
+        document.querySelectorAll("[data-host-frame]").length === 0 &&
+        !root.classList.contains("has-errors") &&
+        root.dataset.version ===
+          document.querySelector("[data-gpu-frame]")?.dataset.settled
+      );
+    },
+    undefined,
+    { timeout: 60000 },
+  );
   await page.evaluate(
     (text) => window.monaco.editor.getEditors()[0].getModel().setValue(text),
     source,
@@ -253,6 +285,8 @@ export const main = fragment(function main(p: builtin<"position", vec4>): vec4 {
     undefined,
     { timeout: 60000 },
   );
+  // The run above returned a value and drew nothing, which brought the Console tab forward.
+  await page.locator('[data-target="result"]').click();
   assert.ok(await page.locator("[data-transport]").isVisible());
   assert.ok(await page.locator("[data-canvas]").isVisible());
   page.once("dialog", (dialog) => dialog.accept());
