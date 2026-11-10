@@ -18970,7 +18970,7 @@
   },
   {
     "bundler": "bun@1.4.3",
-    "measurement": "c60ea9890c3bfac2a845821c77dfb5508dee8b5f960cceb92fdf8542f796d817",
+    "measurement": "116cc1de01b075c57f414c586e36616f9a6135f7744d7306fbb55985827427e7",
     "workloadRevision": "applications-5",
     "instrument": "unified-4",
     "workload": "2e08c5caf7102eaedf6c3167b3ea4290409581741de37f19650eff2c2cd413c3",
@@ -20038,6 +20038,6 @@
         ]
       }
     ],
-    "digest": "ca733df86b51c2746e1fe214e6dfaa91e389bb6689f33a5a33d132f018dfa17a"
+    "digest": "3a13241600b43d9cac86909c73dd122a2d697534b9f99b1f18bf333a0f4833cc"
   }
 ]
