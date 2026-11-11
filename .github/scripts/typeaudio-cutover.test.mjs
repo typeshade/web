@@ -34,6 +34,15 @@ test('verification is read-only and requires both the main-only environment and 
   const f=fixture({exists:true,rules:[{name:'main',type:'branch'}]});await assert.rejects(cutover('verify',f.api,env),/disabled/);assert.ok(f.calls.every(x=>x.method==='GET'));
   const good=fixture({exists:true,rules:[{name:'main',type:'branch'}],state:'disabled_manually'});await cutover('verify',good.api,env);assert.ok(good.calls.every(x=>x.method==='GET'));
 });
+test('a publisher deleted from the library passes verification and needs no disable call, but its runs are still checked',async()=>{
+  const f=fixture({exists:true,rules:[{name:'main',type:'branch'}],state:'deleted'});
+  assert.equal((await cutover('verify',f.api,env)).legacyPublisher,'disabled');assert.ok(f.calls.every(x=>x.method==='GET'));
+  assert.ok(f.calls.some(x=>x.path.includes('/runs?')));
+  const s=fixture({exists:true,rules:[{name:'main',type:'branch'}],state:'deleted'});
+  await cutover('setup',s.api,env);assert.ok(!s.calls.some(x=>x.path.endsWith('/disable')));
+  const busy=fixture({exists:true,rules:[{name:'main',type:'branch'}],state:'deleted',active:true});
+  await assert.rejects(cutover('verify',busy.api,env),/runs/);
+});
 test('non-main or another repository cannot run cutover',async()=>{
   for(const changed of [{GITHUB_REF:'refs/heads/feature'},{GITHUB_REPOSITORY:'other/repo'}]){
     const f=fixture();await assert.rejects(cutover('setup',f.api,{...env,...changed}),/requires/);assert.equal(f.calls.length,0);
