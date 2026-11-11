@@ -3,14 +3,15 @@
   "artifacts": [
     {
       "id": "unseen-force-wall-hit",
-      "sourceCommit": "4a0011d236ca8efc629ed3ec264059ee0679aabf",
-      "sourceBranch": "claude/kinds-as-functions",
+      "sourceCommit": "5b95ded5130c21fd78475111c6f283d53e77ff0d",
+      "sourceBranch": "main",
       "sourcePullRequest": "typeshade/typeaudio#75",
       "command": "bun run exp:10:web --out unseen-force-wall-hit.json",
       "exporter": "experiments/10-seven-questions/to-web.ts",
       "bytes": 222737,
       "sha256": "5526e3b73b22da5c76cf211df8c8455f2e62a294e68f55f55a324a812ac5fecb",
-      "cues": 12
+      "cues": 12,
+      "note": "Exported at 4a0011d on typeaudio #75; 5b95ded is its squash merge on main, with the same tree."
     }
   ],
   "note": "Function-node sources only: the project holds no audio. Each cue is one event of the accepted wall hit of experiment 10, as the engine's typed function nodes, which sound as the engine's lane within 1e-4 of its peak (typeaudio test/to-web.test.ts). Levels and pan follow the engine's direct sound; the room is the editor's, and the engine's limiter is a static master trim. The picture is a YouTube reference by its id only."
