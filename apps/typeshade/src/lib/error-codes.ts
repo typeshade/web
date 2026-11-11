@@ -126,6 +126,7 @@ const GROUP_OF: Readonly<Record<string, ErrorGroup>> = {
   MODULE_VAR: 'resources',
   TEXTURE_ARGUMENT: 'resources',
   LAYOUT: 'resources',
+  HOST_RESERVED_FIELD: 'resources',
   MAT_UNSUPPORTED: 'f64',
   F64_ENTRY_IO: 'f64',
   BACKEND: 'targets',
@@ -1704,6 +1705,36 @@ export function total(xs: array<f32>): f32 {
     s += xs[i]
   }
   return s
+}
+`,
+  },
+  TS8079: {
+    trigger: `"use typeshade"
+
+export class Light {
+  color: vec3 = vec3(1.)
+  set: f32 = 1.
+}
+
+export declare const light: uniform<Light>
+
+@fragment
+export function main(): vec4 {
+  return vec4(light.color * light.set, 1.)
+}
+`,
+    fix: `"use typeshade"
+
+export class Light {
+  color: vec3 = vec3(1.)
+  strength: f32 = 1.
+}
+
+export declare const light: uniform<Light>
+
+@fragment
+export function main(): vec4 {
+  return vec4(light.color * light.strength, 1.)
 }
 `,
   },

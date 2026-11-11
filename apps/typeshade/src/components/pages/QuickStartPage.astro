@@ -78,9 +78,10 @@ const appTs = `import { fs } from './hello.shade.ts';
 const canvas = document.querySelector('canvas')!;
 fs(canvas);`;
 
-// Host resources (compiler change 0138, milestone 1). The shader file is compiled here against
-// the pin, so a pin that refuses it stops the build. The host file was run against the module
-// the pinned compiler generates for scene.shade.ts.
+// Host resources (compiler change 0138, milestones 1 and 3). The shader file is compiled here
+// against the pin, so a pin that refuses it stops the build. The host file was run on the CPU
+// tier against the module the pinned compiler (42550b11) generates for scene.shade.ts: it
+// printed `Float32Array [0, 2, 5] 0.5 4`, then `1.5`.
 const sceneShade = `"use typeshade";
 
 export class Camera {
@@ -106,7 +107,7 @@ export function age(id: builtin<"global_invocation_id">) {
 const sceneErrors = compile(sceneShade, { fileName: 'scene.shade.ts' }).diagnostics.filter((d) => d.category === 'error');
 if (sceneErrors.length > 0) throw new Error(`[quick-start] scene.shade.ts no longer compiles at the pin: ${sceneErrors.map((d) => `${d.code} ${d.message}`).join('; ')}`);
 const sceneHost = `import { uniform, zeros, array } from 'typeshade/runtime';
-import { Camera, Particle, camera, particles } from './scene.shade.ts';
+import { Camera, Particle, camera, particles, age } from './scene.shade.ts';
 
 // An exported binding is a resource the module makes once.
 camera.pos.set(0, 2, 5);
@@ -120,7 +121,12 @@ const ps = zeros(Particle, 2);
 ps.at(1).pos.set(0, 1, 0);
 const seeded = array(Particle, [{ life: 1 }, { life: 2 }]);
 
-console.log(camera.pos.get(), camera.time.get(), particles.length);`;
+console.log(camera.pos.get(), camera.time.get(), particles.length);
+
+// A call on resources returns at once; read() waits for what it wrote.
+age({ camera, particles }, 1);
+const aged = await particles.read();
+console.log(aged[0].life);`;
 ---
 
 <Docs locale={locale} path={links.quickStart.href} title={q.title} description={q.description} headings={headings} editHref={editCopy(locale, 'quickStart')}>

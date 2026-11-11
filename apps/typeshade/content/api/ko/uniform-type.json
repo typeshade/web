@@ -1,8 +1,8 @@
 {
   "slug": "uniform-type",
-  "source": "338693b912961b3f8ebe2a532d87d47bb5de4ce7ad2691ec3f4cb4e2fb139f3d",
+  "source": "2fff68460acb4d9f9fb083f2ff839817c9e4f282a16cf96b3c4e7e458c2e880f",
   "texts": {
     "summary": "구조체 T의 유니폼입니다. 리전의 범위 하나를 규칙 6.8의 유니폼 규칙에 따른 레이아웃으로 차지하며, 필드마다 접근자가 있습니다.",
-    "description": "`camera.pos.set(0, 2, 5)`는 벡터를 쓰고, `camera.view.set(m)`은 배열에서 행렬을 쓰며, `camera.set({ view, proj })`는 여러 필드를 씁니다. `camera.pos.get()`은 그 필드의 타입 배열 뷰입니다. `set`은 바뀐 값만 쓰고 변경된 범위를 넓힙니다. [`uniform`](/api/uniform/)이 만들며, `dispose()`를 부르거나 가비지 컬렉터가 회수하면 해제됩니다. 런타임에 `Symbol.dispose`가 있으면 `using`이 부르는 `[Symbol.dispose]()`도 있습니다. 라이브러리의 `lib`에 이 심벌이 없어서 타입에는 아직 선언하지 않습니다."
+    "description": "`camera.pos.set(0, 2, 5)`는 벡터를 쓰고, `camera.view.set(m)`은 배열에서 행렬을 쓰며, `camera.set({ view, proj })`는 여러 필드를 씁니다. `camera.pos.get()`은 그 필드의 타입 배열 뷰입니다. `set`은 바뀐 값만 쓰고 변경된 범위를 넓힙니다. [`uniform`](/api/uniform/)이 만들며, `dispose()`를 부르거나 가비지 컬렉터가 회수하면 해제됩니다. 런타임에 `Symbol.dispose`가 있으면 `using`이 부르는 `[Symbol.dispose]()`도 있습니다. 호스트의 `lib`가 `Symbol.dispose`를 선언하면 타입도 `Disposable`을 선언합니다(수정안 A5, D4). 내보낸 바인딩은 모듈과 수명이 같으므로, 뷰는 그 타입에 `dispose()`와 `[Symbol.dispose]()`를 두지 않습니다(D7)."
   }
 }
