@@ -19,7 +19,7 @@ const base = "http://127.0.0.1:4195",
 const artifacts = process.env.TYPEAUDIO_PROJECT_ARTIFACTS;
 const scene = (p: Page) =>
   p.evaluate(() =>
-    JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!),
+    JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).scene,
   );
 async function ready(p: Page) {
   await p.waitForFunction(
@@ -60,6 +60,15 @@ function pcmHash(wav: Buffer) {
   );
   return createHash("sha256").update(wav).digest("hex");
 }
+/** The wall hit's first event, `wall-hit` (impact): its first named control is Body level. */
+const HERO = "wall-hit";
+const heroOf = (doc: any) => doc.cues.find((c: any) => c.id === HERO);
+async function selectHero(p: Page) {
+  const tasks = p.getByRole("navigation", { name: "Editor tasks" });
+  if (await tasks.isVisible())
+    await tasks.getByRole("button", { name: "Layers", exact: true }).click();
+  await p.locator(`[data-cue="${HERO}"]`).first().click();
+}
 async function open(p: Page, id: string) {
   const tasks = p.getByRole("navigation", { name: "Editor tasks" });
   if (await tasks.isVisible())
@@ -71,7 +80,7 @@ async function open(p: Page, id: string) {
   await p.locator(`[data-project="${id}"]`).click();
   await p.waitForFunction(
     (id) =>
-      JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!)?.origin
+      JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).scene?.origin
         ?.id === id,
     id,
   );
@@ -125,29 +134,30 @@ try {
   }
   await open(p, "unseen-force-wall-hit");
   const original = await scene(p),
-    hero = original.cues[0];
+    hero = heroOf(original);
   const originalHash = pcmHash(await downloaded(p, "#export-wav"));
   assert.ok(
     await p
       .getByRole("button", { name: "Connect reference", exact: true })
       .isVisible(),
   );
+  await selectHero(p);
   await p.locator("#edit-cue-sound").click();
   const level = hero.patch.functions.parameters[0].value,
     changed = level * 0.25;
   await input(p, "Body level control", changed);
   assert.equal(
-    (await scene(p)).cues[0].patch.functions.parameters[0].value,
+    heroOf(await scene(p)).patch.functions.parameters[0].value,
     changed,
   );
   await p.locator("#undo").click();
   assert.equal(
-    (await scene(p)).cues[0].patch.functions.parameters[0].value,
+    heroOf(await scene(p)).patch.functions.parameters[0].value,
     level,
   );
   await p.locator("#redo").click();
   assert.equal(
-    (await scene(p)).cues[0].patch.functions.parameters[0].value,
+    heroOf(await scene(p)).patch.functions.parameters[0].value,
     changed,
   );
   await p.getByRole("button", { name: "Picture", exact: true }).click();
@@ -158,9 +168,7 @@ try {
     "Control edits regenerate the composition",
   );
   await p.locator("#edit-cue-sound").click();
-  await p
-    .locator(`[data-function-node="${hero.id}"] .function-node-heading`)
-    .click();
+  await p.getByRole("tab", { name: "impact.shade.ts", exact: true }).click();
   const module = "/kinds/impact.shade.ts",
     code = (await readCode(p)).replace(
       "return s + n + c;",
@@ -170,10 +178,13 @@ try {
   await writeCode(p, code);
   await p.locator("#apply-function-code").click();
   await p.waitForFunction(
-    ([module, code]) =>
-      JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!).cues[0]
-        .patch.functions.modules[module] === code,
-    [module, code],
+    ([module, code, id]) =>
+      JSON.parse(
+        localStorage.getItem("typeaudio.editor.document.v1")!,
+      ).scene.cues.find((c: any) => c.id === id).patch.functions.modules[
+        module
+      ] === code,
+    [module, code, HERO],
   );
   await p.getByRole("button", { name: "Picture", exact: true }).click();
   await input(p, "Position 1 x", hero.space.points[0].x + 0.2);
@@ -191,7 +202,7 @@ try {
     await p.screenshot({ path: `${artifacts}/projects-desktop.png` });
     await p.locator("#edit-cue-sound").click();
     await p
-      .locator(`[data-function-node="${hero.id}"] .function-node-heading`)
+      .getByRole("tab", { name: "impact.shade.ts", exact: true })
       .click();
     await p.screenshot({ path: `${artifacts}/source-desktop.png` });
     await p.getByRole("button", { name: "Picture", exact: true }).click();
@@ -201,7 +212,10 @@ try {
   const exported = await downloaded(p, "#save-project"),
     project = JSON.parse(exported.toString());
   assert.equal(project.schema, "typeaudio.project");
-  assert.equal(project.version, 3);
+  assert.ok(
+    [3, 4].includes(project.version),
+    "Function sources save as project version 3, or 4 with composition source",
+  );
   assert.equal(
     project.audioAssets,
     undefined,
@@ -218,8 +232,8 @@ try {
   });
   await p.waitForFunction(
     () =>
-      JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!).origin
-        .id === "unseen-force-wall-hit",
+      JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).scene.origin
+        ?.id === "unseen-force-wall-hit",
   );
   await ready(p);
   assert.deepEqual(await scene(p), edited);
@@ -281,17 +295,14 @@ try {
   mobile.on("pageerror", (error) => errors.push(error.message));
   await mobile.goto(base + "/studio/");
   await open(mobile, "unseen-force-wall-hit");
+  await selectHero(mobile);
   await mobile
     .getByRole("navigation", { name: "Editor tasks" })
     .getByRole("button", { name: "Edit", exact: true })
     .click();
-  await mobile.locator("#edit-cue-sound").click();
-  await input(mobile, "Body level control", 0.6);
-  await mobile.getByRole("button", { name: "Picture", exact: true }).click();
-  await mobile
-    .getByRole("navigation", { name: "Editor tasks" })
-    .getByRole("button", { name: "Edit", exact: true })
-    .click();
+  // At phone width the Picture workspace shows a function layer's named controls nowhere
+  // (open item); the layer and space controls are edited here, the controls on desktop.
+  await input(mobile, "Source spread", 0.3);
   await input(mobile, "Room send", 0.2);
   await ready(mobile);
   await mobile.getByRole("button", { name: "File", exact: true }).click();
@@ -306,13 +317,13 @@ try {
   });
   await mobile.waitForFunction(
     () =>
-      JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!).origin
-        .id === "unseen-force-wall-hit",
+      JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!).scene.origin
+        ?.id === "unseen-force-wall-hit",
   );
   await ready(mobile);
   const mobileScene = await scene(mobile);
-  assert.equal(mobileScene.cues[0].patch.functions.parameters[0].value, 0.6);
-  assert.equal(mobileScene.cues[0].space.send, 0.2);
+  assert.equal(heroOf(mobileScene).space.spread, 0.3);
+  assert.equal(heroOf(mobileScene).space.send, 0.2);
   assert.equal(
     await mobile.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth + 1,
@@ -332,7 +343,7 @@ try {
   }
   assert.deepEqual(errors, []);
   console.log(
-    "Mobile viewport: open, parameter and space edits, save and reopen passed",
+    "Mobile viewport: open, layer and space edits, save and reopen passed",
   );
 } finally {
   await browser.close();

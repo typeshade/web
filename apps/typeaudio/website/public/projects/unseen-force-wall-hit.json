@@ -293,7 +293,7 @@
           "functionLayout": {
             "hit-rumble": {
               "x": 40,
-              "y": 40
+              "y": 100
             }
           },
           "duration": 4,
@@ -590,7 +590,7 @@
           "functionLayout": {
             "wall-body": {
               "x": 40,
-              "y": 40
+              "y": 100
             }
           },
           "duration": 4,
@@ -1047,23 +1047,23 @@
           "functionLayout": {
             "wall-burst-band0": {
               "x": 40,
-              "y": 40
+              "y": 100
             },
             "wall-burst-band1": {
               "x": 40,
-              "y": 260
+              "y": 320
             },
             "wall-burst-band2": {
               "x": 40,
-              "y": 480
+              "y": 540
             },
             "wall-burst-band3": {
               "x": 40,
-              "y": 700
+              "y": 760
             },
             "wall-burst": {
-              "x": 400,
-              "y": 40
+              "x": 380,
+              "y": 100
             }
           },
           "duration": 0.22,
@@ -1816,35 +1816,35 @@
           "functionLayout": {
             "wall-edge-level": {
               "x": 40,
-              "y": 40
+              "y": 100
             },
             "wall-edge-size": {
               "x": 40,
-              "y": 260
+              "y": 320
             },
             "wall-edge-band0": {
-              "x": 400,
-              "y": 40
+              "x": 380,
+              "y": 100
             },
             "wall-edge-band1": {
-              "x": 400,
-              "y": 260
+              "x": 380,
+              "y": 320
             },
             "wall-edge-band2": {
-              "x": 400,
-              "y": 480
+              "x": 380,
+              "y": 540
             },
             "wall-edge-band3": {
-              "x": 400,
-              "y": 700
+              "x": 380,
+              "y": 760
             },
             "wall-edge-band4": {
-              "x": 400,
-              "y": 920
+              "x": 380,
+              "y": 980
             },
             "wall-edge": {
-              "x": 760,
-              "y": 40
+              "x": 720,
+              "y": 100
             }
           },
           "duration": 1.1,
@@ -2160,7 +2160,7 @@
           "functionLayout": {
             "wall-hit": {
               "x": 40,
-              "y": 40
+              "y": 100
             }
           },
           "duration": 1.4675,
@@ -2913,35 +2913,35 @@
           "functionLayout": {
             "wall-mid-level": {
               "x": 40,
-              "y": 40
+              "y": 100
             },
             "wall-mid-size": {
               "x": 40,
-              "y": 260
+              "y": 320
             },
             "wall-mid-band0": {
-              "x": 400,
-              "y": 40
+              "x": 380,
+              "y": 100
             },
             "wall-mid-band1": {
-              "x": 400,
-              "y": 260
+              "x": 380,
+              "y": 320
             },
             "wall-mid-band2": {
-              "x": 400,
-              "y": 480
+              "x": 380,
+              "y": 540
             },
             "wall-mid-band3": {
-              "x": 400,
-              "y": 700
+              "x": 380,
+              "y": 760
             },
             "wall-mid-band4": {
-              "x": 400,
-              "y": 920
+              "x": 380,
+              "y": 980
             },
             "wall-mid": {
-              "x": 760,
-              "y": 40
+              "x": 720,
+              "y": 100
             }
           },
           "duration": 1.15,
@@ -3238,7 +3238,7 @@
           "functionLayout": {
             "wall-punch": {
               "x": 40,
-              "y": 40
+              "y": 100
             }
           },
           "duration": 1.8091041666666667,
@@ -3991,35 +3991,35 @@
           "functionLayout": {
             "wall-stone-level": {
               "x": 40,
-              "y": 40
+              "y": 100
             },
             "wall-stone-size": {
               "x": 40,
-              "y": 260
+              "y": 320
             },
             "wall-stone-band0": {
-              "x": 400,
-              "y": 40
+              "x": 380,
+              "y": 100
             },
             "wall-stone-band1": {
-              "x": 400,
-              "y": 260
+              "x": 380,
+              "y": 320
             },
             "wall-stone-band2": {
-              "x": 400,
-              "y": 480
+              "x": 380,
+              "y": 540
             },
             "wall-stone-band3": {
-              "x": 400,
-              "y": 700
+              "x": 380,
+              "y": 760
             },
             "wall-stone-band4": {
-              "x": 400,
-              "y": 920
+              "x": 380,
+              "y": 980
             },
             "wall-stone": {
-              "x": 760,
-              "y": 40
+              "x": 720,
+              "y": 100
             }
           },
           "duration": 1.2,
@@ -4316,7 +4316,7 @@
           "functionLayout": {
             "wall-thump": {
               "x": 40,
-              "y": 40
+              "y": 100
             }
           },
           "duration": 1.3707083333333334,
@@ -5069,35 +5069,35 @@
           "functionLayout": {
             "wall-chips-level": {
               "x": 40,
-              "y": 40
+              "y": 100
             },
             "wall-chips-size": {
               "x": 40,
-              "y": 260
+              "y": 320
             },
             "wall-chips-band0": {
-              "x": 400,
-              "y": 40
+              "x": 380,
+              "y": 100
             },
             "wall-chips-band1": {
-              "x": 400,
-              "y": 260
+              "x": 380,
+              "y": 320
             },
             "wall-chips-band2": {
-              "x": 400,
-              "y": 480
+              "x": 380,
+              "y": 540
             },
             "wall-chips-band3": {
-              "x": 400,
-              "y": 700
+              "x": 380,
+              "y": 760
             },
             "wall-chips-band4": {
-              "x": 400,
-              "y": 920
+              "x": 380,
+              "y": 980
             },
             "wall-chips": {
-              "x": 760,
-              "y": 40
+              "x": 720,
+              "y": 100
             }
           },
           "duration": 1.2,
@@ -5554,23 +5554,23 @@
           "functionLayout": {
             "dust-burst-band0": {
               "x": 40,
-              "y": 40
+              "y": 100
             },
             "dust-burst-band1": {
               "x": 40,
-              "y": 260
+              "y": 320
             },
             "dust-burst-band2": {
               "x": 40,
-              "y": 480
+              "y": 540
             },
             "dust-burst-band3": {
               "x": 40,
-              "y": 700
+              "y": 760
             },
             "dust-burst": {
-              "x": 400,
-              "y": 40
+              "x": 380,
+              "y": 100
             }
           },
           "duration": 0.4,
@@ -5867,7 +5867,7 @@
           "functionLayout": {
             "hall-answer": {
               "x": 40,
-              "y": 40
+              "y": 100
             }
           },
           "duration": 4,
@@ -5941,7 +5941,7 @@
     },
     "origin": {
       "id": "unseen-force-wall-hit",
-      "revision": "f577455b688954b0736a6a523a82d1eb22a19650",
+      "revision": "4a0011d236ca8efc629ed3ec264059ee0679aabf",
       "author": "TypeAudio engine (experiment 10)",
       "notes": "The accepted wall hit of the force passage, twelve engine events as typed function nodes. Other sounds of the passage are added as they become functions. Levels and pan follow the engine; the room is the editor's. YouTube alignment is approximate."
     }
@@ -6221,7 +6221,7 @@
         "functionLayout": {
           "hit-rumble": {
             "x": 40,
-            "y": 40
+            "y": 100
           }
         },
         "duration": 4,

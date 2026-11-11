@@ -121,7 +121,7 @@ try {
   await p.locator(`[data-recent="${kept.id}"]`).waitFor();
   assert.match(
     await p.locator(`[data-recent="${kept.id}"]`).innerText(),
-    /17 layers · 13\.2 s/,
+    /12 layers · 15\.7 s/,
   );
   assert.equal(await p.locator("[data-last-document]").count(), 0);
 
