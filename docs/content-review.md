@@ -309,3 +309,18 @@ notes. Applied: S1 (this record and the `TS8003` wording of `compiler-changes.md
 SwiftShader sentence names WebGPU and WebGL2 in Chromium and says the values differ from the
 CPU's) and S3 (the first sentence in the active voice). No guide block of the English changed, so
 no Korean block was translated again.
+
+The compiler pin move to `42550b11` (PR #61, 2026-11-11) changes the host-resource copy of the
+quick start, the WebGPU and WebGL2 page and the control-flow page, in English and in Korean.
+Milestone 3 of change 0138 is done at this pin: a call on a `Buffer` or a `Uniform` does not
+block, data decides the device of a call, and on WebGL2 a `read()` waits on a fence. The
+authoring agent wrote the English against the pinned `CHANGELOG.md`, Rules 6.1, 8.21, 8.24 and
+11.8 and the generated host view, then translated it into Korean with the same meaning. The
+quick start's host file was run on the CPU tier against the module the pin generates. Six Korean
+API entries (`array`, `zeros`, `uniform`, `Uniform`, `Buffer`, `Device`) follow the pinned
+JSDoc. Rules 3.9, 6.1, 7.5, 8.21, 8.23, 11.8, 11.13, 12.6 and 12.7 moved; the authoring agent read
+the pages that explain them in both locales and recorded the new fingerprints. Only the Korean
+algorithms tiers sentence changed, to the polite ending. No Luna subagent read these changes. The
+owner chose an editorial review by an independent agent of the session instead; its result is
+recorded on PR #61. No guide block of the English changed, so no Korean block was translated
+again; `the-cpu-oracle` is still shown in English.
