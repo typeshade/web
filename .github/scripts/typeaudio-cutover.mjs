@@ -37,8 +37,11 @@ async function legacyStatus(api, requireDisabled) {
   const workflow = await api(legacy);
   if (workflow.path !== '.github/workflows/deploy.yml' || workflow.id !== 407704055)
     throw new Error('Unexpected legacy publisher identity.');
-  if (requireDisabled && workflow.state !== 'disabled_manually')
-    throw new Error('The legacy TypeAudio publisher must be disabled.');
+  // Disabled, or deleted from the library (typeaudio #72): either way it cannot publish. The run
+  // lists below are still checked, as production-operations does for the other legacy publishers.
+  const stopped = workflow.state === 'disabled_manually' || workflow.state === 'deleted';
+  if (requireDisabled && !stopped)
+    throw new Error('The legacy TypeAudio publisher must be disabled or deleted.');
   for (const status of activeStatuses) {
     const runs = await api(`${legacy}/runs?status=${status}&per_page=1`);
     if (!Array.isArray(runs.workflow_runs) || runs.total_count !== 0 || runs.workflow_runs.length)
@@ -65,7 +68,7 @@ export async function cutover(mode, api = github, env = process.env) {
     if (!rules.length) await api(`repos/${repository}/environments/${environment}/deployment-branch-policies`, 'POST', { name: 'main', type: 'branch' });
     const problems = environmentProblems(current, await policies(api));
     if (problems.length) throw new Error(problems.join('; '));
-    if (legacyState !== 'disabled_manually') await api(`${legacy}/disable`, 'PUT');
+    if (legacyState !== 'disabled_manually' && legacyState !== 'deleted') await api(`${legacy}/disable`, 'PUT');
   }
   const problems = environmentProblems(current, current ? await policies(api) : []);
   if (problems.length) throw new Error(problems.join('; '));
