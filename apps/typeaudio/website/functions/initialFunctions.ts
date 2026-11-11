@@ -1,4 +1,4 @@
-import source from "../public/projects/function-impact.json";
+import source from "./function-sound.json";
 import { validateFunctionDocument } from "typeaudio/function-graph";
 import { DEFAULT } from "../sound/defaultPatch.ts";
 import type { Patch } from "../sound/types.ts";

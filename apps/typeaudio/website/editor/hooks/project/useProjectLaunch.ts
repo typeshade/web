@@ -10,6 +10,7 @@ import {
   sameIdentity,
 } from "../../state/documentIdentity.ts";
 import { isStudioPath, studioPath } from "../../shared/studioPath.ts";
+import { isExample, RETIRED_EXAMPLES } from "../../../project/catalog.ts";
 
 /**
  * Opens what the start screen or the URL asked for, keeps the editor URL naming the open
@@ -34,9 +35,12 @@ export function useProjectLaunch(
     );
   }
   function open(identity: DocumentIdentity) {
-    return identity.kind === "example"
-      ? editor.current.openExample(identity.id)
-      : editor.current.openSavedProject(identity.id);
+    if (identity.kind === "copy")
+      return editor.current.openSavedProject(identity.id);
+    // A retired example's editor URL keeps the working document it was opened into.
+    if (!isExample(identity.id) && identity.id in RETIRED_EXAMPLES)
+      return Promise.resolve(false);
+    return editor.current.openExample(identity.id);
   }
   async function launch(next: LaunchRequest) {
     const current = editor.current;

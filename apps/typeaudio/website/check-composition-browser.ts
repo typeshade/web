@@ -78,7 +78,9 @@ try {
       }
     };
   });
-  await p.goto("http://127.0.0.1:4201/?project=function-impact");
+  // The Function sound starting point (the retired function-impact example's source).
+  await p.goto("http://127.0.0.1:4201/");
+  await p.locator('[data-new-project="function"]').click();
   await p.locator('[data-function-node="level"]').waitFor();
   await network();
   const original = await readCode(p);
@@ -408,7 +410,9 @@ try {
     hasTouch: true,
   });
   mobile.on("pageerror", (error) => errors.push(error.message));
-  await mobile.goto("http://127.0.0.1:4201/?project=function-impact");
+  // The Function sound starting point (the retired function-impact example's source).
+  await mobile.goto("http://127.0.0.1:4201/");
+  await mobile.locator('[data-new-project="function"]').click();
   await mobile.waitForFunction(
     () =>
       JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!)?.source

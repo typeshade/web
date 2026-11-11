@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import source from "../website/public/projects/function-impact.json";
+import source from "../website/functions/function-sound.json";
 import { qualityProject } from "../scripts/projects/qualityProject.ts";
 import { decodeProject } from "../website/project/decodeProject.ts";
 import { encodeProject } from "../website/project/encodeProject.ts";

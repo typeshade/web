@@ -36,8 +36,8 @@ preserves this compiler pipeline; it consumes the web workspace's shared UI toke
 `/` opens a start screen. **New project** starts from the editor's existing
 templates: an empty project, a procedural sound, a function sound or a picture
 composition. **Recent** lists the saved copies in this browser with when each was
-saved, its layer count and length. **Examples** opens the three Frieren passages
-(A and B) and `function-impact`. **Open a project file** accepts a chosen or
+saved, its layer count and length. **Examples** opens the published example,
+`unseen-force-wall-hit`. **Open a project file** accepts a chosen or
 dropped `.json` file; `decodeProject` validates it before the editor opens, so an
 invalid file leaves the start screen in place with the reason.
 
@@ -47,7 +47,9 @@ project or an imported file has no query; it is the working document. Reload or 
 bookmark returns to the working document when it is the named project, and
 otherwise opens that project through the usual checkpoint. The link published
 before the start screen, `/?project=<example id>`, still opens the example in the
-editor directly.
+editor directly. The links of retired examples (`RETIRED_EXAMPLES` in
+`website/project/catalog.ts`) open what replaced them: `function-impact` opens the
+Function sound starting point, and the Frieren passages open the start screen.
 
 **Projects** in the document bar, and Back, return to the start screen. Both first
 keep the work in **Saved copies**, the same checkpoint that runs before another
@@ -56,18 +58,23 @@ reason and the work is unchanged.
 
 ## Editable agent projects
 
-The Project browser starts with agent projects, **Open project file…** and
-**Save project file**. Preview A or B to hear its character without replacing your
-work, then open an editable copy of one of the three Frieren passages. Opening a
-project keeps the previous document in **Saved copies**, including code drafts;
-a failed checkpoint leaves current work intact. These copies stay in this browser.
+The Project browser starts with the example, **Open project file…** and
+**Save project file**. Preview the example to hear it without replacing your
+work, then open an editable copy. Opening a project keeps the previous document
+in **Saved copies**, including code drafts; a failed checkpoint leaves current
+work intact. These copies stay in this browser.
 
-Each project includes procedural layers, Code nodes, parameters, seeds, amplitude
-envelopes, timing and spatial settings. **Connect reference** loads its YouTube
-player on request. Editing and effects playback also work without it.
+The example, **Unseen force: wall hit**, is a work in progress. It holds the
+accepted wall hit of the force passage from TypeAudio experiment 10: twelve
+engine events, each one a layer whose sound is the engine's TypeShade function
+nodes, with named level controls. Levels and pan follow the engine's direct sound;
+the room is the editor's. The other sounds of the passage are added as the engine
+expresses them as functions, so the example sounds incomplete. It holds no audio:
+the picture is a YouTube reference that **Connect reference** loads on request.
+Editing and effects playback also work without it.
 
 1. Select a layer in the Picture timeline and adjust its **Sound controls**.
-2. Choose **Edit sound** for nodes/code. The composition transport and timeline stay available.
+2. Choose **Edit sound** for function nodes and their TypeShade modules. The composition transport and timeline stay available.
 3. Use **Apply code** (Ctrl/Cmd+Enter) to change the sound. Parameter edits apply directly.
 4. Play the composition to hear the shared room, or **Audition dry** for the selected source.
 5. Return to **Composition** for timing, position, room send and **Scene space** controls.
@@ -86,25 +93,25 @@ sound in the browser's sound library, and **Save sound file** exports that appli
 source. These actions are separate from saving the full editable project. The document
 bar reports browser save success/failure and the presence of code drafts.
 
-For these source graphs, **Source length** controls the rendered duration, while
-the exposed **Envelope span** parameter controls the authored amplitude curve.
+For function sources, **Source length** controls the rendered duration.
 
 The source format and agent handoff are documented in
 [the first-milestone contract](../../docs/typeaudio-editable-projects.md).
-The six JSON fixtures are served by this application under `/projects/`.
-Their [provenance manifest](website/public/projects/provenance.json) records hashes
-and the source baseline. Regenerate them from the TypeAudio study with:
+The example's JSON is served by this application under `/projects/`. Its
+[provenance manifest](website/public/projects/provenance.json) records the
+TypeAudio commit, the exporter command and the file's SHA-256. Regenerate it in a
+TypeAudio checkout at that commit with:
 
 ```sh
-cd apps/typeaudio
-bun scripts/export-study-projects.ts /path/to/typeaudio/docs/studies/frieren/sound-design
+bun run exp:10:web --out unseen-force-wall-hit.json
 ```
 
-This is an editable stereo source edition of the study, not a bit-identical copy
-of its review masters. The editor retains its source taper and exports the picture
-range without the masters' additional 2.5-second tail handle. Listening review and
-candidate selection remain pending. Composition updates prepare in Workers before
-playback; this does not implement a game event scheduler or binaural rendering.
+The exporter (`experiments/10-seven-questions/to-web.ts` in TypeAudio) maps the
+engine's event times, distance gains, pan and master gain onto the scene. It does
+not reproduce the engine's room, layer shelf, air filter or limiter: the editor's
+room stands in, and the master trim is static. Composition updates prepare in
+Workers before playback; this does not implement a game event scheduler or
+binaural rendering.
 
 ## Procedural node graphs
 

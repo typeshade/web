@@ -1,59 +1,17 @@
 {
   "sourceRepository": "typeshade/typeaudio",
-  "sourceCommit": "87295117341448ddf56e0352903f0baf6051ce85",
-  "sessionSha256": "4f24794f314d35cfb954e24ec2dedfb678c4a4e99ab7772f861fda64f07bf900",
-  "programs": {
-    "red-core": "6817d0049b0baec4eb5ed9199e2de86f06653209c8c95fa7fcfe2be700906b25",
-    "air": "29494d5ede3d8c42e11ee1b357b5ed3a5c3ba132b90675e6c5f2a56b18301912",
-    "shear": "552441ee0e09d9df8eda73a8ee0717e34282752d5566c1fb9695a3552a5599cc",
-    "stone": "2e1e4b85f594b86b1b0515a07282854a1f8318116fecef105b4e29a4621598ff",
-    "fracture": "3af83be845d33b2c7296a429fc855569d14637eac5a943de051d7874b4c2ca6e",
-    "pressure": "13fbf46d06364313e09398b68c9b0424244aa54e2481d50e45031f65f2b89f98",
-    "grit": "d8b6aade914a4c26fb45cdb757e2a6b506fab7fde316ea1cf4e89d79958e2e76",
-    "shield": "834e9d11c70b80824d1a9b8be9f82844efb612c4132dd250b82b312d07ea8305",
-    "cloth": "5119957da23508c71331c7a7c87fb502e463df9d4b598510dfa4a221f5b31ed1",
-    "beam-core": "dad9aabe00895edef40aacddded63fd73fc5eb685d918a692fcb0067eabe00c8",
-    "preparation": "6b817db39924851fdfc15f6c7c7e719cb143781a83c56380aae8eea3f3e26b3f",
-    "beam-edge": "27ef9548468d9a74d804f44e2521d06bde732d16fa44414e11028598be6b890d",
-    "dissolve": "46e91060ac6d74da388d1ac3d14b60b8ad651787534315d15168ca0e65ae9fbe"
-  },
   "artifacts": [
     {
-      "id": "frieren-red-A",
-      "bytes": 100323,
-      "sha256": "037b5c1c924e42c3db6dfabea1fdbc4d31a5f5dd829c9428f387f5432f87bffe",
-      "layers": 15
-    },
-    {
-      "id": "frieren-red-B",
-      "bytes": 100320,
-      "sha256": "61d0c22e8614d2b953b3eef17d3000ee6ea42b41d49a197df936958042d64315",
-      "layers": 15
-    },
-    {
-      "id": "frieren-force-A",
-      "bytes": 113263,
-      "sha256": "f75d1750f73b2fb3ae8c202e2bfa4739958fab54126d4e7625cf713797c91f76",
-      "layers": 17
-    },
-    {
-      "id": "frieren-force-B",
-      "bytes": 113261,
-      "sha256": "0c4679c377cd2a8bef5ac8fca495d96f3729a7df820ae80ceef1646cb0868908",
-      "layers": 17
-    },
-    {
-      "id": "frieren-finale-A",
-      "bytes": 100719,
-      "sha256": "efafdf94da40e5cdbf101d761044dca3a388603019274b2db0b0b92954c65419",
-      "layers": 15
-    },
-    {
-      "id": "frieren-finale-B",
-      "bytes": 100718,
-      "sha256": "875776d2aca56af2ac8027002fbad83a39903bb86978d5ad90f5e659ba169372",
-      "layers": 15
+      "id": "unseen-force-wall-hit",
+      "sourceCommit": "f577455b688954b0736a6a523a82d1eb22a19650",
+      "sourceBranch": "claude/kinds-as-functions",
+      "sourcePullRequest": "typeshade/typeaudio#75",
+      "command": "bun run exp:10:web --out unseen-force-wall-hit.json",
+      "exporter": "experiments/10-seven-questions/to-web.ts",
+      "bytes": 222714,
+      "sha256": "3b381147faf5f5955c5b73e04f95a93145abb049ac33540da657334041a58310",
+      "cues": 12
     }
   ],
-  "note": "Source-only editable editions. Preview uses the editor's source taper and the stored picture range; it is not a bit-identical copy of the review master."
+  "note": "Function-node sources only: the project holds no audio. Each cue is one event of the accepted wall hit of experiment 10, as the engine's typed function nodes, which sound as the engine's lane within 1e-4 of its peak (typeaudio test/to-web.test.ts). Levels and pan follow the engine's direct sound; the room is the editor's, and the engine's limiter is a static master trim. The picture is a YouTube reference by its id only."
 }

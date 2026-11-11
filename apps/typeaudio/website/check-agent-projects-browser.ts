@@ -3,8 +3,8 @@ import { mkdir, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { chromium, type Page } from "playwright-core";
 import { preview } from "vite";
-import { writeCode } from "./check-code-input.ts";
-import { PROJECTS } from "./project/catalog.ts";
+import { readCode, writeCode } from "./check-code-input.ts";
+import { EXAMPLES } from "./project/catalog.ts";
 
 const server = await preview({
   configFile: "website/vite.config.ts",
@@ -94,35 +94,36 @@ try {
     };
   });
   await p.goto(base + "/studio/");
-  for (const project of PROJECTS)
-    for (const variant of ["A", "B"]) {
-      const id = `${project.id}-${variant}`;
-      await open(p, id);
-      const doc = await scene(p);
-      assert.equal(doc.cues.length, project.layers);
-      assert.equal(doc.media.id, "YHCqcyX9N3s");
-      assert.ok(
-        doc.cues.every((c: any) => c.patch.graph && c.space && !c.audio),
-      );
-      const wav = await downloaded(p, "#export-wav");
-      pcmHash(wav);
-      assert.equal(
-        (wav.length - 44) / (48000 * 4),
-        Math.round((doc.end - doc.start) * 48000) / 48000,
-      );
-      await p.locator("#play").click();
-      await p.waitForFunction(
-        () =>
-          Number(
-            document.querySelector("#clock")?.getAttribute("data-scheduled"),
-          ) === 1,
-      );
-      await p.locator("#stop").click();
-      console.log(
-        `${id}: source import, stereo prepare, playback and export passed`,
-      );
-    }
-  await open(p, "frieren-red-A");
+  for (const project of EXAMPLES) {
+    const id = project.id;
+    await open(p, id);
+    const doc = await scene(p);
+    assert.equal(doc.cues.length, project.layers);
+    assert.equal(doc.media.id, "YHCqcyX9N3s");
+    assert.ok(
+      doc.cues.every(
+        (c: any) => c.patch.functions && !c.patch.graph && c.space && !c.audio,
+      ),
+    );
+    const wav = await downloaded(p, "#export-wav");
+    pcmHash(wav);
+    assert.equal(
+      (wav.length - 44) / (48000 * 4),
+      Math.round((doc.end - doc.start) * 48000) / 48000,
+    );
+    await p.locator("#play").click();
+    await p.waitForFunction(
+      () =>
+        Number(
+          document.querySelector("#clock")?.getAttribute("data-scheduled"),
+        ) === 1,
+    );
+    await p.locator("#stop").click();
+    console.log(
+      `${id}: source import, stereo prepare, playback and export passed`,
+    );
+  }
+  await open(p, "unseen-force-wall-hit");
   const original = await scene(p),
     hero = original.cues[0];
   const originalHash = pcmHash(await downloaded(p, "#export-wav"));
@@ -132,21 +133,21 @@ try {
       .isVisible(),
   );
   await p.locator("#edit-cue-sound").click();
-  const character = hero.patch.graph.parameters[3].value,
-    changed = character < 0.5 ? 0.9 : 0.1;
-  await input(p, "Character value", changed);
+  const level = hero.patch.functions.parameters[0].value,
+    changed = level * 0.25;
+  await input(p, "Body level control", changed);
   assert.equal(
-    (await scene(p)).cues[0].patch.graph.parameters[3].value,
+    (await scene(p)).cues[0].patch.functions.parameters[0].value,
     changed,
   );
   await p.locator("#undo").click();
   assert.equal(
-    (await scene(p)).cues[0].patch.graph.parameters[3].value,
-    character,
+    (await scene(p)).cues[0].patch.functions.parameters[0].value,
+    level,
   );
   await p.locator("#redo").click();
   assert.equal(
-    (await scene(p)).cues[0].patch.graph.parameters[3].value,
+    (await scene(p)).cues[0].patch.functions.parameters[0].value,
     changed,
   );
   await p.getByRole("button", { name: "Picture", exact: true }).click();
@@ -154,22 +155,25 @@ try {
   assert.notEqual(
     pcmHash(await downloaded(p, "#export-wav")),
     originalHash,
-    "Parameter edits regenerate the composition",
+    "Control edits regenerate the composition",
   );
   await p.locator("#edit-cue-sound").click();
-  await p.locator("#code-tab-node-material").click();
-  const code =
-    hero.patch.graph.nodes.find((n: any) => n.id === "material").code +
-    "\nout = out * 0.4;";
+  await p
+    .locator(`[data-function-node="${hero.id}"] .function-node-heading`)
+    .click();
+  const module = "/kinds/impact.shade.ts",
+    code = (await readCode(p)).replace(
+      "return s + n + c;",
+      "return (s + n + c) * 0.4;",
+    );
+  assert.match(code, /\(s \+ n \+ c\) \* 0\.4/);
   await writeCode(p, code);
-  await p.locator("#apply-graph-code").click();
+  await p.locator("#apply-function-code").click();
   await p.waitForFunction(
-    (code) =>
-      JSON.parse(
-        localStorage.getItem("typeaudio.video.scene.v1")!,
-      ).cues[0].patch.graph.nodes.find((n: any) => n.id === "material").code ===
-      code,
-    code,
+    ([module, code]) =>
+      JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!).cues[0]
+        .patch.functions.modules[module] === code,
+    [module, code],
   );
   await p.getByRole("button", { name: "Picture", exact: true }).click();
   await input(p, "Position 1 x", hero.space.points[0].x + 0.2);
@@ -186,7 +190,9 @@ try {
     await mkdir(artifacts, { recursive: true });
     await p.screenshot({ path: `${artifacts}/projects-desktop.png` });
     await p.locator("#edit-cue-sound").click();
-    await p.locator("#code-tab-node-material").click();
+    await p
+      .locator(`[data-function-node="${hero.id}"] .function-node-heading`)
+      .click();
     await p.screenshot({ path: `${artifacts}/source-desktop.png` });
     await p.getByRole("button", { name: "Picture", exact: true }).click();
     await ready(p);
@@ -195,14 +201,16 @@ try {
   const exported = await downloaded(p, "#save-project"),
     project = JSON.parse(exported.toString());
   assert.equal(project.schema, "typeaudio.project");
-  assert.equal(project.version, 2);
+  assert.equal(project.version, 3);
   assert.equal(
     project.audioAssets,
     undefined,
     "Procedural projects need no baked audio",
   );
   assert.deepEqual(project.scene, edited);
-  await open(p, "frieren-force-B");
+  await p.goto(base + "/");
+  await p.locator('[data-new-project="empty"]').click();
+  await p.locator("#project-file").waitFor({ state: "attached" });
   await p.locator("#project-file").setInputFiles({
     name: "edited.typeaudio.json",
     mimeType: "application/json",
@@ -211,7 +219,7 @@ try {
   await p.waitForFunction(
     () =>
       JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!).origin
-        .id === "frieren-red-A",
+        .id === "unseen-force-wall-hit",
   );
   await ready(p);
   assert.deepEqual(await scene(p), edited);
@@ -272,13 +280,13 @@ try {
   mobile.setDefaultTimeout(30000);
   mobile.on("pageerror", (error) => errors.push(error.message));
   await mobile.goto(base + "/studio/");
-  await open(mobile, "frieren-finale-A");
+  await open(mobile, "unseen-force-wall-hit");
   await mobile
     .getByRole("navigation", { name: "Editor tasks" })
     .getByRole("button", { name: "Edit", exact: true })
     .click();
   await mobile.locator("#edit-cue-sound").click();
-  await input(mobile, "Character value", 0.6);
+  await input(mobile, "Body level control", 0.6);
   await mobile.getByRole("button", { name: "Picture", exact: true }).click();
   await mobile
     .getByRole("navigation", { name: "Editor tasks" })
@@ -288,7 +296,9 @@ try {
   await ready(mobile);
   await mobile.getByRole("button", { name: "File", exact: true }).click();
   const mobileData = await downloaded(mobile, "#save-project");
-  await open(mobile, "frieren-red-B");
+  await mobile.goto(base + "/");
+  await mobile.locator('[data-new-project="empty"]').click();
+  await mobile.locator("#project-file").waitFor({ state: "attached" });
   await mobile.locator("#project-file").setInputFiles({
     name: "mobile.json",
     mimeType: "application/json",
@@ -297,11 +307,11 @@ try {
   await mobile.waitForFunction(
     () =>
       JSON.parse(localStorage.getItem("typeaudio.video.scene.v1")!).origin
-        .id === "frieren-finale-A",
+        .id === "unseen-force-wall-hit",
   );
   await ready(mobile);
   const mobileScene = await scene(mobile);
-  assert.equal(mobileScene.cues[0].patch.graph.parameters[3].value, 0.6);
+  assert.equal(mobileScene.cues[0].patch.functions.parameters[0].value, 0.6);
   assert.equal(mobileScene.cues[0].space.send, 0.2);
   assert.equal(
     await mobile.evaluate(

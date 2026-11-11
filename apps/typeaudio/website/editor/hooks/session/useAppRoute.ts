@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { StartingPoint } from "../../../project/startingPoints.ts";
 import { isStudioPath } from "../../shared/studioPath.ts";
+import { isExample, RETIRED_EXAMPLES } from "../../../project/catalog.ts";
 
 /** What the editor opens when it mounts. */
 export type LaunchRequest =
@@ -19,15 +20,21 @@ export type AppRoute =
 let routes = 0;
 /**
  * `/` is the start screen. `/?project=<id>`, the link published before the start screen,
- * still opens that example in the editor. `/studio/` and `/studio/video/` are the editor.
+ * still opens that example in the editor. The link of a retired example opens what replaced it
+ * (`RETIRED_EXAMPLES`), or the start screen. `/studio/` and `/studio/video/` are the editor.
  */
 function routeFromLocation(): AppRoute {
   if (isStudioPath(location.pathname))
     return { screen: "editor", launch: { kind: "resume" }, key: ++routes };
   const id = new URLSearchParams(location.search).get("project");
-  return id
-    ? { screen: "editor", launch: { kind: "example", id }, key: ++routes }
-    : { screen: "start" };
+  if (!id) return { screen: "start" };
+  if (isExample(id))
+    return { screen: "editor", launch: { kind: "example", id }, key: ++routes };
+  const template = RETIRED_EXAMPLES[id];
+  if (template)
+    return { screen: "editor", launch: { kind: "new", template }, key: ++routes };
+  history.replaceState(history.state, "", "/");
+  return { screen: "start" };
 }
 
 export function useAppRoute() {

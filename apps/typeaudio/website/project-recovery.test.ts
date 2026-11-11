@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { decodeProject } from "./project/decodeProject.ts";
 import { encodeProject } from "./project/encodeProject.ts";
 import { DEFAULT } from "./sound/defaultPatch.ts";
+import { initialGraph } from "./graph/recipes.ts";
+import { validateScene } from "./video-model.ts";
 import { validateDrafts } from "./project/editorState.ts";
 import {
   ProjectHistory,
@@ -12,17 +14,32 @@ import { reducer } from "./editor/state/documentReducer.ts";
 import { projectDocument } from "./editor/state/documentProjection.ts";
 import type { EditorState } from "./editor/state/documentTypes.ts";
 
-const { scene } = decodeProject(
+// A picture project with one procedural (node network) sound, placed in the example's room.
+const example = decodeProject(
   JSON.parse(
     readFileSync(
-      new URL("./public/projects/frieren-red-A.json", import.meta.url),
+      new URL("./public/projects/unseen-force-wall-hit.json", import.meta.url),
       "utf8",
     ),
   ),
-);
+).scene;
+const scene = validateScene({
+  ...example,
+  cues: [
+    {
+      id: "impact",
+      name: "Impact",
+      time: example.start + 1,
+      gain: 0.8,
+      muted: false,
+      patch: { ...DEFAULT, graph: initialGraph(), duration: 2, volume: 0.65 },
+      space: example.cues[0].space,
+    },
+  ],
+});
 const key = JSON.stringify([
   JSON.stringify([`cue:${scene.cues[0].id}`, "base"]),
-  "material",
+  "impact",
 ]);
 const editor = {
   source: { name: "Independent source", patch: DEFAULT },
@@ -41,7 +58,7 @@ describe("project recovery", () => {
     expect(reopened.editor).toEqual(editor);
     expect(
       reopened.scene.cues[0].patch.graph!.nodes.find(
-        (n) => n.id === "material",
+        (n) => n.id === "impact",
       )!.code,
     ).not.toContain("incomplete");
     expect(() => decodeProject({ ...encoded, editor: undefined })).toThrow();

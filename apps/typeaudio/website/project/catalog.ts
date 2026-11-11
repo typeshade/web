@@ -1,47 +1,44 @@
-export const PROJECTS = [
+/**
+ * The published example projects. Each opens as an editable copy. The files are made by the
+ * TypeAudio engine's exporters, and `public/projects/provenance.json` records each one's source.
+ */
+export const EXAMPLES = [
   {
-    id: "frieren-red",
-    variants: { A: "Compressed mineral core", B: "Rougher turbulent core" },
-    title: "Red containment",
-    range: "00:20–00:30",
-    layers: 15,
-    detail: "Edit the core, fracture, defence and moving layers.",
-  },
-  {
-    id: "frieren-force",
-    variants: {
-      A: "Compact pressure with body",
-      B: "Shorter pressure impulse",
-    },
-    title: "Unseen force",
-    range: "02:16.5–02:29.7",
-    layers: 17,
-    detail: "Edit the quiet space, force, body travel and column impact.",
-  },
-  {
-    id: "frieren-finale",
-    variants: {
-      A: "Dry fibres losing coherence",
-      B: "More resonant dissolution",
-    },
-    title: "Final beam and dissolution",
-    range: "02:53–03:09.3",
-    layers: 15,
-    detail: "Edit the sustained beam, debris and dissolving material.",
+    id: "unseen-force-wall-hit",
+    title: "Unseen force: wall hit",
+    status: "Work in progress",
+    range: "02:16.5–02:32.2",
+    layers: 12,
+    detail:
+      "A body hits a stone wall: twelve sound events from the TypeAudio engine, each a set of TypeShade function nodes with level controls. The rest of the passage is not here yet, so it sounds incomplete.",
   },
 ] as const;
 
-/** The function-graph example: the same source as the Function sound starting point. */
-export const FUNCTION_EXAMPLE = {
-  id: "function-impact",
-  title: "Function impact",
-  detail:
-    "A noise burst through a resonant body, written as four TypeShade modules with Body pitch, Resonance damping and Strength controls.",
-} as const;
+export type ExampleId = (typeof EXAMPLES)[number]["id"];
+
+export const isExample = (id: string): id is ExampleId =>
+  EXAMPLES.some((p) => p.id === id);
+
+/**
+ * Examples that are no longer published, and what their old `/?project=` links open now.
+ * `function-impact` was the same source as the Function sound starting point.
+ */
+export const RETIRED_EXAMPLES: Record<string, "function" | null> = {
+  "function-impact": "function",
+  "frieren-red-A": null,
+  "frieren-red-B": null,
+  "frieren-force-A": null,
+  "frieren-force-B": null,
+  "frieren-finale-A": null,
+  "frieren-finale-B": null,
+};
 
 export function projectUrl(id: string): string {
-  if (id === "function-impact") return "/projects/function-impact.json";
-  if (!PROJECTS.some((p) => [p.id + "-A", p.id + "-B"].includes(id)))
-    throw new Error("Unknown example project.");
+  if (!isExample(id))
+    throw new Error(
+      id in RETIRED_EXAMPLES
+        ? "This example is no longer published. Choose an example on the start screen."
+        : "Unknown example project.",
+    );
   return `/projects/${id}.json`;
 }
