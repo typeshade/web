@@ -494,7 +494,7 @@ test('a subgroup case is refused by a build that predates it, and skipped as uns
     'reduction-subgroup-levels',
   ]);
   expect(regressionCatalog.builds.every((b) => b.cases.length === 26)).toBe(true);
-  // Both builds of the comparison (50234ad6 and 68b57a03) read the short form of a built-in
+  // Both builds of the comparison (68b57a03 and 42550b11) read the short form of a built-in
   // value, `builtin<"global_invocation_id">` (compiler change 0135), and both carry change
   // 0117, so neither refuses a subgroup-suite case. The comparison of e30bbe57 and 34cea187
   // held four refusals on the baseline, which predates the short form; a baseline that predates

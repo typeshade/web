@@ -1,11 +1,11 @@
 {
   "slug": "uniform",
-  "source": "9bc4054504fdc90a8f1e4600fe999cd060f7ce5f9727e5bd4be7a418caa9d9df",
+  "source": "ea68659b75fbb49332813d855e06af86907c35f4a8156f6f0688ea8ea43e6089",
   "texts": {
     "summary": "셰이더 모듈이 내보낸 class인 cls의 구조체를 담는 유니폼입니다. 리전의 범위 하나를 0으로 채운 뒤 init이 지정한 필드를 넣습니다.",
     "description": "셰이더 파일의 `uniform<T>`와 호스트 코드의 `uniform(T)`는 같은 것, 곧 `T`의 유니폼을 가리킵니다(수정안 A1).",
     "parameters.init": "필드 가운데 일부이며, 각각 호스트 값입니다(규칙 8.21).",
     "returns": "유니폼입니다. 필드는 `set`으로 쓰고 `get`으로 읽습니다.",
-    "exceptions.TypeError": "셰이더 모듈의 class가 아닌 값, 추상 class, 유니폼 레이아웃이 없는 구조체(`bool`, 2행 행렬), 접근자 자신의 이름(`set`, `needsUpdate`, `dispose`)과 같은 필드, 맞지 않는 `init`에는 `TypeError`가 발생합니다."
+    "exceptions.TypeError": "셰이더 모듈의 class가 아닌 값, 추상 class, 유니폼 레이아웃이 없는 구조체(`bool`, 2행 행렬), 접근자 자신의 이름(`set`, `needsUpdate`, `dispose`)과 같은 필드, 맞지 않는 `init`에는 `TypeError`가 발생합니다. 이런 필드가 있는 class는 호스트의 에디터가 이미 `TS8079`로 거부합니다(수정안 A5, D3)."
   }
 }

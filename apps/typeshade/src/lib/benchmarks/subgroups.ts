@@ -25,7 +25,7 @@ declare const src: storage<array<u32>>;
 // its short form, `builtin<"global_invocation_id">` (change 0135). The regression catalog
 // compiles every case at two builds, the pin and the pin before it. A baseline that predates the
 // short form refuses these cases, and the catalog records the refusal: the comparison of
-// e30bbe57 and 34cea187 did. At the pins 50234ad6 and 68b57a03 both builds compile them.
+// e30bbe57 and 34cea187 did. At the pins 50234ad6, 68b57a03 and 42550b11 both builds compile them.
 const subgroupCase = (
   id: string,
   suite: Experiment['suite'],

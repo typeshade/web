@@ -467,7 +467,10 @@ id first, then the pull request that did the work.
   Handled in #52. Pin `68b57a03`: Amendment A3 records the owner's decisions only. The bug fix it
   asked for first (compiler #1217, no proposal: a scalar cast of a written number is a value of
   its type, so `u32(7) / 2` is 3) changes no snippet, example or still of this site; the Korean
-  guide and the `TS8003` lines (en and ko) were read against Rule 5.3's new fingerprint. Handled in #56.
+  guide and the `TS8003` lines (en and ko) were read against Rule 5.3's new fingerprint. Handled in #56. Pin `42550b11`: Amendment A4 records the owner's
+  decisions on the third review. The counter fix of the same range (an integer conversion that
+  starts a `for` counter declares its type, Rule 7.5) changes no sample of this site: no `for`
+  header here starts at `u32(…)`, `i32(…)` or `f32(…)`. Recorded in #61.
 - 0135: a built-in value takes its type from WGSL, and the compiler gives a user-defined value
   its location. The types page (en and ko) says so, with the options as the second argument of
   `builtin<N, O>`; every sample writes `builtin<"position">`; the `TS8029` example is a
@@ -488,7 +491,17 @@ id first, then the pull request that did the work.
   and `configure()` are deprecated, and that no call takes a resource at this pin; `uniform`,
   `zeros`, `array`, `texture`, `Buffer`, `Uniform` and `Device.use` are API reference pages with
   Korean translations. Open: milestones 2 to 9 are not implemented in the compiler (milestone 2 is carried out
-  under 0042), and the site's own renderer stays. Handled in #52.
+  under 0042), and the site's own renderer stays. Handled in #52. Pin `42550b11`: milestone 3 is done (Amendments A5 to A8). A
+  kernel function that returns nothing and a `@compute` entry take a `Buffer` or a `Uniform`, an
+  exported binding among them; such a call is recorded, returns nothing and is read with
+  `await buffer.read()`. Data decides the device of a call, `device.use()` makes the device in
+  use, and on WebGL2 a `read()` of what such a call wrote waits on a fence. The quick start's host
+  file calls `age({ camera, particles }, 1)` and reads the result (run on the CPU tier against
+  the module the pin generates); the resource, owner and devices paragraphs of the WebGPU and
+  WebGL2 page and of the control-flow page say so (en and ko); `TS8079` has an example; the
+  `array`, `zeros`, `uniform`, `Uniform`, `Buffer` and `Device` translations follow. Open:
+  milestones 2 and 4 to 9, a kernel function that returns a value on a resource, a call on a
+  resource inside `fuse()`, and the site's own renderer. Handled in #61.
 - 0140: the stage calls are refused at once. The `TS8028` example is a refused stage call with
   the attribute as its fix. The work is the work of 0130. Handled in #52.
 - 0042: the compiler's libm. Pin `34cea187`: `sin` and `cos` on the CPU; the WebGPU and WebGL2
@@ -502,4 +515,6 @@ id first, then the pull request that did the work.
   kernel). The paragraph names the nineteen, drops the sentence on the engine's `Math`, and says
   what Amendment A4 and the changelog state: `pow` keeps ECMAScript's special values, and on Tint
   and WebGL2 over SwiftShader eleven special pairs give other values. Open: the WebAssembly tier
-  is not implemented, so no page names it. Handled in #56.
+  is not implemented, so no page names it. Handled in #56. Pin `42550b11`: Amendments A5 and A6 record where
+  the `pow` record of Rule 11.2 stands and that milestone 3 of 0138 comes first. Nothing changes
+  on the site. Recorded in #61.
