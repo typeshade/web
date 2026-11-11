@@ -54,8 +54,8 @@ importers:
         specifier: 5.6.3
         version: 5.6.3
       typeshade:
-        specifier: https://github.com/typeshade/typeshade/archive/87af4eb0d9d15f02b66b8341b72cab0944290472.tar.gz
-        version: https://github.com/typeshade/typeshade/archive/87af4eb0d9d15f02b66b8341b72cab0944290472.tar.gz(typescript@5.6.3)
+        specifier: https://github.com/typeshade/typeshade/archive/415b276a7408936cb483d05ca8bb39e797b05966.tar.gz
+        version: https://github.com/typeshade/typeshade/archive/415b276a7408936cb483d05ca8bb39e797b05966.tar.gz(typescript@5.6.3)
       vite:
         specifier: 7.3.7
         version: 7.3.7(@types/node@25.6.0)(jiti@2.7.0)(lightningcss@1.33.0)(yaml@2.9.1)
@@ -4129,8 +4129,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typeshade@https://github.com/typeshade/typeshade/archive/87af4eb0d9d15f02b66b8341b72cab0944290472.tar.gz:
-    resolution: {integrity: sha512-Th7v3uJ80KEUkBs7EhHsdDGgIZ7MAXRZ5Vr+UHNcQ5MKDQOU1g/E+zi7+L0DdMHB5JUgpVzY6zIT8A/MDDH8rg==, tarball: https://github.com/typeshade/typeshade/archive/87af4eb0d9d15f02b66b8341b72cab0944290472.tar.gz}
+  typeshade@https://github.com/typeshade/typeshade/archive/415b276a7408936cb483d05ca8bb39e797b05966.tar.gz:
+    resolution: {integrity: sha512-9paRmjn8FA9rs69FYJnGMSuDttajTG3J/N/GGzaA6I6v2j44YfAPpZN6Yf6EQTS462QrIQcE+3k+cu6INrUG4Q==, tarball: https://github.com/typeshade/typeshade/archive/415b276a7408936cb483d05ca8bb39e797b05966.tar.gz}
     version: 0.1.0
     engines: {node: '>=20'}
     hasBin: true
@@ -8810,7 +8810,7 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  typeshade@https://github.com/typeshade/typeshade/archive/87af4eb0d9d15f02b66b8341b72cab0944290472.tar.gz(typescript@5.6.3):
+  typeshade@https://github.com/typeshade/typeshade/archive/415b276a7408936cb483d05ca8bb39e797b05966.tar.gz(typescript@5.6.3):
     dependencies:
       typescript: 5.6.3
 
