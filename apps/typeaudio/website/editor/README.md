@@ -46,6 +46,14 @@ bar, transport, tool rail and status. `StudioPage` selects the Sound/Picture pan
 composition and connects feature controllers. Keep media/viewer mounting behavior
 stable when changing that composition: hidden workspaces retain session state.
 
+`StudioApp` shows `StartPage` at `/` or `StudioPage` under `/studio/`, as one page.
+`useAppRoute` owns that choice and the launch request the editor opens with.
+`useStartScreen` reads Recent from `ProjectHistory` and validates a chosen file with
+`readProjectFile`; the start screen never writes the working document. In the editor,
+`useProjectLaunch` opens the request, keeps the URL naming the open project
+(`state/documentIdentity.ts`) and calls the checkpoint in `useProjectFiles` before
+it returns to the start screen.
+
 ## State and resource ownership
 
 `useEditorDocument` owns the authoritative reducer, document revision and local

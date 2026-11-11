@@ -46,3 +46,22 @@
   color: #858585;
   white-space: nowrap;
 }
+.studio-app .document-projects {
+  align-self: stretch;
+  flex-shrink: 0;
+  border: 0;
+  border-right: 1px solid #141414;
+  border-radius: 0;
+  background: transparent;
+  padding: 0 12px;
+  font-size: 10px;
+  color: var(--text);
+}
+.studio-app .document-projects::before {
+  content: "‹";
+  margin-right: 5px;
+  color: var(--muted);
+}
+.studio-app .document-projects:hover:not(:disabled) {
+  background: #343434;
+}

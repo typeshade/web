@@ -16,7 +16,7 @@ const browser = await chromium.launch({
 });
 try {
   const page = await browser.newPage();
-  await page.goto("http://127.0.0.1:4184/");
+  await page.goto("http://127.0.0.1:4184/studio/");
   const file = (await readdir("dist/assets")).find((f) =>
     f.startsWith("render.worker-"),
   )!;

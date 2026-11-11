@@ -1,10 +1,26 @@
 import type { Editor } from "../../../useEditor.ts";
 import { Icon } from "../../atoms/Icon.tsx";
 
-export function DocumentBar({ editor: e }: { editor: Editor }) {
+export function DocumentBar({
+  editor: e,
+  onProjects,
+}: {
+  editor: Editor;
+  onProjects: () => void;
+}) {
   const picture = e.state.workspace === "picture";
   return (
     <div className="document-bar">
+      <button
+        id="leave-project"
+        aria-label="Back to Projects"
+        className="document-projects"
+        disabled={e.projectLoading}
+        data-tooltip="Return to the start screen. This project is kept in Recent."
+        onClick={onProjects}
+      >
+        Projects
+      </button>
       <div className="document-tab">
         <Icon name={picture ? "film" : "sound"} />
         {picture ? (
@@ -20,6 +36,7 @@ export function DocumentBar({ editor: e }: { editor: Editor }) {
           />
         ) : (
           <span>
+            {e.state.scene.cues.length ? `${e.state.scene.name} · ` : ""}
             {e.state.patchName}
             {e.selected && !e.selected.audio ? " / Selected layer" : ""}
           </span>

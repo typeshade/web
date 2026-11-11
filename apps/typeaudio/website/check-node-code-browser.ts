@@ -14,7 +14,7 @@ try {
   p.setDefaultTimeout(30000);
   const errors: string[] = [];
   p.on("pageerror", (error) => errors.push(error.message));
-  await p.goto("http://127.0.0.1:4198");
+  await p.goto("http://127.0.0.1:4198/studio/");
   await p
     .getByRole("button", { name: "+ New procedural sound", exact: true })
     .click();

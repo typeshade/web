@@ -40,9 +40,9 @@ export function useEditor() {
     sound.stopSound,
     scene.stopScene,
   );
-  const workspace = (next: "picture" | "sound") => {
+  const workspace = (next: "picture" | "sound", replace = false) => {
     view.showComposition();
-    navigate(next);
+    navigate(next, replace);
   };
   const patches = createPatchActions(document),
     scenes = createSceneActions(document, resources, scene);

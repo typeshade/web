@@ -51,7 +51,7 @@ try {
   const p = await browser.newPage({ viewport: { width: 1680, height: 1050 } });
   p.setDefaultTimeout(30000);
   p.on("pageerror", (error) => errors.push(error.message));
-  await p.goto("http://127.0.0.1:4197");
+  await p.goto("http://127.0.0.1:4197/studio/");
   assert.equal(
     await p
       .getByRole("button", { name: "Open project file…", exact: true })
@@ -243,7 +243,7 @@ try {
   });
   mobile.setDefaultTimeout(30000);
   mobile.on("pageerror", (error) => errors.push(error.message));
-  await mobile.goto("http://127.0.0.1:4197");
+  await mobile.goto("http://127.0.0.1:4197/studio/");
   await mobile.locator("#project-file").setInputFiles({
     name: "draft.typeaudio.json",
     mimeType: "application/json",

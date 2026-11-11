@@ -127,7 +127,7 @@ try {
       }
     };
   });
-  await page.goto(base);
+  await page.goto(base + "/studio/");
   await page.getByRole("button", { name: "Sounds", exact: true }).click();
   assert.equal(await page.locator("[data-preset]").count(), 6);
   await page.locator("#live-start").click();
@@ -693,7 +693,7 @@ try {
   await unavailable.addInitScript(() =>
     Object.defineProperty(navigator, "gpu", { value: undefined }),
   );
-  await unavailable.goto(base);
+  await unavailable.goto(base + "/studio/");
   await unavailable.locator("#mode-render").click();
   await unavailable.selectOption("#backend", "webgpu");
   await unavailable.locator("#render").click();

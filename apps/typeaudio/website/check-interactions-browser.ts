@@ -56,7 +56,7 @@ try {
   const p = await browser.newPage({ viewport: { width: 1440, height: 1000 } }),
     errors: string[] = [];
   p.on("pageerror", (e) => errors.push(e.message));
-  await p.goto(base);
+  await p.goto(base + "/studio/");
   await value(p, "Pitch", "440");
   assert.equal(await p.locator("#frequency").inputValue(), "440");
   await p.getByRole("button", { name: "Sounds", exact: true }).click();

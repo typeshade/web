@@ -93,7 +93,7 @@ try {
       );
     };
   });
-  await p.goto(base);
+  await p.goto(base + "/studio/");
   for (const project of PROJECTS)
     for (const variant of ["A", "B"]) {
       const id = `${project.id}-${variant}`;
@@ -271,7 +271,7 @@ try {
   });
   mobile.setDefaultTimeout(30000);
   mobile.on("pageerror", (error) => errors.push(error.message));
-  await mobile.goto(base);
+  await mobile.goto(base + "/studio/");
   await open(mobile, "frieren-finale-A");
   await mobile
     .getByRole("navigation", { name: "Editor tasks" })

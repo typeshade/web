@@ -31,6 +31,14 @@ export const PROJECTS = [
   },
 ] as const;
 
+/** The function-graph example: the same source as the Function sound starting point. */
+export const FUNCTION_EXAMPLE = {
+  id: "function-impact",
+  title: "Function impact",
+  detail:
+    "A noise burst through a resonant body, written as four TypeShade modules with Body pitch, Resonance damping and Strength controls.",
+} as const;
+
 export function projectUrl(id: string): string {
   if (id === "function-impact") return "/projects/function-impact.json";
   if (!PROJECTS.some((p) => [p.id + "-A", p.id + "-B"].includes(id)))

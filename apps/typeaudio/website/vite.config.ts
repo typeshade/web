@@ -14,5 +14,5 @@ export default defineConfig({
     plugins: () => [audioCpu(), typeshade()],
     rollupOptions: { output: { inlineDynamicImports: true } },
   },
-  build: { outDir: '../dist', emptyOutDir: true, target: 'es2022', rollupOptions: { input: { main: 'website/index.html', video: 'website/studio/video/index.html' } } },
+  build: { outDir: '../dist', emptyOutDir: true, target: 'es2022', rollupOptions: { input: { main: 'website/index.html', studio: 'website/studio/index.html', video: 'website/studio/video/index.html' } } },
 });
