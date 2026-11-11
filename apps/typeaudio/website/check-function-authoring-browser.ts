@@ -388,7 +388,7 @@ try {
   };
 
   // Raw engine documents remain importable, with no custom page or executable artifact.
-  const raw = await readFile("website/public/projects/function-impact.json");
+  const raw = await readFile("website/functions/function-sound.json");
   await p.locator("#project-file").setInputFiles({
     name: "engine-impact.json",
     mimeType: "application/json",
@@ -407,7 +407,9 @@ try {
     hasTouch: true,
   });
   mobile.on("pageerror", (error) => errors.push(error.message));
-  await mobile.goto("http://127.0.0.1:4201/?project=function-impact");
+  // The Function sound starting point (the retired function-impact example's source).
+  await mobile.goto("http://127.0.0.1:4201/");
+  await mobile.locator('[data-new-project="function"]').click();
   await mobile.waitForFunction(
     () =>
       JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!)?.source

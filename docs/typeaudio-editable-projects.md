@@ -8,6 +8,13 @@ This milestone precedes further immersive-engine expansion. It does not wait for
 records the deployed commits, public desktop/mobile checks and the remaining
 YouTube/physical-device/listening verification limits. This is not the full-scene mix.
 
+**Retired 2026-11-11:** the owner removed the Frieren passage projects and the
+`function-impact` example card. The one example is now `unseen-force-wall-hit`: the
+accepted wall hit of the force passage of TypeAudio experiment 10, twelve engine events
+as typed function nodes, a work in progress. Its provenance manifest records the
+TypeAudio commit, the exporter command and the file's SHA-256. The records below
+describe the first milestone as it was delivered.
+
 ## Acceptance
 
 - Open an agent project from JSON or the existing editor's project browser.
@@ -93,12 +100,14 @@ The editor imports legacy flat version-1 scenes and version-1 project envelopes.
 Drafts are bounded to 256 entries, 32,768 characters per buffer and 2 MB total.
 Drafts may contain incomplete or invalid code; saving never compiles or applies them.
 The running sound and exported WAV use applied code in `scene.cues[].patch.graph`.
-Direct links such as `/?project=frieren-red-A` open an allowlisted catalog project
+Direct links such as `/?project=unseen-force-wall-hit` open an allowlisted catalog project
 through the same checkpoint and validation flow. The editor then shows the project
-at `/studio/video/?project=frieren-red-A` (or `/studio/?…` in Sound); reloading that
+at `/studio/video/?project=unseen-force-wall-hit` (or `/studio/?…` in Sound); reloading that
 URL returns to the working document instead of reopening the example. A saved copy
 shows as `?copy=<id>`. `/` is the start screen; leaving the editor for it runs the
-same checkpoint first.
+same checkpoint first. The link of a retired example opens what replaced it
+(`RETIRED_EXAMPLES` in `project/catalog.ts`): `function-impact` opens the Function sound
+starting point, and a Frieren passage opens the start screen.
 Complete version-1 source fixtures remain valid agent handoffs; the editor adds its
 working state when users save them. Older editors reject version 2 explicitly.
 
@@ -117,7 +126,7 @@ Monaco models and pending compilation even when two projects reuse node IDs.
 ## Ownership and playback
 
 - `project/` owns file decoding/encoding, provenance validation and the example catalog.
-- `scripts/projects/` converts the authored source study into editable graphs.
+- `scripts/projects/` converts quality candidates into editable projects.
 - `scene/` validates space, prepares offline stereo audio in a Worker and writes stereo WAV.
 - Existing document state owns layer/source/space edits, undo/redo and local persistence.
 - Project, clip and room components expose those operations in the existing workspace.
@@ -131,11 +140,11 @@ for a newer document. Selected-layer audition remains dry and labels that scope 
 Candidate preview owns disposable audio resources and never replaces the working
 document. Stopping it or starting composition/source playback cancels that preview.
 
-The six fixtures cover three separate passages, with A/B candidates and 15, 17 and
-15 layers respectively. They are not the full 189-second mix. They preserve the
-study's source programs and authored settings, but the editor's 30ms source taper
-and picture-range export differ from the review masters. There is no added 2.5-second
-tail handle. The provenance manifest records this source-edition boundary.
+The example covers one sound of one passage: the twelve events of the wall hit, at
+the picture times where the engine places them. It is not the full passage. Each
+cue's function nodes sound as the engine's lane, but the editor's 5 ms onset fade,
+30 ms source taper, room and static master trim differ from the engine's render.
+The provenance manifest records this boundary.
 
 The first milestone does not require R1, HRTF, acoustic ray tracing, cloud user
 accounts or an R2 catalog service. Source JSON ships with the current Web app;
@@ -146,7 +155,7 @@ and review revisions can be added after this local editable handoff is accepted.
 
 Run `pnpm check:typeaudio`, `pnpm test:typeaudio`, `pnpm build:typeaudio`, then
 `pnpm --filter typeaudio-site test:browser`. The agent-project browser suite must
-open all six fixtures, produce nonzero stereo PCM, edit parameters/code and space,
+open the example, produce nonzero stereo PCM, edit controls/code and space,
 save/reopen and reproduce the edited WAV, retain reload state, reject stale/invalid
 imports and pass the mobile viewport flow. Existing state/timeline/import suites
 must remain green. A mobile viewport is not a physical-device audio test.
@@ -162,7 +171,9 @@ and the owner's SwiftShader measurement boundary.
 
 Function sounds use the engine's `typeaudio.function-graph` document inside the existing source patch.
 The editor imports raw engine documents through **Open project file…**. The protected project flow still creates a recovery copy.
-`?project=function-impact` opens the same bundled, source-only example.
+**New function sound** opens the bundled, source-only function source
+(`website/functions/function-sound.json`). The retired link `?project=function-impact`
+opens the same starting point.
 
 1. Select **New function sound** in Project or File.
 2. Select an instance to inspect its pins and open its complete TypeShade module.

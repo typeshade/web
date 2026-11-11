@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { chromium, type Page } from "playwright-core";
 import { preview } from "vite";
 import { readCode, writeCode } from "./check-code-input.ts";
+import { graphProject } from "./check-graph-project.ts";
 
 const server = await preview({
   configFile: "website/vite.config.ts",
@@ -58,7 +59,18 @@ try {
       .isVisible(),
     true,
   );
-  await open(p, "frieren-red-A");
+  // A picture project with one procedural sound, opened from a file.
+  await p.locator("#project-file").setInputFiles({
+    name: "graph-study.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(graphProject())),
+  });
+  await p.waitForFunction(
+    () =>
+      JSON.parse(localStorage.getItem("typeaudio.editor.document.v1")!)?.scene
+        .origin?.id === "graph-study",
+  );
+  await ready(p);
   // Real wheel input, without locator scrolling, must reach formerly clipped controls.
   const properties = p.locator(".clip-properties > .panel-body"),
     bounds = await properties.boundingBox();
@@ -87,7 +99,7 @@ try {
       (k) => localStorage.getItem(k),
       historyKey,
     );
-  await p.locator('[data-preview="frieren-red-B"]').click();
+  await p.locator('[data-preview="unseen-force-wall-hit"]').click();
   await p.waitForFunction(
     () =>
       document
@@ -107,7 +119,7 @@ try {
   );
   await p.locator(".preview-status button").click();
   // Stopping a pending preview cannot schedule audio after its worker finishes.
-  await p.locator('[data-preview="frieren-force-B"]').click();
+  await p.locator('[data-preview="unseen-force-wall-hit"]').click();
   await p.locator(".preview-status button").click();
   await p.waitForTimeout(300);
   assert.equal(await p.locator(".preview-status").count(), 0);
@@ -129,9 +141,9 @@ try {
       "Initial node framing stays inside the contextual canvas",
     );
   }
-  await p.locator("#code-tab-node-material").click();
+  await p.locator("#code-tab-node-impact").click();
   const applied = beforePreview.scene.cues[0].patch.graph.nodes.find(
-    (n: any) => n.id === "material",
+    (n: any) => n.id === "impact",
   ).code;
   const draft = applied + "\n// unfinished, must survive save\nout =";
   await writeCode(p, draft);
@@ -145,12 +157,12 @@ try {
     Object.values(file.editor.drafts).some((d: any) => d.text === draft),
   );
   assert.equal(
-    file.scene.cues[0].patch.graph.nodes.find((n: any) => n.id === "material")
+    file.scene.cues[0].patch.graph.nodes.find((n: any) => n.id === "impact")
       .code,
     applied,
   );
   await p.screenshot({ path: `${output}/contextual-source.png` });
-  await open(p, "frieren-red-B");
+  await open(p, "unseen-force-wall-hit");
   const copy = p
     .locator("[data-saved-project]")
     .filter({ hasText: "UX edited A" });
@@ -163,7 +175,7 @@ try {
   );
   await ready(p);
   await p.locator("#edit-cue-sound").click();
-  await p.locator("#code-tab-node-material").click();
+  await p.locator("#code-tab-node-impact").click();
   assert.equal(
     await readCode(p),
     draft,
@@ -172,7 +184,7 @@ try {
   await p.reload();
   await ready(p);
   await p.locator("#edit-cue-sound").click();
-  await p.locator("#code-tab-node-material").click();
+  await p.locator("#code-tab-node-impact").click();
   assert.equal(
     await readCode(p),
     draft,
@@ -193,7 +205,7 @@ try {
   // Make the checkpoint distinct so deduplication cannot bypass the failure.
   await p.locator("#scene-name").fill("Quota guard");
   const unsaved = await stored(p);
-  await p.locator('[data-project="frieren-force-A"]').click();
+  await p.locator('[data-project="unseen-force-wall-hit"]').click();
   await p
     .locator("#status")
     .filter({ hasText: "Could not preserve" })
@@ -278,10 +290,10 @@ try {
   await mobile.setViewportSize({ width: 390, height: 844 });
   await task(mobile, "Edit");
   await mobile
-    .getByRole("spinbutton", { name: "Character value", exact: true })
+    .getByRole("spinbutton", { name: "Texture value", exact: true })
     .fill("0.6");
   await mobile
-    .getByRole("spinbutton", { name: "Character value", exact: true })
+    .getByRole("spinbutton", { name: "Texture value", exact: true })
     .blur();
   assert.equal(
     (await stored(mobile)).scene.cues[0].patch.graph.parameters[3].value,
@@ -289,7 +301,7 @@ try {
   );
   await mobile.screenshot({ path: `${output}/mobile-edit.png` });
   await mobile.locator("#edit-cue-sound").click();
-  await mobile.locator("#code-tab-node-material").click();
+  await mobile.locator("#code-tab-node-impact").click();
   assert.equal(await readCode(mobile), draft);
   await task(mobile, "Listen");
   await ready(mobile);
@@ -307,9 +319,9 @@ try {
     viewport: { width: 1280, height: 900 },
   });
   linked.on("pageerror", (error) => errors.push(error.message));
-  await linked.goto("http://127.0.0.1:4197/?project=frieren-red-A");
+  await linked.goto("http://127.0.0.1:4197/?project=unseen-force-wall-hit");
   await ready(linked);
-  assert.equal((await stored(linked)).scene.origin.id, "frieren-red-A");
+  assert.equal((await stored(linked)).scene.origin.id, "unseen-force-wall-hit");
   assert.equal(
     await linked.locator("#editor-main").getAttribute("data-workspace"),
     "picture",
