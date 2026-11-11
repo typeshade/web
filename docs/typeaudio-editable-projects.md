@@ -94,7 +94,11 @@ Drafts are bounded to 256 entries, 32,768 characters per buffer and 2 MB total.
 Drafts may contain incomplete or invalid code; saving never compiles or applies them.
 The running sound and exported WAV use applied code in `scene.cues[].patch.graph`.
 Direct links such as `/?project=frieren-red-A` open an allowlisted catalog project
-through the same checkpoint and validation flow.
+through the same checkpoint and validation flow. The editor then shows the project
+at `/studio/video/?project=frieren-red-A` (or `/studio/?…` in Sound); reloading that
+URL returns to the working document instead of reopening the example. A saved copy
+shows as `?copy=<id>`. `/` is the start screen; leaving the editor for it runs the
+same checkpoint first.
 Complete version-1 source fixtures remain valid agent handoffs; the editor adds its
 working state when users save them. Older editors reject version 2 explicitly.
 

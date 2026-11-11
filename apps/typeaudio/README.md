@@ -31,6 +31,29 @@ are ignored. Vite builds each worker as one module to preserve resident array
 identity even when its URL contains a query string. The separate Vite application
 preserves this compiler pipeline; it consumes the web workspace's shared UI tokens.
 
+## Start screen and project URLs
+
+`/` opens a start screen. **New project** starts from the editor's existing
+templates: an empty project, a procedural sound, a function sound or a picture
+composition. **Recent** lists the saved copies in this browser with when each was
+saved, its layer count and length. **Examples** opens the three Frieren passages
+(A and B) and `function-impact`. **Open a project file** accepts a chosen or
+dropped `.json` file; `decodeProject` validates it before the editor opens, so an
+invalid file leaves the start screen in place with the reason.
+
+The editor is at `/studio/` (Sound) and `/studio/video/` (Picture). Its URL names
+the open project: `?project=<example id>` or `?copy=<saved copy id>`. A new
+project or an imported file has no query; it is the working document. Reload or a
+bookmark returns to the working document when it is the named project, and
+otherwise opens that project through the usual checkpoint. The link published
+before the start screen, `/?project=<example id>`, still opens the example in the
+editor directly.
+
+**Projects** in the document bar, and Back, return to the start screen. Both first
+keep the work in **Saved copies**, the same checkpoint that runs before another
+project opens. If that copy cannot be written, the editor stays open with the
+reason and the work is unchanged.
+
 ## Editable agent projects
 
 The Project browser starts with agent projects, **Open project file…** and
@@ -369,8 +392,9 @@ disabling new publishing; two repositories must not deploy this Worker together.
 
 ## Component workspace
 
-The UI is a React application under `website/editor/`. Both `/` (Sound) and
-`/studio/video/` (Picture) load the same editor. Switching workspaces retains the
+The UI is a React application under `website/editor/`. `/` (start screen),
+`/studio/` (Sound) and `/studio/video/` (Picture) load the same application;
+`pages/StudioApp.tsx` chooses the start screen or the editor without a reload. Switching workspaces retains the
 project, selected layer and in-memory local video. A selected procedural layer's
 sound is edited directly in Sound and immediately updates that layer's patch.
 When an imported audio clip is selected, Sound edits the independent source draft;
@@ -491,7 +515,8 @@ project copies remain until explicitly removed.
 
 `test:browser` runs the workspace, state, device-loss, interaction, sound-design,
 timeline, audio-import, graph, node-workspace, code-workspace, code-language,
-feedback, agent-project, editor-UX and node-code browser suites. They cover actual live processing,
+feedback, agent-project, editor-UX, node-code, function-authoring, composition and
+start-screen browser suites. They cover actual live processing,
 query-bearing CPU/WebGPU workers and PCM parity, project and patch exchange,
 shared selected-layer editing, waveform clip dragging, keyboard/undo/redo,
 transport and video loops, mobile layout and mocked YouTube recovery. Timeline
