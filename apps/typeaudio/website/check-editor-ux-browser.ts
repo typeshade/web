@@ -290,10 +290,10 @@ try {
   await mobile.setViewportSize({ width: 390, height: 844 });
   await task(mobile, "Edit");
   await mobile
-    .getByRole("spinbutton", { name: "Character value", exact: true })
+    .getByRole("spinbutton", { name: "Texture value", exact: true })
     .fill("0.6");
   await mobile
-    .getByRole("spinbutton", { name: "Character value", exact: true })
+    .getByRole("spinbutton", { name: "Texture value", exact: true })
     .blur();
   assert.equal(
     (await stored(mobile)).scene.cues[0].patch.graph.parameters[3].value,
