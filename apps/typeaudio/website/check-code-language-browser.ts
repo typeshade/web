@@ -47,7 +47,7 @@ try {
       }
     };
   });
-  await p.goto("http://127.0.0.1:4196");
+  await p.goto("http://127.0.0.1:4196/studio/");
   assert.equal(
     await p.evaluate(() => (window as any).languageWorkers),
     0,

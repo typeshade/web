@@ -84,7 +84,7 @@ try {
       }
     };
   });
-  await p.goto(base);
+  await p.goto(base + "/studio/");
   await p
     .getByRole("button", { name: "+ New procedural sound", exact: true })
     .click();

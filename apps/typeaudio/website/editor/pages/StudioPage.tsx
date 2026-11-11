@@ -23,7 +23,15 @@ import { CommandPalette } from "../components/organisms/chrome/CommandPalette.ts
 import { useFunctionEditor } from "../hooks/functions/useFunctionEditor.ts";
 import { useFunctionDocuments } from "../hooks/functions/useFunctionDocuments.ts";
 import { FunctionCodeDock } from "../components/organisms/functions/FunctionCodeDock.tsx";
-export function StudioPage() {
+import { useProjectLaunch } from "../hooks/project/useProjectLaunch.ts";
+import type { LaunchRequest } from "../hooks/session/useAppRoute.ts";
+export function StudioPage({
+  launch,
+  onExit,
+}: {
+  launch: LaunchRequest;
+  onExit: () => void;
+}) {
   const e = useEditor(),
     layout = useWorkspaceLayout(),
     selection = useSoundSelection(e),
@@ -56,11 +64,13 @@ export function StudioPage() {
     commands.commands.push(...extra.commands);
   }
   useEditorShortcuts(e);
+  const { leave } = useProjectLaunch(e, launch, onExit);
   return (
     <WorkspaceShell
       editor={e}
       projectFile={projectFile}
       onCommands={() => palette.open()}
+      onProjects={leave}
     >
       <WorkspaceGrid
         workspace={e.state.workspace}

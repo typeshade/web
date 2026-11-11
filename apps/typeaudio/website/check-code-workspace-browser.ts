@@ -65,7 +65,7 @@ try {
       }
     };
   });
-  await p.goto(base);
+  await p.goto(base + "/studio/");
   assert.equal(
     await p.evaluate(() =>
       performance

@@ -47,7 +47,7 @@ export function AppMenuBar({
     <>
       <header className="app-menubar">
         <a
-          href="/"
+          href="/studio/"
           className="app-brand"
           onClick={(event) => {
             event.preventDefault();

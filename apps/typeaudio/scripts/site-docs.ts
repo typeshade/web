@@ -6,7 +6,7 @@ const source = 'https://github.com/typeshade/typeaudio/blob/575b42baa13ee666cc05
 const escape = (s: string): string => s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 const css = '<link rel="stylesheet" href="/docs.css">';
 const nav = names.map(n => `<a href="/docs/${n}/">${n.replaceAll('-', ' ')}</a>`).join('');
-const urls = ['https://audio.typeshade.dev/', 'https://audio.typeshade.dev/studio/video/'];
+const urls = ['https://audio.typeshade.dev/', 'https://audio.typeshade.dev/studio/', 'https://audio.typeshade.dev/studio/video/'];
 for (const name of names) {
   const markdown = await readFile(`../../sources/typeaudio/docs/${name}.md`, 'utf8');
   let body = await marked.parse(markdown);

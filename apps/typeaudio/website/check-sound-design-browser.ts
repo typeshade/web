@@ -83,7 +83,7 @@ try {
       }
     };
   });
-  await p.goto(base);
+  await p.goto(base + "/studio/");
   await p.getByRole("button", { name: "Sounds", exact: true }).click();
   assert.equal(await p.locator("[data-recipe]").count(), 3);
   await p.locator('[data-recipe="door"]').click();

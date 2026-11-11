@@ -11,11 +11,13 @@ export function WorkspaceShell({
   children,
   projectFile,
   onCommands,
+  onProjects,
 }: {
   editor: Editor;
   children: ReactNode;
   projectFile: RefObject<HTMLInputElement | null>;
   onCommands: () => void;
+  onProjects: () => void;
 }) {
   return (
     <div
@@ -27,7 +29,7 @@ export function WorkspaceShell({
         Skip to workspace
       </a>
       <AppMenuBar editor={e} file={projectFile} onCommands={onCommands} />
-      <DocumentBar editor={e} />
+      <DocumentBar editor={e} onProjects={onProjects} />
       <TransportBar editor={e} />
       <MobileTasks editor={e} />
       <div className="editor-body">

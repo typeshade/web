@@ -136,7 +136,7 @@ const errors: string[] = [];
 try {
   const p = await page();
   p.on("pageerror", (e) => errors.push(e.message));
-  await p.goto(base);
+  await p.goto(base + "/studio/");
   await p.locator("#audio-file").setInputFiles(input);
   await p.waitForFunction(
     () =>

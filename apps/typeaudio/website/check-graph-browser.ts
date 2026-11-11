@@ -113,7 +113,7 @@ try {
       }
     };
   });
-  await p.goto(base);
+  await p.goto(base + "/studio/");
   assert.equal(
     await p.evaluate(() => (window as any).compilerWorkers),
     0,

@@ -24,7 +24,7 @@ try {
   });
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("http://127.0.0.1:4194");
+  await page.goto("http://127.0.0.1:4194/studio/");
   await page.getByRole("button", { name: "File", exact: true }).click();
   assert.equal(
     await page.locator("#export-graph-reproduction").isDisabled(),

@@ -55,7 +55,7 @@ try {
       );
     };
   });
-  await p.goto(base);
+  await p.goto(base + "/studio/");
   await p.locator("#frequency").waitFor();
   await p.evaluate(() => {
     for (const [id, value] of [
@@ -214,7 +214,7 @@ try {
       terminate() {}
     };
   });
-  await delayedRender.goto(base);
+  await delayedRender.goto(base + "/studio/");
   await delayedRender.locator("#mode-render").click();
   await delayedRender.locator("#render").click();
   await delayedRender.waitForFunction(

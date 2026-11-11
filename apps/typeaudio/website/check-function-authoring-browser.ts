@@ -82,7 +82,7 @@ try {
       }
     };
   });
-  await p.goto("http://127.0.0.1:4201");
+  await p.goto("http://127.0.0.1:4201/studio/");
   await p
     .getByRole("button", { name: "+ New function sound", exact: true })
     .click();
