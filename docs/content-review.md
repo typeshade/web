@@ -312,15 +312,36 @@ no Korean block was translated again.
 
 The compiler pin move to `42550b11` (PR #61, 2026-11-11) changes the host-resource copy of the
 quick start, the WebGPU and WebGL2 page and the control-flow page, in English and in Korean.
-Milestone 3 of change 0138 is done at this pin: a call on a `Buffer` or a `Uniform` does not
-block, data decides the device of a call, and on WebGL2 a `read()` waits on a fence. The
-authoring agent wrote the English against the pinned `CHANGELOG.md`, Rules 6.1, 8.21, 8.24 and
+At this pin a call of a kernel function that returns nothing or of a `@compute` entry takes a
+`Buffer` or a `Uniform` and does not block, and data decides the device of a call. Amendment A9
+of change 0138, merged after the pin as compiler `0975a3d8`, records that at `42550b11` every
+slice of A7's plan is done or moved, and that deviation D-i (a kernel function that returns a
+value on a resource) stays open for milestone 4. On WebGL2 a `read()` waits on a fence, but the
+WebGL2 tier still reads back inside the call (deviation D-c, open). The authoring agent wrote the English against the pinned `CHANGELOG.md`, Rules 6.1, 8.21, 8.24 and
 11.8 and the generated host view, then translated it into Korean with the same meaning. The
 quick start's host file was run on the CPU tier against the module the pin generates. Six Korean
 API entries (`array`, `zeros`, `uniform`, `Uniform`, `Buffer`, `Device`) follow the pinned
-JSDoc. Rules 3.9, 6.1, 7.5, 8.21, 8.23, 11.8, 11.13, 12.6 and 12.7 moved; the authoring agent read
-the pages that explain them in both locales and recorded the new fingerprints. Only the Korean
-algorithms tiers sentence changed, to the polite ending. No Luna subagent read these changes. The
-owner chose an editorial review by an independent agent of the session instead; its result is
-recorded on PR #61. No guide block of the English changed, so no Korean block was translated
+JSDoc. Ten rules changed: 3.9, 6.1, 7.5, 8.21, 8.23, 8.24, 11.8, 11.13, 12.6 and 12.7. No page
+records a fingerprint of Rule 8.24. The authoring agent read the pages that explain the other nine
+in both locales and recorded the new fingerprints. Only the Korean
+algorithms tiers sentence changed, to the polite ending. No Luna subagent read these changes. An
+independent agent of the same session reviewed commit `cc03180`, as for PR #52, PR #54, PR #55
+and PR #56: this is the deviation the owner chose. It read the pinned sources, ran the quick
+start's host file on the CPU tier and compiled the `TS8079` trigger and fix. It reported
+1 blocking finding, 7 should-fix findings and 9 notes. Applied: B1 (the quick start says that a
+kernel function that returns nothing takes a resource), S1 (a `Uniform` takes no part in the
+choice of a call's device; the refusal of an exported storage array between a write and
+`read()`; a draw and a `fuse()` scope keep the default owner in a `device.use()` block), S2 (the
+WebGL2 read back inside the call, D-c, beside the fence, on the page and in
+`compiler-changes.md`), S3 (an array a call on a resource writes must be a `Buffer` or a
+`Resident`; the runtime as the actor; the draw), S4 (this record), S5 (`compiler-changes.md`
+cites A9 and does not call milestone 3 done; the host reads the `Buffer`), S6 ("인자" for an
+argument), S7 (the Korean `Device.use` stack sentence), N1 (the `use()` caution on the WebGPU
+and WebGL2 page), N2 (an entry call refuses the `Buffer` of a sized exported array), N3 (a
+kernel function that returns a value throws a `TypeError` on a resource), N4 (a `Buffer` keeps
+the error of a failed call), N5 (the `1` is the workgroup count), N7 (the Korean `array`,
+`Buffer` and `Uniform` descriptions) and N8 (the long lines of `compiler-changes.md`). Not
+applied: N6 (the page keeps both "owner" and "device", as Rule 11.8 does; one term per page
+would touch `deviceP`, which the review found correct), the `Device.dispose` point of N7 (the
+review found it acceptable), and N9 (no change asked). No guide block of the English changed, so no Korean block was translated
 again; `the-cpu-oracle` is still shown in English.
